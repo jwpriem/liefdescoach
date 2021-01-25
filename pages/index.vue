@@ -1,7 +1,7 @@
 <template>
   <section>
     <header class="grid md:grid-cols-2 grid-cols-1 relative">
-      <div class="absolute top-0 left-0 m-6">
+      <div class="md:absolute top-0 left-0 m-6">
         <div class="w-full text-pink-300 flex justify-start items-center p-8">
           <span class="text-gray-700 text-3xl font-black">
             Liefdescoach
