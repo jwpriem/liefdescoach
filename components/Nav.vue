@@ -1,8 +1,8 @@
 <template>
   <div>
-    <div class="block md:hidden flex justify-between items-center p-6">
+    <div class="block md:hidden flex justify-between items-center p-6 bg-white">
       <svg class="w-12 h-12 inline-block stroke-current text-rose-600 z-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="{2}" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
-      <div class="bg-rose-600 text-white rounded-full h-12 w-12 flex justify-center items-center z-50" @click="toggle">
+      <div class="bg-rose-600 text-white rounded-full h-12 w-12 flex justify-center items-center z-50 shadow-xl fixed top-0 right-0 m-6" @click="toggle">
         <svg
           v-if="!navOpen"
           class="w-6 h-6 inline-block stroke-current text-white"
@@ -10,7 +10,7 @@
           stroke="currentColor"
           viewBox="0 0 24 24"
           xmlns="http://www.w3.org/2000/svg"
-        ><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="{2}" d="M4 6h16M4 12h16m-7 6h7" /></svg>
+        ><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
         <svg
           v-if="navOpen"
           class="w-6 h-6 inline-block stroke-current text-white"
@@ -18,7 +18,7 @@
           stroke="currentColor"
           viewBox="0 0 24 24"
           xmlns="http://www.w3.org/2000/svg"
-        ><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="{2}" d="M6 18L18 6M6 6l12 12" /></svg>
+        ><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
       </div>
       <div :class="navOpen ? 'left-0 ml-0' : 'ml-96'" class="transition-all duration-300 ease-in-out fixed top-0 bg-white min-h-screen flex justify-start items-center text-center z-40 w-screen">
         <ul class="w-full space-y-8">

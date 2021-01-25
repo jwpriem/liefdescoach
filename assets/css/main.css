@@ -34,8 +34,12 @@ h6 {
   @apply text-lg;
 }
 
+.intro {
+  @apply text-gray-800 text-lg font-light;
+}
+
 .button {
-  @apply rounded-xl font-bold text-lg p-6 cursor-pointer inline-block transition-all duration-300 ease-in-out antialiased;
+  @apply rounded-xl font-bold text-lg p-4 md:p-6 cursor-pointer inline-block transition-all duration-300 ease-in-out antialiased;
 
   &:hover {
     @apply shadow-xl;
