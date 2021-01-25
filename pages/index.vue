@@ -2,7 +2,7 @@
   <section>
     <header class="grid md:grid-cols-2 grid-cols-1">
       <div class="flex justify-center items-center md:p-16 p-8">
-        <h1 class="md:text-6xl text-2xl">
+        <h1 class="md:text-6xl text-2xl text-gray-600">
           <span class="text-pink-300">Liefdescoach</span> voor jezelf of samen
         </h1>
       </div>
