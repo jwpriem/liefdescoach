@@ -12,7 +12,12 @@ h6 {
 }
 
 h1 {
-  @apply text-4xl;
+  @apply text-4xl relative z-10;
+
+  &:before {
+  @apply absolute h-6 bottom-0 left-0 -mb-1 -ml-2 bg-rose-600 bg-opacity-25 z-0 block w-1/2;
+  content: '';
+   }
 }
 
 h2 {
@@ -27,4 +32,26 @@ h4,
 h5,
 h6 {
   @apply text-lg;
+}
+
+.button {
+  @apply rounded-xl font-bold text-lg p-6 cursor-pointer inline-block transition-all duration-300 ease-in-out antialiased;
+
+  &:hover {
+    @apply shadow-xl;
+  }
+
+   &.rose {
+  @apply bg-rose-600 text-white;
+  &:hover {
+  @apply bg-rose-700;
+   }
+    }
+
+    &.gray {
+  @apply bg-gray-200 text-rose-600;
+&:hover {
+   @apply bg-gray-300;
+ }
+     }
 }

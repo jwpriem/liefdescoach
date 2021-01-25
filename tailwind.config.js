@@ -4,12 +4,17 @@
 ** Docs: https://tailwindcss.com/docs/configuration
 ** Default: https://github.com/tailwindcss/tailwindcss/blob/master/stubs/defaultConfig.stub.js
 */
+const colors = require('tailwindcss/colors')
+
 module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        display: ['Dancing Script', 'cursive'],
-        body: ['EB Garamond', 'sans-serif']
+        display: ['Montserrat', 'sans-serif'],
+        body: ['Source Sans Pro', 'sans-serif']
+      },
+      colors: {
+        rose: colors.rose
       }
     }
   },

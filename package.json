@@ -11,8 +11,13 @@
     "lint": "yarn lint:js"
   },
   "dependencies": {
+    "@tailwindcss/postcss7-compat": "^2.0.2",
+    "autoprefixer": "^9",
     "core-js": "^3.6.5",
-    "nuxt": "^2.14.6"
+    "nuxt": "^2.14.6",
+    "postcss": "^7",
+    "postcss-nested": "^5.0.3",
+    "tailwindcss": "npm:@tailwindcss/postcss7-compat"
   },
   "devDependencies": {
     "@nuxtjs/eslint-config": "^3.1.0",
