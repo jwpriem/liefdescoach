@@ -38,20 +38,22 @@
         </nuxt-link>
       </div>
     </Header>
-    <div id="weesJezelf" class="container mx-auto p-8 md:px-0 md:py-24">
-      <div class="flex justify-center items-center">
-        <div class="w-full md:w-1/2 md:text-center space-y-8">
-          <h2 class="text-2xl md:text-4xl uppercase font-black text-gray-800">
-            <span class="pink-underline">Niet jezelf kunnen zijn</span><span class="text-rose-600">.</span>
-          </h2>
-          <p class="text-2xl">
-            <span class="text-rose-600 font-bold">Gewoon jezelf zijn</span>. Dat klinkt zo makkelijk toch? Het is volgens bepaalde onderzoeken toch dé reden waarom relaties eindigen. Als één van de twee zichzelf niet kan zijn en het gevoel heeft zich anders voor te moeten doen om zo leuk gevonden te worden dan is dit extreem vermoeiend en onhoudbaar. Betekent dit dat als je jezelf blijft de kans op een goede relatie kleiner is?
-          </p>
-          <svg class="w-8 h-8 inline-block stroke-current text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="{2}" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+    <div class="bg-gray-100">
+      <div id="weesJezelf" class="container mx-auto p-8 md:px-0 md:py-24">
+        <div class="flex justify-center items-center">
+          <div class="w-full md:w-1/2 md:text-center space-y-8">
+            <h2 class="text-2xl md:text-4xl uppercase font-black text-gray-800">
+              <span class="pink-underline">Niet jezelf kunnen zijn</span><span class="text-rose-600">.</span>
+            </h2>
+            <p class="text-2xl">
+              <span class="text-rose-600 font-bold">Gewoon jezelf zijn</span>. Dat klinkt zo makkelijk toch? Het is volgens bepaalde onderzoeken toch dé reden waarom relaties eindigen. Als één van de twee zichzelf niet kan zijn en het gevoel heeft zich anders voor te moeten doen om zo leuk gevonden te worden dan is dit extreem vermoeiend en onhoudbaar. Betekent dit dat als je jezelf blijft de kans op een goede relatie kleiner is?
+            </p>
+            <svg class="w-8 h-8 inline-block stroke-current text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="{2}" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+          </div>
         </div>
       </div>
     </div>
-    <div class="bg-gray-100 p-8 md:px-0 md:py-24">
+    <div class="p-8 md:px-0 md:py-24">
       <div class="container mx-auto">
         <div class="md:flex justify-between items-center md:space-x-12 space-y-8 md:space-y-0">
           <div class="w-full md:w-1/2">
