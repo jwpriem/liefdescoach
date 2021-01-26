@@ -5,24 +5,24 @@
         <span class="pink-underline">Liefdescoach</span><span class="text-rose-600">.</span>
       </h1>
       <p class="intro">
-        Problemen in de liefde kennen we allemaal en soms hebben we gewoon iemand nodig die naar je luistert en je gewoon zegt waar het op staat. Dingen die je misschien niet direct van je vriendinnen hoort.
+        Problemen in de liefde kennen we allemaal en soms hebben we iemand nodig die naar je luistert en je onafhankelijk adviseert. Dingen die je misschien niet direct van je vrienden of vriendinnen hoort.
       </p>
       <div>
         <p class="intro">
           Topics waar je aan kunt denken:
         </p>
         <ul class="intro">
-          <li class="flex justify-start items-center space-x-3 cursor-pointer" @click="scrollTo('#weesJezelf')">
+          <li class="flex justify-start items-center space-x-3 cursor-pointer" @click="$lc.scrollTo('#weesJezelf')">
             <svg class="w-6 h-6 inline-block stroke-current text-rose-600 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="{2}" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
             <p>Niet jezelf kunnen zijn</p>
             <svg class="w-3 h-3 inline-block stroke-current" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
           </li>
-          <li class="flex justify-start items-center space-x-3 cursor-pointer" @click="scrollTo('#onlineDating')">
+          <li class="flex justify-start items-center space-x-3 cursor-pointer" @click="$lc.scrollTo('#onlineDating')">
             <svg class="w-6 h-6 inline-block stroke-current text-rose-600 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="{2}" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
             <p>(Online) dating</p>
             <svg class="w-3 h-3 inline-block stroke-current" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
           </li>
-          <li class="flex justify-start items-center space-x-3" @click="scrollTo('#twijfels')">
+          <li class="flex justify-start items-center space-x-3" @click="$lc.scrollTo('#twijfels')">
             <svg class="w-6 h-6 inline-block stroke-current text-rose-600 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="{2}" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
             <p>Twijfels over je relatie</p>
             <svg class="w-3 h-3 inline-block stroke-current" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
@@ -66,7 +66,7 @@
               <span class="pink-underline">(Online) dating</span><span class="text-rose-600">.</span>
             </h2>
             <p class="intro">
-              Vind je het eng of heb je er gewoon genoeg van omdat het maar niet lijkt te lukken? Er zijn talloze redenen om te beginnen maar ook om te stoppen met daten, of dit nu online of offline is. Wat werkt er voor jou wel of niet? En misschien wel het belangrijkste .... <span class="font-bold">waarom</span> dan wel of niet?
+              Vind je het eng of heb je er gewoon genoeg van omdat het maar niet lijkt te lukken? Er zijn talloze redenen om te beginnen maar ook om te stoppen met daten. Of dit nu online of offline is. Wat werkt er voor jou wel of niet?
             </p>
           </div>
         </div>
@@ -80,7 +80,7 @@
               <span class="pink-underline">Twijfels over je relatie</span><span class="text-rose-600">.</span>
             </h2>
             <p class="intro">
-              Soms lijkt het alsof je jezelf helemaal gek kunt maken met vragen die in je hoofd malen. Zijn deze twijfels gegrond of zijn het slechts paniekzaaiers. Hoe ga je er mee om en wat kun je het beste doen?
+              Soms lijkt het alsof je jezelf helemaal gek kunt maken met vragen. Zijn deze twijfels gegrond? Hoe ga je er mee om en hoe kom je hier achter?
             </p>
           </div>
           <div class="w-full md:w-1/2 space-y-6 text-center">
@@ -92,7 +92,7 @@
                 Waarom ben ik altijd degene die....
               </li>
               <li>
-                Ik ben jaloers, mag dat?
+                Help! Ik ben jaloers, mag dat?
               </li>
             </ul>
             <svg class="w-10 h-10 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -108,13 +108,6 @@ import Header from '@/components/Header'
 export default {
   components: {
     Header
-  },
-  methods: {
-    scrollTo (id) {
-      document.querySelector(id).scrollIntoView({
-        behavior: 'smooth'
-      })
-    }
   }
 }
 </script>

@@ -5,10 +5,10 @@
         <span class="pink-underline">Kosten</span><span class="text-rose-600">.</span>
       </h1>
       <p class="intro">
-        Ik vind het belangrijk dat je comfortabel en vertrouwt bij me voelt. Om dit te ervaring plan ik graag een kennismakingsessie in waar we in 20 minuutjes gratis en vrijblijvend elkaar iets beter leren kennen. Ben je overtuigt? Dan plannen we gelijk de eerste sessie. Een sessie duurt een uur en kost &euro; 75,-. We kunnen digitaal via Zoom of kom bij me zitten in een lekkere stoel. Ga je liever een rondje lopen samen dat kan dit natuurlijk ook.
+        Ik vind het belangrijk dat je comfortabel en vertrouwt bij me voelt. Om dit te ervaren plan ik graag vrijblijvend en kosteloos een kennismakingsgesprek in waar we in 20 minuutjes elkaar iets beter leren kennen. Ben je overtuigt? Dan plannen we gelijk de eerste sessie. Een sessie duurt circa een uur en kost &euro; 75,-. We kunnen bellen, met of zonder beeld (via Zoom) of ga je liever een rondje samen lopen. Wat jij prettig vind.
       </p>
       <nuxt-link to="/intake" class="rose button">
-        Plan intake
+        Plan gesprek
       </nuxt-link>
     </Header>
   </div>

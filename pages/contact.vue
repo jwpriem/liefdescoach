@@ -4,19 +4,37 @@
       <h1 class="text-3xl md:text-6xl uppercase font-black text-gray-800">
         <span class="pink-underline">Stuur een bericht</span><span class="text-rose-600">.</span>
       </h1>
-      <div class="mt-8 space-y-3">
-        <div>
-          <label class="font-bold uppercase text-rose-600">Naam:<sup>*</sup></label>
-          <input v-model="form.name" type="text" class="p-4 bg-gray-200 w-full">
-        </div>
-        <div>
-          <label class="font-bold uppercase text-rose-600">Email:<sup>*</sup></label>
-          <input v-model="form.email" type="text" class="p-4 bg-gray-200 w-full">
-        </div>
-        <div>
-          <label class="font-bold uppercase text-rose-600">Bericht:<sup>*</sup></label>
-          <textarea v-model="form.message" rows="4" type="text" class="p-4 bg-gray-200 w-full" />
-        </div>
+      <div class="mt-8 space-y-3 darkForm">
+        <LCInput
+          id="naam"
+          v-model="form.name"
+          label="Naam"
+          :required="true"
+          :error="this.$lc.getErrorMessage('name', errors)"
+          type="text"
+          placeholder="Je naam"
+          class="w-full"
+        />
+        <LCInput
+          id="email"
+          v-model="form.email"
+          label="E-mail"
+          :required="true"
+          :error="this.$lc.getErrorMessage('email', errors)"
+          type="text"
+          placeholder="Je e-mailadres"
+          class="w-full"
+        />
+        <LCTextarea
+          id="bericht"
+          v-model="form.message"
+          label="Bericht"
+          :rows="4"
+          :required="true"
+          :error="this.$lc.getErrorMessage('message', errors)"
+          placeholder="Waar gaat het over?"
+          class="w-full"
+        />
         <div class="button rose" @click="send">
           <svg v-if="loading" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle
@@ -37,15 +55,21 @@
 </template>
 
 <script>
-import Header from '@/components/Header'
 import { required, email } from 'vuelidate/lib/validators'
+import Header from '~/components/Header'
+import LCInput from '~/components/forms/LCInput'
+import LCTextarea from '~/components/forms/LCTextarea'
+
 export default {
   components: {
-    Header
+    Header,
+    LCInput,
+    LCTextarea
   },
   data () {
     return {
       loading: false,
+      errors: [],
       form: {
         name: '',
         email: '',
@@ -73,6 +97,11 @@ export default {
     send () {
       this.$v.form.$touch()
 
+      if (this.$v.form.$invalid) {
+        this.errors = this.$lc.setErrorMessages(this.$v.form)
+        this.$message.error('1 of meerdere velden bevatten fouten')
+      }
+
       if (!this.$v.form.$invalid) {
         this.loading = true
         const message = 'Het contactformulier is ingevuld.<br>' + '<b>Naam:</b> ' + this.form.name + '<br>' + '<b>Email:</b> ' + this.form.email + '<br>' + '<b>Bericht:</b> ' + this.form.message + '<br>'
@@ -83,6 +112,7 @@ export default {
           html: message,
           to: 'ravennah@liefdes.coach'
         }).then(() => {
+          this.$message.success('Je bericht is verzonden!')
           this.loading = false
 
           this.form.name = ''

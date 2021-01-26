@@ -80,8 +80,8 @@
           </nuxt-link>
         </li>
       </ul>
-      <nuxt-link class="fixed bottom-0 right-0 m-4 rounded-xl font-bold text-lg px-4 py-2 bg-rose-600 text-white hover:bg-rose-500 cursor-pointer inline-block transition-all duration-300 ease-in-out antialiased" to="/contact">
-        Intake
+      <nuxt-link class="fixed bottom-0 right-0 m-4 rounded-xl font-bold text-lg px-4 py-2 bg-rose-600 text-white hover:bg-rose-500 cursor-pointer inline-block transition-all duration-300 ease-in-out antialiased" to="/intake">
+        Kennismaking
       </nuxt-link>
     </nav>
   </div>
