@@ -45,7 +45,7 @@
         </ul>
       </div>
     </div>
-    <nav class="hidden md:block w-full p-6 fixed top-0 left-0 bg-white">
+    <nav class="hidden md:block w-full p-6 fixed z-50 top-0 left-0 bg-white">
       <ul class="flex justify-center items-center space-x-10 text-lg text-gray-800 uppercase font-light">
         <li>
           <nuxt-link class="nav-item" to="/">

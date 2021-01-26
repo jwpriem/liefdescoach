@@ -1,5 +1,5 @@
 body {
-  @apply font-body text-sm text-gray-600 antialiased;
+  @apply font-body text-gray-600 antialiased;
 }
 
 h1,
@@ -8,24 +8,19 @@ h3,
 h4,
 h5,
 h6 {
-  @apply font-display text-xl font-bold text-gray-900 antialiased;
+  @apply font-display text-xl font-bold text-gray-900 antialiased uppercase;
 }
 
 h1 {
-  @apply text-4xl relative z-10;
-
-  &:before {
-  @apply absolute h-6 bottom-0 left-0 -mb-1 -ml-2 bg-rose-600 bg-opacity-25 z-0 block w-1/2;
-  content: '';
-   }
+  @apply text-6xl;
 }
 
 h2 {
-  @apply text-3xl;
+  @apply text-5xl;
 }
 
 h3 {
-  @apply text-2xl;
+  @apply text-4xl;
 }
 
 h4,
@@ -36,6 +31,14 @@ h6 {
 
 .intro {
   @apply text-gray-800 text-lg font-light;
+}
+
+.pink-underline {
+@apply relative z-10;
+&:before {
+   @apply absolute h-6 bottom-0 left-0 -mb-1 -ml-2 bg-rose-600 bg-opacity-25 z-0 block w-1/2;
+   content: '';
+ }
 }
 
 .button {

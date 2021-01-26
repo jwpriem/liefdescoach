@@ -1,7 +1,7 @@
 <template>
   <div>
     <Header>
-      <h1 class="text-3xl md:text-6xl uppercase font-black text-gray-800">
+      <h1 class="text-3xl md:text-6xl uppercase font-black text-gray-800 pink-underline">
         Liefdescoach<span class="text-rose-600">.</span>
       </h1>
       <p class="intro">
@@ -35,6 +35,27 @@
         </nuxt-link>
       </div>
     </Header>
+    <div class="bg-gray-100 py-6 md:py-24">
+      <div class="container mx-auto">
+        <div class="md:flex justify-between items-center md:space-x-12">
+          <div class="w-full md:w-1/2">
+            <img
+              class="w-full h-64 md:h-96 object-center object-cover rounded-3xl shadow-xl"
+              src="https://images.unsplash.com/photo-1554774853-b415df9eeb92?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=1950&q=80
+"
+            >
+          </div>
+          <div class="w-full md:w-1/2 space-y-6">
+            <h2 class="text-2xl md:text-4xl uppercase font-black text-gray-800 pink-underline">
+              (Online) dating<span class="text-rose-600">.</span>
+            </h2>
+            <p class="intro">
+              Vind je het eng of heb je er gewoon genoeg van omdat het maar niet lijkt te lukken? Er zijn talloze redenen om te beginnen maar ook om te stoppen met daten, of dit nu online of offline is. Wat werkt er voor jou wel of niet? En misschien wel het belangrijkste .... <span class="font-bold">waarom</span> dan wel of niet?
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
