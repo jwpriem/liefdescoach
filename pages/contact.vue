@@ -1,8 +1,8 @@
 <template>
   <div class="">
     <Header image="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=1950&q=80">
-      <h1 class="text-3xl md:text-6xl uppercase font-black text-gray-800 pink-underline">
-        Stuur een bericht<span class="text-rose-600">.</span>
+      <h1 class="text-3xl md:text-6xl uppercase font-black text-gray-800">
+        <span class="pink-underline">Stuur een bericht</span><span class="text-rose-600">.</span>
       </h1>
       <div class="mt-8 space-y-3">
         <div>

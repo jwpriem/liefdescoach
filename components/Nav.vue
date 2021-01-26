@@ -1,7 +1,9 @@
 <template>
   <div>
     <div class="block md:hidden flex justify-between items-center p-6 bg-white">
-      <svg class="w-12 h-12 inline-block stroke-current text-rose-600 z-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="{2}" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+      <nuxt-link to="/">
+        <svg class="w-12 h-12 inline-block stroke-current text-rose-600 z-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="{2}" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+      </nuxt-link>
       <div class="bg-rose-600 text-white rounded-full h-12 w-12 flex justify-center items-center z-50 shadow-xl fixed top-0 right-0 m-6" @click="toggle">
         <svg
           v-if="!navOpen"
@@ -42,6 +44,11 @@
               Contact
             </nuxt-link>
           </li>
+          <li @click="toggle">
+            <nuxt-link class="button rose" to="/intake">
+              Intake
+            </nuxt-link>
+          </li>
         </ul>
       </div>
     </div>
@@ -58,7 +65,9 @@
           </nuxt-link>
         </li>
         <li>
-          <svg class="w-12 h-12 inline-block stroke-current text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="{2}" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+          <nuxt-link to="/">
+            <svg class="w-12 h-12 inline-block stroke-current text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="{2}" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+          </nuxt-link>
         </li>
         <li>
           <nuxt-link class="nav-item" to="/kosten">
@@ -71,6 +80,9 @@
           </nuxt-link>
         </li>
       </ul>
+      <nuxt-link class="fixed bottom-0 right-0 m-4 rounded-xl font-bold text-lg px-4 py-2 bg-rose-600 text-white hover:bg-rose-500 cursor-pointer inline-block transition-all duration-300 ease-in-out antialiased" to="/contact">
+        Intake
+      </nuxt-link>
     </nav>
   </div>
 </template>
@@ -100,7 +112,7 @@ export default {
 .mobile-nav-item {
   @apply text-2xl;
 }
-.nuxt-link-exact-active {
+.nav-item.nuxt-link-exact-active, .mobile-nav-item.nuxt-link-exact-active {
   @apply relative z-10 transition-all duration-300 ease-in-out antialiased;
 
   &:before {
