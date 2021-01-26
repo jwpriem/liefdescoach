@@ -56,7 +56,7 @@ export default {
 
   axios: {
     // 'X-Requested-With': 'XMLHttpRequest',
-    baseURL: isDev ? 'http://localhost:3000/' ? 'https:/www.liefdes.coach/',
+    baseURL: isDev ? 'http://localhost:3000/' ? 'https:/www.liefdes.coach/'
     // See https://github.com/nuxt-community/axios-module#options
   },
 
