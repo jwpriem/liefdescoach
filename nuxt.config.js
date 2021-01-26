@@ -56,7 +56,7 @@ export default {
 
   // See https://github.com/nuxt-community/axios-module#options
   axios: {
-    baseURL: isDev ? 'http://localhost:3000/' : 'https:/www.liefdes.coach/'
+    baseURL: isDev ? 'http://localhost:3000/' : 'https://www.liefdes.coach/'
   },
 
   mail: {
