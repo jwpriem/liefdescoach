@@ -35,9 +35,9 @@
         </nuxt-link>
       </div>
     </Header>
-    <div class="bg-gray-100 py-6 md:py-24">
+    <div class="bg-gray-100 p-8 md:px-0 md:py-24">
       <div class="container mx-auto">
-        <div class="md:flex justify-between items-center md:space-x-12">
+        <div class="md:flex justify-between items-center md:space-x-12 space-y-8 md:space-y-0">
           <div class="w-full md:w-1/2">
             <img
               class="w-full h-64 md:h-96 object-center object-cover rounded-3xl shadow-xl"

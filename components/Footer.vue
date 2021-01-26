@@ -1,7 +1,7 @@
 <template>
-  <footer class="bg-rose-500 text-white py-6 md:py-12">
+  <footer class="bg-rose-500 text-white p-8 md:px-0 md:py-12">
     <div class="container mx-auto">
-      <div class="md:flex justify-between items-start">
+      <div class="md:flex justify-between items-start space-y-8 md:space-y-0">
         <div class="w-full md:w-2/4">
           <svg class="w-12 h-12 block stroke-current text-white mb-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="{2}" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
           <small>&copy; www.liefdes.coach</small>
