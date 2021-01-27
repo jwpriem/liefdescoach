@@ -43,9 +43,16 @@ export default {
     // https://go.nuxtjs.dev/eslint
     '@nuxtjs/eslint-module',
     // https://go.nuxtjs.dev/tailwindcss
-    '@nuxtjs/tailwindcss'
-  ],
+    '@nuxtjs/tailwindcss',
+    '@nuxtjs/google-analytics'
 
+  ],
+  googleAnalytics: {
+    id: process.env.GA,
+    autoTracking: {
+      screenview: true
+    }
+  },
   // Modules (https://go.nuxtjs.dev/config-modules)
   modules: [
     '@nuxtjs/axios',

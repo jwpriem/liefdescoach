@@ -122,6 +122,12 @@ export default {
           this.$nextTick(() => {
             this.$v.$reset()
           })
+
+          this.$ga.event({
+            eventCategory: 'form',
+            eventAction: 'send',
+            eventLabel: 'contact'
+          })
         })
       }
     }
