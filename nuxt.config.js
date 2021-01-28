@@ -48,7 +48,7 @@ export default {
 
   ],
   googleAnalytics: {
-    id: process.env.GA,
+    id: 'G-DC62C58VLR',
     autoTracking: {
       screenview: true
     }
