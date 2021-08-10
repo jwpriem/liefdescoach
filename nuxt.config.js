@@ -43,22 +43,17 @@ export default {
     // https://go.nuxtjs.dev/eslint
     '@nuxtjs/eslint-module',
     // https://go.nuxtjs.dev/tailwindcss
-    '@nuxtjs/tailwindcss',
-    '@nuxtjs/google-analytics'
-
+    '@nuxtjs/tailwindcss'
   ],
-  googleAnalytics: {
-    id: 'G-DC62C58VLR',
-    autoTracking: {
-      screenview: true
-    }
-  },
   // Modules (https://go.nuxtjs.dev/config-modules)
   modules: [
     '@nuxtjs/axios',
-    'nuxt-mail'
+    'nuxt-mail',
+    '@nuxtjs/gtm'
   ],
-
+  gtm: {
+    id: 'GTM-PZP28PP'
+  },
   // Build Configuration (https://go.nuxtjs.dev/config-build)
   build: {
   },
