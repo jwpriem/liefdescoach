@@ -1,6 +1,9 @@
 const isDev = process.env.NODE_ENV !== 'production'
 
 export default {
+  env: {
+    openAi: process.env.OPENAI
+  },
   server: {
     port: isDev ? 3000 : 8080, // default: 3000
     host: isDev ? 'localhost' : '0.0.0.0' // default: localhost
