@@ -88,7 +88,7 @@ import LCInput from '~/components/forms/LCInput'
 
 const { Configuration, OpenAIApi } = require('openai')
 const configuration = new Configuration({
-  apiKey: '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'
+  apiKey: process.env.OPENAI
 })
 
 const openai = new OpenAIApi(configuration)
