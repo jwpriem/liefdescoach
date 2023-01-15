@@ -27,7 +27,7 @@
               Je kunt drie vragen stellen aan mijn digitale coach. Bijvoorbeeld '<i>Mijn partner lijkt zich de laatste tijd niet op zn gemak te voelen. Hoe komt dit?</i>' of '<i>Ik houd niet van online daten, wat zijn de alternatieven?</i>' <span class="text-rose-600 font-bold">Probeer het nu!</span>
             </p>
             <div class="grid grid-cols-12" v-for="(item, index) in conversation" :key="index">
-              <div class="col-start-6 col-end-13 p-2 rounded-lg" v-if="index % 2 === 0">
+              <div class="col-start-1 md:col-start-6 col-end-12 p-2 rounded-lg" v-if="index % 2 === 0">
                 <div class="flex items-center justify-start flex-row-reverse">
                   <div class="flex items-center justify-center h-10 w-10 rounded-full bg-white flex-shrink-0">
                     <svg class="w-6 h-6 inline-block stroke-current text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="{2}" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
@@ -37,7 +37,7 @@
                   </div>
                 </div>
               </div>
-              <div class="col-start-1 col-end-8 p-3 rounded-lg" v-else>
+              <div class="col-start-1 md:col-end-8 col-end-12 p-2 rounded-lg" v-else>
                 <div class="flex flex-row items-center">
                   <div class="flex items-center justify-center h-10 w-10 rounded-full bg-rose-600 text-white flex-shrink-0">
                     Jij
@@ -53,15 +53,21 @@
             </div>
 
             <div class="mt-8 space-y-3 lightForm" v-if="conversation.length < 7">
-              <LCInput
+              <div class="w-full text-center text-xs">
+                Om een goed antwoord te geven is een duidelijke vraag nodig. Gebruik minimaal 100 tekens om je vraag en situatie aan te geven.
+              </div>
+              <LCTextarea
                 id="naam"
                 v-model="question"
                 label="Vraag"
-                :required="true"
+                :required="false"
                 type="text"
-                placeholder="Je vraag"
+                placeholder="Vraag van minimaal 100 tekens"
                 class="w-full"
               />
+              <div class="w-full text-right text-xs">
+                {{ countChars() }} / <span class="text-rose-600">100</span>
+              </div>
               <div @click="chat()" class="rose button block">
                 Stel vraag
               </div>
@@ -84,7 +90,7 @@
 
 <script>
 import Header from '@/components/Header'
-import LCInput from '~/components/forms/LCInput'
+import LCTextarea from '~/components/forms/LCTextarea'
 
 const { Configuration, OpenAIApi } = require('openai')
 const configuration = new Configuration({
@@ -96,7 +102,7 @@ const openai = new OpenAIApi(configuration)
 export default {
   components: {
     Header,
-    LCInput
+    LCTextarea
   },
 
   data () {
@@ -104,7 +110,7 @@ export default {
       prompt: 'The following is a conversation with an dating coach. The coach is loving, helpful, careful and very friendly.\n\nHuman:Hi, maybe you can help me.\nAI:Absolutely! Please explain to me what is happening in your life?\nHuman:I find it hard to date online. All the men seem to look different at love then i do.\nAI:And how do you see love then?\nHuman:I want somebody who is caring and loving and a warm person. When i got home to share the day. Where do i find such love?That is a great question! Have you tried being more open and honest about what you are looking for in a relationship when going on dates? It can be difficult to find someone who is compatible with your definition of love, but if you are willing to put yourself out there and take risks, you will likely come across someone who meets your expectations. Additionally, you can look for people who share similar interests and values as you do - this might increase your chances of finding someone who shares your vision of love.',
       question: '',
       answer: '',
-      conversation: ['Wat speelt er in je leven? Waar kan ik je mee helpen? '],
+      conversation: ['Wat speelt er in je leven? Waar kan ik je mee helpen?', 'Er zijn veel verschillende manieren waarop je online daten kunt aanpakken. Het belangrijkste is dat je ervoor zorgt dat je eerlijk bent over wat je wilt van een relatie, zodat je iemand kunt vinden met dezelfde verwachtingen. Probeer ook contacten te maken met mensen die dezelfde interesses en waarden delen als jij - dit vergroot de kans dat je iemand vindt die je visie op liefde deelt. Als je hebt besloten om online te daten, weet dan dat er verschillende websites, apps en platforms zijn die je kunt gebruiken. Kies een datingsite die bij je past en maak een profiel aan. Zorg ervoor dat je profiel een eerlijke afspiegeling is van wie je bent en wat je zoekt. Vergeet ook niet om online veiligheid te observeren. Wees extra voorzichtig wanneer je apps of websites gebruikt en praat nooit eerder dan nodig face-to-face'],
       waitingForAnswer: false
     }
   },
@@ -128,13 +134,15 @@ export default {
         presence_penalty: 0.6,
         stop: [' Human:', ' AI:']
       })
-      console.log(response.data)
       // Add answer to conversation and prompt for history
       this.waitingForAnswer = false
       this.answer = response.data.choices[0].text
-      this.conversation.push(this.answer.slice(5))
+      this.conversation.push(this.answer.replace('AI:', ''))
       this.prompt = this.prompt += this.answer
       this.answer = ''
+    },
+    countChars () {
+      return this.question.length
     }
   }
 }

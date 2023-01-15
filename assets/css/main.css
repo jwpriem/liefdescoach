@@ -132,7 +132,7 @@ textarea {
  }
 }
 
-.lightForm input {
+.lightForm textarea {
   @apply bg-white;
 }
 

@@ -33,8 +33,8 @@
         <nuxt-link to="/intake" class="rose button">
           Intake plannen?
         </nuxt-link>
-        <nuxt-link to="/contact" class="gray button">
-          Meer weten?
+        <nuxt-link to="/digitale-coach" class="gray button">
+          Digitale coach proberen?
         </nuxt-link>
       </div>
     </Header>

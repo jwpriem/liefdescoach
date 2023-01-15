@@ -35,6 +35,11 @@
             </nuxt-link>
           </li>
           <li @click="toggle">
+            <nuxt-link class="mobile-nav-item" to="/digitale-coach">
+              Digitale coach
+            </nuxt-link>
+          </li>
+          <li @click="toggle">
             <nuxt-link class="mobile-nav-item" to="/kosten">
               Kosten
             </nuxt-link>

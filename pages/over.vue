@@ -8,7 +8,7 @@
         Ravennah helpt mensen, stellen en singels als liefdescoach als ze vastlopen op het gebied van liefde. Mensen met vragen over daten, relatieproblemen, jaloezieen seksualiteit kunnen bij haar terecht voor begeleiding. Volgens haar kan online daten best slim zijn: “Het is vooral heel fijn dat online daten kan en bestaat. Het kan een hoop tijd, geld en teleurstelling voorkomen als je het slim aanpakt!”
       </p>
       <a href="https://openrotterdam.nl/rotterdamse-liefdescoach-ravennah-geeft-tips-voor-dating-sunday-als-je-iets-wil-moet-je-er-voor-durven-gaan/" target="_blank" class="button rose">
-        Lees tips van Ravennah!
+        Dating tips
       </a>
     </Header>
   </div>
