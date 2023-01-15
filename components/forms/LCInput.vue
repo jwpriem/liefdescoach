@@ -41,7 +41,10 @@ export default {
       type: String,
       default: 'text'
     },
-    value: {},
+    value: {
+      type: String,
+      default: ''
+    },
     placeholder: {
       type: String,
       default: ''

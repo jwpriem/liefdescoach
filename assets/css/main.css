@@ -132,6 +132,10 @@ textarea {
  }
 }
 
+.lightForm input {
+  @apply bg-white;
+}
+
 @keyframes shake {
   10%,
   90% {

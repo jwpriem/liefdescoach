@@ -17,6 +17,11 @@
               </nuxt-link>
             </li>
             <li>
+              <nuxt-link to="/digitale-coach">
+                Digitale coach
+              </nuxt-link>
+            </li>
+            <li>
               <nuxt-link to="/kosten">
                 Kosten
               </nuxt-link>
