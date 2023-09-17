@@ -27,6 +27,11 @@
               </nuxt-link>
             </li>
             <li>
+              <nuxt-link to="/oplichters">
+                Oplichters
+              </nuxt-link>
+            </li>
+            <li>
               <nuxt-link to="/contact">
                 Contact
               </nuxt-link>
