@@ -2,22 +2,22 @@
   <div>
     <Header image="/ravennah-yoga.jpg">
       <h1 class="text-3xl md:text-6xl uppercase font-black">
-        <span class="emerald-underline">Yoga</span
+        <span class="emerald-underline">Yoga Ravennah</span
         ><span class="text-emerald-700">.</span>
       </h1>
       <p class="intro">
-        Yoga, met name Hatha, biedt een uitgebreid scala aan fysieke en mentale
-        voordelen die gunstig zijn voor je algehele welzijn. Deze yogastijlen
-        hebben elk hun unieke kenmerken en benaderingen, maar ze delen de
-        kernfilosofie van het in balans brengen van lichaam en geest.
+        Ik ben Ravennah, een gecertificeerde Hatha yoga docent met een passie
+        voor het bevorderen van welzijn. Mijn thuisbasis is het prachtige
+        Rotterdam Nesselande, waar ik mijn missie nastreef om levens te
+        transformeren door middel van yoga. Ik doe dit zowel in de serene
+        omgeving van Studio Yes Wellness als in persoonlijke privélessen.
       </p>
       <div>
         <p class="intro">
           Wil jij:
         </p>
         <ul class="intro">
-          <li
-            class="flex justify-start items-center space-x-3 cursor-pointer">
+          <li class="flex justify-start items-center space-x-3 cursor-pointer">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -49,8 +49,7 @@
               />
             </svg>
           </li>
-          <li
-            class="flex justify-start items-center space-x-3 cursor-pointer">
+          <li class="flex justify-start items-center space-x-3 cursor-pointer">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -81,8 +80,7 @@
               />
             </svg>
           </li>
-          <li
-            class="flex justify-start items-center space-x-3">
+          <li class="flex justify-start items-center space-x-3">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -132,7 +130,8 @@
         <div class="flex justify-center items-center">
           <div class="w-full md:w-1/2 md:text-center space-y-8">
             <h2 class="text-2xl md:text-4xl uppercase font-black">
-              <span class="emerald-underline text-emerald-900">Stressvermindering</span
+              <span class="emerald-underline text-emerald-900"
+                >Stressvermindering</span
               ><span class="text-emerald-700">.</span>
             </h2>
             <p class="text-2xl text-emerald-900">

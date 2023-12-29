@@ -313,7 +313,7 @@ select {
 }
 
 .min-height-50 {
-  min-height: 50vh;
+  min-height: 50svh;
 }
 
 .ml-100vw {
