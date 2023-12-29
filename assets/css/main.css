@@ -3,42 +3,34 @@ body .dark {
 }
 
 h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  @apply font-display text-xl font-bold text-gray-900 antialiased uppercase;
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+  @apply font-display text-xl font-bold antialiased uppercase;
 }
 
-h1 {
+  h1 {
   @apply text-6xl;
 }
 
-h2 {
+  h2 {
   @apply text-5xl;
 }
 
-h3 {
+  h3 {
   @apply text-4xl;
 }
 
-h4,
-h5,
-h6 {
+  h4,
+  h5,
+  h6 {
   @apply text-lg;
 }
 
 .intro {
-  @apply text-gray-800 text-lg font-light;
-}
-
-.pink-underline {
-@apply relative z-10;
-&:before {
-   @apply absolute h-6 bottom-0 left-0 -mb-1 -ml-2 bg-rose-600 bg-opacity-25 z-0 block w-1/2;
-   content: '';
- }
+  @apply text-lg font-light;
 }
 
 .button {
@@ -49,18 +41,25 @@ h6 {
   }
 
    &.rose {
-  @apply bg-rose-600 text-white;
-  &:hover {
-  @apply bg-rose-700;
-   }
+    @apply bg-rose-600 text-white;
+    &:hover {
+      @apply bg-rose-700;
     }
+  }
+
+&.emerald {
+    @apply bg-emerald-700 text-emerald-200;
+    &:hover {
+      @apply bg-emerald-600 text-emerald-100;
+    }
+  }
 
     &.gray {
-  @apply bg-gray-200 text-rose-600;
-&:hover {
-   @apply bg-gray-300;
- }
-     }
+    @apply bg-gray-200 text-rose-600;
+    &:hover {
+      @apply bg-gray-300;
+    }
+  }
 }
 
 label {
@@ -75,66 +74,197 @@ label {
   @apply text-red-600 italic text-xs mt-1;
 }
 
-input,
-.select-wrapper,
-textarea {
-  @apply bg-gray-200 text-gray-800 p-4 font-body w-full rounded border-transparent text-sm transition-all duration-300 ease-in-out;
-
-&::placeholder {
-   @apply tracking-wide italic text-sm subpixel-antialiased;
- }
-
-&:disabled {
-   @apply bg-gray-400 text-gray-700 cursor-not-allowed;
- }
-
-&:focus {
-   @apply bg-gray-200 border-rose-600;
- }
-
-&.hasError {
-   @apply border border-solid border-red-600;
-
-   animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-   transform: translate3d(0, 0, 0);
-   backface-visibility: hidden;
-   perspective: 100px;
- }
+.bg-ravennah-yoga {
+  background-image: url('/ravennah-yoga.jpg');
+  background-size: cover;
+  background-position: center center;
 }
 
-.checkbox {
-  @apply bg-white border-gray-300 h-5 w-5 border border-solid rounded cursor-pointer flex justify-center items-center;
-&.checked {
-   @apply bg-rose-600 border-rose-600 text-white;
- }
-&.hasError {
-   @apply border border-solid border-red-600;
-
-   animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-   transform: translate3d(0, 0, 0);
-   backface-visibility: hidden;
-   perspective: 100px;
- }
+.dark-opacity {
+  background: rgba(17, 24, 39, 0.9);
 }
 
-.radio {
-@apply bg-gray-200;
-&.checked {
-   @apply bg-rose-600;
- }
-&.hasError {
-   @apply border border-solid border-red-600;
+.yoga {
+  @apply bg-gray-900 text-emerald-100;
 
-   animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-   transform: translate3d(0, 0, 0);
-   backface-visibility: hidden;
-   perspective: 100px;
- }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply text-emerald-100;
+  }
+
+  .title-dark {
+    h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+      @apply text-emerald-900;
+    }
+  }
+
+  .intro {
+    @apply text-emerald-100;
+  }
+
+  .intro-dark {
+    @apply text-emerald-900
+  }
+
+.emerald-underline {
+    @apply relative z-10;
+    &:before {
+      @apply absolute h-6 bottom-0 left-0 -mb-1 -ml-2 bg-emerald-700 bg-opacity-25 z-0 block w-1/2;
+      content: '';
+    }
+  }
+
+  input,
+  .select-wrapper,
+  textarea {
+    @apply bg-emerald-100 text-emerald-800 p-4 font-body w-full rounded border-transparent text-sm transition-all duration-300 ease-in-out;
+
+    &::placeholder {
+      @apply tracking-wide italic text-sm subpixel-antialiased text-emerald-300;
+    }
+
+  &:disabled {
+      @apply bg-gray-400 text-emerald-700 cursor-not-allowed;
+    }
+
+  &:focus {
+      @apply bg-emerald-100 border-emerald-600;
+    }
+
+  &.hasError {
+      @apply border border-solid border-red-600;
+
+      animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+      transform: translate3d(0, 0, 0);
+      backface-visibility: hidden;
+      perspective: 100px;
+    }
+  }
+
+  .checkbox {
+    @apply bg-white border-gray-300 h-5 w-5 border border-solid rounded cursor-pointer flex justify-center items-center;
+    &.checked {
+      @apply bg-emerald-600 border-emerald-600 text-white;
+    }
+  &.hasError {
+      @apply border border-solid border-red-600;
+
+      animaition: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+      transforae: translate3d(0, 0, 0);
+      backface-visibility: hidden;
+      perspective: 100px;
+    }
+  }
+
+  .radio {
+    @apply bg-emerald-100;
+    &.checked {
+      @apply bg-emerald-600;
+    }
+  &.hasError {
+      @apply border border-solid border-red-600;
+
+      animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+      transform: translate3d(0, 0, 0);
+      backface-visibility: hidden;
+      perspective: 100px;
+    }
+  }
 }
 
-.lightForm textarea {
-  @apply bg-white;
+.liefdescoach {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply text-gray-900;
+  }
+
+  .intro {
+      @apply text-gray-800;
+    }
+
+  .pink-underline {
+      @apply relative z-10;
+      &:before {
+        @apply absolute h-6 bottom-0 left-0 -mb-1 -ml-2 bg-rose-600 bg-opacity-25 z-0 block w-1/2;
+        content: '';
+      }
+    }
+
+  input,
+  .select-wrapper,
+  textarea {
+      @apply bg-gray-200 text-gray-800 p-4 font-body w-full rounded border-transparent text-sm transition-all duration-300 ease-in-out;
+
+      &::placeholder {
+        @apply tracking-wide italic text-sm subpixel-antialiased;
+      }
+
+  &:disabled {
+        @apply bg-gray-400 text-gray-700 cursor-not-allowed;
+      }
+
+  &:focus {
+        @apply bg-gray-200 border-rose-600;
+      }
+
+  &.hasError {
+        @apply border border-solid border-red-600;
+
+        animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+        transform: translate3d(0, 0, 0);
+        backface-visibility: hidden;
+        perspective: 100px;
+      }
+    }
+
+  .checkbox {
+      @apply bg-white border-gray-300 h-5 w-5 border border-solid rounded cursor-pointer flex justify-center items-center;
+      &.checked {
+        @apply bg-rose-600 border-rose-600 text-white;
+      }
+  &.hasError {
+        @apply border border-solid border-red-600;
+
+        animaition: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+        transforae: translate3d(0, 0, 0);
+        backface-visibility: hidden;
+        perspective: 100px;
+      }
+    }
+
+  .radio {
+      @apply bg-gray-200;
+      &.checked {
+        @apply bg-rose-600;
+      }
+  &.hasError {
+        @apply border border-solid border-red-600;
+
+        animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+        transform: translate3d(0, 0, 0);
+        backface-visibility: hidden;
+        perspective: 100px;
+      }
+    }
+
+  .lightForm textarea {
+      @apply bg-white;
+    }
 }
+
 
 @keyframes shake {
   10%,
@@ -169,4 +299,8 @@ select {
 &:focus {
     @apply outline-none border-0;
   }
+}
+
+.min-height-50 {
+  min-height: 50vh;
 }

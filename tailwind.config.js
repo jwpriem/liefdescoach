@@ -14,7 +14,9 @@ module.exports = {
         body: ['Source Sans Pro', 'sans-serif']
       },
       colors: {
-        rose: colors.rose
+        rose: colors.rose,
+        emerald: colors.emerald,
+        gray: colors.gray
       }
     }
   },

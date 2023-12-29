@@ -17,6 +17,7 @@
 <script>
 import Header from '@/components/Header'
 export default {
+  layout: 'liefdescoach',
   components: {
     Header
   }

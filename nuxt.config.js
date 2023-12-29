@@ -63,7 +63,7 @@ export default {
 
   // See https://github.com/nuxt-community/axios-module#options
   axios: {
-    baseURL: isDev ? 'http://localhost:3000/' : 'https://www.liefdes.coach/'
+    baseURL: isDev ? 'http://localhost:3000/' : 'https://www.ravennah.com/'
   },
 
   mail: {
@@ -71,7 +71,7 @@ export default {
       host: 'mail.privateemail.com',
       port: 587,
       auth: {
-        user: 'ravennah@liefdes.coach',
+        user: 'info@ravennah.com',
         pass: process.env.EMAIL_PASS
       }
     }

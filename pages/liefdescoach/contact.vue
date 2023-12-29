@@ -61,6 +61,7 @@ import LCInput from '~/components/forms/LCInput'
 import LCTextarea from '~/components/forms/LCTextarea'
 
 export default {
+  layout: 'liefdescoach',
   components: {
     Header,
     LCInput,
@@ -107,10 +108,10 @@ export default {
         const message = 'Het contactformulier is ingevuld.<br>' + '<b>Naam:</b> ' + this.form.name + '<br>' + '<b>Email:</b> ' + this.form.email + '<br>' + '<b>Bericht:</b> ' + this.form.message + '<br>'
 
         this.$mail.send({
-          from: 'ravennah@liefdes.coach',
+          from: 'info@ravennah.com',
           subject: 'Contactformulier Liefdescoach',
           html: message,
-          to: 'ravennah@liefdes.coach'
+          to: 'info@ravennah.com'
         }).then(() => {
           this.$message.success('Je bericht is verzonden!')
           this.loading = false

@@ -11,7 +11,7 @@
         <a href="#digitaleCoach" class="rose button">
           Chat met digitale coach
         </a>
-        <nuxt-link to="/intake" class="gray button">
+        <nuxt-link to="/liefdescoach/intake" class="gray button">
           Intake plannen?
         </nuxt-link>
       </div>
@@ -76,7 +76,7 @@
               <p class='intro'>
                 Een echte coach voelt veel beter aan wat eventueel het onderliggende probleem is. Wil je graag eens kennismaken en weten hoe het is om met een liefdescoach te praten? Vul het formulier in en ik neem contact met je op!
               </p>
-              <nuxt-link to="/intake" class="rose button">
+              <nuxt-link to="/liefdescoach/intake" class="rose button">
                 Plan een gratis intake!
               </nuxt-link>
             </div>
@@ -100,6 +100,7 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration)
 
 export default {
+  layout: 'liefdescoach',
   components: {
     Header,
     LCTextarea
