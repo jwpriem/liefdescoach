@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="block md:hidden flex justify-between items-center p-6 bg-gray-900">
-      <nuxt-link to="/">
+      <nuxt-link to="/" class="z-50">
         <Yoga color="#d1fae5"/>
       </nuxt-link>
       <div class="bg-emerald-700 text-emerald-100 rounded-full h-12 w-12 flex justify-center items-center z-50 shadow-xl fixed top-0 right-0 m-6" @click="toggle">
