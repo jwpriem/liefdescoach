@@ -123,62 +123,73 @@ label {
     }
   }
 
-  input,
-  .select-wrapper,
-  textarea {
-    @apply bg-emerald-100 text-emerald-800 p-4 font-body w-full rounded border-transparent text-sm transition-all duration-300 ease-in-out;
+ input,
+.select-wrapper,
+textarea {
+  @apply bg-emerald-100 text-emerald-800 p-4 font-body w-full rounded border-transparent text-sm transition-all duration-300 ease-in-out;
 
-    &::placeholder {
-      @apply tracking-wide italic text-sm subpixel-antialiased text-emerald-300;
-    }
+  &::placeholder {
+    @apply tracking-wide italic text-sm subpixel-antialiased text-emerald-300;
+  }
 
   &:disabled {
-      @apply bg-gray-400 text-emerald-700 cursor-not-allowed;
-    }
+    @apply bg-gray-400 text-emerald-700 cursor-not-allowed;
+  }
 
   &:focus {
-      @apply bg-emerald-100 border-emerald-600;
-    }
-
-  &.hasError {
-      @apply border border-solid border-red-600;
-
-      animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-      transform: translate3d(0, 0, 0);
-      backface-visibility: hidden;
-      perspective: 100px;
-    }
+    @apply bg-emerald-100 border-emerald-600;
   }
 
-  .checkbox {
-    @apply bg-white border-gray-300 h-5 w-5 border border-solid rounded cursor-pointer flex justify-center items-center;
-    &.checked {
-      @apply bg-emerald-600 border-emerald-600 text-white;
-    }
   &.hasError {
-      @apply border border-solid border-red-600;
+    @apply border border-solid border-red-600;
 
-      animaition: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-      transforae: translate3d(0, 0, 0);
-      backface-visibility: hidden;
-      perspective: 100px;
-    }
+    animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    -webkit-animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; /* For Safari */
+    transform: translate3d(0, 0, 0);
+    -webkit-transform: translate3d(0, 0, 0); /* For Safari */
+    backface-visibility: hidden;
+    perspective: 100px;
+  }
+}
+
+.checkbox {
+  @apply bg-white border-gray-300 h-5 w-5 border border-solid rounded cursor-pointer flex justify-center items-center;
+
+  &.checked {
+    @apply bg-emerald-600 border-emerald-600 text-white;
   }
 
-  .radio {
-    @apply bg-emerald-100;
-    &.checked {
-      @apply bg-emerald-600;
-    }
   &.hasError {
-      @apply border border-solid border-red-600;
+    @apply border border-solid border-red-600;
 
-      animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-      transform: translate3d(0, 0, 0);
-      backface-visibility: hidden;
-      perspective: 100px;
-    }
+    animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    -webkit-animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; /* For Safari */
+    transform: translate3d(0, 0, 0);
+    -webkit-transform: translate3d(0, 0, 0); /* For Safari */
+    backface-visibility: hidden;
+    perspective: 100px;
   }
+}
+
+.radio {
+  @apply bg-emerald-100;
+
+  &.checked {
+    @apply bg-emerald-600;
+  }
+
+  &.hasError {
+    @apply border border-solid border-red-600;
+
+    animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    -webkit-animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; /* For Safari */
+    transform: translate3d(0, 0, 0);
+    -webkit-transform: translate3d(0, 0, 0); /* For Safari */
+    backface-visibility: hidden;
+    perspective: 100px;
+  }
+  }
+
 }
 
 .liefdescoach {
