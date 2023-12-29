@@ -17,6 +17,11 @@
               </nuxt-link>
             </li>
             <li>
+              <nuxt-link to="/yoga">
+                Yoga
+              </nuxt-link>
+            </li>
+            <li>
               <nuxt-link to="/digitale-coach">
                 Digitale coach
               </nuxt-link>

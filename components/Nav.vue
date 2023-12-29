@@ -30,6 +30,11 @@
             </nuxt-link>
           </li>
           <li @click="toggle">
+            <nuxt-link class="mobile-nav-item" to="/yoga">
+              Yoga
+            </nuxt-link>
+          </li>
+          <li @click="toggle">
             <nuxt-link class="mobile-nav-item" to="/over">
               Over mij
             </nuxt-link>
@@ -72,6 +77,11 @@
         <li>
           <nuxt-link class="nav-item" to="/over">
             Over mij
+          </nuxt-link>
+        </li>
+        <li>
+          <nuxt-link class="nav-item" to="/yoga">
+            Yoga
           </nuxt-link>
         </li>
         <li>
