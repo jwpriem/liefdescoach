@@ -22,7 +22,7 @@
           xmlns="http://www.w3.org/2000/svg"
         ><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
       </div>
-      <div :class="navOpen ? 'left-0 ml-0' : 'ml-96'" class="transition-all duration-300 ease-in-out fixed top-0 bg-gray-900 min-h-screen flex justify-start items-center text-center z-40 w-screen">
+      <div :class="navOpen ? 'left-0 ml-0' : 'ml-100vw'" class="transition-all duration-300 ease-in-out fixed top-0 bg-gray-900 min-h-screen flex justify-start items-center text-center z-40 w-screen">
         <ul class="w-full space-y-8">
           <li @click="toggle">
             <nuxt-link class="mobile-nav-item" to="/yoga/">

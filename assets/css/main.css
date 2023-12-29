@@ -315,3 +315,7 @@ select {
 .min-height-50 {
   min-height: 50vh;
 }
+
+.ml-100vw {
+  margin-left: 100vw;
+}
