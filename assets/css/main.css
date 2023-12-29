@@ -1,4 +1,4 @@
-body {
+body .dark {
   @apply font-body text-gray-600 antialiased;
 }
 
