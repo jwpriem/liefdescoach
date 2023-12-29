@@ -1,7 +1,7 @@
 <template>
   <div class="">
     <Header image="/yoga-sfeer.jpg">
-      <h1 class="text-3xl md:text-6xl uppercase font-black text-gray-800">
+      <h1 class="text-3xl md:text-6xl uppercase font-black">
         <span class="emerald-underline">Stuur een bericht</span><span class="text-emerald-600">.</span>
       </h1>
       <div class="mt-8 space-y-3 darkForm">

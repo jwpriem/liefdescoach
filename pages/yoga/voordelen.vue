@@ -1,7 +1,7 @@
 <template>
   <div>
     <Header image="/les-buiten.jpg" alignment="object-bottom">
-      <h1 class="text-3xl md:text-6xl uppercase font-black text-gray-800">
+      <h1 class="text-3xl md:text-6xl uppercase font-black">
         <span class="emerald-underline">Voordelen</span
         ><span class="text-emerald-600">.</span>
       </h1>
@@ -18,7 +18,7 @@
           class="md:flex justify-between items-center md:space-x-12 space-y-8 md:space-y-0"
         >
           <div class="w-full md:w-1/2 space-y-8">
-            <h2 class="text-2xl md:text-4xl uppercase font-black text-gray-800">
+            <h2 class="text-2xl md:text-4xl uppercase font-black text-emerald-900">
               <span class="emerald-underline"
               >5 voorbeelden van de vele voordelen van yoga</span
               ><span class="text-emerald-600">.</span>

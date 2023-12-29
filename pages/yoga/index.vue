@@ -1,7 +1,7 @@
 <template>
   <div>
     <Header image="/ravennah-yoga.jpg">
-      <h1 class="text-3xl md:text-6xl uppercase font-black text-gray-800">
+      <h1 class="text-3xl md:text-6xl uppercase font-black">
         <span class="emerald-underline">Yoga</span
         ><span class="text-emerald-700">.</span>
       </h1>
@@ -131,8 +131,8 @@
       <div id="weesJezelf" class="container mx-auto p-8 md:px-0 md:py-24">
         <div class="flex justify-center items-center">
           <div class="w-full md:w-1/2 md:text-center space-y-8">
-            <h2 class="text-2xl md:text-4xl uppercase font-black text-gray-800">
-              <span class="emerald-underline">Stressvermindering</span
+            <h2 class="text-2xl md:text-4xl uppercase font-black">
+              <span class="emerald-underline text-emerald-900">Stressvermindering</span
               ><span class="text-emerald-700">.</span>
             </h2>
             <p class="text-2xl text-emerald-900">
@@ -159,7 +159,7 @@
             />
           </div>
           <div id="onlineDating" class="w-full md:w-1/2 space-y-6">
-            <h2 class="text-2xl md:text-4xl uppercase font-black text-gray-800">
+            <h2 class="text-2xl md:text-4xl uppercase font-black">
               <span class="emerald-underline">Mobiliteit</span
               ><span class="text-emerald-700">.</span>
             </h2>
@@ -184,7 +184,7 @@
               <span class="emerald-underline">Alleen maar voordelen</span
               ><span class="text-emerald-700">.</span>
             </h2>
-            <p class="intro intro-dark">
+            <p class="intro intro-dark text-emerald-900">
               Al met al bied Hatha yoga veel voordelen voor zowel je fysieke als
               mentale gezondheid. Het regelmatig beoefenen van deze yogastijlen
               kan een waardevolle aanvulling zijn op je levensstijl en bijdragen
