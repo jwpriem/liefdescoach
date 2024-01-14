@@ -119,9 +119,9 @@
         <nuxt-link to="/yoga/lessen" class="emerald button">
           Les schema
         </nuxt-link>
-        <!--<nuxt-link to="/digitale-coach" class="gray button">-->
-        <!--  Yoga bij bedrijven-->
-        <!--</nuxt-link>-->
+        <nuxt-link to="/yoga/tarieven" class="emerald-outlined button">
+          Tarieven
+        </nuxt-link>
       </div>
     </Header>
     <div class="bg-emerald-100 title-dark">

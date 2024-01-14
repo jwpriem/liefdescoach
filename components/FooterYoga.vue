@@ -25,6 +25,16 @@
               </nuxt-link>
             </li>
             <li>
+              <nuxt-link to="/yoga/lessen">
+                Lessen
+              </nuxt-link>
+            </li>
+            <li>
+              <nuxt-link to="/yoga/tarieven">
+                Tarieven
+              </nuxt-link>
+            </li>
+            <li>
               <nuxt-link to="/yoga/contact">
                 Contact
               </nuxt-link>

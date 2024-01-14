@@ -16,6 +16,7 @@
     "@tailwindcss/postcss7-compat": "^2.0.2",
     "autoprefixer": "^9",
     "core-js": "^3.6.5",
+    "dayjs": "^1.11.10",
     "nuxt": "^2.14.6",
     "nuxt-mail": "^1.0.2",
     "openai": "^3.1.0",

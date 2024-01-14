@@ -14,7 +14,7 @@
         </div>
       </p>
       <p class="intro">
-        Boeken kan via <a href="https://www.instagram.com/yogaravennah" target="_blank"><u>Instagram</u></a> of <nuxt-link to="/yoga/contact"><u>contactformulier</u></nuxt-link>. Vul bij het bericht in welke datum je wilt boeken.
+        Boeken kan via <a href="https://www.instagram.com/yogaravennah" target="_blank"><u>Instagram</u></a> of <nuxt-link to="/yoga/contact"><u>contactformulier</u></nuxt-link>. Vul bij het bericht in welke datum je wilt boeken. Bekijk de <nuxt-link to="/yoga/tarieven"><u>tarieven</u></nuxt-link>. 
       </p>
       &nbsp;
       <p class="intro"><span
@@ -26,7 +26,7 @@ Emmy van Leersumhof 24a
         Rotterdam (Nesselande)
       </p>
 
-      <a href="https://www.google.com/maps/place/Emmy+van+Leersumhof+24a,+3059+LT+Rotterdam/@51.9683125,4.585844,17z/data=!3m1!4b1!4m6!3m5!1s0x47c5cd7dec493187:0xd32480c3b7fa1581!8m2!3d51.9683092!4d4.5884189!16s%2Fg%2F11t40nxhs0?entry=ttu" target="_blank">
+      <a class="intro" href="https://www.google.com/maps/place/Emmy+van+Leersumhof+24a,+3059+LT+Rotterdam/@51.9683125,4.585844,17z/data=!3m1!4b1!4m6!3m5!1s0x47c5cd7dec493187:0xd32480c3b7fa1581!8m2!3d51.9683092!4d4.5884189!16s%2Fg%2F11t40nxhs0?entry=ttu" target="_blank">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 mr-2 inline-block stroke-current text-emerald-700">
   <path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498 4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 0 0-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0Z" />
 </svg>
@@ -38,6 +38,8 @@ Emmy van Leersumhof 24a
 
 <script>
 import Header from '~/components/Header'
+import dayjs from 'dayjs';
+import 'dayjs/locale/nl';
 
 export default {
   layout: 'yoga',
@@ -48,7 +50,7 @@ export default {
     return {
       yogaLessons: [
         {day: 14, month: 1, year: 2024, startTime: "10", endTime: "11"},
-        {day: 1, month: 2, year: 2024, startTime: "10", endTime: "11"},
+        {day: 4, month: 2, year: 2024, startTime: "10", endTime: "11"},
         {day: 11, month: 2, year: 2024, startTime: "10", endTime: "11"},
         {day: 3, month: 3, year: 2024, startTime: "10", endTime: "11"},
         {day: 10, month: 3, year: 2024, startTime: "10", endTime: "11"}
@@ -68,15 +70,12 @@ export default {
   },
   methods: {
     formatDateInDutch(lesson) {
-      const dutchMonthNames = ["januari", "februari", "maart", "april", "mei", "juni",
-        "juli", "augustus", "september", "oktober", "november", "december"];
-      const dutchDayNames = ["Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag", "Zondag"];
+      dayjs.locale('nl'); // Set locale to Dutch
 
-      const date = new Date(lesson.year, lesson.month - 1, lesson.day);
-      const dayName = dutchDayNames[date.getDay()];
-      const monthName = dutchMonthNames[lesson.month - 1];
+      const lessonDate = dayjs(new Date(lesson.year, lesson.month - 1, lesson.day));
+      const formattedDate = lessonDate.format('dddd D MMMM');
 
-      return `${dayName} ${lesson.day} ${monthName} van ${lesson.startTime} tot ${lesson.endTime} uur`;
+      return `${formattedDate} van ${lesson.startTime} tot ${lesson.endTime} uur`;
     }
   }
 }

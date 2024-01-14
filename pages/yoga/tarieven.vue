@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Header image="/ravennah-rug.jpg" alignment="object-center">
+    <Header image="/ravennah-pose.jpg" alignment="object-center">
       <h1 class="text-3xl md:text-6xl uppercase font-black">
         <span class="emerald-underline">Tarieven</span><span class="text-emerald-600">.</span>
       </h1>
