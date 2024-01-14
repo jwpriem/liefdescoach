@@ -35,8 +35,18 @@
             </nuxt-link>
           </li>
           <li @click="toggle">
-            <nuxt-link class="mobile-nav-item" to="/yoga/voordeleh">
+            <nuxt-link class="mobile-nav-item" to="/yoga/voordelen">
               Voordelen
+            </nuxt-link>
+          </li>
+          <li @click="toggle">
+            <nuxt-link class="mobile-nav-item" to="/yoga/lessen">
+              Lessen
+            </nuxt-link>
+          </li>
+          <li @click="toggle">
+            <nuxt-link class="mobile-nav-item" to="/yoga/tarieven">
+              Tarieven
             </nuxt-link>
           </li>
           <li @click="toggle">
@@ -60,8 +70,18 @@
           </nuxt-link>
         </li>
         <li>
+          <nuxt-link class="nav-item" to="/yoga/lessen">
+            Lessen
+          </nuxt-link>
+        </li>
+        <li>
           <nuxt-link to="/">
             <Yoga color="#d1fae5"/>
+          </nuxt-link>
+        </li>
+        <li>
+          <nuxt-link class="nav-item" to="/yoga/tarieven">
+            Tarieven
           </nuxt-link>
         </li>
         <li>

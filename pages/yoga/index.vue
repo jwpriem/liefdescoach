@@ -8,8 +8,7 @@
       <p class="intro">
         Ik ben Ravennah, een gecertificeerde Hatha yoga docent met een passie
         voor het bevorderen van welzijn. Mijn thuisbasis is het prachtige
-        Rotterdam Nesselande, waar ik mijn missie nastreef om levens te
-        transformeren door middel van yoga. Ik doe dit zowel in de serene
+        Rotterdam Nesselande, waar ik mijn missie nastreef om mensen ruimte te laten ervaren in lichaam en geest door middel van yoga. Ik doe dit zowel in de serene
         omgeving van Studio Yes Wellness als in persoonlijke privélessen.
       </p>
       <div>
@@ -117,8 +116,8 @@
       <div
         class="md:flex justify-start items-center md:space-x-3 space-y-2 md:space-y-0"
       >
-        <nuxt-link to="/intake" class="emerald button">
-          Les volgen?
+        <nuxt-link to="/yoga/lessen" class="emerald button">
+          Les schema
         </nuxt-link>
         <!--<nuxt-link to="/digitale-coach" class="gray button">-->
         <!--  Yoga bij bedrijven-->
