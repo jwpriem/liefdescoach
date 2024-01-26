@@ -106,7 +106,7 @@ export default {
           email: this.email,
           password: this.password,
           name: this.name,
-          phone: phone ? this.formatPhoneNumber(this.phone) : null
+          phone: this.phone ? this.formatPhoneNumber(this.phone) : null
         });
 
         this.$router.push("/yoga/account");
