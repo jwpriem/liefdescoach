@@ -387,10 +387,17 @@ export default {
     },
 
     async book(lesson, user) {
-      await this.$store.dispatch("handleBooking", {
-        lesson: lesson,
-        user: user
-      });
+      try {
+        await this.$store.dispatch("handleBooking", {
+          lesson: lesson,
+          user: user
+        });
+
+        this.cancelBooking()
+      }
+      catch(error) {
+        console.log(error)
+      }
     },
 
     async removeBooking(booking, lesson) {
@@ -419,6 +426,9 @@ export default {
           const lessonDate = dayjs(new Date(booking.lessons.date))
           return dayjs().isBefore(lessonDate)
         })
+    },
+    isLoading() {
+      return this.$store.getters.isLoading
     }
   }
 };

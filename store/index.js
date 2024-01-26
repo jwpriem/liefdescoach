@@ -190,7 +190,7 @@ export const actions = {
             state.loggedInUser ? [] : [ Query.select(['date', '$id', 'spots']) ]
             )
         
-        commit('SET_LESSONS', list.documents)
+      commit('SET_LESSONS', list.documents.sort((a, b) => new Date(a.date) - new Date(b.date)))
       
     }catch (error) {
       console.log(error)
