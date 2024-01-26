@@ -134,8 +134,9 @@ export const actions = {
   },
   async registerUser ({ commit }, { email, password, name, phone }) {
     try {
-      await account.create(ID.unique(), email, password, name, phone);
+      await account.create(ID.unique(), email, password, name);
       await account.createEmailSession(email, password);
+      await account.updatePhone(phone, password);
       const user = await account.get();
       
       let data = {
