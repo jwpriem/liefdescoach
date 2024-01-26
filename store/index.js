@@ -278,12 +278,48 @@ export const actions = {
         { spots: newSpots }
       )
       await dispatch('getStudents')
-      await dispatch('getAccountDetails')
+      await dispatch('getAccountDetails', { route: '/yoga/account' })
       await dispatch('getLessons')
       
       commit('SET_LOADING', false)
     }catch (error) {
       commit('SET_LOADING', false)
+      console.log(error)
+    }
+  },
+  async cancelBooking({ dispatch }, { booking, lesson }) {
+    try {
+
+      // Update availability lesson
+      const newSpots = lesson.spots + 1
+
+      await databases.updateDocument(
+        this.$config.database,
+        'lessons',
+        lesson.$id,
+        { spots: newSpots }
+        )
+
+      const newCredits = booking.students.credits + 1
+
+      await databases.updateDocument(
+        this.$config.database,
+        'students',
+        booking.students.$id,
+        { credits: newCredits }
+        )
+
+      await databases.deleteDocument(
+        this.$config.database,
+        'bookings',
+        booking.$id
+        )
+
+      await dispatch('getStudents')
+      await dispatch('getAccountDetails', { route: '/yoga/account' })
+      await dispatch('getLessons')
+
+    } catch(error) {
       console.log(error)
     }
   }

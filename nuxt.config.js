@@ -3,10 +3,12 @@ const isDev = process.env.NODE_ENV !== 'production'
 export default {
   env: {
     openAi: process.env.OPENAI,
-    database: process.env.DATABASE
+    database: process.env.DATABASE,
+    project: process.env.PROJECT
   },
   publicRuntimeConfig: {
-    database: process.env.DATABASE
+    database: process.env.DATABASE,
+    project: process.env.PROJECT
   },
   ssr: true,
   target: 'server',
