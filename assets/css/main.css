@@ -52,7 +52,7 @@ h1,
   }
 
 &.emerald {
-    @apply bg-emerald-700 text-emerald-200;
+    @apply ring-emerald-700 bg-emerald-700 text-emerald-200;
     &:hover {
       @apply bg-emerald-600 text-emerald-100;
     }
@@ -61,7 +61,7 @@ h1,
 &.emerald-outlined {
     @apply ring-emerald-700 ring-2 text-emerald-700;
     &:hover {
-      @apply bg-emerald-600 text-emerald-100;
+      @apply ring-emerald-600 bg-emerald-600 text-emerald-100;
     }
   }
 
@@ -71,7 +71,17 @@ h1,
       @apply bg-gray-300;
     }
   }
+
+&.disabled {
+    @apply bg-gray-300 text-gray-800 ring-gray-300;
+
+    &:hover {
+      @apply bg-gray-200 ring-gray-200 text-gray-600 cursor-not-allowed;
+    }
+  }
 }
+
+
 
 label {
   @apply block text-sm font-bold antialiased break-normal;
@@ -329,4 +339,29 @@ select {
 
 .ml-100vw {
   margin-left: 100vw;
+}
+
+.max-height-75 {
+  max-height: 75svh;
+}
+
+thead {
+  tr {
+    @apply text-left text-emerald-900;
+
+    th {
+      @apply p-2;
+    }
+  }
+}
+
+tbody {
+  tr:nth-child(even) {
+    @apply bg-gray-800;
+  }
+
+  td {
+    @apply p-2;
+    vertical-align: top;
+  }
 }

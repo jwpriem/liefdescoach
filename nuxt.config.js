@@ -2,8 +2,14 @@ const isDev = process.env.NODE_ENV !== 'production'
 
 export default {
   env: {
-    openAi: process.env.OPENAI
+    openAi: process.env.OPENAI,
+    database: process.env.DATABASE
   },
+  publicRuntimeConfig: {
+    database: process.env.DATABASE
+  },
+  ssr: true,
+  target: 'server',
   server: {
     port: isDev ? 3000 : 8080, // default: 3000
     host: isDev ? 'localhost' : '0.0.0.0' // default: localhost
@@ -52,13 +58,18 @@ export default {
   modules: [
     '@nuxtjs/axios',
     'nuxt-mail',
-    '@nuxtjs/gtm'
+    '@nuxtjs/gtm',
+    'cookie-universal-nuxt'
   ],
   gtm: {
     id: 'GTM-PZP28PP'
   },
   // Build Configuration (https://go.nuxtjs.dev/config-build)
   build: {
+  },
+
+  router: {
+    middleware: 'auth'
   },
 
   // See https://github.com/nuxt-community/axios-module#options
