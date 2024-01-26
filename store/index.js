@@ -99,6 +99,8 @@ export const actions = {
   },
   async updateAccount({ commit, state }, { email, password, name, phone }) {
     try {
+      commit('SET_LOADING', true)
+
       if( email != state.loggedInUser.email ) {
         await account.updateEmail(email, password)  
       }
@@ -125,7 +127,7 @@ export const actions = {
         user.$id,
         data
         );
-      
+      commit('SET_LOADING', false)
       await dispatch('getAccountDetails', { route: '/yoga/account' })
       
     } catch(error) {
@@ -134,6 +136,8 @@ export const actions = {
   },
   async registerUser ({ commit }, { email, password, name, phone }) {
     try {
+      commit('SET_LOADING', true)
+
       await account.create(ID.unique(), email, password, name);
       await account.createEmailSession(email, password);
       await account.updatePhone(phone, password);
@@ -157,6 +161,7 @@ export const actions = {
       commit('SET_LOGGED_IN_USER', user);
       commit('SET_CREDITS_USER', res.credits)
       commit('SET_DEBITS_USER', res.debits)
+      commit('SET_LOADING', false)
       
     } catch (error) {
       throw error;
