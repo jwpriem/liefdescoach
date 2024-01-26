@@ -52,7 +52,7 @@ h1,
   }
 
 &.emerald {
-    @apply ring-emerald-700 bg-emerald-700 text-emerald-200;
+    @apply ring-emerald-700 ring-2 bg-emerald-700 text-emerald-200;
     &:hover {
       @apply bg-emerald-600 text-emerald-100;
     }
