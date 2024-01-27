@@ -161,6 +161,7 @@ label {
 .select-wrapper,
 textarea {
     @apply appearance-none bg-emerald-100 text-emerald-800 p-4 font-body w-full rounded border-transparent text-sm transition-all duration-300 ease-in-out;
+    font-size: 16px;
 
   &::placeholder {
     @apply tracking-wide italic text-sm subpixel-antialiased text-emerald-800 text-opacity-50;
