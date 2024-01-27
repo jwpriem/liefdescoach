@@ -6,10 +6,7 @@
         ><span class="text-emerald-700">.</span>
       </h1>
       <p class="intro">
-        Ik ben Ravennah, een gecertificeerde Hatha yoga docent met een passie
-        voor het bevorderen van welzijn. Mijn thuisbasis is het prachtige
-        Rotterdam Nesselande, waar ik mijn missie nastreef om mensen ruimte te laten ervaren in lichaam en geest door middel van yoga. Ik doe dit zowel in de serene
-        omgeving van Studio Yes Wellness als in persoonlijke privélessen.
+        Welkom bij Yoga Ravennah - de perfecte plek om kennis te maken met yoga en jezelf te verwelkomen in een laagdrempelige en ongedwongen omgeving. In Rotterdam Nesselande bied ik small group lessen met veel aandacht en ruimte voor persoonlijke groei.
       </p>
       <div>
         <p class="intro">

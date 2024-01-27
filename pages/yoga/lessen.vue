@@ -72,6 +72,29 @@
         <u>Bekijk op Google Maps</u>
       </a>
     </Header>
+    <div class="bg-emerald-100 title-dark">
+      <div id="weesJezelf" class="container mx-auto p-8 md:px-0 md:py-24">
+        <div class="flex justify-center items-center">
+          <div class="w-full md:w-2/3 md:text-center space-y-8">
+            <h2 class="text-2xl md:text-4xl uppercase font-black">
+              <span class="emerald-underline text-emerald-900"
+                >Waarom Yoga Ravennah</span
+              ><span class="text-emerald-700">.</span>
+            </h2>
+            <p class="text-xl text-emerald-900">
+              <ol class="flex flex-col gap-y-3">
+                <li><span class="text-emerald-700 font-bold">Laagdrempelige yoga:</span> Ik vind dat yoga voor iedereen toegankelijk moet zijn. Of je nu een beginner bent of al ervaring hebt, mijn lessen zijn ontworpen om je op je gemak te stellen en je te begeleiden bij elke stap van je yogareis.</li>
+                <li><span class="text-emerald-700 font-bold">Ongedwongen en no-nonsense:</span> tijdens mijn les creëer ik een ontspannen en informele sfeer waarin je jezelf kunt zijn. Geen oordeel, geen druk. Het is mijn doel dat je geniet van de voordelen van yoga zonder de stress van prestatiedruk.</li>
+                <li><span class="text-emerald-700 font-bold">Veel aandacht en ruimte:</span> De small group lessen zorgen ervoor dat je de persoonlijke aandacht krijgt die je verdient. Als ervaren instructeur zal ik je begeleiden en ondersteunen bij elke houding en ademhalingstechniek, zodat je het maximale uit elke les kunt halen.</li>
+                <li><span class="text-emerald-700 font-bold">Verbinding en gemeenschap:</span> In mijn lessen, hecht veel waarde aan het creëren van een gemeenschap van gelijkgestemde mensen die samen groeien en leren. Je zult je welkom voelen en nieuwe vriendschappen opbouwen terwijl je je yoga-avontuur voortzet.</li>
+                <li class="mt-3">Dus, als je op zoek bent naar een plek waar je op je eigen tempo kunt kennismaken met yoga, waar je jezelf kunt zijn en waar je kunt genieten van de voordelen van yoga in een ondersteunende omgeving, dan ben je van harte welkom bij de mijn yogalessen.</li>
+              </ol>
+            </p>
+            <Yoga />
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 

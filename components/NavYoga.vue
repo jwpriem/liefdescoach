@@ -1,7 +1,7 @@
 <template>
   <div>
     <div
-      class="block md:hidden flex justify-between items-center p-6 bg-gray-900"
+      class="block md:hidden flex justify-between items-center p-6 bg-gray-950"
     >
       <nuxt-link to="/" class="z-50">
         <Yoga color="#d1fae5" />
@@ -43,7 +43,7 @@
       </div>
       <div
         :class="navOpen ? 'left-0 ml-0' : 'ml-100vw'"
-        class="transition-all duration-300 ease-in-out fixed top-0 bg-gray-900 min-h-screen flex justify-start items-center text-center z-40 w-screen"
+        class="transition-all duration-300 ease-in-out fixed top-0 bg-gray-950 min-h-screen flex justify-start items-center text-center z-40 w-screen"
       >
         <ul class="w-full space-y-8">
           <li @click="toggle">
@@ -94,7 +94,7 @@
         </ul>
       </div>
     </div>
-    <nav class="hidden md:block w-full p-6 fixed z-50 top-0 left-0 bg-gray-900">
+    <nav class="hidden md:block w-full p-6 fixed z-50 top-0 left-0 bg-gray-950">
       <ul
         class="flex justify-center items-center space-x-10 text-lg text-emerald-100 uppercase font-light"
       >

@@ -15,7 +15,7 @@ module.exports = {
     extend: {
       fontFamily: {
         display: ['Montserrat', 'sans-serif'],
-        body: ['Source Sans Pro', 'sans-serif']
+        body: ['Source Sans 3', 'sans-serif']
       },
       colors: {
         rose: colors.rose,
