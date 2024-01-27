@@ -4,6 +4,8 @@
 
 body .dark {
   @apply font-body text-gray-600 antialiased ;
+
+  font-family: 'Source Sans 3', sans-serif;
 }
 
 h1,
@@ -33,8 +35,10 @@ h1,
   @apply text-lg;
 }
 
-p {
+p, li {
   @apply font-body;
+
+  font-family: 'Source Sans 3', sans-serif;
 }
 
 .intro {
@@ -43,6 +47,7 @@ p {
 
 .button {
   @apply rounded-xl font-bold text-lg p-4 md:p-6 cursor-pointer inline-block transition-all duration-300 ease-in-out antialiased;
+  font-family: 'Source Sans 3', sans-serif;
 
   &.button-small {
     @apply text-sm px-2 py-1 md:px-3 md:py-2;
