@@ -130,8 +130,6 @@ export default {
           name: this.name,
           phone: this.phone ? this.formatPhoneNumber(this.phone) : null
         });
-
-        this.$router.push("/yoga/account");
       } catch (error) {
         console.error("Registration failed:", error);
       }

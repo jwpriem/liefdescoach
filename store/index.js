@@ -86,10 +86,10 @@ export const actions = {
       await dispatch('getMyBookings')
       
     } catch (error) {
-      console.log('error')
-      console.log(route)
-      const str = JSON.stringify(error, null, 4); // (Optional) beautiful indented output.
-      console.log(str); // Logs output to dev tools console.
+//      console.log('error')
+//      console.log(route)
+//      const str = JSON.stringify(error, null, 4); // (Optional) beautiful indented output.
+//      console.log(str); // Logs output to dev tools console.
       if(route){
         if(route == '/yoga/account') {
           $nuxt.$router.push('/yoga/login')
@@ -163,8 +163,21 @@ export const actions = {
       commit('SET_DEBITS_USER', res.debits)
       commit('SET_LOADING', false)
       
+      $nuxt.$router.push("/yoga/account");
+
     } catch (error) {
-      throw error;
+      commit('SET_LOADING', false)
+//      const str = JSON.stringify(error, null, 4); // (Optional) beautiful indented output.
+//      console.log(str); // Logs output to dev tools console.
+      if(error['response']['message'] == 'Invalid `password` param: Password must be at least 8 characters and should not be one of the commonly used password.') {
+        //Navigate to login
+        commit('SET_ERROR_MESSAGE', 'Wachtwoord moet minimaal 8 character zijn')
+      } else if(error['response']['message'] == 'A user with the same id, email, or phone already exists in this project.') {
+        commit('SET_ERROR_MESSAGE', 'Emailadres is al in gebruik, probeer in te loggen')
+      } else {
+        //Navigate to login
+        commit('SET_ERROR_MESSAGE', 'Er iets verkeerd gegaan')
+      }
     }
   },
   async getStudents({ commit,state }) {
