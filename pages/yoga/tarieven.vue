@@ -6,10 +6,14 @@
       </h1>
       <p class="intro">Je kunt een losse les meedoen voor <span
         class="text-emerald-700 font-bold">&euro; 15,- per les</span> of je kunt een strippenkaart kopen van <span
-        class="text-emerald-700 font-bold">10 lessen voor &euro; 125,-</span> (&euro; 12,50 per les).</p>
+        class="text-emerald-700 font-bold">10 lessen voor &euro; 125,-</span> (&euro; 12,50 per les). Een strippenkaart is 12 maanden geldig.</p>
+
+        <p class="intro">Een les annuleren kan tot 24 uur voor de les kosteloos.</p>
       
       <p class="intro">
-        Boeken kan via <a href="https://www.instagram.com/yogaravennah" target="_blank"><u>Instagram</u></a> of <nuxt-link to="/yoga/contact"><u>contactformulier</u></nuxt-link>. Vul bij het bericht in welke datum je wilt boeken.
+        <span v-if="!loggedInUser">Boeken kan door
+        <nuxt-link to="/yoga/login"><u>in te loggen</u></nuxt-link>. Heb je nog geen account dan kun je er 1 aanmaken.</span>
+        Bekijk ook de <nuxt-link to="/yoga/tarieven"><u>tarieven</u></nuxt-link>
       </p>
       
       <nuxt-link to="/yoga/lessen" class="emerald button">
