@@ -140,7 +140,11 @@ export const actions = {
 
       await account.create(ID.unique(), email, password, name);
       await account.createEmailSession(email, password);
-      await account.updatePhone(phone, password);
+
+      if(phone) {
+        await account.updatePhone(phone, password);
+      }
+      
       const user = await account.get();
       
       let data = {
@@ -148,7 +152,7 @@ export const actions = {
         debits: 0,
         name: user.name,
         email: user.email,
-        phone: user.phone,
+        phone: phone ? user.phone : null,
         registration: user.registration
       }
       

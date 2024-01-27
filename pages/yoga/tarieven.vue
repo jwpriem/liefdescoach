@@ -12,7 +12,7 @@
       
       <p class="intro">
         <span v-if="!loggedInUser">Boeken kan door
-        <nuxt-link to="/yoga/login"><u>in te loggen</u></nuxt-link>. Heb je nog geen account dan kun je er 1 aanmaken.</span>
+        <nuxt-link to="/yoga/login"><u>in te loggen</u></nuxt-link>. Heb je nog geen account dan kun je een account aanmaken.</span>
         Bekijk ook de <nuxt-link to="/yoga/tarieven"><u>tarieven</u></nuxt-link>
       </p>
       
