@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 body .dark {
   @apply font-body text-gray-600 antialiased;
 }
@@ -150,7 +154,7 @@ textarea {
     @apply appearance-none bg-emerald-100 text-emerald-800 p-4 font-body w-full rounded border-transparent text-sm transition-all duration-300 ease-in-out;
 
   &::placeholder {
-    @apply tracking-wide italic text-sm subpixel-antialiased text-emerald-300;
+    @apply tracking-wide italic text-sm subpixel-antialiased text-emerald-800 text-opacity-50;
   }
 
   &:disabled {

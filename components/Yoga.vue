@@ -1,7 +1,7 @@
 <template>
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    class="w-20 h-20 inline-block stroke-emerald-100"
+    class="w-20 h-20 inline-block stroke-emerald-800"
     xmlns:xlink="http://www.w3.org/1999/xlink"
     version="1.1"
     x="0px"

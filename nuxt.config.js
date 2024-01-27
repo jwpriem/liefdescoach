@@ -51,23 +51,33 @@ export default {
 
   // Modules for dev and build (recommended) (https://go.nuxtjs.dev/config-modules)
   buildModules: [
-    // https://go.nuxtjs.dev/eslint
-    // '@nuxtjs/eslint-module',
-    // https://go.nuxtjs.dev/tailwindcss
-    '@nuxtjs/tailwindcss'
+    'tailwindcss'
   ],
   // Modules (https://go.nuxtjs.dev/config-modules)
   modules: [
     '@nuxtjs/axios',
     'nuxt-mail',
     '@nuxtjs/gtm',
-    'cookie-universal-nuxt'
+    'cookie-universal-nuxt',
   ],
   gtm: {
     id: 'GTM-PZP28PP'
   },
+
+
+
   // Build Configuration (https://go.nuxtjs.dev/config-build)
   build: {
+    postcss: {
+      postcssOptions: {
+        plugins: {
+          'postcss-import': {},
+          'tailwindcss/nesting': 'postcss-nesting',
+          tailwindcss: {},
+          autoprefixer: {},
+        }
+      }
+    },
   },
 
   router: {

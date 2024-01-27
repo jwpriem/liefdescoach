@@ -10,49 +10,56 @@
               >Bewerk gegevens</span
               ><span class="text-emerald-700">.</span>
           </h2>
-          <LCInput
-            id="email"
+          <div>
+          <div class="flex items-center justify-start">
+            <label>E-mail</label>
+          </div>
+          <input id="email"
             v-model="email"
-            label="E-mail"
-            :required="true"
             type="text"
             placeholder="Je e-mailadres"
             class="w-full"
           />
-          <LCInput
-            id="naam"
+        </div>
+        <div>
+          <div class="flex items-center justify-start">
+            <label>Naam</label>
+          </div>
+          <input id="name"
             v-model="name"
-            label="Naam"
-            :required="true"
             type="text"
             placeholder="Je naam"
             class="w-full"
           />
-          <LCInput
-            id="telefoon"
+        </div>
+        <div>
+          <div class="flex items-center justify-start">
+            <label>Telefoonnummer</label>
+          </div>
+          <input id="phone"
             v-model="phone"
-            label="Telefoonnummer"
-            :required="false"
             type="text"
             placeholder="Je telefoonnummer"
             class="w-full"
           />
-
-          <LCInput
-            id="wachtwoord"
+        </div>
+        <div>
+          <div class="flex items-center justify-start">
+            <label>Wachtwoord (om de wijzigen op te slaan)</label>
+          </div>
+          <input id="password"
             v-model="password"
-            label="Vul wachtwoord in om wijzigen te kunnen verwerken"
-            :required="true"
             type="password"
-            placeholder="Wachtwoord"
-            class="w-full mb-2"
+            placeholder="Je wachtwoord"
+            class="w-full"
           />
-          <div>
+        </div>
+          <div class="flex gap-x-3">
             <button :disabled="!password" class="button emerald button-small" :class="!password ? 'disabled' : ''"
                     type="button" @click="updateAccount()">
               Opslaan
             </button>
-            <button class="button outlined emerald button-small " type="button" @click="cancelAccount()">
+            <button class="button emerald-outlined button-small" type="button" @click="cancelAccount()">
               Annuleer
             </button>
           </div>
@@ -70,21 +77,22 @@
               >Voeg credits toe</span
               ><span class="text-emerald-700">.</span>
           </h2>
-
-          <LCInput
-            id="add-credits"
-            v-model="addCredits"
-            label="Credits toevoegen"
-            :required="true"
-            type="text"
-            placeholder="Aantal credits om toe te voegen"
-            class="w-full mb-2"
-          />
           <div>
+            <div class="flex items-center justify-start">
+              <label>Credits toevoegen</label>
+            </div>
+            <input id="add-credits"
+              v-model="addCredits"
+              type="number"
+              placeholder="Aantal credits om toe te voegen"
+              class="w-full"
+            />
+          </div>
+          <div class="flex gap-x-3">
             <button class="button emerald button-small" type="button" @click="updateCredits()">
               Voeg credits toe
             </button>
-            <button class="button outlined emerald button-small " type="button" @click="cancel()">
+            <button class="button emerald-outlined button-small" type="button" @click="cancel()">
               Annuleer
             </button>
           </div>
@@ -112,12 +120,12 @@
               <option :value="null">Kies gebruiker</option>
               <option v-for="student in students" :value="student">{{ student.name }}</option>
             </select>
-          <div>
+          <div class="flex gap-x-3">
             <button :disabled="!addBooking.user && !addBooking.lesson" class="button emerald button-small" :class="!addBooking.user && !addBooking.lesson ? 'disabled' : ''"
                     type="button" @click="book(addBooking.lesson, addBooking.user)">
               Voeg toe
             </button>
-            <button class="button outlined emerald button-small " type="button" @click="cancelBooking()">
+            <button class="button emerald-outlined button-small" type="button" @click="cancelBooking()">
               Annuleer
             </button>
           </div>

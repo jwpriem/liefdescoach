@@ -5,44 +5,50 @@
         <div v-if="errorMessage" class="p-4 border-red-600 border-2 bg-red-200 text-red-600 font-bold rounded">
           {{ errorMessage }}
         </div>
-        <LCInput
-          id="email"
-          v-model="email"
-          label="E-mail"
-          :required="true"
-          type="text"
-          placeholder="Je e-mailadres"
-          class="w-full"
-        />
-        <LCInput
-          id="wachtwoord"
-          v-model="password"
-          label="Wachtwoord"
-          :required="true"
-          type="password"
-          placeholder="Wachtwoord"
-          class="w-full"
-        />
-        <LCInput
-          id="naam"
-          v-model="name"
-          label="Naam"
-          :required="true"
-          type="text"
-          placeholder="Je naam"
-          class="w-full"
-          v-if="registerForm"
-        />
-        <LCInput
-          id="telefoon"
-          v-model="phone"
-          label="Telefoonnummer"
-          :required="false"
-          type="text"
-          placeholder="Je telefoonnummer"
-          class="w-full"
-          v-if="registerForm"
-        />
+        <div>
+          <div class="flex items-center justify-start">
+            <label>E-mail</label> <sup class="required">*</sup>
+          </div>
+          <input id="email"
+            v-model="email"
+            type="text"
+            placeholder="Je e-mailadres"
+            class="w-full"
+          />
+        </div>
+        <div>
+          <div class="flex items-center justify-start">
+            <label>Wachtwoord (minimaal 8 characters)</label> <sup class="required">*</sup>
+          </div>
+          <input id="password"
+            v-model="password"
+            type="password"
+            placeholder="Je wachtwoord"
+            class="w-full"
+          />
+        </div>
+        <div v-if="registerForm">
+          <div class="flex items-center justify-start">
+            <label>Naam</label> <sup class="required">*</sup>
+          </div>
+          <input id="name"
+            v-model="name"
+            type="text"
+            placeholder="Je naam"
+            class="w-full"
+          />
+        </div>
+        <div v-if="registerForm">
+          <div class="flex items-center justify-start">
+            <label>Telefoonnummer</label>
+          </div>
+          <input id="phone"
+            v-model="phone"
+            type="text"
+            placeholder="Je telefoonnummer"
+            class="w-full"
+          />
+        </div>
       </div>
       <div class="mt-8">
         <span v-if="!registerForm" class="flex justify-start items-center gap-x-3">
