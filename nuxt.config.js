@@ -8,7 +8,8 @@ export default {
   },
   publicRuntimeConfig: {
     database: process.env.DATABASE,
-    project: process.env.PROJECT
+    project: process.env.PROJECT,
+    postmark: process.env.POSTMARK
   },
   ssr: true,
   target: 'server',
