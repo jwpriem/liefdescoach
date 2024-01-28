@@ -205,8 +205,8 @@
               ><span class="text-emerald-700">.</span>
         </h2>
         <div class="w-full">
-        <div class="flex flex-col md:flex-row mt-8 gap-3">
-          <div v-for="student in students" index="student.$id" class="p-4 bg-gray-800 rounded flex flex-col gap-y-3 w-full md:w-1/4" v-if="student.$id != loggedInUser.$id">
+        <div class="grid grid-cols-1 md:grid-cols-4 mt-8 gap-3">
+          <div v-for="student in students" index="student.$id" class="p-4 bg-gray-800 rounded flex flex-col gap-y-3 w-full" v-if="student.$id != loggedInUser.$id">
             <div>
               <sup class="text-emerald-500">Naam</sup>
               <span class="block -mt-2">{{ student.name }}</span>
@@ -237,13 +237,13 @@
         </div>
         
 
-          <div class="mt-12 w-full sm:w-2/3 md:w-1/2">
+          <div class="mt-12 w-full">
             <h2 class="text-2xl md:text-4xl uppercase font-black">
               <span class="emerald-underline text-emerald-900"
               >Lessen</span
               ><span class="text-emerald-700">.</span>
             </h2>
-            <div class="flex flex-col mt-8 gap-y-3">
+            <div class="grid grid-cols-1 md:grid-cols-4 mt-8 gap-3">
               <div v-for="lesson in lessons" index="lesson.$id" class="p-4 bg-gray-800 rounded flex flex-col gap-y-3" :class="isFutureBooking(lesson) ? '' : 'opacity-20 hover:opacity-100'">
                 <div>
                   <sup class="text-emerald-500">Datum</sup>

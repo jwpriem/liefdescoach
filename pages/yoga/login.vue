@@ -18,7 +18,7 @@
         </div>
         <div>
           <div class="flex items-center justify-start">
-            <label>Wachtwoord (minimaal 8 characters)</label> <sup class="required">*</sup>
+            <label>Wachtwoord <span v-if="registerForm">(minimaal 8 characters)</span></label> <sup class="required">*</sup>
           </div>
           <input id="password"
             v-model="password"
