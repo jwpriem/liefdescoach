@@ -131,7 +131,7 @@ export const actions = {
       await dispatch('getAccountDetails', { route: '/yoga/account' })
       
     } catch(error) {
-      
+      commit('SET_LOADING', false)
     }
   },
   async registerUser ({ commit }, { email, password, name, phone }) {
@@ -310,9 +310,9 @@ export const actions = {
       console.log(error)
     }
   },
-  async cancelBooking({ dispatch }, { booking, lesson }) {
+  async cancelBooking({ commit, dispatch }, { booking, lesson }) {
     try {
-
+      commit('SET_LOADING', true)
       // Update availability lesson
       const newSpots = lesson.spots + 1
 
@@ -341,8 +341,9 @@ export const actions = {
       await dispatch('getStudents')
       await dispatch('getAccountDetails', { route: '/yoga/account' })
       await dispatch('getLessons')
-
+      commit('SET_LOADING', false)
     } catch(error) {
+      commit('SET_LOADING', false)
       console.log(error)
     }
   }

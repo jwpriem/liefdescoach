@@ -1,5 +1,6 @@
 <template>
   <div>
+    <IsLoading :loading="isLoading" />
     <Header image="/yoga-sfeer2.jpg" alignment="object-bottom">
       <h1 class="text-3xl md:text-6xl uppercase font-black">
         <span class="emerald-underline">Les schema</span><span class="text-emerald-600">.</span>
@@ -14,19 +15,6 @@
           <b>{{ formatDateInDutch(lesson.date) }} ({{ lesson.spots }} {{ lesson.spots == 1 ? 'plek' : 'plekken' }} )</b>
           <button :disabled="checkBooking(lesson.$id)" class="button emerald button-small"
                   :class="checkBooking(lesson.$id) ? 'disabled' : ''" @click="book(lesson)" v-if="loggedInUser && !checkBooking(lesson.$id) && lesson.spots > 0">
-                  <svg v-if="isLoading" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline-block"
-                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle
-                class="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                stroke-width="4"
-              />
-              <path class="opacity-75" fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
-            </svg>
             Boek
           </button>
           <span v-if="checkBooking(lesson.$id)" class="flex content-center"><svg xmlns="http://www.w3.org/2000/svg"

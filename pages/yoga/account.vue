@@ -1,5 +1,6 @@
 <template>
   <div>
+    <IsLoading :loading="isLoading" />
     <!--Pop up for editing details-->
     <div v-if="editAccount" class="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
       <div class="w-full max-height-75 overflow-y-scroll sm:w-2/3 md:w-1/2 bg-gray-800 p-6 rounded-lg shadow-lg">
@@ -192,6 +193,9 @@
                   </svg>
                   {{ formatDateInDutch(booking.lessons.date, true) }}
                 </span>
+                <button class="button emerald button-small mt-3" @click="removeBooking(booking, booking.lessons)" v-if="checkCancelPeriod(booking.lessons)">
+                  Les annuleren
+                </button>
             </div>
             </div>
           </div>
@@ -395,6 +399,12 @@ export default {
     isFutureBooking(lesson) {
       const lessonDate = dayjs(new Date(lesson.date))
       return dayjs().isBefore(lessonDate)
+    },
+
+    checkCancelPeriod(lesson) {
+      dayjs.extend(utc)
+
+      return dayjs().utc().isBefore(dayjs(new Date(lesson.date)).utc().subtract(1, 'day'))
     },
 
     async book(lesson, user) {
