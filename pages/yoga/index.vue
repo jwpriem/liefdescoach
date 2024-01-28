@@ -111,7 +111,7 @@
         </ul>
       </div>
       <div
-        class="md:flex justify-start items-center md:space-x-3 space-y-2 md:space-y-0"
+        class="flex justify-start items-center gap-x-3"
       >
         <nuxt-link to="/yoga/lessen" class="emerald button">
           Les schema

@@ -80,8 +80,8 @@ export default {
     },
   },
 
-  router: {
-    middleware: 'auth'
+  serverMiddleware: {
+    '/api': '~/api'
   },
 
   // See https://github.com/nuxt-community/axios-module#options

@@ -172,6 +172,9 @@
 
           <div class="button button-small emerald" v-if="!editAccount" @click="setUserAccount()">Gegevens bewerken</div>
 
+            <button @click="showMessageFromBackend()" class="button button-small rose" v-if="isAdmin">
+              Test
+            </button>
         </div>
       </div>
       <div v-if="!isAdmin && myBookings.length" Class="mt-12">
@@ -426,6 +429,17 @@ export default {
         booking: booking,
         lesson: lesson
       });
+    },
+
+    async showMessageFromBackend () {
+
+      try {
+        const response = await this.$axios.get('/api/test')
+        console.log(response.data)
+      } catch (err) {
+        console.log(err)
+      }
+
     }
   },
   computed: {
