@@ -108,6 +108,7 @@
 import Header from '~/components/Header'
 import dayjs from 'dayjs';
 import 'dayjs/locale/nl';
+const utc = require('dayjs/plugin/utc');
 
 export default {
   layout: 'yoga',
@@ -139,8 +140,9 @@ export default {
   methods: {
     formatDateInDutch(lesson) {
       dayjs.locale('nl'); // Set locale to Dutch
+      dayjs.extend(utc)
 
-      const lessonDate = dayjs(new Date(lesson))
+      const lessonDate = dayjs(new Date(lesson)).utc()
       const formattedDate = lessonDate.format('dddd D MMMM')
       const startTime = lessonDate.format('h')
       const endTime = lessonDate.add(1, 'hour').format('h')
