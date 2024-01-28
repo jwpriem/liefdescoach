@@ -171,10 +171,6 @@
           </div>
 
           <div class="button button-small emerald" v-if="!editAccount" @click="setUserAccount()">Gegevens bewerken</div>
-
-            <button @click="showMessageFromBackend()" class="button button-small rose" v-if="isAdmin">
-              Test
-            </button>
         </div>
       </div>
       <div v-if="!isAdmin && myBookings.length" Class="mt-12">
@@ -353,7 +349,7 @@ export default {
         await this.$store.dispatch('getAccountDetails', {route: this.$route.fullPath})
 
       } catch (error) {
-        console.log(error)
+
       }
     },
 
@@ -420,7 +416,7 @@ export default {
         this.cancelBooking()
       }
       catch(error) {
-        console.log(error)
+
       }
     },
 
