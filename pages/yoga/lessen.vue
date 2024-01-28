@@ -6,14 +6,14 @@
       </h1>
       <p class="intro">
         <div v-for="lesson in upcomingLessons" :key="lesson.$id" v-if="lessons.length"
-             class="flex content-center items-center gap-x-3">
+             class="flex items-center gap-x-3">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                stroke="currentColor" class="w-6 h-6 mr-1 inline-block stroke-current text-emerald-700">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
           </svg>
-          {{ formatDateInDutch(lesson.date) }} ({{ lesson.spots }} plekken)
+          <b>{{ formatDateInDutch(lesson.date) }} ({{ lesson.spots }} {{ lesson.spots == 1 ? 'plek' : 'plekken' }} )</b>
           <button :disabled="checkBooking(lesson.$id)" class="button emerald button-small"
-                  :class="checkBooking(lesson.$id) ? 'disabled' : ''" @click="book(lesson)" v-if="loggedInUser && !checkBooking(lesson.$id)">
+                  :class="checkBooking(lesson.$id) ? 'disabled' : ''" @click="book(lesson)" v-if="loggedInUser && !checkBooking(lesson.$id) && lesson.spots > 0">
                   <svg v-if="isLoading" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline-block"
                  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
               <circle
@@ -33,11 +33,17 @@
                                                                                  fill="none" viewBox="0 0 24 24"
                                                                                  stroke-width="1.5"
                                                                                  stroke="currentColor"
-                                                                                 class="w-6 h-6 inline-block mx-2">
+                                                                                 class="w-6 h-6 inline-block mx-1">
                 <path stroke-linecap="round" stroke-linejoin="round"
                       d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
               </svg>
             Geboekt
+          </span>
+          <span v-if="loggedInUser && !checkBooking(lesson.$id) && lesson.spots == 0" class="flex content-center">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"class="w-6 h-6 inline-block mx-1">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+            </svg>
+            Helaas les is vol
           </span>
           <nuxt-link to="/yoga/login" v-if="!loggedInUser" class="button button-small emerald">
             Login om te boeken
