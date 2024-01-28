@@ -108,7 +108,6 @@ export default {
   },
   computed: {
     upcomingLessons() {
-      console.log(this.$store.getters.lessons)
       return this.$store.getters.lessons
         .filter(lesson => {
           const lessonDate = dayjs(new Date(lesson.date))

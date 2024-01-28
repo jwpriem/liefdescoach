@@ -182,7 +182,7 @@ export default {
         await this.$store.dispatch("logoutUser");
         this.$router.push("/yoga");
       } catch (error) {
-        console.error("Logout failed:", error);
+
       }
     }
   },

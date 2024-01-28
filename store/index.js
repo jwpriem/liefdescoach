@@ -51,9 +51,6 @@ export const actions = {
       // Navigate to account
       $nuxt.$router.push("/yoga/account");
     } catch (error) {
-//      console.log(JSON.stringify(error, null, 4))
-//      console.log(error['type'] == 'user_invalid_credentials')
-      
       if(error['type'] == 'user_invalid_credentials') {
         //Navigate to login
         commit('SET_ERROR_MESSAGE', 'Verkeerde gebruikersnaam of wachtwoord')
@@ -86,10 +83,7 @@ export const actions = {
       await dispatch('getMyBookings')
       
     } catch (error) {
-//      console.log('error')
-//      console.log(route)
 //      const str = JSON.stringify(error, null, 4); // (Optional) beautiful indented output.
-//      console.log(str); // Logs output to dev tools console.
       if(route){
         if(route == '/yoga/account') {
           $nuxt.$router.push('/yoga/login')
@@ -171,8 +165,6 @@ export const actions = {
 
     } catch (error) {
       commit('SET_LOADING', false)
-//      const str = JSON.stringify(error, null, 4); // (Optional) beautiful indented output.
-//      console.log(str); // Logs output to dev tools console.
       if(error['response']['message'] == 'Invalid `password` param: Password must be at least 8 characters and should not be one of the commonly used password.') {
         //Navigate to login
         commit('SET_ERROR_MESSAGE', 'Wachtwoord moet minimaal 8 character zijn')
@@ -196,7 +188,6 @@ export const actions = {
         commit('SET_STUDENTS', [])
       }
     }catch (error) {
-      console.log(error)
     }
   },
   async getLessons({ commit,state }) {
@@ -210,7 +201,6 @@ export const actions = {
       commit('SET_LESSONS', list.documents.sort((a, b) => new Date(a.date) - new Date(b.date)))
       
     }catch (error) {
-      console.log(error)
     }
   },
   async logoutUser({ commit }) {
@@ -244,7 +234,6 @@ export const actions = {
       await dispatch('getStudents')
       await dispatch('getAccountDetails')
     }catch (error) {
-      console.log(error)
     }
   },
   async getMyBookings({ commit, state, dispatch }) {
@@ -258,7 +247,6 @@ export const actions = {
       )
       commit('SET_MY_BOOKINGS', myBookings.documents)
     } catch (error) {
-      console.log(error)
     }
   },
   async handleBooking({ commit, state, dispatch }, { lesson, user }){
@@ -307,7 +295,6 @@ export const actions = {
       commit('SET_LOADING', false)
     }catch (error) {
       commit('SET_LOADING', false)
-      console.log(error)
     }
   },
   async cancelBooking({ commit, dispatch }, { booking, lesson }) {
@@ -344,7 +331,6 @@ export const actions = {
       commit('SET_LOADING', false)
     } catch(error) {
       commit('SET_LOADING', false)
-      console.log(error)
     }
   }
 };
