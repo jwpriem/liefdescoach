@@ -142,7 +142,8 @@ export default {
     async book(lesson) {
       await this.$store.dispatch("handleBooking", {
         lesson: lesson,
-        user: this.$store.getters.loggedInUser
+        user: this.$store.getters.loggedInUser,
+        formattedDate: this.formatDateInDutch(lesson.date)
       });
 
       await this.$store.dispatch('getAccountDetails', { route: this.$route.fullPath })
