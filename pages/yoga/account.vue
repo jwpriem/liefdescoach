@@ -114,12 +114,12 @@
 
           <select class="select-wrapper" v-model="addBooking.lesson">
             <option :value="null">Kies datum</option>
-            <option v-for="lesson in lessons" :value="lesson" v-if="isFutureBooking(lesson)">{{ formatDateInDutch(lesson.date) }}</option>
+            <option v-for="lesson in lessons" :value="lesson" v-if="isFutureBooking(lesson)" :disabled="!lesson.spots > 0">{{ formatDateInDutch(lesson.date) }} <span v-if="!lesson.spots > 0">(vol)</span><span v-else>(Nog {{lesson.spots}} {{ lesson.spots == 1 ? 'plek' : 'plekken'}})</span></option>
           </select>
 
-          <select class="select-wrapper" v-model="addBooking.user">
+          <select class="select-wrapper" v-model="addBooking.user" :disabled="!addBooking.lesson">
               <option :value="null">Kies gebruiker</option>
-              <option v-for="student in students" :value="student">{{ student.name }}</option>
+              <option v-for="student in students" :value="student" v-if="checkAvailability(student)">{{ student.name }}</option>
             </select>
           <div class="flex gap-x-3">
             <button :disabled="!addBooking.user && !addBooking.lesson" class="button emerald button-small" :class="!addBooking.user && !addBooking.lesson ? 'disabled' : ''"
@@ -204,7 +204,7 @@
       <div v-if="isAdmin && students.length" Class="mt-12">
         <h2 class="text-2xl md:text-4xl uppercase font-black">
               <span class="emerald-underline text-emerald-900"
-              >Gebruikers</span
+              >Gebruikers ({{students.length}})</span
               ><span class="text-emerald-700">.</span>
         </h2>
         <div class="w-full">
@@ -419,6 +419,10 @@ export default {
       catch(error) {
 
       }
+    },
+
+    checkAvailability(student) {
+      return this.addBooking.lesson ? !this.addBooking.lesson.bookings.some(x => x.students.$id == student.$id) : false
     },
 
     async removeBooking(booking, lesson) {
