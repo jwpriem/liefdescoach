@@ -192,9 +192,17 @@
                   </svg>
                   {{ formatDateInDutch(booking.lessons.date, true) }}
                 </span>
+
+                <div class="flex gap-x-3 my-2">
+                  <a :href="getCalenderLink('apple', booking.lessons.date)"><img src="/apple.png" class="w-6" /></a>
+                  <a :href="getCalenderLink('google', booking.lessons.date)"><img src="/gmail.png" class="w-6" /></a>
+                  <a :href="getCalenderLink('outlook', booking.lessons.date)"><img src="/outlook.png" class="w-6" /></a>
+                </div>
+
                 <button class="button emerald button-small mt-3" @click="removeBooking(booking, booking.lessons)" v-if="checkCancelPeriod(booking.lessons)">
                   Les annuleren
                 </button>
+
             </div>
             </div>
           </div>
@@ -404,6 +412,16 @@ export default {
       dayjs.extend(utc)
 
       return dayjs().utc().isBefore(dayjs(new Date(lesson.date)).utc().subtract(1, 'day'))
+    },
+
+    getCalenderLink(stream, date) {
+      dayjs.locale('nl'); // Set locale to Dutch
+      dayjs.extend(utc)
+
+      const lessonDate = dayjs(new Date(date)).utc()
+      const startTime = lessonDate.format('h')
+      const link = `https://calndr.link/d/event/?service=${stream}&start=${lessonDate.format('YYYY-MM-DD')}%20${startTime}:00&title=Yogales%20Ravennah&timezone=Europe/Amsterdam&location=Emmy%20van%20Leersumhof%2024a%20Rotterdam`
+      return link
     },
 
     async book(lesson, user) {
