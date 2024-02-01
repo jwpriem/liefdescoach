@@ -33,8 +33,8 @@
               <span class="block -mt-2">{{ $rav.formatDateInDutch(loggedInUser.registration) }}</span>
             </div>
             <div>
-              <div class="button button-small emerald" v-if="!editMode" @click="openEdit()">Gegevens bewerken</div>
-              <div class="button button-small emerald mx-3" v-if="!editPassword" @click="editPassword = true">Wachtwoord wijzigen</div>
+              <div class="button button-small emerald mr-1" v-if="!editMode" @click="openEdit()">Gegevens bewerken</div>
+              <div class="button button-small emerald" v-if="!editPassword" @click="editPassword = true">Wachtwoord wijzigen</div>
             </div>
             
             
