@@ -12,17 +12,17 @@
             Topics waar je aan kunt denken:
           </p>
           <ul class="intro">
-            <li class="flex justify-start items-center space-x-3 cursor-pointer" @click="$lc.scrollTo('#weesJezelf')">
+            <li class="flex justify-start items-center space-x-3 cursor-pointer" @click="$rav.scrollTo('#weesJezelf')">
               <svg class="w-6 h-6 inline-block stroke-current text-rose-600 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="{2}" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
               <p>Niet jezelf kunnen zijn</p>
               <svg class="w-3 h-3 inline-block stroke-current" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
             </li>
-            <li class="flex justify-start items-center space-x-3 cursor-pointer" @click="$lc.scrollTo('#onlineDating')">
+            <li class="flex justify-start items-center space-x-3 cursor-pointer" @click="$rav.scrollTo('#onlineDating')">
               <svg class="w-6 h-6 inline-block stroke-current text-rose-600 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="{2}" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
               <p>(Online) dating</p>
               <svg class="w-3 h-3 inline-block stroke-current" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
             </li>
-            <li class="flex justify-start items-center space-x-3" @click="$lc.scrollTo('#twijfels')">
+            <li class="flex justify-start items-center space-x-3" @click="$rav.scrollTo('#twijfels')">
               <svg class="w-6 h-6 inline-block stroke-current text-rose-600 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="{2}" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
               <p>Twijfels over je relatie</p>
               <svg class="w-3 h-3 inline-block stroke-current" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>

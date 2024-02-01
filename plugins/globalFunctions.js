@@ -1,6 +1,9 @@
 import Vue from 'vue'
+import dayjs from 'dayjs';
+import 'dayjs/locale/nl';
+const utc = require('dayjs/plugin/utc');
 
-const lc = {
+const rav = {
   scrollTo (id) {
     return document.querySelector(id).scrollIntoView({
       behavior: 'smooth'
@@ -59,11 +62,68 @@ const lc = {
     return errors.find(error => error.field === field)
       ? errors.find(error => error.field === field).error
       : ''
+  },
+  formatDateInDutch(lesson, isLesson = false) {
+    dayjs.locale('nl'); // Set locale to Dutch
+    dayjs.extend(utc)
+
+    const lessonDate = dayjs(new Date(lesson)).utc()
+    const startTime = lessonDate.format('h')
+    const endTime = lessonDate.add(1, 'hour').format('h')
+    const formattedDate = isLesson ? `${lessonDate.format('dddd D MMMM')} van ${startTime} tot ${endTime} uur` : lessonDate.format('D MMMM YYYY')
+
+
+    return formattedDate
+  },
+  isFutureBooking(lesson) {
+    const lessonDate = dayjs(new Date(lesson.date))
+    return dayjs().isBefore(lessonDate)
+  },
+  checkCancelPeriod(lesson) {
+    dayjs.extend(utc)
+
+    return dayjs().utc().isBefore(dayjs(new Date(lesson.date)).utc().subtract(1, 'day'))
+  },
+  getCalenderLink(stream, date) {
+    dayjs.locale('nl'); // Set locale to Dutch
+    dayjs.extend(utc)
+
+    const lessonDate = dayjs(new Date(date)).utc()
+    const startTime = lessonDate.format('h')
+    const link = `https://calndr.link/d/event/?service=${stream}&start=${lessonDate.format('YYYY-MM-DD')}%20${startTime}:00&title=Yogales%20Ravennah&timezone=Europe/Amsterdam&location=Emmy%20van%20Leersumhof%2024a%20Rotterdam`
+    return link
+  },
+  formatPhoneNumber(input) {
+    // Remove all non-digit characters
+    let digits = input.replace(/\D/g, '');
+
+    // Check if the number starts with '06' and replace with '316'
+    if (digits.startsWith('06')) {
+      digits = '31' + digits.substring(1);
+    }
+
+    // Validate if the number is now in the correct format
+    if (!/^31[0-9]{9}$/.test(digits)) {
+      console.log('Invalid phone number format');
+    }
+
+    // Reconstruct the phone number with the country code +31
+    return `+${digits}`;
+  },
+  upcomingLessons(lessons) {
+    return lessons
+        .filter(lesson => {
+          const lessonDate = dayjs(new Date(lesson.date))
+          return dayjs().isBefore(lessonDate)
+        })
+  },
+  checkAvailability(lesson, student) {
+    return lesson ? !lesson.bookings.some(x => x.students.$id == student.$id) : false
   }
 }
 
-Vue.prototype.lc = lc
+Vue.prototype.rav = rav
 
 export default ({ app }, inject) => {
-  inject('lc', lc)
+  inject('rav', rav)
 }

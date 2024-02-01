@@ -132,6 +132,19 @@ export const actions = {
       commit('SET_LOADING', false)
     }
   },
+  async updatePasswordUser({ commit, state }, { password, newPassword }) {
+    try {
+      commit('SET_LOADING', true)
+
+      await account.updatePassword(newPassword, password)
+
+      commit('SET_LOADING', false)
+      await dispatch('getAccountDetails', { route: '/yoga/account' })
+
+    } catch(error) {
+      commit('SET_LOADING', false)
+    }
+  },
   async registerUser ({ commit }, { email, password, name, phone }) {
     try {
       commit('SET_LOADING', true)
@@ -186,6 +199,9 @@ export const actions = {
         const list = await databases.listDocuments(
           this.$config.database,
           'students',
+          [
+            Query.orderAsc('name'),
+            ]
           )
         commit('SET_STUDENTS', list.documents)
       } else {

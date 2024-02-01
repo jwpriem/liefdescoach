@@ -16,7 +16,7 @@
               v-model="form.name"
               label="Naam"
               :required="true"
-              :error="this.$lc.getErrorMessage('name', errors)"
+              :error="this.$rav.getErrorMessage('name', errors)"
               type="text"
               placeholder="Je naam"
               class="w-full"
@@ -26,7 +26,7 @@
               v-model="form.email"
               label="E-mail"
               :required="true"
-              :error="this.$lc.getErrorMessage('email', errors)"
+              :error="this.$rav.getErrorMessage('email', errors)"
               type="text"
               placeholder="Je e-mailadres"
               class="w-full"
@@ -36,7 +36,7 @@
               v-model="form.phone"
               label="Telefoonnummer"
               :required="true"
-              :error="this.$lc.getErrorMessage('phone', errors)"
+              :error="this.$rav.getErrorMessage('phone', errors)"
               type="text"
               placeholder="Je telefoonnummer"
               class="w-full"
@@ -47,7 +47,7 @@
               label="Waar kan ik je mee helpen?"
               :rows="4"
               :required="true"
-              :error="this.$lc.getErrorMessage('message', errors)"
+              :error="this.$rav.getErrorMessage('message', errors)"
               placeholder="Waar kan ik je mee helpen?"
               class="w-full"
             />
@@ -123,7 +123,7 @@ export default {
       this.$v.form.$touch()
 
       if (this.$v.form.$invalid) {
-        this.errors = this.$lc.setErrorMessages(this.$v.form)
+        this.errors = this.$rav.setErrorMessages(this.$v.form)
         this.$message.error('1 of meerdere velden bevatten fouten')
       }
 

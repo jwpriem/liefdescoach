@@ -6,13 +6,13 @@
         <span class="emerald-underline">Les schema</span><span class="text-emerald-600">.</span>
       </h1>
       <p class="intro">
-        <div v-for="lesson in upcomingLessons" :key="lesson.$id" v-if="lessons.length"
+        <div v-for="lesson in $rav.upcomingLessons(lessons)" :key="lesson.$id" v-if="lessons.length"
              class="flex items-center gap-x-3">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                stroke="currentColor" class="w-6 h-6 mr-1 inline-block stroke-current text-emerald-700">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
           </svg>
-          <b>{{ formatDateInDutch(lesson.date) }} ({{ lesson.spots }} {{ lesson.spots == 1 ? 'plek' : 'plekken' }} )</b>
+          <b>{{ $rav.formatDateInDutch(lesson.date) }} ({{ lesson.spots }} {{ lesson.spots == 1 ? 'plek' : 'plekken' }} )</b>
           <button :disabled="checkBooking(lesson.$id)" class="button emerald button-small"
                   :class="checkBooking(lesson.$id) ? 'disabled' : ''" @click="book(lesson)" v-if="loggedInUser && !checkBooking(lesson.$id) && lesson.spots > 0">
             Boek
@@ -107,13 +107,6 @@ export default {
     await this.$store.dispatch("getLessons");
   },
   computed: {
-    upcomingLessons() {
-      return this.$store.getters.lessons
-        .filter(lesson => {
-          const lessonDate = dayjs(new Date(lesson.date))
-          return dayjs().isBefore(lessonDate)
-        })
-    },
     lessons() {
       return this.$store.getters.lessons;
     },
@@ -125,17 +118,6 @@ export default {
     }
   },
   methods: {
-    formatDateInDutch(lesson) {
-      dayjs.locale('nl'); // Set locale to Dutch
-      dayjs.extend(utc)
-
-      const lessonDate = dayjs(new Date(lesson)).utc()
-      const formattedDate = lessonDate.format('dddd D MMMM')
-      const startTime = lessonDate.format('h')
-      const endTime = lessonDate.add(1, 'hour').format('h')
-
-      return `${formattedDate} van ${startTime} tot ${endTime} uur`
-    },
     checkBooking(id) {
       return this.$store.getters.myBookings.some(booking => booking.lessons.$id === id)
     },
@@ -143,7 +125,7 @@ export default {
       await this.$store.dispatch("handleBooking", {
         lesson: lesson,
         user: this.$store.getters.loggedInUser,
-        formattedDate: this.formatDateInDutch(lesson.date)
+        formattedDate: this.$rav.formatDateInDutch(lesson.date)
       });
 
       await this.$store.dispatch('getAccountDetails', { route: this.$route.fullPath })

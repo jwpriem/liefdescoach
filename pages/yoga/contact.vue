@@ -10,7 +10,7 @@
             v-model="form.name"
             label="Naam"
             :required="true"
-            :error="this.$lc.getErrorMessage('name', errors)"
+            :error="this.$rav.getErrorMessage('name', errors)"
             type="text"
             placeholder="Je naam"
             class="w-full"
@@ -20,7 +20,7 @@
             v-model="form.email"
             label="E-mail"
             :required="true"
-            :error="this.$lc.getErrorMessage('email', errors)"
+            :error="this.$rav.getErrorMessage('email', errors)"
             type="text"
             placeholder="Je e-mailadres"
             class="w-full"
@@ -31,7 +31,7 @@
             label="Bericht"
             :rows="4"
             :required="true"
-            :error="this.$lc.getErrorMessage('message', errors)"
+            :error="this.$rav.getErrorMessage('message', errors)"
             placeholder="Waar gaat het over?"
             class="w-full"
           />
@@ -119,7 +119,7 @@ export default {
       this.$v.form.$touch()
 
       if (this.$v.form.$invalid) {
-        this.errors = this.$lc.setErrorMessages(this.$v.form)
+        this.errors = this.$rav.setErrorMessages(this.$v.form)
         this.$message.error('1 of meerdere velden bevatten fouten')
       }
 
