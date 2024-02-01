@@ -1,5 +1,5 @@
 <template>
-  <div class="md:h-screen p-8 pt-12 md:p-24 md:flex justify-between items-center md:space-x-16">
+  <div class="md:h-screen p-8 pt-12 md:p-20 md:flex justify-between items-center md:space-x-16">
     <div class="w-full md:w-1/2 space-y-6">
       <slot />
     </div>
