@@ -318,16 +318,21 @@ export const actions = {
         bookingsArr.unshift({ name: x.students.name})
       })
 
+      commit('SET_LOADING', false)
+
       // Send email
       const emailData = {
         new_booking_name: user.name,
         lessondate: formattedDate,
         spots: lessonsResponse.spots,
         bookings: bookingsArr,
+        calendar_link_apple: this.$rav.getCalenderLink('apple', lessonsResponse.date),
+        calendar_link_gmail: this.$rav.getCalenderLink('gmail', lessonsResponse.date),
+        calendar_link_outlook: this.$rav.getCalenderLink('outlook', lessonsResponse.date)
       }
 
       await this.$axios.post('/api/bookingEmail', emailData)
-      commit('SET_LOADING', false)
+
     }catch (error) {
       commit('SET_LOADING', false)
     }
@@ -338,7 +343,7 @@ export const actions = {
       // Update availability lesson
       const newSpots = lesson.spots + 1
 
-      await databases.updateDocument(
+      const lessonsResponse = await databases.updateDocument(
         this.$config.database,
         'lessons',
         lesson.$id,
@@ -347,7 +352,7 @@ export const actions = {
 
       const newCredits = booking.students.credits + 1
 
-      await databases.updateDocument(
+       await databases.updateDocument(
         this.$config.database,
         'students',
         booking.students.$id,
@@ -364,6 +369,23 @@ export const actions = {
       await dispatch('getAccountDetails', { route: '/yoga/account' })
       await dispatch('getLessons')
       commit('SET_LOADING', false)
+
+      // Bookingsarray for email
+      const bookingsArr = []
+      const lessonsArr = lessonsResponse.bookings.forEach(x => {
+        bookingsArr.unshift({ name: x.students.name})
+      })
+
+      // Send email
+      const emailData = {
+        booking_name: booking.students.name,
+        lessondate: this.$rav.formatDateInDutch(lessonsResponse.date, true),
+        spots: lessonsResponse.spots,
+        bookings: bookingsArr
+      }
+
+      await this.$axios.post('/api/cancelBookingEmail', emailData)
+
     } catch(error) {
       commit('SET_LOADING', false)
     }
