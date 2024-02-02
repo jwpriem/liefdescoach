@@ -14,7 +14,7 @@ app.post('/bookingEmail', function (req, res) {
   console.log(req.body);
     const email = client.sendEmailWithTemplate({
           "From": "info@ravennah.com",
-          "To": "jwpriem@gmail.com",
+          "To": "info@ravennah.com",
           "TemplateAlias": "lesson",
           "TemplateModel": {
             "body": null, // You can also pass this from the request body if needed
@@ -40,7 +40,7 @@ app.post('/cancelBookingEmail', function (req, res) {
   console.log(req.body);
   const email = client.sendEmailWithTemplate({
     "From": "info@ravennah.com",
-    "To": "jwpriem@gmail.com",
+    "To": "info@ravennah.com",
     "TemplateAlias": "lesson-cancel",
     "TemplateModel": {
       "body": null, // You can also pass this from the request body if needed
