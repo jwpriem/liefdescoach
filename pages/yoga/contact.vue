@@ -82,6 +82,24 @@ import LCTextarea from '~/components/forms/LCTextarea'
 
 export default {
   layout: 'yoga',
+  head() {
+    return {
+      title: this.pageTitle,
+      meta:[
+        { hid: 'description', name: 'description', content:  this.description },
+        { hid: 'og:title', property: 'og:title', content: this.pageTitle },
+        { hid: 'og:url', property: 'og:url', content: this.pageUrl },
+        { hid: 'og:description', property: 'og:description', content: this.description },
+        { hid: 'og:image', property: 'og:image', content: this.ogImage},
+
+        // twitter card
+        { hid: "twitter:title", name: "twitter:title", content: this.pageTitle },
+        { hid: "twitter:url", name: "twitter:url", content: this.pageUrl },
+        { hid: 'twitter:description', name: 'twitter:description', content: this.description },
+        { hid: "twitter:image", name: "twitter:image", content: this.ogImage},
+        ]
+    }
+  },
   components: {
     Header,
     LCInput,
@@ -89,6 +107,10 @@ export default {
   },
   data() {
     return {
+      pageTitle: 'Yoga Ravennah | Contact',
+      description: 'Wil je meer weten of een keer een proefles meedoen? Neem dan contact op via het formulier of mijn socials.',
+      ogImage: 'https://www.ravennah.com/ravennah-social.jpg',
+      pageUrl: 'https://www.ravennah.com/yoga/contact',
       loading: false,
       errors: [],
       form: {

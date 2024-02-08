@@ -246,7 +246,7 @@ export default {
     return {
       pageTitle: 'Yoga Ravennah | Ongedwongen yogales in Rotterdam Nesselande',
       description: 'De perfecte plek om kennis te maken met yoga en jezelf te verwelkomen in een laagdrempelige en ongedwongen omgeving. In Rotterdam Nesselande bied ik small group lessen met veel aandacht en ruimte voor persoonlijke groei.',
-      ogImage: 'https://www.ravennah.com/ravennah-yoga.jpg',
+      ogImage: 'https://www.ravennah.com/ravennah-social.jpg',
       pageUrl: 'https://www.ravennah.com/yoga'
     }
   },
