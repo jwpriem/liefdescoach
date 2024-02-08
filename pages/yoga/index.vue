@@ -224,6 +224,32 @@ import Header from "@/components/Header";
 
 export default {
   layout: "yoga",
+  head() {
+    return {
+      title: this.pageTitle,
+      meta:[
+        { hid: 'description', name: 'description', content:  this.description },
+        { hid: 'og:title', property: 'og:title', content: this.pageTitle },
+        { hid: 'og:url', property: 'og:url', content: this.pageUrl },
+        { hid: 'og:description', property: 'og:description', content: this.description },
+        { hid: 'og:image', property: 'og:image', content: this.ogImage},
+
+        // twitter card
+        { hid: "twitter:title", name: "twitter:title", content: this.pageTitle },
+        { hid: "twitter:url", name: "twitter:url", content: this.pageUrl },
+        { hid: 'twitter:description', name: 'twitter:description', content: this.description },
+        { hid: "twitter:image", name: "twitter:image", content: this.ogImage},
+        ]
+    }
+  },
+  data(){
+    return {
+      pageTitle: 'Yoga Ravennah | Ongedwongen yogales in Rotterdam Nesselande',
+      description: 'De perfecte plek om kennis te maken met yoga en jezelf te verwelkomen in een laagdrempelige en ongedwongen omgeving. In Rotterdam Nesselande bied ik small group lessen met veel aandacht en ruimte voor persoonlijke groei.',
+      ogImage: 'https://www.ravennah.com/ravennah-yoga.jpg',
+      pageUrl: 'https://www.ravennah.com/yoga'
+    }
+  },
   components: {
     Header
   }
