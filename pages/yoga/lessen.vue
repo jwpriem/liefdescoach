@@ -12,7 +12,7 @@
                stroke="currentColor" class="w-6 h-6 mr-1 inline-block stroke-current text-emerald-700">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
           </svg>
-          <b>{{ $rav.formatDateInDutch(lesson.date) }} ({{ lesson.spots }} {{ lesson.spots == 1 ? 'plek' : 'plekken' }} )</b>
+          <b>{{ $rav.formatDateInDutch(lesson.date, true) }} ({{ lesson.spots }} {{ lesson.spots == 1 ? 'plek' : 'plekken' }} )</b>
           <button :disabled="checkBooking(lesson.$id)" class="button emerald button-small"
                   :class="checkBooking(lesson.$id) ? 'disabled' : ''" @click="book(lesson)" v-if="loggedInUser && !checkBooking(lesson.$id) && lesson.spots > 0">
             Boek
