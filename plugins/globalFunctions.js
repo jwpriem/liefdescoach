@@ -68,8 +68,8 @@ const rav = {
     dayjs.extend(utc)
 
     const lessonDate = dayjs(new Date(lesson)).utc()
-    const startTime = lessonDate.format('h')
-    const endTime = lessonDate.add(1, 'hour').format('h')
+    const startTime = lessonDate.format('h.mm')
+    const endTime = lessonDate.add(1, 'hour').format('h.mm')
     const formattedDate = isLesson ? `${lessonDate.format('dddd D MMMM')} van ${startTime} tot ${endTime} uur` : lessonDate.format('D MMMM YYYY')
 
 
