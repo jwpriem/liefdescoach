@@ -1,3 +1,25 @@
+<script setup lang="ts">
+const store = useMainStore()
+const router = useRouter()
+const navOpen = ref(false);
+
+await useAsyncData('user', () => store.getAccountDetails(router.currentRoute.value.fullPath), { server: false })
+const toggle = () => {
+    navOpen.value = !navOpen.value;
+};
+
+const logout = async () => {
+    try {
+        await store.logoutUser();
+        await router.push('/yoga');
+    } catch (error) {
+        // Handle the error
+    }
+};
+
+const loggedInUser = computed(() => store.loggedInUser)
+</script>
+
 <template>
   <div>
     <div
@@ -155,65 +177,3 @@
     </nav>
   </div>
 </template>
-
-<script>
-import Yoga from "/components/Yoga";
-
-export default {
-  components: {
-    Yoga
-  },
-  data() {
-    return {
-      navOpen: false
-    };
-  },
-  async beforeMount() {
-    await this.$store.dispatch("getAccountDetails", {
-      route: this.$route.fullPath
-    });
-  },
-  methods: {
-    toggle() {
-      this.navOpen = !this.navOpen;
-    },
-    async logout() {
-      try {
-        await this.$store.dispatch("logoutUser");
-        this.$router.push("/yoga");
-      } catch (error) {
-  
-      }
-    }
-  },
-  computed: {
-    loggedInUser() {
-      return this.$store.getters.loggedInUser;
-    }
-  }
-};
-</script>
-
-<style lang="postcss" scoped>
-.nav-item {
-  @apply transition-all duration-300 ease-in-out antialiased;
-
-  &:hover {
-    @apply text-emerald-800;
-  }
-}
-
-.mobile-nav-item {
-  @apply text-2xl;
-}
-
-.nav-item.nuxt-link-exact-active,
-.mobile-nav-item.nuxt-link-exact-active {
-  @apply relative z-10 transition-all duration-300 ease-in-out antialiased;
-
-  &:before {
-    @apply absolute h-2.5 bottom-0 left-0 -ml-2 bg-emerald-700 bg-opacity-25 z-0 block w-full;
-    content: "";
-  }
-}
-</style>

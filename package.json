@@ -1,39 +1,31 @@
 {
-  "name": "do-app",
-  "version": "1.0.0",
+  "name": "nuxt-app",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "nuxt",
     "build": "nuxt build",
-    "start": "nuxt start",
+    "dev": "nuxt dev",
     "generate": "nuxt generate",
-    "lint:js": "eslint --ext .js,.vue --ignore-path .gitignore .",
-    "lint": "yarn lint:js"
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@nuxtjs/axios": "^5.12.5",
-    "@nuxtjs/gtm": "^2.4.0",
+    "@nuxtjs/robots": "^3.0.0",
+    "@nuxtjs/sitemap": "^5.1.2",
+    "@pinia/nuxt": "^0.5.1",
     "appwrite": "^13.0.1",
-    "cookie-universal-nuxt": "^2.2.2",
-    "core-js": "^3.6.5",
-    "dayjs": "^1.11.10",
     "express": "^4.18.2",
-    "install": "^0.13.0",
-    "nuxt": "^2.14.6",
-    "nuxt-mail": "^1.0.2",
-    "openai": "^3.1.0",
+    "nuxt": "^3.10.1",
+    "nuxt-mail": "^5.0.0",
+    "pinia": "^2.1.7",
     "postmark": "^4.0.2",
-    "vuelidate": "^0.7.6"
+    "vue": "^3.4.15",
+    "vue-router": "^4.2.5"
   },
   "devDependencies": {
-    "@nuxtjs/eslint-config": "^3.1.0",
-    "@nuxtjs/eslint-module": "^2.0.0",
-    "autoprefixer": "^10.4.17",
-    "babel-eslint": "^10.1.0",
-    "eslint": "^7.10.0",
-    "eslint-plugin-nuxt": "^1.0.0",
-    "postcss": "^8.4.33",
-    "postcss-nesting": "^12.0.2",
-    "tailwindcss": "^3.4.1"
+    "@nuxtjs/google-fonts": "^3.2.0",
+    "@nuxtjs/tailwindcss": "^6.11.4",
+    "@zadigetvoltaire/nuxt-gtm": "^0.0.13",
+    "dayjs-nuxt": "^2.1.9"
   }
 }

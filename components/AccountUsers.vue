@@ -1,12 +1,59 @@
+<script setup lang="ts">
+const store = useMainStore()
+
+const editMode = ref(false)
+const addCredits = ref(null)
+const user = ref(null)
+
+const props = defineProps({
+  isAdmin: {
+    type: Boolean,
+    default: false
+  },
+  loggedInUser: {
+    type: Object,
+    default: null
+  },
+  students: {
+    type: Array,
+    default: []
+  }
+});
+
+function setUser(user) {
+  this.user = user
+  this.editMode = true
+}
+
+function cancel() {
+  this.user = null
+  this.addCredits = null
+  this.editMode = false
+}
+
+async function update() {
+  try {
+    await store.addCredits(
+      this.addCredits,
+      this.user
+    );
+    loggedInUser
+    this.cancel()
+  } catch (error) {
+
+  }
+}
+</script>
+
 <template>
   <div v-if="isAdmin && students.length">
     <h2 class="text-2xl md:text-4xl uppercase font-black">
      <span class="emerald-underline text-emerald-900">Gebruikers ({{students.length}})</span><span class="text-emerald-700">.</span>
    </h2>
-   
-   <div class="w-full">
+
+   <div class="w-full" v-if="students.length && loggedInUser">
     <div class="grid grid-cols-1 md:grid-cols-4 mt-8 gap-3">
-      <div v-for="student in students" index="student.$id" class="p-4 bg-gray-800 rounded flex flex-col gap-y-3 w-full" v-if="student.$id != loggedInUser.$id">
+      <div v-for="student in students" index="student.$id" class="p-4 bg-gray-800 rounded flex flex-col gap-y-3 w-full">
         <div>
           <sup class="text-emerald-500">Naam</sup>
           <span class="block -mt-2">{{ student.name }}</span>
@@ -36,7 +83,7 @@
       </div>
     </div>
    </div>
-   
+
    <!--Pop up for adding credits-->
     <div v-if="editMode" class="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
       <div class="w-full max-height-75 overflow-y-scroll sm:w-2/3 md:w-1/2 bg-gray-800 p-6 rounded-lg shadow-lg">
@@ -71,54 +118,3 @@
     </div>
   </div>
 </template>
-
-<script>
-export default {
-  props: {
-    isAdmin: {
-      type: Boolean,
-      default: false
-    },
-    loggedInUser: {
-      type: Object,
-      default: null
-    },
-    students: {
-      type: Array,
-      default: []
-    }
-  },
-  data() {
-    return {
-      editMode: false,
-      addCredits: null,
-      user: null,
-    }
-  },
-  methods: {
-    setUser(user) {
-      this.user = user
-      this.editMode = true
-    },
-    
-    cancel() {
-      this.user = null
-      this.addCredits = null
-      this.editMode = false
-    },
-    
-    async update() {
-      try {
-        await this.$store.dispatch("addCredits", {
-          credits: this.addCredits,
-          user: this.user
-        });
-
-        this.cancel()
-      } catch (error) {
-        
-      }
-    }
-  }
-}
-</script>

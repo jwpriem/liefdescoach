@@ -1,3 +1,13 @@
+
+<script setup lang="ts">
+const props = defineProps({
+    loading: {
+        type: Boolean,
+        default: false
+    }
+})
+</script>
+
 <template>
 <div v-if="loading" class="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
        <svg class="animate-spin h-16 w-16 text-white"
@@ -15,13 +25,3 @@
             </svg>
     </div>
 </template>
-<script>
-export default {
-  props: {
-    loading: {
-      type: Boolean,
-      default: false
-    }
-  }
-}
-</script>

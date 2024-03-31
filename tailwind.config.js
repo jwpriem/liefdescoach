@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 
-const colors = require('tailwindcss/colors')
+//const colors = require('tailwindcss/colors')
 
 module.exports = {
   content: [
@@ -17,11 +17,11 @@ module.exports = {
         display: ['Montserrat', 'sans-serif'],
         body: ['Source Sans 3', 'sans-serif']
       },
-      colors: {
-        rose: colors.rose,
-        emerald: colors.emerald,
-        gray: colors.gray
-      }
+//      colors: {
+//        rose: colors.rose,
+//        emerald: colors.emerald,
+//        gray: colors.gray
+//      }
     },
   },
   plugins: [],

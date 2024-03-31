@@ -1,3 +1,12 @@
+<script setup>
+const props = defineProps({
+  color: {
+    type: String,
+    default: '#022c22'
+  }
+});
+</script>
+
 <template>
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -17,14 +26,3 @@
     </g>
   </svg>
 </template>
-
-<script>
-export default {
-  props: {
-    color: {
-      type: String,
-      default: '#022c22'
-    }
-  }
-}
-</script>

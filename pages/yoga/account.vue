@@ -1,41 +1,52 @@
+<script setup lang="ts">
+const title = ref('Yoga Ravennah | Account');
+const description = ref('Mijn accountdetails');
+const ogImage = ref('https://www.ravennah.com/ravennah-social.jpg');
+const pageUrl = ref('https://www.ravennah.com/yoga/account');
+
+const store = useMainStore()
+
+definePageMeta({
+    layout: 'yoga'
+})
+
+useHead({
+    title,
+    meta: [
+        {hid: 'description', name: 'description', content: description},
+        {hid: 'og:title', property: 'og:title', content: title},
+        {hid: 'og:url', property: 'og:url', content: pageUrl},
+        {hid: 'og:description', property: 'og:description', content: description},
+        {hid: 'og:image', property: 'og:image', content: ogImage},
+
+        // twitter card
+        {hid: "twitter:title", name: "twitter:title", content: title},
+        {hid: "twitter:url", name: "twitter:url", content: pageUrl},
+        {hid: 'twitter:description', name: 'twitter:description', content: description},
+        {hid: "twitter:image", name: "twitter:image", content: ogImage},
+        ]
+})
+
+const loggedInUser = computed(() => store.loggedInUser);
+const isAdmin = computed(() => store.isAdmin);
+const students = computed(() => store.students);
+const lessons = computed(() => store.lessons);
+const myBookings = computed(() => store.myBookings);
+const isLoading = computed(() => store.isLoading);
+
+</script>
+
 <template>
   <div>
     <IsLoading :loading="isLoading" />
-    
+       {{loggedInUser}}
     <div class="container mt-8 sm:mt-12 md:mt-24 mx-auto p-8 md:px-0 md:py-24">
       <div class="flex flex-col gap-y-24">
-        <AccountDetails :isAdmin="isAdmin" :loggedInUser="loggedInUser" />
-        <AccountBookings :isAdmin="isAdmin" :bookings="myBookings" />
-        <AccountLessons :isAdmin="isAdmin" :lessons="lessons" :students="students"/>
+        <AccountDetails v-if="loggedInUser"/>
+        <AccountBookings v-if="myBookings" />
+        <AccountLessons v-if="isAdmin && lessons && students" />
         <AccountUsers :isAdmin="isAdmin" :loggedInUser="loggedInUser" :students="students" />
       </div>
     </div>
   </div>
 </template>
-
-<script>
-export default {
-  layout: "yoga",
-
-  computed: {
-    loggedInUser() {
-      return this.$store.getters.loggedInUser;
-    },
-    isAdmin() {
-      return this.$store.getters.isAdmin;
-    },
-    students() {
-      return this.$store.getters.students;
-    },
-    lessons() {
-      return this.$store.getters.lessons;
-    },
-    myBookings() {
-      return this.$store.getters.myBookings
-    },
-    isLoading() {
-      return this.$store.getters.isLoading
-    }
-  }
-};
-</script>

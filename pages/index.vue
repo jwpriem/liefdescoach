@@ -45,13 +45,3 @@
     </div>
   </div>
 </template>
-
-<script>
-import Yoga from "@/components/Yoga";
-
-export default {
-  components: {
-    Yoga
-  }
-};
-</script>

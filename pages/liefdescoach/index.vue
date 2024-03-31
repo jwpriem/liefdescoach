@@ -1,3 +1,32 @@
+<script setup lang="ts">
+const title = ref('Liefdescoach Ravennah | Hulp met dates of in de liefde');
+const description = ref('Problemen in de liefde kennen we allemaal en soms hebben we iemand nodig die naar je luistert en je onafhankelijk adviseert. Dingen die je misschien niet direct van je vrienden of vriendinnen hoort.');
+const ogImage = ref('https://www.ravennah.com/ravennah-social-liefdescoach.jpg');
+const pageUrl = ref('https://www.ravennah.com/liefdescoach');
+
+definePageMeta({
+  layout: 'liefdescoach'
+})
+
+useHead({
+  title,
+  meta: [
+    {hid: 'description', name: 'description', content: description},
+    {hid: 'og:title', property: 'og:title', content: title},
+    {hid: 'og:url', property: 'og:url', content: pageUrl},
+    {hid: 'og:description', property: 'og:description', content: description},
+    {hid: 'og:image', property: 'og:image', content: ogImage},
+
+    // twitter card
+    {hid: "twitter:title", name: "twitter:title", content: title},
+    {hid: "twitter:url", name: "twitter:url", content: pageUrl},
+    {hid: 'twitter:description', name: 'twitter:description', content: description},
+    {hid: "twitter:image", name: "twitter:image", content: ogImage},
+    ]
+})
+
+</script>
+
 <template>
     <div>
       <Header image="/ravennah-small.jpg">
@@ -33,9 +62,7 @@
           <nuxt-link to="/liefdescoach/intake" class="rose button">
             Intake plannen?
           </nuxt-link>
-          <nuxt-link to="/liefdescoach/digitale-coach" class="gray button">
-            Digitale coach proberen?
-          </nuxt-link>
+      
         </div>
       </Header>
       <div class="bg-gray-100">
@@ -104,14 +131,3 @@
       </div>
     </div>
   </template>
-  
-  <script>
-  import Header from '@/components/Header'
-  export default {
-    layout: 'liefdescoach',
-    components: {
-      Header
-    }
-  }
-  </script>
-  

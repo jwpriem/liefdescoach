@@ -1,3 +1,32 @@
+<script setup lang="ts">
+const title = ref('Yoga Ravennah | Over mij');
+const description = ref('Ik ben Ravennah Matser, een optimistische, energieke, creatieve verbinder die dagelijks streeft naar bijzondere momenten. Mijn focus ligt op het verspreiden van positiviteit, het vinden van innerlijke rust.');
+const ogImage = ref('https://www.ravennah.com/ravennah-social.jpg');
+const pageUrl = ref('https://www.ravennah.com/yoga/over');
+
+definePageMeta({
+    layout: 'yoga'
+})
+
+useHead({
+    title,
+    meta: [
+        {hid: 'description', name: 'description', content: description},
+        {hid: 'og:title', property: 'og:title', content: title},
+        {hid: 'og:url', property: 'og:url', content: pageUrl},
+        {hid: 'og:description', property: 'og:description', content: description},
+        {hid: 'og:image', property: 'og:image', content: ogImage},
+
+        // twitter card
+        {hid: "twitter:title", name: "twitter:title", content: title},
+        {hid: "twitter:url", name: "twitter:url", content: pageUrl},
+        {hid: 'twitter:description', name: 'twitter:description', content: description},
+        {hid: "twitter:image", name: "twitter:image", content: ogImage},
+        ]
+})
+
+</script>
+
 <template>
   <div>
     <Header image="/ravennah-zwart.jpg" alignment="object-top">
@@ -24,40 +53,3 @@
     </Header>
   </div>
 </template>
-
-<script>
-import Header from "@/components/Header";
-
-export default {
-  layout: "yoga",
-  head() {
-    return {
-      title: this.pageTitle,
-      meta:[
-        { hid: 'description', name: 'description', content:  this.description },
-        { hid: 'og:title', property: 'og:title', content: this.pageTitle },
-        { hid: 'og:url', property: 'og:url', content: this.pageUrl },
-        { hid: 'og:description', property: 'og:description', content: this.description },
-        { hid: 'og:image', property: 'og:image', content: this.ogImage},
-
-        // twitter card
-        { hid: "twitter:title", name: "twitter:title", content: this.pageTitle },
-        { hid: "twitter:url", name: "twitter:url", content: this.pageUrl },
-        { hid: 'twitter:description', name: 'twitter:description', content: this.description },
-        { hid: "twitter:image", name: "twitter:image", content: this.ogImage},
-        ]
-    }
-  },
-  data(){
-    return {
-      pageTitle: 'Yoga Ravennah | Over mij',
-      description: 'Ik ben Ravennah Matser, een optimistische, energieke, creatieve verbinder die dagelijks streeft naar bijzondere momenten. Mijn focus ligt op het verspreiden van positiviteit, het vinden van innerlijke rust.',
-      ogImage: 'https://www.ravennah.com/ravennah-social.jpg',
-      pageUrl: 'https://www.ravennah.com/yoga/over'
-    }
-  },
-  components: {
-    Header,
-  },
-};
-</script>

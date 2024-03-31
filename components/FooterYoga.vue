@@ -105,13 +105,6 @@
                 viewBox="0 0 128 128"
                 xmlns="http://www.w3.org/2000/svg"
               >
-                <defs>
-                  <style>
-                    .cls-1 {
-                      fill: #881337;
-                    }
-                  </style>
-                </defs>
                 <title />
                 <path
                   class="cls-1"
@@ -136,22 +129,3 @@
     </div>
   </footer>
 </template>
-<script>
-import Yoga from "@/components/Yoga";
-import Liefdescoach from "~/layouts/liefdescoach.vue";
-export default {
-  components: {
-    Liefdescoach,
-    Yoga
-  },
-  methods: {
-    track(label) {
-      this.$ga.event({
-        eventCategory: "actions",
-        eventAction: "click",
-        eventLabel: label
-      });
-    }
-  }
-};
-</script>

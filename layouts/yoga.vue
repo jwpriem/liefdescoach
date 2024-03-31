@@ -1,19 +1,7 @@
 <template>
   <div class="yoga">
     <NavYoga />
-    <Nuxt />
+    <slot />
     <FooterYoga />
   </div>
 </template>
-
-<script>
-import NavYoga from '@/components/NavYoga'
-import FooterYoga from '@/components/FooterYoga'
-
-export default {
-  components: {
-    NavYoga,
-    FooterYoga
-  }
-}
-</script>

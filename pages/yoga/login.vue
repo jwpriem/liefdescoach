@@ -1,3 +1,90 @@
+<script setup lang="ts">
+const title = ref('Yoga Ravennah | Login');
+const description = ref('Om te kunnen boeken kun je een account aanmaken en inloggen');
+const ogImage = ref('https://www.ravennah.com/ravennah-social.jpg');
+const pageUrl = ref('https://www.ravennah.com/yoga/login');
+const email = ref('');
+const password = ref('');
+const name = ref('');
+const phone = ref('');
+const registerForm = ref(false);
+const passwordCheck = ref(false);
+
+const store = useMainStore()
+const { $rav } = useNuxtApp()
+
+definePageMeta({
+  layout: 'yoga'
+})
+
+useHead({
+  title,
+  meta: [
+    {hid: 'description', name: 'description', content: description},
+    {hid: 'og:title', property: 'og:title', content: title},
+    {hid: 'og:url', property: 'og:url', content: pageUrl},
+    {hid: 'og:description', property: 'og:description', content: description},
+    {hid: 'og:image', property: 'og:image', content: ogImage},
+
+    // twitter card
+    {hid: "twitter:title", name: "twitter:title", content: title},
+    {hid: "twitter:url", name: "twitter:url", content: pageUrl},
+    {hid: 'twitter:description', name: 'twitter:description', content: description},
+    {hid: "twitter:image", name: "twitter:image", content: ogImage},
+    ]
+})
+
+const errorMessage = computed(() => store.errorMessage);
+const isLoading = computed(() => store.isLoading);
+
+async function login() {
+    try {
+      await store.loginUser(email.value, password.value )
+      await navigateTo({ path: "/yoga/account" })
+    } catch (error) {
+        console.error("Login failed:", error);
+    }
+}
+
+async function register() {
+    try {
+      await store.registerUser(
+            email.value,
+            password.value,
+            name.value,
+            phone.value ? formatPhoneNumber(phone.value) : ''
+        )
+      await navigateTo({ path: "/yoga/account" })
+    } catch (error) {
+        console.error("Registration failed:", error);
+    }
+}
+
+function formatPhoneNumber(input: string) {
+    let digits = input.replace(/\D/g, '');
+    if (digits.startsWith('06')) {
+        digits = '31' + digits.substring(1);
+    }
+    if (!/^31[0-9]{9}$/.test(digits)) {
+        console.log('Invalid phone number format');
+    }
+    return `+${digits}`;
+}
+
+const passwordStrength = computed(() => {
+  let res = ''
+  if(password.value) {
+    if(password.value.length < 8 ) {
+      res = 'Minimaal 8 tekens'
+    } else {
+      res = password.value ? 'Veilig wachtwoord' : ''
+      passwordCheck.value = true
+    }
+  }
+  return res
+})
+</script>
+
 <template>
   <div class="container mx-auto p-8 md:px-0 md:py-24">
     <IsLoading :loading="isLoading" />
@@ -29,6 +116,16 @@
           />
         </div>
         <div v-if="registerForm">
+          <div v-if="passwordStrength" class="mt-3">
+            <svg v-if="passwordStrength == 'Veilig wachtwoord'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 stroke-green-600 inline-block">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
+            </svg>
+
+            <svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 stroke-red-600 inline-block">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+            </svg>
+            <span class="ml-2" :class="passwordStrength == 'Veilig wachtwoord' ? 'text-green-600' : 'text-red-600'">{{ passwordStrength }} </span>
+          </div>
           <div class="flex items-center justify-start">
             <label>Naam</label> <sup class="required">*</sup>
           </div>
@@ -78,93 +175,3 @@
     </form>
   </div>
 </template>
-
-<script>
-import { ref } from "vue";
-import { account, ID } from "@/utils/appwrite.js";
-
-export default {
-  layout: "yoga",
-  head() {
-    return {
-      title: this.pageTitle,
-      meta:[
-        { hid: 'description', name: 'description', content:  this.description },
-        { hid: 'og:title', property: 'og:title', content: this.pageTitle },
-        { hid: 'og:url', property: 'og:url', content: this.pageUrl },
-        { hid: 'og:description', property: 'og:description', content: this.description },
-        { hid: 'og:image', property: 'og:image', content: this.ogImage},
-
-        // twitter card
-        { hid: "twitter:title", name: "twitter:title", content: this.pageTitle },
-        { hid: "twitter:url", name: "twitter:url", content: this.pageUrl },
-        { hid: 'twitter:description', name: 'twitter:description', content: this.description },
-        { hid: "twitter:image", name: "twitter:image", content: this.ogImage},
-        ]
-    }
-  },
-  data() {
-    return {
-      pageTitle: 'Yoga Ravennah | Login',
-      description: 'Om te kunnen boeken kun je een account aanmaken en inloggen',
-      ogImage: 'https://www.ravennah.com/ravennah-social.jpg',
-      pageUrl: 'https://www.ravennah.com/yoga/login',
-      email: '',
-      password: '',
-      name: '',
-      phone: '',
-      registerForm: false
-    };
-  },
-  methods: {
-    async login() {
-      try {
-        await this.$store.dispatch("loginUser", {
-          email: this.email,
-          password: this.password
-        });
-        
-      } catch (error) {
-        console.error("Login failed:", error);
-      }
-    },
-    async register() {
-      try {
-        await this.$store.dispatch("registerUser", {
-          email: this.email,
-          password: this.password,
-          name: this.name,
-          phone: this.phone ? this.formatPhoneNumber(this.phone) : null
-        });
-      } catch (error) {
-        console.error("Registration failed:", error);
-      }
-    },
-    formatPhoneNumber(input) {
-      // Remove all non-digit characters
-      let digits = input.replace(/\D/g, '');
-
-      // Check if the number starts with '06' and replace with '316'
-      if (digits.startsWith('06')) {
-        digits = '31' + digits.substring(1);
-      }
-
-      // Validate if the number is now in the correct format
-      if (!/^31[0-9]{9}$/.test(digits)) {
-        console.log('Invalid phone number format');
-      }
-
-      // Reconstruct the phone number with the country code +31
-      return `+${digits}`;
-    }
-  },
-  computed: {
-    errorMessage() {
-      return this.$store.getters.errorMessage;
-    },
-    isLoading() {
-      return this.$store.getters.isLoading;
-    }
-  }
-};
-</script>

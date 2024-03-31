@@ -1,3 +1,58 @@
+<script setup lang="ts">
+const title = ref('Yoga Ravennah | Lessen');
+const description = ref('Ik geef les elke zondag van 9.45u tot 10.45u bij Studio YES Wellness in Rotterdam Nesselande');
+const ogImage = ref('https://www.ravennah.com/ravennah-social.jpg');
+const pageUrl = ref('https://www.ravennah.com/yoga/lessen');
+
+const store = useMainStore()
+const router = useRouter()
+
+definePageMeta({
+  layout: 'yoga'
+})
+
+useHead({
+  title,
+  meta: [
+    {hid: 'description', name: 'description', content: description},
+    {hid: 'og:title', property: 'og:title', content: title},
+    {hid: 'og:url', property: 'og:url', content: pageUrl},
+    {hid: 'og:description', property: 'og:description', content: description},
+    {hid: 'og:image', property: 'og:image', content: ogImage},
+
+    // twitter card
+    {hid: "twitter:title", name: "twitter:title", content: title},
+    {hid: "twitter:url", name: "twitter:url", content: pageUrl},
+    {hid: 'twitter:description', name: 'twitter:description', content: description},
+    {hid: "twitter:image", name: "twitter:image", content: ogImage},
+    ]
+})
+
+await useAsyncData('user', () => store.getLessons(), { server: false })
+
+const lessons = computed(() => store.lessons);
+const loggedInUser = computed(() => store.loggedInUser);
+const isLoading = computed(() => store.isLoading);
+
+function checkBooking(id) {
+  return store.myBookings.some(booking => booking.lessons.$id === id)
+}
+
+async function book(lesson) {
+  await store.setOnBehalfOf(store.loggedInUser)
+  await store.handleBooking(lesson)
+  await store.getAccountDetails(router.fullPath)
+}
+
+async function login() {
+  try {
+    await store.loginUser(email.value, password.value );
+  } catch (error) {
+    console.error("Login failed:", error);
+  }
+}
+</script>
+
 <template>
   <div>
     <IsLoading :loading="isLoading" />
@@ -5,14 +60,14 @@
       <h1 class="text-3xl md:text-6xl uppercase font-black">
         <span class="emerald-underline">Les schema</span><span class="text-emerald-600">.</span>
       </h1>
-      <p class="intro">
+      <div class="intro">
         <div v-for="lesson in $rav.upcomingLessons(lessons)" :key="lesson.$id" v-if="lessons.length"
              class="flex items-center gap-x-3">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                stroke="currentColor" class="w-6 h-6 mr-1 inline-block stroke-current text-emerald-700">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
           </svg>
-          <b>{{ $rav.formatDateInDutch(lesson.date, true) }} ({{ lesson.spots }} {{ lesson.spots == 1 ? 'plek' : 'plekken' }} )</b>
+          <b>{{ $rav.formatDateInDutch(lesson.date) }} ({{ 9 - lesson.bookings.length }} {{ 9 - lesson.bookings.length == 1 ? 'plek' : 'plekken' }} )</b>
           <button :disabled="checkBooking(lesson.$id)" class="button emerald button-small"
                   :class="checkBooking(lesson.$id) ? 'disabled' : ''" @click="book(lesson)" v-if="loggedInUser && !checkBooking(lesson.$id) && lesson.spots > 0">
             Boek
@@ -37,7 +92,7 @@
             Login om te boeken
           </nuxt-link>
         </div>
-      </p>
+      </div>
       <p class="intro">
         <span v-if="!loggedInUser">Boeken kan door
         <nuxt-link to="/yoga/login"><u>in te loggen</u></nuxt-link>. Heb je nog geen account dan kun je een account aanmaken.</span>
@@ -55,7 +110,7 @@
                 >Waarom Yoga Ravennah</span
               ><span class="text-emerald-700">.</span>
             </h2>
-            <p class="text-xl text-emerald-900">
+            <div class="text-xl text-emerald-900">
               <ol class="flex flex-col gap-y-3">
                 <li><span class="text-emerald-700 font-bold">Laagdrempelige yoga:</span> Ik vind dat yoga voor iedereen toegankelijk moet zijn. Of je nu een beginner bent of al ervaring hebt, mijn lessen zijn ontworpen om je op je gemak te stellen en je te begeleiden bij elke stap van je yogareis.</li>
                 <li><span class="text-emerald-700 font-bold">Ongedwongen en no-nonsense:</span> tijdens mijn les creëer ik een ontspannen en informele sfeer waarin je jezelf kunt zijn. Geen oordeel, geen druk. Het is mijn doel dat je geniet van de voordelen van yoga zonder de stress van prestatiedruk.</li>
@@ -63,7 +118,7 @@
                 <li><span class="text-emerald-700 font-bold">Verbinding en gemeenschap:</span> In mijn lessen, hecht veel waarde aan het creëren van een gemeenschap van gelijkgestemde mensen die samen groeien en leren. Je zult je welkom voelen en nieuwe vriendschappen opbouwen terwijl je je yoga-avontuur voortzet.</li>
                 <li class="mt-3">Dus, als je op zoek bent naar een plek waar je op je eigen tempo kunt kennismaken met yoga, waar je jezelf kunt zijn en waar je kunt genieten van de voordelen van yoga in een ondersteunende omgeving, dan ben je van harte welkom bij de mijn yogalessen.</li>
               </ol>
-            </p>
+            </div>
             <Yoga />
           </div>
         </div>
@@ -112,71 +167,3 @@
     </div>
   </div>
 </template>
-
-<script>
-import Header from '~/components/Header'
-import dayjs from 'dayjs';
-import 'dayjs/locale/nl';
-const utc = require('dayjs/plugin/utc');
-
-export default {
-  layout: 'yoga',
-  head() {
-    return {
-      title: this.pageTitle,
-      meta:[
-        { hid: 'description', name: 'description', content:  this.description },
-        { hid: 'og:title', property: 'og:title', content: this.pageTitle },
-        { hid: 'og:url', property: 'og:url', content: this.pageUrl },
-        { hid: 'og:description', property: 'og:description', content: this.description },
-        { hid: 'og:image', property: 'og:image', content: this.ogImage},
-
-        // twitter card
-        { hid: "twitter:title", name: "twitter:title", content: this.pageTitle },
-        { hid: "twitter:url", name: "twitter:url", content: this.pageUrl },
-        { hid: 'twitter:description', name: 'twitter:description', content: this.description },
-        { hid: "twitter:image", name: "twitter:image", content: this.ogImage},
-        ]
-    }
-  },
-  data(){
-    return {
-      pageTitle: 'Yoga Ravennah | Lessen',
-      description: 'Ik geef les elke zondag van 10.00u tot 11.00u bij Studio YES Wellness in Rotterdam Nesselande',
-      ogImage: 'https://www.ravennah.com/ravennah-social.jpg',
-      pageUrl: 'https://www.ravennah.com/yoga/lessen'
-    }
-  },
-  components: {
-    Header
-  },
-  async beforeCreate() {
-    await this.$store.dispatch("getLessons");
-  },
-  computed: {
-    lessons() {
-      return this.$store.getters.lessons;
-    },
-    loggedInUser() {
-      return this.$store.getters.loggedInUser;
-    },
-    isLoading() {
-      return this.$store.getters.isLoading;
-    }
-  },
-  methods: {
-    checkBooking(id) {
-      return this.$store.getters.myBookings.some(booking => booking.lessons.$id === id)
-    },
-    async book(lesson) {
-      await this.$store.dispatch("handleBooking", {
-        lesson: lesson,
-        user: this.$store.getters.loggedInUser,
-        formattedDate: this.$rav.formatDateInDutch(lesson.date)
-      });
-
-      await this.$store.dispatch('getAccountDetails', { route: this.$route.fullPath })
-    }
-  },
-}
-</script>

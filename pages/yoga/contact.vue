@@ -1,3 +1,50 @@
+<script setup lang="ts">
+const mail = useMail()
+
+const title = ref('Yoga Ravennah | Contact');
+const description = ref('Wil je meer weten of een keer een proefles meedoen? Neem dan contact op via het formulier of mijn socials.');
+const ogImage = ref('https://www.ravennah.com/ravennah-social.jpg');
+const pageUrl = ref('https://www.ravennah.com/yoga/contact');
+const name = ref('');
+const email = ref('');
+const message = ref('');
+
+definePageMeta({
+    layout: 'yoga'
+})
+
+useHead({
+    title,
+    meta: [
+        {hid: 'description', name: 'description', content: description},
+        {hid: 'og:title', property: 'og:title', content: title},
+        {hid: 'og:url', property: 'og:url', content: pageUrl},
+        {hid: 'og:description', property: 'og:description', content: description},
+        {hid: 'og:image', property: 'og:image', content: ogImage},
+
+        // twitter card
+        {hid: "twitter:title", name: "twitter:title", content: title},
+        {hid: "twitter:url", name: "twitter:url", content: pageUrl},
+        {hid: 'twitter:description', name: 'twitter:description', content: description},
+        {hid: "twitter:image", name: "twitter:image", content: ogImage},
+        ]
+})
+
+async function send(){
+    mail.send({
+      config:0,
+      from: 'Yoga Ravennah <info@ravennah.com>',
+      subject: 'Contactformulier Yoga Ravennah',
+      text: 'Naam:\n' + name.value + '\n\nEmail:\n' + email.value + '\n\nBericht:\n' + message.value,
+    })
+    
+  name.value = ''
+  email.value = ''
+  message.value = ''
+}
+
+</script>
+
 <template>
   <div class="">
     <Header image="/yoga-sfeer.jpg">
@@ -5,33 +52,31 @@
         <span class="emerald-underline">Stuur een bericht</span><span class="text-emerald-600">.</span>
       </h1>
         <div class="mt-8 space-y-3 darkForm">
-          <LCInput
+        <label>Naam</label>
+          <input 
             id="naam"
-            v-model="form.name"
-            label="Naam"
+            v-model="name"
+            
             :required="true"
-            :error="this.$rav.getErrorMessage('name', errors)"
             type="text"
             placeholder="Je naam"
             class="w-full"
           />
-          <LCInput
+          <label>E-mail</label>
+          <input 
             id="email"
-            v-model="form.email"
-            label="E-mail"
+            v-model="email"
             :required="true"
-            :error="this.$rav.getErrorMessage('email', errors)"
             type="text"
             placeholder="Je e-mailadres"
             class="w-full"
           />
-          <LCTextarea
+          <label>Bericht</label>
+          <textarea
             id="bericht"
-            v-model="form.message"
-            label="Bericht"
+            v-model="message"
             :rows="4"
             :required="true"
-            :error="this.$rav.getErrorMessage('message', errors)"
             placeholder="Waar gaat het over?"
             class="w-full"
           />
@@ -73,107 +118,3 @@
     </Header>
   </div>
 </template>
-
-<script>
-import {required, email} from 'vuelidate/lib/validators'
-import Header from '~/components/Header'
-import LCInput from '~/components/forms/LCInput'
-import LCTextarea from '~/components/forms/LCTextarea'
-
-export default {
-  layout: 'yoga',
-  head() {
-    return {
-      title: this.pageTitle,
-      meta:[
-        { hid: 'description', name: 'description', content:  this.description },
-        { hid: 'og:title', property: 'og:title', content: this.pageTitle },
-        { hid: 'og:url', property: 'og:url', content: this.pageUrl },
-        { hid: 'og:description', property: 'og:description', content: this.description },
-        { hid: 'og:image', property: 'og:image', content: this.ogImage},
-
-        // twitter card
-        { hid: "twitter:title", name: "twitter:title", content: this.pageTitle },
-        { hid: "twitter:url", name: "twitter:url", content: this.pageUrl },
-        { hid: 'twitter:description', name: 'twitter:description', content: this.description },
-        { hid: "twitter:image", name: "twitter:image", content: this.ogImage},
-        ]
-    }
-  },
-  components: {
-    Header,
-    LCInput,
-    LCTextarea
-  },
-  data() {
-    return {
-      pageTitle: 'Yoga Ravennah | Contact',
-      description: 'Wil je meer weten of een keer een proefles meedoen? Neem dan contact op via het formulier of mijn socials.',
-      ogImage: 'https://www.ravennah.com/ravennah-social.jpg',
-      pageUrl: 'https://www.ravennah.com/yoga/contact',
-      loading: false,
-      errors: [],
-      form: {
-        name: '',
-        email: '',
-        message: ''
-      }
-    }
-  },
-  validations() {
-    return {
-      form: {
-        name: {
-          required
-        },
-        email: {
-          required,
-          email
-        },
-        message: {
-          required
-        }
-      }
-    }
-  },
-  methods: {
-    send() {
-      this.$v.form.$touch()
-
-      if (this.$v.form.$invalid) {
-        this.errors = this.$rav.setErrorMessages(this.$v.form)
-        this.$message.error('1 of meerdere velden bevatten fouten')
-      }
-
-      if (!this.$v.form.$invalid) {
-        this.loading = true
-        const message = 'Het contactformulier is ingevuld.<br>' + '<b>Naam:</b> ' + this.form.name + '<br>' + '<b>Email:</b> ' + this.form.email + '<br>' + '<b>Bericht:</b> ' + this.form.message + '<br>'
-
-        this.$mail.send({
-          from: 'info@ravennah.com',
-          subject: 'Contactformulier Yoga',
-          html: message,
-          to: 'info@ravennah.com'
-        }).then(() => {
-          this.$message.success('Je bericht is verzonden!')
-          this.loading = false
-
-          this.form.name = ''
-          this.form.email = ''
-          this.form.message = ''
-
-          this.$nextTick(() => {
-            this.$v.$reset()
-          })
-
-          this.$ga.event({
-            eventCategory: 'form',
-            eventAction: 'send',
-            eventLabel: 'contact'
-          })
-        })
-      }
-    }
-  }
-}
-</script>

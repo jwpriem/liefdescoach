@@ -1,3 +1,86 @@
+<script setup lang="ts">
+const store = useMainStore()
+const router = useRouter()
+const { $rav } = useNuxtApp()
+
+const name = ref(null)
+const email = ref(null)
+const phone = ref(null)
+const password = ref(null)
+const newPassword = ref(null)
+const editAccountDetails = ref(false)
+const editPassword = ref(false)
+const passwordCheck = ref(false)
+
+const loggedInUser = computed(() => store.loggedInUser);
+const isAdmin = computed(() => store.isAdmin);
+
+async function openEdit() {
+  this.name = this.loggedInUser.name
+  this.email = this.loggedInUser.email
+  this.phone = this.loggedInUser.phone
+  this.editAccountDetails = true
+}
+
+function cancel() {
+  this.name = null
+  this.email = null
+  this.phone = null
+  this.password = null
+  this.newPassword = null
+  this.editAccountDetails = false
+  this.editPassword = false
+  this.passwordCheck = false
+}
+
+async function update() {
+  try {
+    if(this.name != this.loggedInUser.name) {
+      await store.nameUpdate(this.name, this.password)
+    }
+    if(this.email != this.loggedInUser.email) {
+      await store.emailUpdate(this.email, this.password)
+    }
+    if(this.phone != this.loggedInUser.phone) {
+      await store.phoneUpdate($rav.formatPhoneNumber(this.phone), this.password)
+    }
+    
+    cancel()
+    
+    await store.getAccountDetails(router.fullPath)
+
+  } catch (error) {
+
+  }
+}
+
+async function updatePassword() {
+  try {
+    if(this.passwordCheck){
+      await store.updatePasswordUser(this.password, this.newPassword)
+      cancel()
+    }
+  } catch (error) {
+
+  }
+}
+const passwordStrength = computed(() => {
+  let res = ''
+    if(newPassword.value) {
+      if(newPassword.value.length < 8 ) {
+        res = 'Minimaal 8 tekens'
+      } else if(newPassword.value == password.value) {
+        res = 'Je kunt niet twee keer hetzelfde wachtwoord kiezen'
+      } else {
+        res = newPassword.value ? 'Veilig wachtwoord' : ''
+        passwordCheck.value = true
+      }
+    }
+    return res
+})
+
+</script>
+
 <template>
   <div v-if="loggedInUser">
     <!--User info-->
@@ -33,13 +116,13 @@
               <span class="block -mt-2">{{ $rav.formatDateInDutch(loggedInUser.registration) }}</span>
             </div>
             <div>
-              <div class="button button-small emerald mr-1" v-if="!editMode" @click="openEdit()">Gegevens bewerken</div>
+              <div class="button button-small emerald mr-2" v-if="!editAccountDetails" @click="openEdit()">Gegevens bewerken</div>
               <div class="button button-small emerald" v-if="!editPassword" @click="editPassword = true">Wachtwoord wijzigen</div>
             </div>
-            
-            
+
+
             <!--Pop up for editing details-->
-      <div v-if="editMode" class="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
+      <div v-if="editAccountDetails" class="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
         <div class="w-full max-height-75 overflow-y-scroll sm:w-2/3 md:w-1/2 bg-gray-800 p-6 rounded-lg shadow-lg">
           <!-- Your form content goes here -->
           <div class="w-full flex flex-col gap-y-5">
@@ -94,7 +177,7 @@
           </div>
             <div class="flex gap-x-3">
               <button :disabled="!password" class="button emerald button-small" :class="!password ? 'disabled' : ''"
-                      type="button" @click="update(), editMode = false">
+                      type="button" @click="update(), editAccountDetails = false">
                 Opslaan
               </button>
               <button class="button emerald-outlined button-small" type="button" @click="cancel()">
@@ -105,7 +188,7 @@
         </div>
       </div>
     </div>
-    
+
     <div v-if="editPassword" class="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
       <div class="w-full max-height-75 overflow-y-scroll sm:w-2/3 md:w-1/2 bg-gray-800 p-6 rounded-lg shadow-lg">
         <!-- Your form content goes here -->
@@ -115,7 +198,7 @@
               >Wachtwoord wijzigen</span
               ><span class="text-emerald-700">.</span>
           </h2>
-          
+
           <div>
             <div class="flex items-center justify-start">
               <label>Huidige wachtwoord</label>
@@ -162,95 +245,3 @@
     </div>
   </div>
 </template>
-
-<script>
-export default {
-  props: {
-    isAdmin: {
-      type: Boolean,
-      default: false
-    },
-    loggedInUser: {
-      type: Object,
-      default: null
-    }
-  },
-  data() {
-    return {
-      name: null,
-      email: null,
-      phone: null,
-      password: null,
-      newPassword: null,
-      editMode: false,
-      editPassword: false,
-      passwordCheck: false
-    }
-  },
-  computed: {
-    passwordStrength() {
-      let res = ''
-      if(this.newPassword) {
-        if(this.newPassword.length < 8 ) {
-          res = 'Minimaal 8 tekens'
-        } else if(this.newPassword == this.password) {
-          res = 'Je kunt niet twee keer hetzelfde wachtwoord kiezen'
-        } else {
-          res = this.newPassword ? 'Veilig wachtwoord' : ''
-          this.passwordCheck = true
-        }
-      }
-      
-      return res
-    }
-  },
-  methods: {
-    openEdit() {
-      this.name = this.loggedInUser.name
-      this.email = this.loggedInUser.email
-      this.phone = this.loggedInUser.phone
-      this.editMode = true
-    },
-    
-    cancel() {
-      this.name = null
-      this.email = null
-      this.phone = null
-      this.password = null
-      this.newPassword = null
-      this.editMode = false
-      this.editPassword = false
-      this.passwordCheck = false
-    },
-    
-    async update() {
-      try {
-        await this.$store.dispatch('updateAccount', {
-          name: this.name,
-          password: this.password,
-          phone: this.$rav.formatPhoneNumber(this.phone),
-          email: this.email
-        })
-        this.cancel()
-        await this.$store.dispatch('getAccountDetails', {route: this.$route.fullPath})
-
-      } catch (error) {
-
-      }
-    },
-    
-    async updatePassword() {
-      try {
-        await this.$store.dispatch('updatePasswordUser', {
-          password: this.password,
-          newPassword: this.newPassword
-        })
-        this.cancel()
-
-      } catch (error) {
-
-      }
-    }
-  }
-}
-</script>

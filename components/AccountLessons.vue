@@ -1,6 +1,51 @@
+<script setup lang="ts">
+const store = useMainStore()
+
+const onlyFutureLessons = ref(false)
+const bookForUser = ref(false)
+const addBookingUser = ref(null)
+const addBookingLesson = ref(null)
+
+const lessons = computed(() => store.lessons);
+const students = computed(() => store.students);
+const isAdmin = computed(() => store.isAdmin);
+
+function cancel() {
+    this.addBookingUser = null
+    this.addBookingLesson = null
+    this.bookForUser = false
+}
+
+async function book() {
+    try {
+        await store.setOnBehalfOf(this.addBookingUser)
+        await store.handleBooking(this.addBookingLesson)
+        
+        this.cancel()
+    }
+      catch(error) {
+
+      }
+}
+
+async function removeBooking(booking, lesson) {
+    await store.cancelBooking(booking, lesson);
+}
+
+function compareByName(a, b) {
+    return a.students.name.localeCompare(b.students.name);
+}
+
+function sortStudents(students) {
+    const arr = [...students]
+    return arr.sort(this.compareByName)
+}
+
+</script>
+
 <template>
   <div v-if="isAdmin && lessons.length">
-    
+
 
    <div class="w-full">
     <div class="md:flex justify-between items-center">
@@ -13,13 +58,13 @@
       </label>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-4 mt-8 gap-3">
-      <div v-for="lesson in onlyFutureLessons ? $rav.upcomingLessons(lessons) : lessons" index="lesson.$id" class="p-4 bg-gray-800 rounded flex flex-col gap-y-3" :class="$rav.isFutureBooking(lesson) ? '' : 'opacity-20 hover:opacity-100'">
+      <div v-for="lesson in onlyFutureLessons ? $rav.upcomingLessons(lessons) : lessons" index="lesson.$id" class="p-4 bg-gray-800 rounded flex flex-col gap-y-3" :class="$rav.isFutureBooking(lesson.date) ? '' : 'opacity-20 hover:opacity-100'">
         <div>
           <sup class="text-emerald-500">Datum</sup>
           <span class="block -mt-2">{{ $rav.formatDateInDutch(lesson.date, true) }}</span>
         </div>
         <div>
-          <sup class="text-emerald-500">Boekingen ( {{ lesson.bookings.length }}/{{ lesson.spots + lesson.bookings.length }} )</sup>
+          <sup class="text-emerald-500">Boekingen ( {{ lesson.bookings.length }}/9 )</sup>
           <span class="block -mt-2">
             <span v-for="booking in sortStudents(lesson.bookings)" index="booking.$id" class="block">
               {{ booking.students.name }}
@@ -34,9 +79,9 @@
     </div>
    </div>
    <div class="button button-small emerald mt-3" v-if="!bookForUser" @click="bookForUser = true">Maak boeking voor gebruiker</div>
-   
+
    <!--Book for user-->
-    <div v-if="bookForUser" class="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
+    <div v-if="bookForUser && lessons.length && students.length" class="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
       <div class="w-full max-height-75 overflow-y-scroll sm:w-2/3 md:w-1/2 bg-gray-800 p-6 rounded-lg shadow-lg">
         <!-- Your form content goes here -->
         <div class="w-full flex flex-col gap-y-5">
@@ -46,18 +91,18 @@
               ><span class="text-emerald-700">.</span>
           </h2>
 
-          <select class="select-wrapper" v-model="addBooking.lesson">
+          <select class="select-wrapper" v-model="addBookingLesson">
             <option :value="null">Kies datum</option>
-            <option v-for="lesson in lessons" :value="lesson" v-if="$rav.isFutureBooking(lesson)" :disabled="!lesson.spots > 0">{{ $rav.formatDateInDutch(lesson.date) }} <span v-if="!lesson.spots > 0">(vol)</span><span v-else>(Nog {{lesson.spots}} {{ lesson.spots == 1 ? 'plek' : 'plekken'}})</span></option>
+            <option v-for="lesson in $rav.upcomingLessons(lessons)" :value="lesson" :disabled="!lesson.spots > 0">{{ $rav.formatDateInDutch(lesson.date) }} <span v-if="!lesson.spots > 0">(vol)</span><span v-else>(Nog {{lesson.spots}} {{ lesson.spots == 1 ? 'plek' : 'plekken'}})</span></option>
           </select>
 
-          <select class="select-wrapper" v-model="addBooking.user" :disabled="!addBooking.lesson">
+          <select class="select-wrapper" v-model="addBookingUser" :disabled="!addBookingLesson">
               <option :value="null">Kies gebruiker</option>
-              <option v-for="student in students" :value="student" v-if="$rav.checkAvailability(addBooking.lesson, student)">{{ student.name }}</option>
+              <option v-for="student in students" :value="student" :disabled="!$rav.checkAvailability(addBookingLesson, student)">{{ student.name }}</option>
             </select>
           <div class="flex gap-x-3">
-            <button :disabled="!addBooking.user && !addBooking.lesson" class="button emerald button-small" :class="!addBooking.user && !addBooking.lesson ? 'disabled' : ''"
-                    type="button" @click="book(addBooking.lesson, addBooking.user), bookForUser = false">
+            <button :disabled="!addBookingUser && !addBookingLesson" class="button emerald button-small" :class="!addBookingUser && !addBookingLesson ? 'disabled' : ''"
+                    type="button" @click="book(), bookForUser = false">
               Voeg toe
             </button>
             <button class="button emerald-outlined button-small" type="button" @click="cancel()">
@@ -69,70 +114,3 @@
     </div>
   </div>
 </template>
-
-<script>
-export default {
-  props: {
-    isAdmin: {
-      type: Boolean,
-      default: false
-    },
-    lessons: {
-      type: Array,
-      default: []
-    },
-    students: {
-      type: Array,
-      default: []
-    }
-  },
-  data() {
-    return {
-      onlyFutureLessons: true,
-      bookForUser: false,
-      addBooking: {
-        user: null,
-        lesson: null
-      }
-    }
-  },
-  methods: {
-    cancel() {
-      this.addBooking.user = null
-      this.addBooking.lesson = null
-      this.bookForUser = false
-    },
-
-    async book(lesson, user) {
-      try {
-        await this.$store.dispatch("handleBooking", {
-          lesson: lesson,
-          user: user,
-          formattedDate: this.$rav.formatDateInDutch(lesson.date, true)
-        });
-
-        this.cancel()
-      }
-      catch(error) {
-
-      }
-    },
-    
-    async removeBooking(booking, lesson) {
-      await this.$store.dispatch("cancelBooking", {
-        booking: booking,
-        lesson: lesson
-      });
-    },
-
-    compareByName(a, b) {
-      return a.students.name.localeCompare(b.students.name);
-    },
-
-    sortStudents(students) {
-      const arr = [...students]
-      return arr.sort(this.compareByName)
-    }
-  }
-}
-</script>
