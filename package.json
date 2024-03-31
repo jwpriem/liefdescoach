@@ -28,5 +28,8 @@
     "@nuxtjs/tailwindcss": "^6.11.4",
     "@zadigetvoltaire/nuxt-gtm": "^0.0.13",
     "dayjs-nuxt": "^2.1.9"
+  },
+  "engines": {
+    "node": "20.11"
   }
 }
