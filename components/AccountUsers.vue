@@ -5,20 +5,9 @@ const editMode = ref(false)
 const addCredits = ref(null)
 const user = ref(null)
 
-const props = defineProps({
-  isAdmin: {
-    type: Boolean,
-    default: false
-  },
-  loggedInUser: {
-    type: Object,
-    default: null
-  },
-  students: {
-    type: Array,
-    default: []
-  }
-});
+const loggedInUser = computed(() => store.loggedInUser);
+const students = computed(() => store.students);
+const isAdmin = computed(() => store.isAdmin);
 
 function setUser(user) {
   this.user = user
@@ -37,7 +26,7 @@ async function update() {
       this.addCredits,
       this.user
     );
-    loggedInUser
+    
     this.cancel()
   } catch (error) {
 
