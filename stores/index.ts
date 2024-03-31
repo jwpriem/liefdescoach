@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { Query } from 'appwrite';
+import {tryCatch} from "standard-as-callback/built/utils";
 
 // Define interfaces for your state and other types you will use
 interface User {
@@ -7,6 +8,7 @@ interface User {
     email?: string;
     name?: string;
     phone?: string;
+    preferences?: [];
     credits?: number;
     debits?: number;
     labels?: string[];
@@ -193,6 +195,17 @@ export const useMainStore = defineStore('main', {
 
             } catch(error) {
                 this.isLoading = false
+            }
+        },
+        async updatePrefs(prefs: Object) {
+            this.loading = true
+            try {
+                const { account } = useAppwrite();
+                await account.updatePrefs(prefs)
+                this.loading = false
+                await this.getAccountDetails('/yoga/account')
+            } catch {
+                this.loading = false
             }
         },
         async registerUser (email: string, password: string, name: string, phone: string) {
