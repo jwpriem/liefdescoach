@@ -39,7 +39,6 @@ const isLoading = computed(() => store.isLoading);
 <template>
   <div>
     <IsLoading :loading="isLoading" />
-       {{loggedInUser}}
     <div class="container mt-8 sm:mt-12 md:mt-24 mx-auto p-8 md:px-0 md:py-24">
       <div class="flex flex-col gap-y-24">
         <AccountDetails v-if="loggedInUser"/>
