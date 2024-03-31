@@ -32,13 +32,9 @@ async function removeBooking(booking, lesson) {
     await store.cancelBooking(booking, lesson);
 }
 
-function compareByName(a, b) {
-    return a.students.name.localeCompare(b.students.name);
-}
-
 function sortStudents(students) {
     const arr = [...students]
-    return arr.sort(this.compareByName)
+    return arr.sort((a, b) => a.students.name.localeCompare(b.students.name) )
 }
 
 </script>
