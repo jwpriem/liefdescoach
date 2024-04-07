@@ -28,9 +28,8 @@ useHead({
     ]
 })
 
-await useAsyncData('user', () => store.getLessons(), { server: false })
+const { data: lessons, pending } = await useFetch('/api/lessons')
 
-const lessons = computed(() => store.lessons);
 const loggedInUser = computed(() => store.loggedInUser);
 const isLoading = computed(() => store.isLoading);
 
@@ -41,16 +40,9 @@ function checkBooking(id) {
 async function book(lesson) {
   await store.setOnBehalfOf(store.loggedInUser)
   await store.handleBooking(lesson)
-  await store.getAccountDetails(router.fullPath)
+  await store.getUser()
 }
 
-async function login() {
-  try {
-    await store.loginUser(email.value, password.value );
-  } catch (error) {
-    console.error("Login failed:", error);
-  }
-}
 </script>
 
 <template>
@@ -61,15 +53,15 @@ async function login() {
         <span class="emerald-underline">Les schema</span><span class="text-emerald-600">.</span>
       </h1>
       <div class="intro">
-        <div v-for="lesson in $rav.upcomingLessons(lessons)" :key="lesson.$id" v-if="lessons.length"
+        <div v-for="lesson in $rav.upcomingLessons(lessons.documents)" :key="lesson.$id"
              class="flex items-center gap-x-3 mb-3">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                stroke="currentColor" class="w-6 h-6 mr-1 inline-block stroke-current text-emerald-700">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
           </svg>
-          <b>{{ $rav.formatDateInDutch(lesson.date) }} ({{ 9 - lesson.bookings.length }} {{ 9 - lesson.bookings.length == 1 ? 'plek' : 'plekken' }} )</b>
+          <b>{{ $rav.formatDateInDutch(lesson.date) }} ({{ 9 - lesson.bookings.length }} {{ lesson.bookings.length == 8 ? 'plek' : 'plekken' }} )</b>
           <button :disabled="checkBooking(lesson.$id)" class="button emerald button-small"
-                  :class="checkBooking(lesson.$id) ? 'disabled' : ''" @click="book(lesson)" v-if="loggedInUser && !checkBooking(lesson.$id) && lesson.spots > 0">
+                  :class="checkBooking(lesson.$id) ? 'disabled' : ''" @click="book(lesson)" v-if="loggedInUser && !checkBooking(lesson.$id)">
             Boek
           </button>
           <span v-if="checkBooking(lesson.$id)" class="flex content-center"><svg xmlns="http://www.w3.org/2000/svg"
@@ -82,7 +74,7 @@ async function login() {
               </svg>
             Geboekt
           </span>
-          <span v-if="loggedInUser && !checkBooking(lesson.$id) && lesson.spots == 0" class="flex content-center">
+          <span v-if="loggedInUser && !checkBooking(lesson.$id) && lesson.bookings.length == 9" class="flex content-center">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"class="w-6 h-6 inline-block mx-1">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
             </svg>

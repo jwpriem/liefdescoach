@@ -1,10 +1,9 @@
 import { ref } from 'vue';
-import { Client, Users } from 'node-appwrite';
+import { Client, Databases, Query } from 'node-appwrite';
 import { useRuntimeConfig } from '#imports';
 
 export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig();
-
     const client = new Client();
 
     client
@@ -12,9 +11,15 @@ export default defineEventHandler(async (event) => {
     .setProject(config.public.project) // Your project ID
     .setKey(config.appwriteKey) // Your secret API key
 
+    const databases = new Databases(client);
     const body = await readBody(event)
-    const users = new Users(client);
-    const res = await users.updatePrefs(body.userId, body.prefs);
+    const res = await databases.listDocuments(
+        config.public.database,
+        'bookings',
+        [
+            Query.equal('students', [body.userId])
+        ]
+        );
 
-    return { res }
+    return Object.assign({}, res)
 })

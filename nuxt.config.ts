@@ -7,6 +7,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     // Private keys are only available on the server
     postmark: '',
+    appwriteKey: '',
     // Public keys that are exposed to the client
     public: {
       project: '',

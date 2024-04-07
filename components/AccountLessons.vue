@@ -89,7 +89,7 @@ function sortStudents(students) {
 
           <select class="select-wrapper" v-model="addBookingLesson">
             <option :value="null">Kies datum</option>
-            <option v-for="lesson in $rav.upcomingLessons(lessons)" :value="lesson" :disabled="!lesson.spots > 0">{{ $rav.formatDateInDutch(lesson.date) }} <span v-if="!lesson.spots > 0">(vol)</span><span v-else>(Nog {{lesson.spots}} {{ lesson.spots == 1 ? 'plek' : 'plekken'}})</span></option>
+            <option v-for="lesson in $rav.upcomingLessons(lessons)" :value="lesson" :disabled="!lesson.bookings.length > 0">{{ $rav.formatDateInDutch(lesson.date) }} <span v-if="!lesson.bookings.length > 0">(vol)</span><span v-else>(Nog {{lesson.bookings.length}} {{ lesson.bookings.length == 8 ? 'plek' : 'plekken'}})</span></option>
           </select>
 
           <select class="select-wrapper" v-model="addBookingUser" :disabled="!addBookingLesson">

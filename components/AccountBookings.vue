@@ -22,7 +22,7 @@ async function removeBooking(booking, lesson) {
      <span class="emerald-underline text-emerald-900">Boekingen</span><span class="text-emerald-700">.</span>
    </h2>
     
-   <div class="w-full" v-if="myBookings.length">
+   <div class="w-full" v-if="myBookings">
      <div class="flex flex-col mt-8 gap-3">
        <div v-for="booking in myBookings" index="booking.$id" class="p-4 bg-gray-800 rounded flex flex-col gap-y-3 w-full md:w-1/4" v-show="$rav.isFutureBooking(booking.lessons.date)">
           <div>
@@ -40,7 +40,7 @@ async function removeBooking(booking, lesson) {
               <a :href="$rav.getCalenderLink('outlook', booking.lessons.date)"><img src="/outlook.png" class="w-6" /></a>
             </div>
        
-            <button class="button emerald button-small mt-3" @click="removeBooking(booking, booking.lessons)" v-if="$rav.checkCancelPeriod(booking.lessons)">
+            <button class="button emerald button-small mt-3" @click="removeBooking(booking)" v-if="$rav.checkCancelPeriod(booking.lessons)">
               Les annuleren
             </button>
        

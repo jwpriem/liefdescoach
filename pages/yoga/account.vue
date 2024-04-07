@@ -33,19 +33,17 @@ const students = computed(() => store.students);
 const lessons = computed(() => store.lessons);
 const myBookings = computed(() => store.myBookings);
 const isLoading = computed(() => store.isLoading);
-
 </script>
 
 <template>
   <div>
     <IsLoading :loading="isLoading" />
-       {{loggedInUser}}
     <div class="container mt-8 sm:mt-12 md:mt-24 mx-auto p-8 md:px-0 md:py-24">
       <div class="flex flex-col gap-y-24">
         <AccountDetails v-if="loggedInUser"/>
         <AccountBookings v-if="myBookings" />
         <AccountLessons v-if="isAdmin && lessons && students" />
-        <AccountUsers :isAdmin="isAdmin" :loggedInUser="loggedInUser" :students="students" />
+        <AccountUsers v-if="isAdmin && students && loggedInUser" />
       </div>
     </div>
   </div>

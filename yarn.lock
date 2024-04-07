@@ -2289,7 +2289,7 @@ autoprefixer@^10.4.17, autoprefixer@^10.4.18:
     picocolors "^1.0.0"
     postcss-value-parser "^4.2.0"
 
-axios@^1.6.2:
+axios@^1.4.0, axios@^1.6.2:
   version "1.6.8"
   resolved "https://registry.yarnpkg.com/axios/-/axios-1.6.8.tgz#66d294951f5d988a00e87a0ffb955316a619ea66"
   integrity sha512-v/ZHtJDU39mDpyBoFVkETcd/uNdxrWRrg3bKpOKzXFA6Bvqopts6ALSMU3y6ijYxbw2B+wPrIv46egTzJXCLGQ==
@@ -4877,12 +4877,13 @@ node-addon-api@^7.0.0:
   resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-7.1.0.tgz#71f609369379c08e251c558527a107107b5e0fdb"
   integrity sha512-mNcltoe1R8o7STTegSOHdnJNN7s5EUvhoS7ShnTHDyOSd+8H+UdWODq6qSv67PjC8Zc5JRT8+oLAMCr0SIXw7g==
 
-node-appwrite@^12.0.1:
-  version "12.0.1"
-  resolved "https://registry.yarnpkg.com/node-appwrite/-/node-appwrite-12.0.1.tgz#a9c950df94b79274f5443c667c96344976c5d37f"
-  integrity sha512-2YHjh6gKe5oyFG4E4bnIz7zPEU456PYE6vCJerqGEgXD5xS5B4ToFFEvtYM6Vk3Q7XSWMqXo2sQJIXkT+MSD7A==
+node-appwrite@11.1.1:
+  version "11.1.1"
+  resolved "https://registry.yarnpkg.com/node-appwrite/-/node-appwrite-11.1.1.tgz#6d76e2ece2dd24bf679ba167562ccc6a36bac714"
+  integrity sha512-j9QTHfsDx/RoLq9shVtpDWofCG8u/izy6uQrlzet7+UV14OMikaPUNZpQhtZGi5KjLy5R+JvJfx6HHXrfdcIvQ==
   dependencies:
-    undici "^5.28.2"
+    axios "^1.4.0"
+    form-data "^4.0.0"
 
 node-fetch-native@^1.6.1, node-fetch-native@^1.6.2, node-fetch-native@^1.6.3, node-fetch-native@^1.6.4:
   version "1.6.4"

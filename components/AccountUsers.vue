@@ -5,20 +5,9 @@ const editMode = ref(false)
 const addCredits = ref(null)
 const user = ref(null)
 
-const props = defineProps({
-  isAdmin: {
-    type: Boolean,
-    default: false
-  },
-  loggedInUser: {
-    type: Object,
-    default: null
-  },
-  students: {
-    type: Array,
-    default: []
-  }
-});
+const students = computed(() => store.students)
+const loggedInUser = computed(() => store.loggedInUser);
+const isAdmin = computed(() => store.isAdmin);
 
 function setUser(user) {
   this.user = user
@@ -31,17 +20,20 @@ function cancel() {
   this.editMode = false
 }
 
-async function update() {
-  try {
-    await store.addCredits(
-      this.addCredits,
-      this.user
-    );
-    loggedInUser
-    this.cancel()
-  } catch (error) {
+async function updatePrefs(userId: string, credits: number, current: number) {
 
-  }
+  const { res } = await $fetch('/api/updatePrefs', {
+    method: 'post',
+    body: {
+      userId: userId,
+      prefs: {
+        credits: current + credits
+      }
+    }
+  })
+  
+  this.cancel()
+  store.getUser()
 }
 </script>
 
@@ -68,9 +60,9 @@ async function update() {
           <span class="block -mt-2" v-else>Geen telefoonnummer</span>
         </div>
         <div>
-         <sup class="text-emerald-500">Credits - Te betalen</sup>
-         <span class="block -mt-2 flex flex-no-wrap align-center justify-start gap-x-2">
-          {{ student.credits }} - {{ student.debits }}
+         <sup class="text-emerald-500">Credits</sup>
+         <span class="block -mt-2 flex flex-no-wrap align-center justify-start gap-x-2" v-if="student.prefs">
+         {{ student.prefs['credits'] }}
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 cursor-pointer" @click="setUser(student)">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
           </svg>
@@ -106,7 +98,7 @@ async function update() {
             />
           </div>
           <div class="flex gap-x-3">
-            <button class="button emerald button-small" type="button" @click="update(), editMode = false">
+            <button class="button emerald button-small" type="button" @click="updatePrefs(user.$id, addCredits, user.prefs['credits']), editMode = false">
               Voeg credits toe
             </button>
             <button class="button emerald-outlined button-small" type="button" @click="cancel()">
