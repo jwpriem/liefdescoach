@@ -33,7 +33,6 @@ const students = computed(() => store.students);
 const lessons = computed(() => store.lessons);
 const myBookings = computed(() => store.myBookings);
 const isLoading = computed(() => store.isLoading);
-
 </script>
 
 <template>
@@ -44,7 +43,7 @@ const isLoading = computed(() => store.isLoading);
         <AccountDetails v-if="loggedInUser"/>
         <AccountBookings v-if="myBookings" />
         <AccountLessons v-if="isAdmin && lessons && students" />
-        <AccountUsers v-if="isAdmin && loggedInUser && students" />
+        <AccountUsers v-if="isAdmin && students && loggedInUser" />
       </div>
     </div>
   </div>

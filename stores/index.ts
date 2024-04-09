@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { Query } from 'appwrite';
+import {tryCatch} from "standard-as-callback/built/utils";
 
 // Define interfaces for your state and other types you will use
 interface User {
@@ -7,6 +8,7 @@ interface User {
     email?: string;
     name?: string;
     phone?: string;
+    preferences?: [];
     credits?: number;
     debits?: number;
     labels?: string[];
@@ -18,17 +20,12 @@ interface Student {
     $id?: string;
     email?: string;
     name?: string;
-    phone?: string;
-    credits?: number;
-    debits?: number;
-    labels?: string[];
-    registration?: string;
 }
 
 interface Lesson {
     $id: string;
     date: string;
-    spots: number;
+    type: string;
     // Add more lesson properties as needed
 }
 
@@ -61,61 +58,37 @@ export const useMainStore = defineStore('main', {
         onBehalfOf: null
     }),
     actions: {
-        async loginUser(email: string, password: string) {
-            this.isLoading = true
-            const { account, ID } = useAppwrite();
-            
-            try {
-                await account.createEmailSession(email, password);
-                await this.getAccountDetails( '/yoga/login');
-                this.errorMessage = null;
-                this.isLoading = false
-            } catch (error: any) {
-                this.isLoading = false
-                console.log(JSON. stringify(error))
-                if(error['type'] == 'user_invalid_credentials') {
-                    //Navigate to login
-                    this.errorMessage = 'Verkeerde gebruikersnaam of wachtwoord';
-                } else {
-                    //Navigate to login
-                    this.errorMessage = 'Er iets verkeerd gegaan'
-                }
-            }
+        async setLoading(value: boolean) {
+            this.isLoading = value
+        },
+        async setError(value: string) {
+            this.errorMessage = value
         },
         async setOnBehalfOf(user: User) {
             this.onBehalfOf = user
         },
-        async getAccountDetails(route: string){
+        async getUser(){
             try {
-                const { account, databases, ID } = useAppwrite();
-                
-                const user = await account.get();
-
-                const res = await databases.getDocument(
-                    useRuntimeConfig().public.database,
-                    'students',
-                    user.$id
-                    );
-                
+                const { account } = useAppwrite();
+                const user = await account.get()
                 this.loggedInUser = user
-                this.loggedInUser.credits = res.credits
-                this.loggedInUser.debits = res.debits
-                this.isAdmin = user.labels.includes('admin')
+                this.isAdmin = this.loggedInUser.labels.includes('admin')
 
-                // Only admin calls
-                if(user.labels.includes('admin')) {
-                    await this.getStudents()
-                    await this.getLessons()
-                }
+                if(this.isAdmin) {
+                    const lessons = await $fetch('/api/lessonsWithBookings')
+                    this.lessons = lessons.documents
 
-                await this.getMyBookings()
-            } catch (error) {
-                //      const str = JSON.stringify(error, null, 4); // (Optional) beautiful indented output.
-                if(route){
-                    if(route == '/yoga/account') {
-                        //          $nuxt.$router.push('/yoga/login')
-                    }
+                    const users = await $fetch('/api/users')
+                    this.students = users.users
+                } else {
+                    const bookings = await $fetch('/api/bookings', {
+                        method: 'post',
+                        body: { userId: this.loggedInUser.$id }
+                    })
+                    this.myBookings = bookings.documents
                 }
+            } catch(error) {
+
             }
         },
         async phoneUpdate(phone: string, password: string) {
@@ -124,16 +97,9 @@ export const useMainStore = defineStore('main', {
                 this.isLoading = true
                 
                 await account.updatePhone(phone, password)
-
-                await databases.updateDocument(
-                    useRuntimeConfig().public.database,
-                    'students',
-                    this.loggedInUser.$id,
-                    { phone: phone}
-                    );
                 
                 this.isLoading = false
-                await this.getAccountDetails('/yoga/account');
+                await this.getUser();
             } catch(error) {
                 this.isLoading = false
             }
@@ -145,15 +111,8 @@ export const useMainStore = defineStore('main', {
                 
                 await account.updateEmail(email, password)
 
-                await databases.updateDocument(
-                    useRuntimeConfig().public.database,
-                    'students',
-                    this.loggedInUser.$id,
-                    { email: email}
-                    );
-                
                 this.isLoading = false
-                await this.getAccountDetails('/yoga/account');
+                await this.getUser()
                 
             } catch(error) {
                 this.isLoading = false
@@ -165,16 +124,9 @@ export const useMainStore = defineStore('main', {
                 this.isLoading = true
                 
                 await account.updateName(name, password)
-
-                await databases.updateDocument(
-                    useRuntimeConfig().public.database,
-                    'students',
-                    this.loggedInUser.$id,
-                    { name: name}
-                    );
                 
                 this.isLoading = false
-                await this.getAccountDetails('/yoga/account');
+                await this.getUser()
                 
             } catch(error) {
                 this.isLoading = false
@@ -189,10 +141,30 @@ export const useMainStore = defineStore('main', {
                 await account.updatePassword(newPassword, password)
 
                 this.isLoading = false
-                await this.getAccountDetails('/yoga/account')
+                await this.getUser()
 
             } catch(error) {
                 this.isLoading = false
+            }
+        },
+        async updatePrefs(user: User, prefs: Object) {
+            this.loading = true
+
+            try {
+                const data = {
+                    userId: user.$id,
+                    prefs: prefs
+                }
+                const { res } = await $fetch('/api/updatePrefs', {
+                    method: 'POST',
+                    body: data
+                })
+
+                this.loading = false
+
+                await this.getUser()
+            } catch {
+                this.loading = false
             }
         },
         async registerUser (email: string, password: string, name: string, phone: string) {
@@ -201,7 +173,7 @@ export const useMainStore = defineStore('main', {
                 
                 this.isLoading = true
 
-                await account.create(ID.unique(), email, password, name);
+                const registration = await account.create(ID.unique(), email, password, name);
                 await account.createEmailSession(email, password);
 
                 if(phone) {
@@ -210,25 +182,24 @@ export const useMainStore = defineStore('main', {
 
                 const user = await account.get();
 
-                let data = {
-                    credits: 0,
-                    debits: 0,
-                    name: user.name,
-                    email: user.email,
-                    phone: phone ? user.phone : null,
-                    registration: user.registration
-                }
+                await $fetch('/api/updatePrefs', {
+                    method: 'post',
+                    body: {
+                        userId: user.$id,
+                        prefs: {
+                            credits: '0'
+                        }
+                    }
+                })
 
                 const res = await databases.createDocument(
                     useRuntimeConfig().public.database,
                     'students',
                     user.$id,
-                    data
+                    { email: user.email, name: user.name }
                     );
 
-                this.loggedInUser = user
-                this.loggedInUser.credits = res.credits
-                this.loggedInUser.debits = res.debits
+                this.getUser()
                 this.isLoading = false
 
             } catch (error: any) {
@@ -242,42 +213,6 @@ export const useMainStore = defineStore('main', {
                     //Navigate to login
                     this.errorMessage = 'Er iets verkeerd gegaan';
                 }
-            }
-        },
-        async getStudents() {
-            try {
-                const { account, databases, ID } = useAppwrite();
-                
-                if(this.isAdmin){
-                    const list = await databases.listDocuments(
-                        useRuntimeConfig().public.database,
-                        'students',
-                        [
-                            Query.orderAsc('name'),
-                            ]
-                            )
-                    this.students = list.documents
-                } else {
-                    this.students = []
-                }
-            }catch (error) {
-            }
-        },
-        async getLessons() {
-            try {
-                const { account, databases, ID } = useAppwrite();
-                
-                const list = await databases.listDocuments(
-                    useRuntimeConfig().public.database,
-                    'lessons',
-// fix not getting bookings without login
-//                    this.loggedInUser ? [] : [ Query.select(['date', '$id', 'spots']) ]
-                    )
-
-                this.lessons = list.documents
-                //      this.lessons = list.documents.sort((a, b) => new Date(a.date) - new Date(b.date)))
-
-            }catch (error) {
             }
         },
         async logoutUser() {
@@ -315,7 +250,7 @@ export const useMainStore = defineStore('main', {
                     )
 
                 await this.getStudents()
-                await this.getAccountDetails()
+                await this.getUser()
 
             }catch (error) {
             }
@@ -333,56 +268,49 @@ export const useMainStore = defineStore('main', {
                     )
                 
                 this.myBookings = list.documents
+                await $fetch('/api/bookings', {
+                    method: 'POST',
+                    body: { userId: this.loggedInUser.$id }
+                })
+
             } catch (error) {
 
             }
         },
         async handleBooking(lesson: Lesson){
             try {
+
                 const user = this.onBehalfOf != null ? this.onBehalfOf : this.loggedInUser
                 
                 const { account, databases, ID } = useAppwrite();
                 
                 this.isLoading = true
                 // Register booking
-                await databases.createDocument(
+                const booking = await databases.createDocument(
                     useRuntimeConfig().public.database,
                     'bookings',
                     ID.unique(),
                     { lessons: lesson.$id, students: user.$id }
                     )
 
-                // Update student credits/debits
-                let data = {
-                    credits: user.credits,
-                    debits: user.debits
-                }
-
-                if(user.credits <= 0) {
-                    data['debits'] = user.debits + 1
-                } else {
-                    data['credits'] = user.credits - 1
-                }
-
-                await databases.updateDocument(
-                    useRuntimeConfig().public.database,
-                    'students',
-                    user.$id,
-                    data
-                    )
-
-                // Update availability lesson
-                const lessonsResponse = await databases.updateDocument(
-                    useRuntimeConfig().public.database,
-                    'lessons',
-                    lesson.$id,
-                    { spots: lesson.spots - 1 }
-                    )
+                // Update credits
+                await $fetch('/api/updatePrefs', {
+                    method: 'post',
+                    body: {
+                        userId: user.$id,
+                        prefs: {
+                            credits: +this.loggedInUser.prefs['credits'] - 1
+                        }
+                    }
+                })
                 
-                await this.getStudents();
-                await this.getAccountDetails('/yoga/account');
-                await this.getLessons();
-                console.log(lessonsResponse)
+                if(this.isAdmin) {
+                    await this.getStudents();
+                }
+
+                await this.getUser()
+                await this.getLessons()
+
                 // Bookingsarray for email
                 let bookingsArr: any[] = []
                 lessonsResponse.bookings.forEach((x: any) => {
@@ -394,17 +322,17 @@ export const useMainStore = defineStore('main', {
                     body: null,
                     new_booking_name: this.onBehalfOf.name,
                     lessondate: this.formatDateInDutch(lessonsResponse.date, true),
-                    spots: lessonsResponse.spots,
+                    spots: lessonsResponse.bookings.length,
                     bookings: bookingsArr,
                     calendar_link_apple: this.getCalenderLink('apple', lessonsResponse.date),
                     calendar_link_gmail: this.getCalenderLink('gmail', lessonsResponse.date),
                     calendar_link_outlook: this.getCalenderLink('outlook', lessonsResponse.date)
                 }
                 
-                const { body } = await $fetch('/api/sendBookingConfirmation', {
-                    method: 'POST',
-                    body: emailData
-                })
+//                const { body } = await $fetch('/api/sendBookingConfirmation', {
+//                    method: 'POST',
+//                    body: emailData
+//                })
                 
                 this.onBehalfOf = null
                 this.isLoading = false
@@ -413,35 +341,50 @@ export const useMainStore = defineStore('main', {
                 this.isLoading = false
             }
         },
-        async cancelBooking(booking: Booking, lesson: Lesson) {
+        async getBookings(userId) {
             try {
+                if(this.isAdmin) {
+                    const lessons = await $fetch('/api/lessonsWithBookings')
+                    this.lessons = lessons.documents
+                } else {
+                    const lessons = await $fetch('api/lessons')
+                    this.lessons = lessons.documents
+                }
+            } catch(error) {
+
+            }
+        },
+
+        async cancelBooking(booking: Booking) {
+            try {
+                const user = this.onBehalfOf != null ? this.onBehalfOf : this.loggedInUser
+
                 const { account, databases, ID } = useAppwrite();
                 
                 this.isLoading = true
-                
-                // Update availability lesson
-                const lessonsResponse = await databases.updateDocument(
-                    useRuntimeConfig().public.database,
-                    'lessons',
-                    lesson.$id,
-                    { spots: lesson.spots + 1 }
-                    )
 
-                await databases.updateDocument(
-                    useRuntimeConfig().public.database,
-                    'students',
-                    booking.students.$id,
-                    { credits: booking.students.credits + 1 }
-                    )
-
-                await databases.deleteDocument(
+                // Cancel booking
+                const response = await databases.deleteDocument(
                     useRuntimeConfig().public.database,
                     'bookings',
                     booking.$id
                     )
 
-                await this.getStudents()
-                await this.getAccountDetails('/yoga/account')
+                // Update credits
+                await $fetch('/api/updatePrefs', {
+                    method: 'post',
+                    body: {
+                        userId: user.$id,
+                        prefs: {
+                            credits: +user.prefs['credits'] + 1
+                        }
+                    }
+                })
+
+                if(this.isAdmin) {
+                    await this.getStudents()
+                }
+                await this.getUser()
                 await this.getLessons()
                 
                 this.isLoading = false
@@ -456,14 +399,14 @@ export const useMainStore = defineStore('main', {
                 const emailData = {
                     booking_name: booking.students.name,
                     lessondate: this.formatDateInDutch(lessonsResponse.date, true),
-                    spots: lessonsResponse.spots,
+                    spots: lessonsResponse.bookings.length,
                     bookings: bookingsArr
                 }
                 
-                const { body } = await $fetch('/api/SendBookingCancellation', {
-                    method: 'POST',
-                    body: emailData
-                })
+//                const { body } = await $fetch('/api/sendBookingCancellation', {
+//                    method: 'POST',
+//                    body: emailData
+//                })
 
             } catch(error) {
                 this.isLoading = false

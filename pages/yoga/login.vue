@@ -12,6 +12,7 @@ const passwordCheck = ref(false);
 
 const store = useMainStore()
 const { $rav } = useNuxtApp()
+const { account, ID } = useAppwrite();
 
 definePageMeta({
   layout: 'yoga'
@@ -38,10 +39,16 @@ const errorMessage = computed(() => store.errorMessage);
 const isLoading = computed(() => store.isLoading);
 
 async function login() {
+    store.setError('')
+    store.setLoading(true)
     try {
-      await store.loginUser(email.value, password.value )
+      await account.createEmailSession(email.value, password.value);
+      store.getUser()
+      store.setLoading(false)
       await navigateTo({ path: "/yoga/account" })
     } catch (error) {
+        store.setLoading(false)
+        store.setError('Er is iets verkeerd gegaan')
         console.error("Login failed:", error);
     }
 }

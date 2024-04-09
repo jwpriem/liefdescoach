@@ -3,7 +3,7 @@ const store = useMainStore()
 const router = useRouter()
 const navOpen = ref(false);
 
-await useAsyncData('user', () => store.getAccountDetails(router.currentRoute.value.fullPath), { server: false })
+await useAsyncData('loggedInUser', () => store.getUser(), { server: false })
 const toggle = () => {
     navOpen.value = !navOpen.value;
 };
