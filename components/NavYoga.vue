@@ -89,6 +89,11 @@ const loggedInUser = computed(() => store.loggedInUser)
             </nuxt-link>
           </li>
           <li @click="toggle">
+            <nuxt-link class="mobile-nav-item" to="/yoga/peachy-bum">
+              Peachy Bum
+            </nuxt-link>
+          </li>
+          <li @click="toggle">
             <nuxt-link class="mobile-nav-item" to="/yoga/tarieven">
               Tarieven
             </nuxt-link>
@@ -138,6 +143,11 @@ const loggedInUser = computed(() => store.loggedInUser)
         <li>
           <nuxt-link class="nav-item" to="/yoga/lessen">
             Lessen
+          </nuxt-link>
+        </li>
+        <li>
+          <nuxt-link class="nav-item" to="/yoga/peachy-bum">
+            Peachy Bum
           </nuxt-link>
         </li>
         <li>
