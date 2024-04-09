@@ -27,18 +27,27 @@ useHead({
 
 </script>
 
+<style scoped>
+    h1 {
+        @apply text-orange-100;
+    }
+
+   .intro {
+       @apply text-orange-100;
+   }
+</style>
 <template>
   <div>
       <Header image="/peachy-bum.webp" alignment="object-middle">
         <div class="flex justify-start items-center gap-x-6">
           <h1 class="text-3xl md:text-6xl uppercase font-black">
-              <span class="emerald-underline">Peachy Bum</span
-                  ><span class="text-emerald-600">.</span>
+              <span class="orange-underline">Peachy Bum</span
+                  ><span class="text-orange-600">.</span>
           </h1>
           <div class="flex grow-0 animate-bounce rounded-full bg-orange-300 text-orange-900 text-xs px-3 py-1">New</div>
         </div>
           <p class="intro">
-        Wie graag iets actievers doet dan yoga en het leuk vind om buiten te sporten geef ik in de zomermaanden bij goed weer van april tot september Peachy Bum lessen! 
+        Wie graag (ook) iets actievers doet dan yoga en het leuk vind om buiten te sporten geef ik in de zomermaanden bij goed weer van april tot september Peachy Bum lessen!
           </p>
           <p class="intro">
           De Peachy Bum is een andere benaming voor mooie getrainde billen. De musculus gluteus maximus oftewel grote bilspier is de grootste van de drie bilspieren en bepaalt een groot deel van de vorm van de billen. Tijdens de Peachy Bum les zullen we allerlei leuke oefeningen doen om deze spier optimaal te trainen en zo te werken aan de (nog mooiere) billen! Ook trainen we natuurlijk je core voor optimale stabiliteit en houding, wat natuurlijk weer van pas komt bij yoga.
@@ -46,10 +55,10 @@ useHead({
           <div
               class="flex justify-start items-center gap-x-3"
               >
-              <nuxt-link to="/yoga/lessen" class="emerald button">
+              <nuxt-link to="/yoga/lessen" class="orange button">
                     Les schema
               </nuxt-link>
-              <nuxt-link to="/yoga/tarieven" class="emerald-outlined button">
+              <nuxt-link to="/yoga/tarieven" class="orange-outlined button">
                     Tarieven
               </nuxt-link>
           </div>

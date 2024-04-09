@@ -85,7 +85,12 @@ const loggedInUser = computed(() => store.loggedInUser)
           </li>
           <li @click="toggle">
             <nuxt-link class="mobile-nav-item" to="/yoga/lessen">
-              Lessen
+              Les schema
+            </nuxt-link>
+          </li>
+          <li @click="toggle">
+            <nuxt-link class="mobile-nav-item" to="/yoga/hatha-yoga">
+              Hatha Yoga
             </nuxt-link>
           </li>
           <li @click="toggle">
@@ -142,7 +147,12 @@ const loggedInUser = computed(() => store.loggedInUser)
         </li>
         <li>
           <nuxt-link class="nav-item" to="/yoga/lessen">
-            Lessen
+            Les schema
+          </nuxt-link>
+        </li>
+        <li>
+          <nuxt-link class="nav-item" to="/yoga/hatha-yoga">02-hostels-praal@icloud.com
+            Hatha Yoga
           </nuxt-link>
         </li>
         <li>

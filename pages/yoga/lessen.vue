@@ -60,7 +60,7 @@ async function book(lesson) {
                  stroke="currentColor" class="w-6 h-6 mr-1 inline-block stroke-current text-emerald-700">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
             </svg>
-            <b class="capitalize">{{ lesson.type ? lesson.type : 'yoga' }}</b>
+              <b class="capitalize"><nuxt-link :to="lesson.type == 'peachy bum' ? '/yoga/peachy-bum' : '/yoga/hatha-yoga'">{{ lesson.type ? lesson.type : 'hatha yoga' }}</nuxt-link></b>
               <span class="animate-bounce rounded-full bg-orange-300 text-orange-900 text-xs px-3 py-1" v-if="lesson.type == 'peachy bum'">New</span>
             </div>
             <p>{{ $rav.formatDateInDutch(lesson.date, true) }} ({{ 9 - lesson.bookings.length }} {{ lesson.bookings.length == 8 ? 'plek' : 'plekken' }} )</p>

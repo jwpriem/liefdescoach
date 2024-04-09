@@ -75,10 +75,24 @@ p, li {
         }
     }
 
+    &.orange {
+        @apply ring-orange-700 ring-2 bg-orange-700 text-orange-200;
+        &:hover {
+            @apply bg-orange-600 text-orange-100;
+        }
+    }
+
 &.emerald-outlined {
         @apply ring-emerald-700 ring-2 text-emerald-700;
         &:hover {
             @apply ring-emerald-600 bg-emerald-600 text-emerald-100;
+        }
+    }
+
+    &.orange-outlined {
+        @apply ring-orange-700 ring-2 text-orange-700;
+        &:hover {
+            @apply ring-orange-600 bg-orange-600 text-orange-100;
         }
     }
 
@@ -157,6 +171,14 @@ label {
         @apply relative z-10;
         &:before {
             @apply absolute h-6 bottom-0 left-0 -mb-1 -ml-2 bg-emerald-700 bg-opacity-25 z-0 block w-1/2;
+            content: '';
+        }
+    }
+
+    .orange-underline {
+        @apply relative z-10;
+        &:before {
+            @apply absolute h-6 bottom-0 left-0 -mb-1 -ml-2 bg-orange-700 bg-opacity-25 z-0 block w-1/2;
             content: '';
         }
     }

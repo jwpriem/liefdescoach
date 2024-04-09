@@ -163,7 +163,7 @@ useHead({
                         </h2>
                         <p class="text-2xl text-emerald-900">
                             <span class="text-emerald-700 font-bold">Hatha</span> yoga
-                            moedigen diepe ademhaling en ontspanning aan, wat kan helpen
+                            moedigt diepe ademhaling en ontspanning aan, wat kan helpen
                             stress te verminderen. Door je aandacht te richten op je
                             ademhaling en het beoefenen van mindfulness, kun je kalmeren en
                             innerlijke rust vinden.
