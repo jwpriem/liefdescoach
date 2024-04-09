@@ -26,7 +26,17 @@
             </li>
             <li>
               <nuxt-link to="/yoga/lessen">
-                Lessen
+                Les schema
+              </nuxt-link>
+            </li>
+            <li>
+              <nuxt-link to="/yoga/hatha-yoga">
+            Hatha Yoga
+              </nuxt-link>
+            </li>
+            <li>
+              <nuxt-link to="/yoga/peachy-bum">
+            Peachy Bum
               </nuxt-link>
             </li>
             <li>

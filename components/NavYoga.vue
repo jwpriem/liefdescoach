@@ -151,7 +151,7 @@ const loggedInUser = computed(() => store.loggedInUser)
           </nuxt-link>
         </li>
         <li>
-          <nuxt-link class="nav-item" to="/yoga/hatha-yoga">02-hostels-praal@icloud.com
+          <nuxt-link class="nav-item" to="/yoga/hatha-yoga">
             Hatha Yoga
           </nuxt-link>
         </li>

@@ -197,6 +197,32 @@ useHead({
                 </div>
             </div>
         </div>
+        <div class="bg-orange-100">
+            <div id="peachy" class="container mx-auto p-8 md:px-0 md:py-24">
+                <div class="flex justify-center items-center">
+                    <div class="w-full md:w-1/2 md:text-center space-y-8">
+                        <h2 class="text-2xl md:text-4xl uppercase font-black">
+                            <span class="orange-underline text-orange-900"
+                                >Peachy Bum</span
+                                ><span class="text-orange-700">.</span>
+                        </h2>
+                        <p class="text-2xl text-orange-900">
+                            Wie graag (ook) iets actievers doet dan yoga en het leuk vind om buiten te sporten geef ik in de zomermaanden bij goed weer van april tot september <span class="text-orange-700 font-bold">Peachy Bum</span> lessen!
+                        </p>
+                        <div
+                            class="flex justify-center items-center gap-x-3"
+                            >
+                            <nuxt-link to="/yoga/lessen" class="orange button">
+                    Les schema
+                            </nuxt-link>
+                            <nuxt-link to="/yoga/peachy-bum" class="orange-outlined button">
+                    Wat is Peachy Bum?
+                            </nuxt-link>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="bg-emerald-100 title-dark p-8 md:px-0 md:py-24">
             <div class="container mx-auto">
                 <div
@@ -247,5 +273,6 @@ useHead({
                 </div>
             </div>
         </div>
+
     </div>
 </template>
