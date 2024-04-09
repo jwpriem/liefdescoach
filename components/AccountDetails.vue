@@ -104,8 +104,8 @@ const passwordStrength = computed(() => {
               <span class="block -mt-2" v-else>Geen telefoonnummer</span>
             </div>
             <div>
-              <sup class="text-emerald-500">Credits</sup>
-              <span class="block -mt-2" >{{ loggedInUser.prefs['credits'] }}</span>
+              <sup class="text-emerald-500">Saldo</sup>
+              <span class="block -mt-2" >{{ loggedInUser.prefs['credits'] }} {{ loggedInUser.prefs['credits'] == 1 ? 'les' : 'lessen' }}</span>
             </div>
             <div>
               <sup class="text-emerald-500">Geregistreerd op</sup>

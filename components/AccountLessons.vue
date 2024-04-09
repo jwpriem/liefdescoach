@@ -40,7 +40,7 @@ function sortStudents(students) {
 </script>
 
 <template>
-  <div v-if="isAdmin && lessons.length">
+  <div v-if="isAdmin && lessons && students">
 
 
    <div class="w-full">
@@ -55,6 +55,10 @@ function sortStudents(students) {
     </div>
     <div class="grid grid-cols-1 md:grid-cols-4 mt-8 gap-3">
       <div v-for="lesson in onlyFutureLessons ? $rav.upcomingLessons(lessons) : lessons" index="lesson.$id" class="p-4 bg-gray-800 rounded flex flex-col gap-y-3" :class="$rav.isFutureBooking(lesson.date) ? '' : 'opacity-20 hover:opacity-100'">
+        <div>
+          <sup class="text-emerald-500">Les</sup>
+          <span class="block -mt-2 capitalize">{{lesson.type ? lesson.type : 'yoga' }}</span>
+        </div>
         <div>
           <sup class="text-emerald-500">Datum</sup>
           <span class="block -mt-2">{{ $rav.formatDateInDutch(lesson.date, true) }}</span>

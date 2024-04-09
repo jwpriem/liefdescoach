@@ -19,11 +19,13 @@ interface User {
 interface Student {
     $id?: string;
     email?: string;
+    name?: string;
 }
 
 interface Lesson {
     $id: string;
     date: string;
+    type: string;
     // Add more lesson properties as needed
 }
 
@@ -177,7 +179,7 @@ export const useMainStore = defineStore('main', {
                 if(phone) {
                     await account.updatePhone(phone, password);
                 }
-                console.log(registration)
+
                 const user = await account.get();
 
                 await $fetch('/api/updatePrefs', {
@@ -185,7 +187,7 @@ export const useMainStore = defineStore('main', {
                     body: {
                         userId: user.$id,
                         prefs: {
-                            credits: String(0)
+                            credits: '0'
                         }
                     }
                 })
@@ -194,10 +196,10 @@ export const useMainStore = defineStore('main', {
                     useRuntimeConfig().public.database,
                     'students',
                     user.$id,
-                    { email: user.email }
+                    { email: user.email, name: user.name }
                     );
 
-                this.loggedInUser = user
+                this.getUser()
                 this.isLoading = false
 
             } catch (error: any) {
@@ -360,15 +362,14 @@ export const useMainStore = defineStore('main', {
                 const { account, databases, ID } = useAppwrite();
                 
                 this.isLoading = true
-                console.log(booking)
+
                 // Cancel booking
                 const response = await databases.deleteDocument(
                     useRuntimeConfig().public.database,
                     'bookings',
                     booking.$id
                     )
-                console.log(response)
-                console.log('fetch')
+
                 // Update credits
                 await $fetch('/api/updatePrefs', {
                     method: 'post',
@@ -379,7 +380,7 @@ export const useMainStore = defineStore('main', {
                         }
                     }
                 })
-                console.log('fetchDone')
+
                 if(this.isAdmin) {
                     await this.getStudents()
                 }

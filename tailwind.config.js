@@ -1,7 +1,5 @@
 /** @type {import('tailwindcss').Config} */
 
-//const colors = require('tailwindcss/colors')
-
 module.exports = {
   content: [
     "./components/**/*.{js,vue,ts}",
@@ -16,12 +14,7 @@ module.exports = {
       fontFamily: {
         display: ['Montserrat', 'sans-serif'],
         body: ['Source Sans 3', 'sans-serif']
-      },
-//      colors: {
-//        rose: colors.rose,
-//        emerald: colors.emerald,
-//        gray: colors.gray
-//      }
+      }
     },
   },
   plugins: [],

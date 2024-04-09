@@ -53,36 +53,42 @@ async function book(lesson) {
         <span class="emerald-underline">Les schema</span><span class="text-emerald-600">.</span>
       </h1>
       <div class="intro">
-        <div v-for="lesson in $rav.upcomingLessons(lessons.documents)" :key="lesson.$id"
-             class="flex items-center gap-x-3 mb-3">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-               stroke="currentColor" class="w-6 h-6 mr-1 inline-block stroke-current text-emerald-700">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-          </svg>
-          <b>{{ $rav.formatDateInDutch(lesson.date) }} ({{ 9 - lesson.bookings.length }} {{ lesson.bookings.length == 8 ? 'plek' : 'plekken' }} )</b>
-          <button :disabled="checkBooking(lesson.$id)" class="button emerald button-small"
-                  :class="checkBooking(lesson.$id) ? 'disabled' : ''" @click="book(lesson)" v-if="loggedInUser && !checkBooking(lesson.$id)">
-            Boek
-          </button>
-          <span v-if="checkBooking(lesson.$id)" class="flex content-center"><svg xmlns="http://www.w3.org/2000/svg"
-                                                                                 fill="none" viewBox="0 0 24 24"
-                                                                                 stroke-width="1.5"
-                                                                                 stroke="currentColor"
-                                                                                 class="w-6 h-6 inline-block mx-1">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                      d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-              </svg>
-            Geboekt
-          </span>
-          <span v-if="loggedInUser && !checkBooking(lesson.$id) && lesson.bookings.length == 9" class="flex content-center">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"class="w-6 h-6 inline-block mx-1">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+        <div v-for="lesson in $rav.upcomingLessons(lessons.documents)" :key="lesson.$id" class="flex justify-between items-center gap-y-3 border-b py-3">
+          <div>
+            <div class="flex align-start items-center gap-x-3">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                 stroke="currentColor" class="w-6 h-6 mr-1 inline-block stroke-current text-emerald-700">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
             </svg>
-            Helaas les is vol
-          </span>
-          <nuxt-link to="/yoga/login" v-if="!loggedInUser" class="button button-small emerald">
-            Login om te boeken
-          </nuxt-link>
+            <b class="capitalize">{{ lesson.type ? lesson.type : 'yoga' }}</b>
+            </div>
+            <p>{{ $rav.formatDateInDutch(lesson.date, true) }} ({{ 9 - lesson.bookings.length }} {{ lesson.bookings.length == 8 ? 'plek' : 'plekken' }} )</p>
+          </div>
+          <div>
+            <button :disabled="checkBooking(lesson.$id)" class="button emerald button-small"
+                    :class="checkBooking(lesson.$id) ? 'disabled' : ''" @click="book(lesson)" v-if="loggedInUser && !checkBooking(lesson.$id)">
+              Boek
+            </button>
+            <span v-if="checkBooking(lesson.$id)" class="flex content-center"><svg xmlns="http://www.w3.org/2000/svg"
+                                                                                   fill="none" viewBox="0 0 24 24"
+                                                                                   stroke-width="1.5"
+                                                                                   stroke="currentColor"
+                                                                                   class="w-6 h-6 inline-block mx-1">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                </svg>
+              Geboekt
+            </span>
+            <span v-if="loggedInUser && !checkBooking(lesson.$id) && lesson.bookings.length == 9" class="flex content-center">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"class="w-6 h-6 inline-block mx-1">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+              </svg>
+              Helaas les is vol
+            </span>
+            <nuxt-link to="/yoga/login" v-if="!loggedInUser" class="button button-small emerald">
+              Login om te boeken
+            </nuxt-link>
+          </div>
         </div>
       </div>
       <p class="intro">

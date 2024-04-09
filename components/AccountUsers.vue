@@ -60,9 +60,9 @@ async function updatePrefs(userId: string, credits: number, current: number) {
           <span class="block -mt-2" v-else>Geen telefoonnummer</span>
         </div>
         <div>
-         <sup class="text-emerald-500">Credits</sup>
+         <sup class="text-emerald-500">Saldo</sup>
          <span class="block -mt-2 flex flex-no-wrap align-center justify-start gap-x-2" v-if="student.prefs">
-         {{ student.prefs['credits'] }}
+         {{ student.prefs['credits'] }} {{ student.prefs['credits'] == 1 ? 'les' : 'lessen' }}
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 cursor-pointer" @click="setUser(student)">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
           </svg>
