@@ -14,7 +14,10 @@ export default defineEventHandler(async (event) => {
     const databases = new Databases(client);
     const res = await databases.listDocuments(
         config.public.database,
-        'lessons'
+        'lessons',
+        [
+            Query.orderAsc("date")
+        ]
         );
 
     return Object.assign({}, res)

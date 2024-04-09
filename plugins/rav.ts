@@ -63,8 +63,8 @@ const rav = {
         const dayjs = useDayjs()
         
         const lessonDate = dayjs(date).utc();
-        const startTime = lessonDate.format('h');
-        const endTime = lessonDate.add(1, 'hour').format('h');
+        const startTime = lessonDate.format('h.mm');
+        const endTime = lessonDate.add(1, 'hour').format('h.mm');
         return isLesson ? `${lessonDate.format('dddd D MMMM')} van ${startTime} tot ${endTime} uur` : lessonDate.format('D MMMM YYYY');
     },
 
@@ -83,7 +83,8 @@ const rav = {
 
         const lessonDate = dayjs(new Date(date)).utc()
         const startTime = lessonDate.format('h')
-        const link = `https://calndr.link/d/event/?service=${stream}&start=${lessonDate.format('YYYY-MM-DD')}%20${startTime}:00&title=Yogales%20Ravennah&timezone=Europe/Amsterdam&location=Emmy%20van%20Leersumhof%2024a%20Rotterdam`
+        const startMinutes = lessonDate.format('mm')
+        const link = `https://calndr.link/d/event/?service=${stream}&start=${lessonDate.format('YYYY-MM-DD')}%20${startTime}:${startMinutes}&title=Yogales%20Ravennah&timezone=Europe/Amsterdam&location=Emmy%20van%20Leersumhof%2024a%20Rotterdam`
         return link
     },
 
