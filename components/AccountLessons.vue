@@ -35,16 +35,18 @@ function cancelLesson() {
 }
 
 async function book() {
-    try {
-      await store.setOnBehalfOf(JSON.parse(this.addBookingUser))
-      await store.handleBooking(JSON.parse(this.addBookingLesson))
-      await store.getStudents()
-      await store.getLessons()
-      this.cancel()
-    }
-      catch(error) {
+    this.bookForUser = false
+    store.setLoading(true)
 
-      }
+    await store.setOnBehalfOf(JSON.parse(this.addBookingUser))
+    await store.handleBooking(JSON.parse(this.addBookingLesson))
+    await store.getStudents()
+    await store.getLessons()
+
+  this.addBookingUser = null
+  this.addBookingLesson = null
+  store.setLoading(false)
+
 }
 
 async function createNewLesson() {

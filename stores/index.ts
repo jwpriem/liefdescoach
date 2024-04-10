@@ -305,11 +305,14 @@ export const useMainStore = defineStore('main', {
                 })
 
                 await this.getUser()
-                const lessonsResponse = await this.getLessons()
-
+                const lessonsResponse = await databases.getDocument(
+                    useRuntimeConfig().public.database,
+                    'lessons',
+                    lesson.$id,
+                    )
                 // Bookingsarray for email
                 let bookingsArr: any[] = []
-                lessonsResponse.bookings.forEach((x: any) => {
+                lessonsResponse.documents.bookings.forEach((x: any) => {
                     bookingsArr.unshift({ name: x.students.name})
                 })
                 
@@ -387,6 +390,12 @@ export const useMainStore = defineStore('main', {
                 await this.getLessons()
                 
                 this.isLoading = false
+
+                const lessonsResponse = await databases.getDocument(
+                    useRuntimeConfig().public.database,
+                    'lessons',
+                    lesson.$id,
+                    )
 
                 // Bookingsarray for email
                 const bookingsArr: any = []
