@@ -182,10 +182,12 @@ label {
             content: '';
         }
     }
-
+    select {
+        @apply text-emerald-600;
+    }
  input[type='text'], input[type='password'], input[type='number'],
 .select-wrapper,
-textarea, select:focus {
+textarea {
         @apply appearance-none bg-emerald-100 text-emerald-800 p-4 font-body w-full rounded border-transparent text-sm transition-all duration-300 ease-in-out mt-1;
         font-size: 16px;
 
@@ -405,13 +407,15 @@ textarea, select:focus {
     @apply p-0 pr-3;
 }
 
-select {
-    @apply p-3 bg-transparent w-full;
+/*select {*/
+/*    @apply p-3 bg-transparent w-full;*/
 
-    &:focus {
-        @apply outline-none border-0;
-    }
-}
+/*    &:focus {*/
+/*        @apply outline-none border-0;*/
+/*    }*/
+/*}*/
+
+
 
 .min-height-50 {
     min-height: 50svh;

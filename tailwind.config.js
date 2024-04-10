@@ -14,6 +14,11 @@ module.exports = {
       fontFamily: {
         display: ['Montserrat', 'sans-serif'],
         body: ['Source Sans 3', 'sans-serif']
+      },
+      aspectRatio: {
+        auto: 'auto',
+        square: '1 / 1',
+        video: '16 / 9'
       }
     },
   },

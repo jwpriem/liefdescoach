@@ -74,18 +74,18 @@ export const useMainStore = defineStore('main', {
                 this.loggedInUser = user
                 this.isAdmin = this.loggedInUser.labels.includes('admin')
 
+                const bookings = await $fetch('/api/bookings', {
+                    method: 'post',
+                    body: { userId: this.loggedInUser.$id }
+                })
+                this.myBookings = bookings.documents
+
                 if(this.isAdmin) {
                     const lessons = await $fetch('/api/lessonsWithBookings')
                     this.lessons = lessons.documents
 
                     const users = await $fetch('/api/users')
                     this.students = users.users
-                } else {
-                    const bookings = await $fetch('/api/bookings', {
-                        method: 'post',
-                        body: { userId: this.loggedInUser.$id }
-                    })
-                    this.myBookings = bookings.documents
                 }
             } catch(error) {
 
@@ -294,22 +294,18 @@ export const useMainStore = defineStore('main', {
                     )
 
                 // Update credits
-                await $fetch('/api/updatePrefs', {
+                const credits = await $fetch('/api/updatePrefs', {
                     method: 'post',
                     body: {
                         userId: user.$id,
                         prefs: {
-                            credits: +this.loggedInUser.prefs['credits'] - 1
+                            credits: +user.prefs['credits'] - 1
                         }
                     }
                 })
-                
-                if(this.isAdmin) {
-                    await this.getStudents();
-                }
 
                 await this.getUser()
-                await this.getLessons()
+                const lessonsResponse = await this.getLessons()
 
                 // Bookingsarray for email
                 let bookingsArr: any[] = []
@@ -328,11 +324,14 @@ export const useMainStore = defineStore('main', {
                     calendar_link_gmail: this.getCalenderLink('gmail', lessonsResponse.date),
                     calendar_link_outlook: this.getCalenderLink('outlook', lessonsResponse.date)
                 }
-                
-//                const { body } = await $fetch('/api/sendBookingConfirmation', {
-//                    method: 'POST',
-//                    body: emailData
-//                })
+                const isProd = process.env.NODE_ENV == 'production'
+
+                if(isProd) {
+                    const { body } = await $fetch('/api/sendBookingConfirmation', {
+                        method: 'POST',
+                        body: emailData
+                    })
+                }
                 
                 this.onBehalfOf = null
                 this.isLoading = false
@@ -341,7 +340,7 @@ export const useMainStore = defineStore('main', {
                 this.isLoading = false
             }
         },
-        async getBookings(userId) {
+        async getBookings() {
             try {
                 if(this.isAdmin) {
                     const lessons = await $fetch('/api/lessonsWithBookings')
@@ -402,11 +401,14 @@ export const useMainStore = defineStore('main', {
                     spots: lessonsResponse.bookings.length,
                     bookings: bookingsArr
                 }
-                
-//                const { body } = await $fetch('/api/sendBookingCancellation', {
-//                    method: 'POST',
-//                    body: emailData
-//                })
+                const isProd = process.env.NODE_ENV == 'production'
+
+                if(isProd) {
+                    const { body } = await $fetch('/api/sendBookingCancellation', {
+                        method: 'POST',
+                        body: emailData
+                    })
+                }
 
             } catch(error) {
                 this.isLoading = false
@@ -432,5 +434,19 @@ export const useMainStore = defineStore('main', {
             const link = `https://calndr.link/d/event/?service=${stream}&start=${lessonDate.format('YYYY-MM-DD')}%20${startTime}:00&title=Yogales%20Ravennah&timezone=Europe/Amsterdam&location=Emmy%20van%20Leersumhof%2024a%20Rotterdam`
             return link
         },
+
+        async getLessons() {
+            try {
+                if(this.isAdmin) {
+                    const lessons = await $fetch('/api/lessonsWithBookings')
+                    this.lessons = lessons.documents
+                } else {
+                    const lessons = await $fetch('api/lessons')
+                    this.lessons = lessons.documents
+                }
+            } catch(error) {
+
+            }
+        }
     }
 })

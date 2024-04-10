@@ -29,13 +29,13 @@ export default defineNuxtConfig({
   
   modules: [
     '@nuxtjs/google-fonts',
-    '@nuxtjs/tailwindcss',
     '@pinia/nuxt',
     'dayjs-nuxt',
     'nuxt-mail',
     '@nuxtjs/sitemap',
     '@nuxtjs/robots',
-    '@zadigetvoltaire/nuxt-gtm'
+    '@zadigetvoltaire/nuxt-gtm',
+    '@nuxt/ui'
   ],
   
   dayjs: {
@@ -79,4 +79,8 @@ export default defineNuxtConfig({
   gtm: {
     id: 'GTM-PZP28PP'
   },
+
+  ui: {
+    global: true
+  }
 })
