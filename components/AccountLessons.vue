@@ -167,6 +167,7 @@ function getStudents(students) {
             />
 
           <USelect
+            v-if="addBookingLesson"
             icon="i-heroicons-user-20-solid"
             size="md"
             color="primary"
