@@ -61,7 +61,9 @@ async function createNewLesson() {
     }
   })
 
-  this.cancel()
+  this.createLessonDate = new Date()
+  this.createLessonType = 'hatha yoga'
+  this.createLesson = false
   await store.getLessons()
   await store.setLoading(false)
 }
@@ -93,11 +95,11 @@ function getLessons(lessons) {
 
 function getStudents(students) {
   return students.map(student => {
-//    const isDisabled = this.addBookingLesson ? !$rav.checkAvailability(JSON.parse(this.addBookingLesson), student) : false
+    const isDisabled = this.addBookingLesson ? !$rav.checkAvailability(JSON.parse(this.addBookingLesson), student) : false
     return {
       label: student.name,
       value: JSON.stringify(student),
-      disabled: false
+      disabled: isDisabled
     };
   });
 }

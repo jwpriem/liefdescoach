@@ -456,6 +456,17 @@ export const useMainStore = defineStore('main', {
             } catch(error) {
 
             }
+        },
+
+        async getStudents() {
+            try {
+                if(this.isAdmin) {
+                    const users = await $fetch('/api/users')
+                    this.students = users.users
+                }
+            } catch(error) {
+
+            }
         }
     }
 })
