@@ -19,7 +19,8 @@ export default defineEventHandler(async (event) => {
         'lessons',
         [
             Query.orderAsc("date"),
-            Query.greaterThanEqual("date", fromDate.toISOString())
+            Query.greaterThanEqual("date", fromDate.toISOString()),
+            Query.limit(100)
         ]
     );
     

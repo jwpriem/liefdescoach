@@ -17,7 +17,8 @@ export default defineEventHandler(async (event) => {
         config.public.database,
         'bookings',
         [
-            Query.equal('students', [body.userId])
+            Query.equal('students', [body.userId]),
+            Query.limit(100)
         ]
         );
 

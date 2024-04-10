@@ -16,7 +16,8 @@ export default defineEventHandler(async (event) => {
         config.public.database,
         'lessons',
         [
-            Query.orderAsc("date")
+            Query.orderAsc("date"),
+            Query.limit(100)
         ]
         );
 
