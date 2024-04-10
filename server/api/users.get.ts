@@ -15,6 +15,7 @@ export default defineEventHandler(async (event) => {
     const users = new Users(client);
     const res = await users.list(
         [
+            Query.orderAsc("name"),
             Query.limit(100)
         ]
     );

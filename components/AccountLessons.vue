@@ -91,10 +91,11 @@ function getLessons(lessons) {
 
 function getStudents(students) {
   return students.map(student => {
+    const isDisabled = this.addBookingLesson ? !$rav.checkAvailability(JSON.parse(this.addBookingLesson), student) : false
     return {
       label: student.name,
       value: JSON.stringify(student),
-      disabled: !$rav.checkAvailability(JSON.parse(this.addBookingLesson), student)
+      disabled: isDisabled
     };
   });
 }
