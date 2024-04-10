@@ -118,7 +118,6 @@ const rav = {
     },
 
     checkAvailability(lesson: any, student: any) {
-        console.log(lesson)
         return lesson ? !lesson.bookings.some((x: any) => x.students.$id == student.$id) : false
     }
 };

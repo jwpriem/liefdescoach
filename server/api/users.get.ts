@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import { Client, Users } from 'node-appwrite';
+import { Client, Users, Query } from 'node-appwrite';
 import { useRuntimeConfig } from '#imports';
 
 export default defineEventHandler(async (event) => {
@@ -13,7 +13,11 @@ export default defineEventHandler(async (event) => {
     .setKey(config.appwriteKey) // Your secret API key
     
     const users = new Users(client);
-    const res = await users.list();
+    const res = await users.list(
+        [
+            Query.limit(100)
+        ]
+    );
 
     return Object.assign({}, res)
 })
