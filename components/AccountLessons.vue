@@ -221,7 +221,7 @@ const computedStudents = computed(() => {
             color="primary"
             variant="outline"
             v-model="state.createLessonType"
-            :options="types"
+            :options="state.types"
           />
 
           <div class="flex gap-x-3">
