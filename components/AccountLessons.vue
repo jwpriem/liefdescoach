@@ -107,7 +107,7 @@ function getStudents(students) {
 </script>
 
 <template>
-  <div v-if="isAdmin && lessons && students">
+  <div v-show="isAdmin && lessons && students">
 
 
    <div class="w-full">
@@ -145,7 +145,7 @@ function getStudents(students) {
                 <path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m6 4.125 2.25 2.25m0 0 2.25 2.25M12 13.875l2.25-2.25M12 13.875l-2.25 2.25M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
               </svg>
             </span>
-            <span v-if="!lesson.bookings.length">Geen boekingen</span>
+            <span v-show="!lesson.bookings.length">Geen boekingen</span>
           </span>
         </div>
       </div>
@@ -153,7 +153,7 @@ function getStudents(students) {
    </div>
 
    <!--Book for user-->
-    <div v-if="bookForUser && lessons.length && students.length" class="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
+    <div v-show="bookForUser && lessons.length && students.length" class="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
       <div class="w-full max-height-75 overflow-y-scroll sm:w-2/3 md:w-1/2 bg-gray-800 p-6 rounded-lg shadow-lg">
         <!-- Your form content goes here -->
         <div class="w-full flex flex-col gap-y-5">
@@ -172,7 +172,7 @@ function getStudents(students) {
             />
 
           <USelect
-            v-if="addBookingLesson"
+            v-show="addBookingLesson"
             icon="i-heroicons-user-20-solid"
             size="md"
             color="primary"
@@ -189,7 +189,7 @@ function getStudents(students) {
       </div>
     </div>
     <!--Create lesson-->
-    <div v-if="createLesson && isAdmin" class="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
+    <div v-show="createLesson && isAdmin" class="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
       <div class="w-full max-height-75 overflow-y-scroll sm:w-2/3 md:w-1/2 bg-gray-800 p-6 rounded-lg shadow-lg">
         <!-- Your form content goes here -->
         <div class="w-full flex flex-col gap-y-5">
