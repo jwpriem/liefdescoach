@@ -3,107 +3,115 @@ import { format } from 'date-fns'
 const store = useMainStore()
 const { $rav } = useNuxtApp()
 
-const onlyFutureLessons = ref(false)
-const bookForUser = ref(false)
-const addBookingUser = ref(null)
-const addBookingLesson = ref(null)
-const createLesson = ref(false)
-const createLessonDate = ref(new Date())
-const createLessonType = ref('hatha yoga')
-const types = [{
-    label: 'Hatha Yoga',
-    value: 'hatha yoga'
-  },{
-    label: 'Peachy Bum',
-    value: 'peachy bum'
-  }]
+const state = reactive({
+  onlyFutureLessons: false,
+  bookForUser: false,
+  addBookingUser: null,
+  addBookingLesson: null,
+  createLesson: false,
+  createLessonDate: new Date(),
+  createLessonType: 'hatha yoga',
+  types: [
+    {
+      label: 'Hatha Yoga',
+      value: 'hatha yoga',
+    },
+    {
+      label: 'Peachy Bum',
+      value: 'peachy bum',
+    },
+  ],
+})
 
-const lessons = computed(() => store.lessons);
-const students = computed(() => store.students);
-const isAdmin = computed(() => store.isAdmin);
+const lessons = computed(() => store.lessons)
+const students = computed(() => store.students)
+const isAdmin = computed(() => store.isAdmin)
 
 function cancel() {
-    this.addBookingUser = null
-    this.addBookingLesson = null
-    this.bookForUser = false
+  state.addBookingUser = null
+  state.addBookingLesson = null
+  state.bookForUser = false
 }
 
 function cancelLesson() {
-  this.createLessonDate = new Date()
-  this.createLessonType = 'hatha yoga'
-  this.createLesson = false
+  state.createLessonDate = new Date()
+  state.createLessonType = 'hatha yoga'
+  state.createLesson = false
 }
 
 async function book() {
-    this.bookForUser = false
-    store.setLoading(true)
+  state.bookForUser = false
+  store.setLoading(true)
 
-    await store.setOnBehalfOf(JSON.parse(this.addBookingUser))
-    await store.handleBooking(JSON.parse(this.addBookingLesson))
-    await store.getStudents()
-    await store.getLessons()
+  await store.setOnBehalfOf(JSON.parse(state.addBookingUser))
+  await store.handleBooking(JSON.parse(state.addBookingLesson))
+  await store.getStudents()
+  await store.getLessons()
 
-  this.addBookingUser = null
-  this.addBookingLesson = null
+  state.addBookingUser = null
+  state.addBookingLesson = null
   store.setLoading(false)
-
 }
 
 async function createNewLesson() {
-  await store.setLoading(true)
-  this.createLessonType == 'hatha yoga' ? this.createLessonDate.setUTCHours(9, 45, 0, 0) : this.createLessonDate.setUTCHours(10, 0, 0, 0)
+  store.setLoading(true)
+  state.createLessonType === 'hatha yoga' ? state.createLessonDate.setUTCHours(9, 45, 0, 0) : state.createLessonDate.setUTCHours(10, 0, 0, 0)
 
-  const { res } = await $fetch('/api/createLesson', {
+  await $fetch('/api/createLesson', {
     method: 'post',
-    body: {
-      date: this.createLessonDate.toISOString(),
-      type: this.createLessonType
-    }
+    body: JSON.stringify({
+      date: state.createLessonDate.toISOString(),
+      type: state.createLessonType,
+    }),
   })
 
-  this.createLessonDate = new Date()
-  this.createLessonType = 'hatha yoga'
-  this.createLesson = false
+  cancelLesson() // Resets the lesson creation form
   await store.getLessons()
-  await store.setLoading(false)
+  store.setLoading(false)
 }
 
 async function removeBooking(booking, lesson) {
-    await store.cancelBooking(booking, lesson);
+  await store.cancelBooking(booking, lesson)
 }
 
 function sortStudents(students) {
-    const arr = [...students]
-    return arr.sort((a, b) => a.students.name.localeCompare(b.students.name) )
+  console.log(students); // Check the structure in the browser's console
+  if (!Array.isArray(students)) return [];
+
+  return [...students].sort((a, b) => {
+    const nameA = a.name || "";
+    const nameB = b.name || "";
+    return nameA.localeCompare(nameB);
+  });
 }
 
-function getLessons(lessons) {
-  return lessons.map(lesson => {
-    const bookingsLength = lesson.bookings.length;
-    const spots = 9 - bookingsLength;
-    const isFull = bookingsLength === 9;
-    const spotsContext = bookingsLength === 8 ? 'plek' : 'plekken';
-    const spotsText = isFull ? ' (Vol)' : ` (Nog ${spots} ${spotsContext})`;
+const computedLessons = computed(() => {
+  const futureLessons = $rav.upcomingLessons(lessons.value)
+  return futureLessons.map(lesson => {
+    const bookingsLength = lesson.bookings.length
+    const spots = 9 - bookingsLength
+    const isFull = bookingsLength === 9
+    const spotsContext = bookingsLength === 8 ? 'plek' : 'plekken'
+    const spotsText = isFull ? ' (Vol)' : ` (Nog ${spots} ${spotsContext})`
 
     return {
       label: $rav.formatDateInDutch(lesson.date) + spotsText,
       value: JSON.stringify(lesson),
-      disabled: isFull
-    };
-  });
-}
+      disabled: isFull,
+    }
+  })
+})
 
-function getStudents(students) {
-  return students.map(student => {
-    const isDisabled = this.addBookingLesson ? !$rav.checkAvailability(JSON.parse(this.addBookingLesson), student) : false
+const computedStudents = computed(() => {
+  return students.value.map(student => {
+    const isDisabled = state.addBookingLesson ? !$rav.checkAvailability(JSON.parse(state.addBookingLesson), student) : false
     return {
       label: student.name,
       value: JSON.stringify(student),
-      disabled: isDisabled
-    };
-  });
-}
-
+      disabled: isDisabled,
+    }
+  })
+})
 </script>
 
 <template>
@@ -116,18 +124,18 @@ function getStudents(students) {
        <span class="emerald-underline text-emerald-900">Lessen</span><span class="text-emerald-700">.</span>
      </h2>
      <div class="flex items-center gap-x-3">
-       <UButton color="primary" variant="solid" @click="createLesson = !createLesson">Voeg les toe</UButton>
-       <UButton color="primary" variant="solid" @click="bookForUser = true">Maak boeking voor gebruiker</UButton>
+       <UButton color="primary" variant="solid" @click="state.createLesson = !state.createLesson">Voeg les toe</UButton>
+       <UButton color="primary" variant="solid" @click="state.bookForUser = !state.bookForUser">Maak boeking voor gebruiker</UButton>
        <UToggle
          on-icon="i-heroicons-check-20-solid"
          off-icon="i-heroicons-x-mark-20-solid"
-         v-model="onlyFutureLessons"
+         v-model="state.onlyFutureLessons"
          />
       <span>Alleen toekomstige lessen</span>
      </div>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-4 mt-8 gap-3">
-      <div v-for="lesson in onlyFutureLessons ? $rav.upcomingLessons(lessons) : lessons" index="lesson.$id" class="p-4 bg-gray-800 rounded flex flex-col gap-y-3" :class="$rav.isFutureBooking(lesson.date) ? '' : 'opacity-20 hover:opacity-100'">
+      <div v-for="lesson in state.onlyFutureLessons ? $rav.upcomingLessons(lessons) : lessons" index="lesson.$id" class="p-4 bg-gray-800 rounded flex flex-col gap-y-3" :class="$rav.isFutureBooking(lesson.date) ? '' : 'opacity-20 hover:opacity-100'">
         <div>
           <sup class="text-emerald-500">Les</sup>
           <span class="block -mt-2 capitalize">{{lesson.type ? lesson.type : 'hatha yoga' }}</span>
@@ -153,7 +161,7 @@ function getStudents(students) {
    </div>
 
    <!--Book for user-->
-    <div v-if="bookForUser && lessons.length && students.length" class="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
+    <div v-if="state.bookForUser && lessons.length && students.length" class="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
       <div class="w-full max-height-75 overflow-y-scroll sm:w-2/3 md:w-1/2 bg-gray-800 p-6 rounded-lg shadow-lg">
         <!-- Your form content goes here -->
         <div class="w-full flex flex-col gap-y-5">
@@ -167,29 +175,29 @@ function getStudents(students) {
             size="md"
             color="primary"
             variant="outline"
-            v-model="addBookingLesson"
-            :options="getLessons($rav.upcomingLessons(lessons))"
+            v-model="state.addBookingLesson"
+            :options="computedLessons"
             />
 
           <USelect
-            v-if="addBookingLesson"
+            v-if="state.addBookingLesson"
             icon="i-heroicons-user-20-solid"
             size="md"
             color="primary"
             variant="outline"
-            v-model="addBookingUser"
-            :options="getStudents(students)"
+            v-model="state.addBookingUser"
+            :options="computedStudents"
             />
 
           <div class="flex gap-x-3">
-            <UButton color="primary" variant="solid" @click="book()" :disabled="!addBookingUser && !addBookingLesson">Voeg toe</UButton>
+            <UButton color="primary" variant="solid" @click="book()" :disabled="!state.addBookingUser && !state.addBookingLesson">Voeg toe</UButton>
             <UButton color="primary" variant="outline" @click="cancel()">Annuleer</UButton>
           </div>
         </div>
       </div>
     </div>
     <!--Create lesson-->
-    <div v-if="createLesson && isAdmin" class="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
+    <div v-if="state.createLesson && isAdmin" class="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
       <div class="w-full max-height-75 overflow-y-scroll sm:w-2/3 md:w-1/2 bg-gray-800 p-6 rounded-lg shadow-lg">
         <!-- Your form content goes here -->
         <div class="w-full flex flex-col gap-y-5">
@@ -200,10 +208,10 @@ function getStudents(students) {
           </h2>
 
           <UPopover :popper="{ placement: 'bottom-start' }">
-            <UButton icon="i-heroicons-calendar-days-20-solid" :label="format(createLessonDate, 'd MMM, yyy')" />
+            <UButton icon="i-heroicons-calendar-days-20-solid" :label="format(state.createLessonDate, 'd MMM, yyy')" />
 
             <template #panel="{ close }">
-              <DatePicker v-model="createLessonDate" is-required @close="close" />
+              <DatePicker v-model="state.createLessonDate" is-required @close="close" />
             </template>
           </UPopover>
 
@@ -212,7 +220,7 @@ function getStudents(students) {
             size="md"
             color="primary"
             variant="outline"
-            v-model="createLessonType"
+            v-model="state.createLessonType"
             :options="types"
           />
 
