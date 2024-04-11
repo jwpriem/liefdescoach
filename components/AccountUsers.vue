@@ -1,39 +1,45 @@
 <script setup lang="ts">
-const store = useMainStore()
+const store = useMainStore();
 
-const editMode = ref(false)
-const addCredits = ref(null)
-const user = ref(null)
+// Using a reactive object to group related states
+const state = reactive({
+  editMode: false,
+  addCredits: null as number | null,
+  user: null as any | null, // Adjust 'any' to the appropriate type for your user objects
+});
 
-const students = computed(() => store.students)
+const students = computed(() => store.students);
 const loggedInUser = computed(() => store.loggedInUser);
 const isAdmin = computed(() => store.isAdmin);
 
-function setUser(user) {
-  this.user = user
-  this.editMode = true
+function setUser(selectedUser: any): void { // Adjust 'any' to your user type
+  state.user = selectedUser;
+  state.editMode = true;
 }
 
-function cancel() {
-  this.user = null
-  this.addCredits = null
-  this.editMode = false
+function cancel(): void {
+  state.user = null;
+  state.addCredits = null;
+  state.editMode = false;
 }
 
-async function updatePrefs(userId: string, credits: number, current: number) {
+async function updatePrefs(userId: string, credits: number, current: number): Promise<void> {
+  try {
+    await $fetch('/api/updatePrefs', {
+      method: 'post',
+      body: {
+        userId,
+        prefs: {
+          credits: +current + credits,
+        },
+      },
+    });
 
-  const { res } = await $fetch('/api/updatePrefs', {
-    method: 'post',
-    body: {
-      userId: userId,
-      prefs: {
-        credits: current + credits
-      }
-    }
-  })
-
-  this.cancel()
-  store.getUser()
+    cancel(); // Use cancel function to reset state
+    await store.getUser(); // Assuming getUser is an async operation
+  } catch (error) {
+    console.error('Failed to update preferences:', error);
+  }
 }
 </script>
 
@@ -77,7 +83,7 @@ async function updatePrefs(userId: string, credits: number, current: number) {
    </div>
 
    <!--Pop up for adding credits-->
-    <div v-if="editMode" class="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
+    <div v-if="state.editMode" class="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
       <div class="w-full max-height-75 overflow-y-scroll sm:w-2/3 md:w-1/2 bg-gray-800 p-6 rounded-lg shadow-lg">
         <!-- Your form content goes here -->
         <div class="w-full flex flex-col gap-y-5">
@@ -91,14 +97,14 @@ async function updatePrefs(userId: string, credits: number, current: number) {
               <label>Credits toevoegen</label>
             </div>
             <input id="add-credits"
-              v-model="addCredits"
+              v-model="state.addCredits"
               type="number"
               placeholder="Aantal credits om toe te voegen"
               class="w-full"
             />
           </div>
           <div class="flex gap-x-3">
-            <button class="button emerald button-small" type="button" @click="updatePrefs(user.$id, addCredits, user.prefs['credits']), editMode = false">
+            <button class="button emerald button-small" type="button" @click="updatePrefs(state.user.$id, state.addCredits, state.user.prefs['credits']), state.editMode = false">
               Voeg credits toe
             </button>
             <button class="button emerald-outlined button-small" type="button" @click="cancel()">
