@@ -66,10 +66,7 @@ async function book(lesson) {
             <p>{{ $rav.formatDateInDutch(lesson.date, true) }} ({{ 9 - lesson.bookings.length }} {{ lesson.bookings.length == 8 ? 'plek' : 'plekken' }} )</p>
           </div>
           <div>
-            <button :disabled="checkBooking(lesson.$id)" class="button emerald button-small"
-                    :class="checkBooking(lesson.$id) ? 'disabled' : ''" @click="book(lesson)" v-if="loggedInUser && !checkBooking(lesson.$id)">
-              Boek
-            </button>
+            <UButton :disabled="checkBooking(lesson.$id)" color="primary" variant="solid" @click="book(lesson)" v-if="loggedInUser && !checkBooking(lesson.$id)">Boek</UButton>
             <span v-if="checkBooking(lesson.$id)" class="flex content-center"><svg xmlns="http://www.w3.org/2000/svg"
                                                                                    fill="none" viewBox="0 0 24 24"
                                                                                    stroke-width="1.5"
@@ -86,9 +83,7 @@ async function book(lesson) {
               </svg>
               Helaas les is vol
             </span>
-            <nuxt-link to="/yoga/login" v-if="!loggedInUser" class="button button-small emerald">
-              Login om te boeken
-            </nuxt-link>
+           <UButton color="primary" variant="solid" to="/yoga/login" v-if="!loggedInUser">Login om te boeken</UButton>
           </div>
         </div>
       </div>

@@ -8,7 +8,7 @@ interface User {
     email?: string;
     name?: string;
     phone?: string;
-    preferences?: [];
+    prefs?: [];
     credits?: number;
     debits?: number;
     labels?: string[];

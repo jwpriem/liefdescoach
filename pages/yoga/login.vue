@@ -104,23 +104,13 @@ const passwordStrength = computed(() => {
           <div class="flex items-center justify-start">
             <label>E-mail</label> <sup class="required">*</sup>
           </div>
-          <input id="email"
-            v-model="email"
-            type="text"
-            placeholder="Je e-mailadres"
-            class="w-full"
-          />
+         <UInput id="email" color="primary" v-model="email" variant="outline" type="email" placeholder="Je e-mailadres" />
         </div>
         <div>
           <div class="flex items-center justify-start">
             <label>Wachtwoord <span v-if="registerForm">(minimaal 8 characters)</span></label> <sup class="required">*</sup>
           </div>
-          <input id="password"
-            v-model="password"
-            type="password"
-            placeholder="Je wachtwoord"
-            class="w-full"
-          />
+         <UInput id="password" color="primary" v-model="password" variant="outline" type="password" placeholder="Je wachtwoord" />
         </div>
         <div v-if="registerForm">
           <div v-if="passwordStrength" class="mt-3">
@@ -136,47 +126,20 @@ const passwordStrength = computed(() => {
           <div class="flex items-center justify-start">
             <label>Naam</label> <sup class="required">*</sup>
           </div>
-          <input id="name"
-            v-model="name"
-            type="text"
-            placeholder="Je naam"
-            class="w-full"
-          />
+         <UInput id="name" color="primary" v-model="name" variant="outline" placeholder="Je naam" />
         </div>
         <div v-if="registerForm">
           <div class="flex items-center justify-start">
             <label>Telefoonnummer</label>
           </div>
-          <input id="phone"
-            v-model="phone"
-            type="text"
-            placeholder="Je telefoonnummer"
-            class="w-full"
-          />
+         <UInput id="phone" color="primary" v-model="phone" variant="outline" placeholder="Je telefoonnummer" />
         </div>
       </div>
       <div class="mt-8">
-        <span v-if="!registerForm" class="flex justify-start items-center gap-x-3">
-          <button class="button emerald button-small" type="button" @click="login">
-            Login
-          </button>
-          <span
-            class="button button-small emerald-outlined"
-            @click="registerForm = !registerForm"
-          >
-            Registreren
-          </span>
-        </span>
-        <span v-else class="flex justify-start items-center gap-x-3">
-          <button class="button button-small emerald" type="button" @click="register">
-            Registeren
-          </button>
-          <span
-            class="button button-small emerald-outlined"
-            @click="registerForm = !registerForm"
-          >
-            Inloggen
-          </span>
+        <span class="flex justify-start items-center gap-x-3">
+         <UButton v-if="!registerForm" color="primary" variant="solid" :disabled="!password" @click="login">Login</UButton>
+         <UButton v-else color="primary" variant="solid" :disabled="!password" @click="register">Registeren</UButton>
+         <UButton color="primary" variant="outline" @click="registerForm = !registerForm">{{ registerForm ? 'Inloggen' : 'Registreren' }}</UButton>
         </span>
       </div>
     </form>

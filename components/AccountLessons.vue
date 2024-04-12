@@ -123,7 +123,7 @@ const computedStudents = computed(() => {
       <h2 class="text-2xl md:text-4xl uppercase font-black">
        <span class="emerald-underline text-emerald-900">Lessen</span><span class="text-emerald-700">.</span>
      </h2>
-     <div class="flex items-center gap-x-3">
+     <div class="flex flex-wrap items-center gap-x-3">
        <UButton color="primary" variant="solid" @click="state.createLesson = !state.createLesson">Voeg les toe</UButton>
        <UButton color="primary" variant="solid" @click="state.bookForUser = !state.bookForUser">Maak boeking voor gebruiker</UButton>
        <UToggle
@@ -189,7 +189,7 @@ const computedStudents = computed(() => {
             :options="computedStudents"
             />
 
-          <div class="flex gap-x-3">
+          <div class="flex flex-wrap gap-x-3">
             <UButton color="primary" variant="solid" @click="book()" :disabled="!state.addBookingUser && !state.addBookingLesson">Voeg toe</UButton>
             <UButton color="primary" variant="outline" @click="cancel()">Annuleer</UButton>
           </div>
@@ -224,7 +224,7 @@ const computedStudents = computed(() => {
             :options="state.types"
           />
 
-          <div class="flex gap-x-3">
+          <div class="flex flex-wrap gap-x-3">
             <UButton color="primary" variant="solid" @click="createNewLesson()">Voeg toe</UButton>
             <UButton color="primary" variant="outline" @click="cancelLesson()">Annuleer</UButton>
           </div>

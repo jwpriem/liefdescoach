@@ -182,76 +182,10 @@ label {
             content: '';
         }
     }
-    select {
+    select, input, textarea, label {
         @apply text-emerald-600;
     }
- input[type='text'], input[type='password'], input[type='number'],
-.select-wrapper,
-textarea {
-        @apply appearance-none bg-emerald-100 text-emerald-800 p-4 font-body w-full rounded border-transparent text-sm transition-all duration-300 ease-in-out mt-1;
-        font-size: 16px;
 
-        &::placeholder {
-            @apply tracking-wide italic text-sm subpixel-antialiased text-emerald-800 text-opacity-50;
-        }
-
-  &:disabled {
-            @apply bg-gray-400 text-emerald-700 cursor-not-allowed;
-        }
-
-  &:focus {
-            @apply bg-emerald-100 border-emerald-600;
-        }
-
-  &.hasError {
-            @apply border border-solid border-red-600;
-
-            animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-            -webkit-animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; /* For Safari */
-    transform: translate3d(0, 0, 0);
-    -webkit-transform: translate3d(0, 0, 0); /* For Safari */
-    backface-visibility: hidden;
-    perspective: 100px;
-        }
-    }
-
-.checkbox {
-        @apply bg-white border-gray-300 h-5 w-5 border border-solid rounded cursor-pointer flex justify-center items-center;
-
-        &.checked {
-            @apply bg-emerald-600 border-emerald-600 text-white;
-        }
-
-  &.hasError {
-            @apply border border-solid border-red-600;
-
-            animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-            -webkit-animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; /* For Safari */
-    transform: translate3d(0, 0, 0);
-    -webkit-transform: translate3d(0, 0, 0); /* For Safari */
-    backface-visibility: hidden;
-    perspective: 100px;
-        }
-    }
-
-.radio {
-        @apply bg-emerald-100;
-
-        &.checked {
-            @apply bg-emerald-600;
-        }
-
-  &.hasError {
-            @apply border border-solid border-red-600;
-
-            animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-            -webkit-animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; /* For Safari */
-    transform: translate3d(0, 0, 0);
-    -webkit-transform: translate3d(0, 0, 0); /* For Safari */
-    backface-visibility: hidden;
-    perspective: 100px;
-        }
-    }
 
 .nav-item {
         @apply transition-all duration-300 ease-in-out antialiased;
@@ -315,67 +249,6 @@ textarea {
             @apply absolute h-2.5 bottom-0 left-0 -ml-2 bg-rose-600 bg-opacity-25 z-0 block w-full;
             content: '';
         };
-    }
-
-  input,
-  .select-wrapper,
-  textarea {
-        @apply bg-gray-200 text-gray-800 p-4 font-body w-full rounded border-transparent text-sm transition-all duration-300 ease-in-out;
-
-        &::placeholder {
-            @apply tracking-wide italic text-sm subpixel-antialiased;
-        }
-
-  &:disabled {
-            @apply bg-gray-400 text-gray-700 cursor-not-allowed;
-        }
-
-  &:focus {
-            @apply bg-gray-200 border-rose-600;
-        }
-
-  &.hasError {
-            @apply border border-solid border-red-600;
-
-            animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-            transform: translate3d(0, 0, 0);
-            backface-visibility: hidden;
-            perspective: 100px;
-        }
-    }
-
-  .checkbox {
-        @apply bg-white border-gray-300 h-5 w-5 border border-solid rounded cursor-pointer flex justify-center items-center;
-        &.checked {
-            @apply bg-rose-600 border-rose-600 text-white;
-        }
-  &.hasError {
-            @apply border border-solid border-red-600;
-
-            animaition: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-            transforae: translate3d(0, 0, 0);
-            backface-visibility: hidden;
-            perspective: 100px;
-        }
-    }
-
-  .radio {
-        @apply bg-gray-200;
-        &.checked {
-            @apply bg-rose-600;
-        }
-  &.hasError {
-            @apply border border-solid border-red-600;
-
-            animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-            transform: translate3d(0, 0, 0);
-            backface-visibility: hidden;
-            perspective: 100px;
-        }
-    }
-
-  .lightForm textarea {
-        @apply bg-white;
     }
 }
 

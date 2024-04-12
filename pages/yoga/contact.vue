@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const mail = useMail()
+const store = useMainStore();
 
 const title = ref('Yoga Ravennah | Contact');
 const description = ref('Wil je meer weten of een keer een proefles meedoen? Neem dan contact op via het formulier of mijn socials.');
@@ -31,6 +32,7 @@ useHead({
 })
 
 async function send(){
+ await store.setLoading(true)
     mail.send({
       config:0,
       from: 'Yoga Ravennah <info@ravennah.com>',
@@ -41,6 +43,7 @@ async function send(){
   name.value = ''
   email.value = ''
   message.value = ''
+ await store.setLoading(false)
 }
 
 </script>
@@ -52,50 +55,16 @@ async function send(){
         <span class="emerald-underline">Stuur een bericht</span><span class="text-emerald-600">.</span>
       </h1>
         <div class="mt-8 space-y-3 darkForm">
-        <label>Naam</label>
-          <input 
-            id="naam"
-            v-model="name"
-            
-            :required="true"
-            type="text"
-            placeholder="Je naam"
-            class="w-full"
-          />
-          <label>E-mail</label>
-          <input 
-            id="email"
-            v-model="email"
-            :required="true"
-            type="text"
-            placeholder="Je e-mailadres"
-            class="w-full"
-          />
-          <label>Bericht</label>
-          <textarea
-            id="bericht"
-            v-model="message"
-            :rows="4"
-            :required="true"
-            placeholder="Waar gaat het over?"
-            class="w-full"
-          />
-          <div class="button emerald" @click="send">
-            <svg v-if="loading" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline-block"
-                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle
-                class="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                stroke-width="4"
-              />
-              <path class="opacity-75" fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
-            </svg>
-            Verzend
-          </div>
+         <UFormGroup label="Naam" required>
+          <UInput id="naam" color="primary" v-model="name" variant="outline" type="text" placeholder="Je naam" />
+         </UFormGroup>
+         <UFormGroup label="Email" required>
+         <UInput id="email" color="primary" v-model="email" variant="outline" type="email" placeholder="Je e-mailadres" />
+         </UFormGroup>
+         <UFormGroup label="Bericht" required>
+          <UTextarea id="bericht" v-model="message" :rows="4" color="primary" variant="outline" placeholder="Waar gaat het over?" />
+         </UFormGroup>
+         <UButton color="primary" variant="solid" size="xl" @click="send">Verzenden</UButton>
           <div class="py-12">
         <p class="intro"><span
           class="text-emerald-700 text-xl md:text-2xl font-bold">Adres Studio YES Wellness</span><br>

@@ -96,20 +96,11 @@ async function updatePrefs(userId: string, credits: number, current: number): Pr
             <div class="flex items-center justify-start">
               <label>Credits toevoegen</label>
             </div>
-            <input id="add-credits"
-              v-model="state.addCredits"
-              type="number"
-              placeholder="Aantal credits om toe te voegen"
-              class="w-full"
-            />
+           <UInput id="add-credits" color="primary" v-model="state.addCredits" type="number" variant="outline" placeholder="Aantal credits om toe te voegen" />
           </div>
           <div class="flex gap-x-3">
-            <button class="button emerald button-small" type="button" @click="updatePrefs(state.user.$id, state.addCredits, state.user.prefs['credits']), state.editMode = false">
-              Voeg credits toe
-            </button>
-            <button class="button emerald-outlined button-small" type="button" @click="cancel()">
-              Annuleer
-            </button>
+           <UButton color="primary" variant="solid" :disabled="!state.addCredits"  @click="updatePrefs(state.user.$id, state.addCredits, state.user.prefs['credits']), state.editMode = false">Voeg credits toe</UButton>
+           <UButton color="primary" variant="solid" @click="cancel()">Annuleer</UButton>
           </div>
         </div>
       </div>
