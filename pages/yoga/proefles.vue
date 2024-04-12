@@ -79,9 +79,9 @@ const lessons = computed(() => store.lessons)
         ><span class="text-emerald-600">.</span>
    </h1>
    <p class="intro">
-    Zou je graag een keer yoga of peachy bum willen proberen maar ben je nog niet zeker of het iets voor je is, of dat je mijn lessen niet leuk vind? Geen nood! Je kunt voor slechts 5 euro een keertje komen proberen.
+    Zou je graag een keer yoga of peachy bum willen proberen maar ben je nog niet zeker of het iets voor je is, of dat je mijn lessen niet leuk vind? Geen nood! Je kunt voor slechts 7,50 euro een keertje komen proberen.
    </p>
-   <p class="intro">Vul je naam en e-mail in en kom een keer vrijblijvend meedoen voor slechts 5 euro.</p>
+   <p class="intro">Vul je naam en e-mail in en kom een keer vrijblijvend meedoen voor slechts 7,50 euro.</p>
    <UFormGroup label="Naam" required>
     <UInput id="naam" color="primary" v-model="name" variant="outline" type="text" placeholder="Je naam" />
    </UFormGroup>
