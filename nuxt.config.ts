@@ -51,7 +51,7 @@ export default defineNuxtConfig({
     },
     smtp: {
       host: isDev ? "sandbox.smtp.mailtrap.io" : "mail.privateemail.com",
-      port: isDev ? 2525 : 587,
+      port: isDev ? 2525 : 465,
       secure: isDev ? false : true,
       auth: {
         user: isDev ? process.env.NUXT_PUBLIC_MAIL_USER_DEV : "info@ravennah.com",

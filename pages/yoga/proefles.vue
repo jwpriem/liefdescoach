@@ -89,15 +89,15 @@ const lessons = computed(() => store.lessons)
     <UInput id="email" color="primary" v-model="email" variant="outline" type="email" placeholder="Je e-mailadres" />
    </UFormGroup>
    <UFormGroup label="Kies een les" required>
-   <USelect
-     icon="i-heroicons-academic-cap-20-solid"
-     size="md"
-     color="primary"
-     variant="outline"
-     v-model="lesson"
-     :options="computedLessons"
-     placeholder="Kies een les"
-   />
+    <USelect
+      icon="i-heroicons-academic-cap-20-solid"
+      size="md"
+      color="primary"
+      variant="outline"
+      v-model="lesson"
+      :options="computedLessons"
+      placeholder="Kies een les"
+    />
    </UFormGroup>
    <UButton color="primary" variant="solid" size="xl" @click="send" :disabled="!name || !email || !lesson">Ik kom!</UButton>
    <div class="py-8">
