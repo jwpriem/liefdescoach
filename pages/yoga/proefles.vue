@@ -75,11 +75,11 @@ const lessons = computed(() => store.lessons)
   <IsLoading :loading="isLoading" />
   <Header image="/yoga-sfeer2.jpg" alignment="object-center">
    <h1 class="text-3xl md:text-6xl uppercase font-black">
-        <span class="emerald-underline">Proefles 5 euro!</span
+        <span class="emerald-underline">Proefles 7,50 euro!</span
         ><span class="text-emerald-600">.</span>
    </h1>
    <p class="intro">
-    Zou je graag een keer yoga of peachy bum willen proberen maar ben je nog niet zeker of het iets voor je is? Geen nood! Je kunt voor slechts 7,50 euro een keertje komen proberen.
+    Zou je graag een keer yoga of peachy bum willen proberen maar ben je nog niet zeker of het iets voor je is? Geen nood! Je kunt voor slechts 7,50 euro een keertje komen proberen. Dat is 50% korting op een reguliere les.
    </p>
    <p class="intro">Vul je naam en e-mail in en kom een keer vrijblijvend meedoen voor slechts 7,50 euro.</p>
    <UFormGroup label="Naam" required>
