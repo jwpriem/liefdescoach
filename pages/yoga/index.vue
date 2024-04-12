@@ -197,6 +197,7 @@ useHead({
                 </div>
             </div>
         </div>
+        <Proefles />
         <div class="bg-orange-100">
             <div id="peachy" class="container mx-auto p-8 md:px-0 md:py-24">
                 <div class="flex justify-center items-center">

@@ -159,5 +159,7 @@ async function book(lesson) {
         </div>
       </div>
     </div>
+   
+   <Proefles />
   </div>
 </template>

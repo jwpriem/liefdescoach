@@ -184,6 +184,10 @@ label {
     }
     select, input, textarea, label {
         @apply text-emerald-600;
+
+        &::placeholder {
+            @apply tracking-wide italic text-sm text-emerald-100 opacity-30 subpixel-antialiased;
+        }
     }
 
 
@@ -275,18 +279,6 @@ label {
         transform: translate3d(4px, 0, 0);
     }
 }
-
-.select-wrapper {
-    @apply p-0 pr-3;
-}
-
-/*select {*/
-/*    @apply p-3 bg-transparent w-full;*/
-
-/*    &:focus {*/
-/*        @apply outline-none border-0;*/
-/*    }*/
-/*}*/
 
 
 
