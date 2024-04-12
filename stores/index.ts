@@ -26,6 +26,7 @@ interface Lesson {
     $id: string;
     date: string;
     type: string;
+    bookings: Array;
     // Add more lesson properties as needed
 }
 

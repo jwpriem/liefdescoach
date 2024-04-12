@@ -86,8 +86,7 @@ function sortStudents(students) {
 }
 
 const computedLessons = computed(() => {
-  const futureLessons = $rav.upcomingLessons(lessons.value)
-  return futureLessons.map(lesson => {
+  return lessons.value.map(lesson => {
     const bookingsLength = lesson.bookings.length
     const spots = 9 - bookingsLength
     const isFull = bookingsLength === 9
@@ -116,8 +115,6 @@ const computedStudents = computed(() => {
 
 <template>
   <div v-if="isAdmin && lessons && students">
-
-
    <div class="w-full">
     <div class="md:flex justify-between items-center">
       <h2 class="text-2xl md:text-4xl uppercase font-black">
@@ -126,16 +123,11 @@ const computedStudents = computed(() => {
      <div class="flex flex-wrap items-center gap-x-3">
        <UButton color="primary" variant="solid" @click="state.createLesson = !state.createLesson">Voeg les toe</UButton>
        <UButton color="primary" variant="solid" @click="state.bookForUser = !state.bookForUser">Maak boeking voor gebruiker</UButton>
-       <UToggle
-         on-icon="i-heroicons-check-20-solid"
-         off-icon="i-heroicons-x-mark-20-solid"
-         v-model="state.onlyFutureLessons"
-         />
-      <span>Alleen toekomstige lessen</span>
+      <UButton color="primary" variant="outline" to="/yoga/archief">Archief</UButton>
      </div>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-4 mt-8 gap-3">
-      <div v-for="lesson in state.onlyFutureLessons ? $rav.upcomingLessons(lessons) : lessons" index="lesson.$id" class="p-4 bg-gray-800 rounded flex flex-col gap-y-3" :class="$rav.isFutureBooking(lesson.date) ? '' : 'opacity-20 hover:opacity-100'">
+      <div v-for="lesson in lessons" index="lesson.$id" class="p-4 bg-gray-800 rounded flex flex-col gap-y-3">
         <div>
           <sup class="text-emerald-500">Les</sup>
           <span class="block -mt-2 capitalize">{{lesson.type ? lesson.type : 'hatha yoga' }}</span>
