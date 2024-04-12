@@ -52,5 +52,6 @@ const loggedInUser = computed(() => store.loggedInUser);
           Les schema
         </nuxt-link>
     </Header>
+	  <Proefles />
   </div>
 </template>

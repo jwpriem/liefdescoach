@@ -1,5 +1,26 @@
 <script setup lang="ts">
 const store = useMainStore();
+const { $rav } = useNuxtApp()
+
+const columns = [{
+	key: 'name',
+	label: 'Name',
+	sortable: true
+}, {
+	key: 'email',
+	label: 'Email',
+	sortable: true
+}, {
+	key: 'phone',
+	label: 'Phone'
+}, {
+	key: 'credits',
+	label: 'Credits'
+},{
+	key: 'registration',
+	label: 'Geregistreerd',
+	sortable: true
+}]
 
 // Using a reactive object to group related states
 const state = reactive({
@@ -41,6 +62,34 @@ async function updatePrefs(userId: string, credits: number, current: number): Pr
     console.error('Failed to update preferences:', error);
   }
 }
+
+const computedStudents = computed(() => {
+	return students.value.map(student => {
+		return {
+			name: student.name,
+			email: student.email,
+			phone: student.phone,
+			credits: student.prefs['credits'],
+			// registration: $rav.formatDateInDutch(student.registration),
+			registration: student.registration
+		}
+	})
+})
+
+const q = ref('')
+
+const filteredRows = computed(() => {
+	if (!q.value) {
+		return  computedStudents.value
+	}
+
+	return computedStudents.value.filter((student) => {
+		return Object.values(student).some((value) => {
+			return String(value).toLowerCase().includes(q.value.toLowerCase())
+		})
+	})
+})
+
 </script>
 
 <template>
@@ -48,7 +97,7 @@ async function updatePrefs(userId: string, credits: number, current: number): Pr
     <h2 class="text-2xl md:text-4xl uppercase font-black">
      <span class="emerald-underline text-emerald-900">Gebruikers ({{students.length}})</span><span class="text-emerald-700">.</span>
    </h2>
-
+	  
    <div class="w-full" v-if="students.length && loggedInUser">
     <div class="grid grid-cols-1 md:grid-cols-4 mt-8 gap-3">
       <div v-for="student in students" index="student.$id" class="p-4 bg-gray-800 rounded flex flex-col gap-y-3 w-full">
@@ -81,6 +130,13 @@ async function updatePrefs(userId: string, credits: number, current: number): Pr
       </div>
     </div>
    </div>
+
+	  <div class="my-6">
+		  <UFormGroup label="Filter gebruikers">
+			  <UInput id="naam" color="primary" v-model="q" variant="outline" type="text" placeholder="Filter gebruikers" />
+		  </UFormGroup>
+	  </div>
+	  <UTable :rows="filteredRows" :columns="columns" v-if="computedStudents.length"/>
 
    <!--Pop up for adding credits-->
     <div v-if="state.editMode" class="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">

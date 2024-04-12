@@ -59,7 +59,7 @@ const computedLessons = computed(() => {
 
   return {
    label: $rav.formatDateInDutch(lesson.date, true) + spotsText,
-   value: $rav.formatDateInDutch(lesson.date, true),
+   value: $rav.formatDateInDutch(lesson.date, true) + spotsText,
    disabled: isFull,
   }
  })
