@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const mail = useMail()
 const store = useMainStore();
+const toast = useToast()
 const { $rav } = useNuxtApp()
 
 const title = ref('Yoga Ravennah | Proefles');
@@ -33,19 +34,60 @@ useHead({
 })
 
 async function send(){
- await store.setLoading(true)
-  
- await mail.send({
-  config:0,
-  from: 'Yoga Ravennah <info@ravennah.com>',
-  subject: 'Proefles Yoga Ravennah',
-  text: 'Naam:\n' + name.value + '\n\nEmail:\n' + email.value + '\n\nLes:\n' + lesson.value,
- })
- 
- name.value = ''
- email.value = ''
- lesson.value = ''
- await store.setLoading(false)
+	const result = await $fetch('/api/studentCheck', {
+		method: 'POST',
+		body: {
+			email: email.value
+		}
+	})
+
+	if(result.total == 1) {
+		toast.add({
+			id: 'duplicate',
+			title: 'Niet geboekt.',
+			icon: 'i-heroicons-x-mark',
+			color: 'red',
+			description: 'Je kunt helaas geen proefles meer boeken.',
+		})
+		// Clear form
+		name.value = ''
+		email.value = ''
+		lesson.value = ''
+	} else {
+		await store.setLoading(true)
+		
+		await $fetch('/api/bookTrailLesson', {
+			method: 'POST',
+			body: {
+				name: name.value,
+				email: email.value,
+				lessonId: JSON.parse(lesson.value).$id
+			}
+		})
+
+		await mail.send({
+			config:0,
+			from: 'Yoga Ravennah <info@ravennah.com>',
+			subject: 'Proefles Yoga Ravennah',
+			text: 'Naam:\n' + name.value + '\n\nEmail:\n' + email.value + '\n\nLes:\n' + $rav.formatDateInDutch(JSON.parse(lesson.value).date, true),
+		})
+		
+		// Clear form
+		name.value = ''
+		email.value = ''
+		lesson.value = ''
+
+		await store.getLessons()
+		await store.setLoading(false)
+		
+		toast.add({
+			id: 'non_duplicate',
+			title: 'Tot snel',
+			icon: 'i-heroicons-check-badge',
+			color: 'primary',
+			description: 'Je proefles is geboekt!'
+		})
+	}
 }
 
 const computedLessons = computed(() => {
@@ -59,7 +101,7 @@ const computedLessons = computed(() => {
 
   return {
    label: $rav.formatDateInDutch(lesson.date, true) + spotsText,
-   value: $rav.formatDateInDutch(lesson.date, true) + spotsText,
+   value: JSON.stringify(lesson),
    disabled: isFull,
   }
  })
