@@ -64,12 +64,14 @@ async function send(){
 				lessonId: JSON.parse(lesson.value).$id
 			}
 		})
-
+		
+		const type = JSON.parse(lesson.value).type ? 'Hatha Yoga' : 'Peachy Bum'
+		
 		await mail.send({
 			config:0,
 			from: 'Yoga Ravennah <info@ravennah.com>',
 			subject: 'Proefles Yoga Ravennah',
-			text: 'Naam:\n' + name.value + '\n\nEmail:\n' + email.value + '\n\nLes:\n' + $rav.formatDateInDutch(JSON.parse(lesson.value).date, true),
+			text: 'Naam:\n' + name.value + '\n\nEmail:\n' + email.value + '\n\nDatum:\n' + $rav.formatDateInDutch(JSON.parse(lesson.value).date, true)  + '\n\nLes:\n' + type,
 		})
 		
 		// Clear form
