@@ -27,7 +27,6 @@ interface Lesson {
     date: string;
     type: string;
     bookings: Array;
-    // Add more lesson properties as needed
 }
 
 interface Booking {
@@ -320,7 +319,7 @@ export const useMainStore = defineStore('main', {
                 // Send email
                 const emailData = {
                     body: null,
-                    new_booking_name: this.onBehalfOf.name,
+                    new_booking_name: user.name,
                     lessondate: this.formatDateInDutch(lessonsResponse.date, true),
                     spots: lessonsResponse.bookings.length,
                     bookings: bookingsArr,
@@ -395,7 +394,7 @@ export const useMainStore = defineStore('main', {
                 const lessonsResponse = await databases.getDocument(
                     useRuntimeConfig().public.database,
                     'lessons',
-                    lesson.$id,
+                    booking.lessons.$id,
                     )
 
                 // Bookingsarray for email
@@ -406,7 +405,7 @@ export const useMainStore = defineStore('main', {
 
                 // Send email
                 const emailData = {
-                    booking_name: booking.students.name,
+                    booking_name: user.name,
                     lessondate: this.formatDateInDutch(lessonsResponse.date, true),
                     spots: lessonsResponse.bookings.length,
                     bookings: bookingsArr
