@@ -310,9 +310,10 @@ export const useMainStore = defineStore('main', {
                     'lessons',
                     lesson.$id,
                     )
+                
                 // Bookingsarray for email
                 let bookingsArr: any[] = []
-                lessonsResponse.documents.bookings.forEach((x: any) => {
+                lessonsResponse.bookings.forEach((x: any) => {
                     bookingsArr.unshift({ name: x.students.name})
                 })
                 
@@ -321,16 +322,16 @@ export const useMainStore = defineStore('main', {
                     body: null,
                     new_booking_name: user.name,
                     lessondate: this.formatDateInDutch(lessonsResponse.date, true),
-                    spots: lessonsResponse.bookings.length,
+                    spots: 9 - lessonsResponse.bookings.length,
                     bookings: bookingsArr,
                     calendar_link_apple: this.getCalenderLink('apple', lessonsResponse.date),
                     calendar_link_gmail: this.getCalenderLink('gmail', lessonsResponse.date),
                     calendar_link_outlook: this.getCalenderLink('outlook', lessonsResponse.date)
                 }
                 const isProd = process.env.NODE_ENV == 'production'
-
+                
                 if(isProd) {
-                    const { body } = await $fetch('/api/sendBookingConfirmation', {
+                    await $fetch('/api/sendBookingConfirmation', {
                         method: 'POST',
                         body: emailData
                     })
@@ -399,7 +400,7 @@ export const useMainStore = defineStore('main', {
 
                 // Bookingsarray for email
                 const bookingsArr: any = []
-                lessonsResponse.bookings.forEach((x: any) => {
+                lessonsResponse.forEach((x: any) => {
                     bookingsArr.unshift({ name: x.students.name})
                 })
 
@@ -407,13 +408,13 @@ export const useMainStore = defineStore('main', {
                 const emailData = {
                     booking_name: user.name,
                     lessondate: this.formatDateInDutch(lessonsResponse.date, true),
-                    spots: lessonsResponse.bookings.length,
+                    spots: 9 - lessonsResponse.bookings.length,
                     bookings: bookingsArr
                 }
                 const isProd = process.env.NODE_ENV == 'production'
 
                 if(isProd) {
-                    const { body } = await $fetch('/api/sendBookingCancellation', {
+                    await $fetch('/api/sendBookingCancellation', {
                         method: 'POST',
                         body: emailData
                     })
@@ -431,7 +432,6 @@ export const useMainStore = defineStore('main', {
             const startTime = lessonDate.format('h');
             const endTime = lessonDate.add(1, 'hour').format('h');
             const formatted = isLesson ? `${lessonDate.format('dddd D MMMM')} van ${startTime} tot ${endTime} uur` : lessonDate.format('D MMMM YYYY');
-            
             return formatted
         },
         

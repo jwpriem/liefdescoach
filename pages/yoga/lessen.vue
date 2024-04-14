@@ -5,7 +5,9 @@ const ogImage = ref('https://www.ravennah.com/ravennah-social.jpg');
 const pageUrl = ref('https://www.ravennah.com/yoga/lessen');
 
 const store = useMainStore()
-const router = useRouter()
+const mail = useMail()
+const toast = useToast()
+const { $rav } = useNuxtApp()
 
 definePageMeta({
   layout: 'yoga'
@@ -41,6 +43,23 @@ async function book(lesson) {
   await store.setOnBehalfOf(store.loggedInUser)
   await store.handleBooking(lesson)
   await store.getUser()
+
+	const type = lesson ? 'Hatha Yoga' : 'Peachy Bum'
+
+	await mail.send({
+		config:0,
+		from: 'Yoga Ravennah <info@ravennah.com>',
+		subject: 'Nieuwe boeking Yoga Ravennah',
+		text: 'Naam:\n' + store.loggedInUser.name + '\n\nEmail:\n' + store.loggedInUser.email + '\n\nDatum:\n' + $rav.formatDateInDutch(lesson.date, true)  + '\n\nLes:\n' + type,
+	})
+
+	toast.add({
+		id: 'booking',
+		title: 'Tot snel',
+		icon: 'i-heroicons-check-badge',
+		color: 'primary',
+		description: 'Je les is geboekt!'
+	})
 }
 
 </script>
