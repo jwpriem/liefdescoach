@@ -316,7 +316,7 @@ export const useMainStore = defineStore('main', {
                 lessonsResponse.bookings.forEach((x: any) => {
                     bookingsArr.unshift({ name: x.students.name})
                 })
-                
+                const address = lessonsResponse.type == 'peachy bum' ? 'Kosboulevard 5 Rotterdam' : 'Emmy van Leersumhof 24a Rotterdam'
                 // Send email
                 const emailData = {
                     body: null,
@@ -326,10 +326,11 @@ export const useMainStore = defineStore('main', {
                     lessondate: this.formatDateInDutch(lessonsResponse.date, true),
                     spots: 9 - lessonsResponse.bookings.length,
                     bookings: bookingsArr,
-                    calendar_link_apple: this.getCalenderLink('apple', lessonsResponse.date),
-                    calendar_link_gmail: this.getCalenderLink('gmail', lessonsResponse.date),
-                    calendar_link_outlook: this.getCalenderLink('outlook', lessonsResponse.date)
+                    calendar_link_apple: this.getCalenderLink('apple', lessonsResponse.date, lessonsResponse.type),
+                    calendar_link_gmail: this.getCalenderLink('gmail', lessonsResponse.date, lessonsResponse.type),
+                    calendar_link_outlook: this.getCalenderLink('outlook', lessonsResponse.date, lessonsResponse.type)
                 }
+                
                 const isProd = process.env.NODE_ENV == 'production'
 
                 if(isProd) {
@@ -436,14 +437,15 @@ export const useMainStore = defineStore('main', {
             const endTime = lessonDate.add(1, 'hour').format('h.mm');
             return isLesson ? `${lessonDate.format('dddd D MMMM')} van ${startTime} tot ${endTime} uur` : lessonDate.format('D MMMM YYYY');
         },
-        
-        getCalenderLink(stream: string, date: string) {
-            const dayjs = useDayjs()
 
+        getCalenderLink(stream: string, date: string, type: string = 'hatha yoga') {
+            const dayjs = useDayjs()
+            const lessonType = type == 'peachy bum' ? 'Peachy Bum les' : 'Hatha Yoga les'
+            const address = type == 'peachy bum' ? 'Kosboulevard 5 Rotterdam' : 'Emmy van Leersumhof 24a Rotterdam'
             const lessonDate = dayjs(new Date(date)).utc()
             const startTime = lessonDate.format('h')
             const startMinutes = lessonDate.format('mm')
-            return `https://calndr.link/d/event/?service=${stream}&start=${lessonDate.format('YYYY-MM-DD')}%20${startTime}:${startMinutes}&title=Yogales%20Ravennah&timezone=Europe/Amsterdam&location=Emmy%20van%20Leersumhof%2024a%20Rotterdam`
+            return `https://calndr.link/d/event/?service=${stream}&start=${lessonDate.format('YYYY-MM-DD')}%20${startTime}:${startMinutes}&title=${lessonType}%20Ravennah&timezone=Europe/Amsterdam&location=${encodeURIComponent(address)}`
         },
 
         async getLessons() {

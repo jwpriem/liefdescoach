@@ -78,14 +78,14 @@ const rav = {
 
         return dayjs().utc().isBefore(dayjs(new Date(lesson.date)).utc().subtract(1, 'day'))
     },
-    getCalenderLink(stream: string, date: string) {
+    getCalenderLink(stream: string, date: string, type: string = 'hatha yoga') {
         const dayjs = useDayjs()
-
+        const lessonType = type == 'peachy bum' ? 'Peachy Bum les' : 'Hatha Yoga les'
+        const address = type == 'peachy bum' ? 'Kosboulevard 5 Rotterdam' : 'Emmy van Leersumhof 24a Rotterdam'
         const lessonDate = dayjs(new Date(date)).utc()
         const startTime = lessonDate.format('h')
         const startMinutes = lessonDate.format('mm')
-        const link = `https://calndr.link/d/event/?service=${stream}&start=${lessonDate.format('YYYY-MM-DD')}%20${startTime}:${startMinutes}&title=Yogales%20Ravennah&timezone=Europe/Amsterdam&location=Emmy%20van%20Leersumhof%2024a%20Rotterdam`
-        return link
+        return `https://calndr.link/d/event/?service=${stream}&start=${lessonDate.format('YYYY-MM-DD')}%20${startTime}:${startMinutes}&title=${lessonType}%20Ravennah&timezone=Europe/Amsterdam&location=${encodeURIComponent(address)}`
     },
 
     formatPhoneNumber(input: string) {

@@ -35,9 +35,9 @@ async function removeBooking(booking, lesson) {
             </span>
        
             <div class="flex gap-x-3 my-2">
-              <a :href="$rav.getCalenderLink('apple', booking.lessons.date)"><img src="/apple.png" class="w-6" /></a>
-              <a :href="$rav.getCalenderLink('google', booking.lessons.date)"><img src="/gmail.png" class="w-6" /></a>
-              <a :href="$rav.getCalenderLink('outlook', booking.lessons.date)"><img src="/outlook.png" class="w-6" /></a>
+              <a :href="$rav.getCalenderLink('apple', booking.lessons.date, booking.lessons.type)"><img src="/apple.png" class="w-6" /></a>
+              <a :href="$rav.getCalenderLink('google', booking.lessons.date, booking.lessons.type)"><img src="/gmail.png" class="w-6" /></a>
+              <a :href="$rav.getCalenderLink('outlook', booking.lessons.date, booking.lessons.type)"><img src="/outlook.png" class="w-6" /></a>
             </div>
        
             <button class="button emerald button-small mt-3" @click="removeBooking(booking)" v-if="$rav.checkCancelPeriod(booking.lessons)">
