@@ -332,12 +332,12 @@ export const useMainStore = defineStore('main', {
                 }
                 const isProd = process.env.NODE_ENV == 'production'
 
-                // if(isProd) {
+                if(isProd) {
                     await $fetch('/api/sendBookingConfirmation', {
                         method: 'POST',
                         body: emailData
                     })
-                // }
+                }
                 
                 this.onBehalfOf = null
                 this.isLoading = false
