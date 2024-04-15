@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
     const client = new ServerClient(config.postmark)
 
     const content = await readBody(event)
-    const email = client.sendEmailWithTemplate({
+    const email = await client.sendEmailWithTemplate({
         "From": "info@ravennah.com",
         "To": "info@ravennah.com",
         "TemplateAlias": "lesson-cancel",

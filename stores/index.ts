@@ -320,7 +320,9 @@ export const useMainStore = defineStore('main', {
                 // Send email
                 const emailData = {
                     body: null,
+                    email: user.email,
                     new_booking_name: user.name,
+                    lessontype: lessonsResponse.type == 'peachy bum'? 'Peachy Bum' : 'Hatha Yoga' ,
                     lessondate: this.formatDateInDutch(lessonsResponse.date, true),
                     spots: 9 - lessonsResponse.bookings.length,
                     bookings: bookingsArr,
@@ -329,13 +331,13 @@ export const useMainStore = defineStore('main', {
                     calendar_link_outlook: this.getCalenderLink('outlook', lessonsResponse.date)
                 }
                 const isProd = process.env.NODE_ENV == 'production'
-                
-                if(isProd) {
+
+                // if(isProd) {
                     await $fetch('/api/sendBookingConfirmation', {
                         method: 'POST',
                         body: emailData
                     })
-                }
+                // }
                 
                 this.onBehalfOf = null
                 this.isLoading = false
@@ -430,10 +432,9 @@ export const useMainStore = defineStore('main', {
             const dayjs = useDayjs()
 
             const lessonDate = dayjs(date).utc();
-            const startTime = lessonDate.format('h');
-            const endTime = lessonDate.add(1, 'hour').format('h');
-            const formatted = isLesson ? `${lessonDate.format('dddd D MMMM')} van ${startTime} tot ${endTime} uur` : lessonDate.format('D MMMM YYYY');
-            return formatted
+            const startTime = lessonDate.format('h.mm');
+            const endTime = lessonDate.add(1, 'hour').format('h.mm');
+            return isLesson ? `${lessonDate.format('dddd D MMMM')} van ${startTime} tot ${endTime} uur` : lessonDate.format('D MMMM YYYY');
         },
         
         getCalenderLink(stream: string, date: string) {
@@ -441,8 +442,8 @@ export const useMainStore = defineStore('main', {
 
             const lessonDate = dayjs(new Date(date)).utc()
             const startTime = lessonDate.format('h')
-            const link = `https://calndr.link/d/event/?service=${stream}&start=${lessonDate.format('YYYY-MM-DD')}%20${startTime}:00&title=Yogales%20Ravennah&timezone=Europe/Amsterdam&location=Emmy%20van%20Leersumhof%2024a%20Rotterdam`
-            return link
+            const startMinutes = lessonDate.format('mm')
+            return `https://calndr.link/d/event/?service=${stream}&start=${lessonDate.format('YYYY-MM-DD')}%20${startTime}:${startMinutes}&title=Yogales%20Ravennah&timezone=Europe/Amsterdam&location=Emmy%20van%20Leersumhof%2024a%20Rotterdam`
         },
 
         async getLessons() {
