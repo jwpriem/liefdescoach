@@ -81,7 +81,7 @@ const rav = {
     getCalenderLink(stream: string, date: string, type: string = 'hatha yoga') {
         const dayjs = useDayjs()
         const lessonType = type == 'peachy bum' ? 'Peachy Bum les' : 'Hatha Yoga les'
-        const address = type == 'peachy bum' ? 'Kosboulevard 5 Rotterdam' : 'Emmy van Leersumhof 24a Rotterdam'
+        const address = type == 'peachy bum' ? 'Kosboulevard 5, 3059 XZ Rotterdam' : 'Emmy van Leersumhof 24a, 3059 LT Rotterdam'
         const lessonDate = dayjs(new Date(date)).utc()
         const startTime = lessonDate.format('h')
         const startMinutes = lessonDate.format('mm')
