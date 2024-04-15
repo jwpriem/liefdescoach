@@ -44,13 +44,16 @@ async function book(lesson) {
   await store.handleBooking(lesson)
   await store.getUser()
 	
-	// const type = lesson ? 'Hatha Yoga' : 'Peachy Bum'
-	// await mail.send({
-	// 	config:0,
-	// 	from: 'Yoga Ravennah <info@ravennah.com>',
-	// 	subject: 'Nieuwe boeking Yoga Ravennah',
-	// 	text: 'Naam:\n' + store.loggedInUser.name + '\n\nEmail:\n' + store.loggedInUser.email + '\n\nDatum:\n' + $rav.formatDateInDutch(lesson.date, true)  + '\n\nLes:\n' + type,
-	// })
+	const type = lesson ? 'Hatha Yoga' : 'Peachy Bum'
+	let bookings = lesson.bookings.length ? lesson.bookings.map(booking => booking.students.name + '\n').join('') : ''
+	bookings = bookings + store.loggedInUser.name + '\n'
+	
+	await mail.send({
+		config:0,
+		from: 'Yoga Ravennah <info@ravennah.com>',
+		subject: 'Nieuwe boeking Yoga Ravennah',
+		text: `Naam:\n${store.loggedInUser.name}\n\nEmail:\n${store.loggedInUser.email}\n\nDatum:\n${$rav.formatDateInDutch(lesson.date, true)}\n\nLes:\n${type}\n\nAantal plekken:\n${9 - (lesson.bookings.length + 1)}\n\nBoekingen:\n${bookings}`
+	})
 
 	toast.add({
 		id: 'booking',
