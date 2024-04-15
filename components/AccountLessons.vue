@@ -75,7 +75,6 @@ async function removeBooking(booking, lesson) {
 }
 
 function sortStudents(students) {
-  console.log(students); // Check the structure in the browser's console
   if (!Array.isArray(students)) return [];
 
   return [...students].sort((a, b) => {

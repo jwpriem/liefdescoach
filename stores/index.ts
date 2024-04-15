@@ -372,7 +372,7 @@ export const useMainStore = defineStore('main', {
                     'bookings',
                     booking.$id
                     )
-
+                
                 // Update credits
                 await $fetch('/api/updatePrefs', {
                     method: 'post',
@@ -383,7 +383,7 @@ export const useMainStore = defineStore('main', {
                         }
                     }
                 })
-
+                
                 if(this.isAdmin) {
                     await this.getStudents()
                 }
@@ -391,19 +391,19 @@ export const useMainStore = defineStore('main', {
                 await this.getLessons()
                 
                 this.isLoading = false
-
+                
                 const lessonsResponse = await databases.getDocument(
                     useRuntimeConfig().public.database,
                     'lessons',
                     booking.lessons.$id,
                     )
-
+                
                 // Bookingsarray for email
                 const bookingsArr: any = []
-                lessonsResponse.forEach((x: any) => {
+                lessonsResponse.bookings.forEach((x: any) => {
                     bookingsArr.unshift({ name: x.students.name})
                 })
-
+                
                 // Send email
                 const emailData = {
                     booking_name: user.name,
@@ -411,6 +411,7 @@ export const useMainStore = defineStore('main', {
                     spots: 9 - lessonsResponse.bookings.length,
                     bookings: bookingsArr
                 }
+                
                 const isProd = process.env.NODE_ENV == 'production'
 
                 if(isProd) {
@@ -450,7 +451,7 @@ export const useMainStore = defineStore('main', {
                     const lessons = await $fetch('/api/lessonsWithBookings')
                     this.lessons = lessons.documents
                 } else {
-                    const lessons = await $fetch('api/lessons')
+                    const lessons = await $fetch('/api/lessons')
                     this.lessons = lessons.documents
                 }
             } catch(error) {

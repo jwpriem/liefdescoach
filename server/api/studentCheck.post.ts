@@ -20,6 +20,6 @@ export default defineEventHandler(async (event) => {
             Query.equal('email', [body.email])
         ]
     );
-    console.log(res)
+    
     return Object.assign({}, res)
 })

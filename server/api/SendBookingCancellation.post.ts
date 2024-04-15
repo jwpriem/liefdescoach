@@ -13,6 +13,6 @@ export default defineEventHandler(async (event) => {
         "TemplateAlias": "lesson-cancel",
         "TemplateModel": content
     })
-    console.log(email)
+    
     setResponseStatus(event, 202)
 })
