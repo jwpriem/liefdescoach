@@ -68,7 +68,9 @@ export const useMainStore = defineStore('main', {
                 //     //Navigate to login
                 //     this.errorMessage = 'Er iets verkeerd gegaan';
                 // }
-                this.errorMessage = 'Er is iets verkeerd gegaan'
+                if(error != "AppwriteException: User (role: guests) missing scope (account)") {
+                    this.errorMessage = 'Er is iets verkeerd gegaan'
+                }
             } finally {
                 this.isLoading = false;
             }

@@ -59,6 +59,7 @@ async function login() {
 		}
 
 		await store.setLoading(false)
+		await store.setError('')
 		await navigateTo({path: "/yoga/account"})
 	} catch (error) {
 		store.setLoading(false)
@@ -110,6 +111,7 @@ const passwordStrength = computed(() => {
 	<div class="container mx-auto p-8 md:px-0 md:py-24">
 		<IsLoading :loading="isLoading"/>
 		<form class="w-full sm:w-2/3 md:w-1/2 mx-auto my-12 md:my-24">
+		{{ errorMessage }}
 			<div class="mt-8 space-y-3 darkForm">
 				<div v-if="errorMessage" class="p-4 border-red-600 border-2 bg-red-200 text-red-600 font-bold rounded">
 					{{ errorMessage }}
