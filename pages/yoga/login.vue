@@ -39,46 +39,23 @@ const errorMessage = computed(() => store.errorMessage);
 const isLoading = computed(() => store.isLoading);
 
 async function login() {
-	await store.setError('')
-	await store.setLoading(true)
-	try {
-		await account.createEmailSession(email.value, password.value);
-		await store.getUser()
+	await store.login(email.value, password.value)
 
-		// Unarchive on login if archived
-		if (store.loggedInUser.prefs['archive'] == true) {
-			await $fetch('/api/updatePrefs', {
-				method: 'post',
-				body: {
-					userId: store.loggedInUser.$id,
-					prefs: {
-						archive: false,
-					},
-				},
-			});
-		}
-
-		await store.setLoading(false)
-		await store.setError('')
+	if(!store.errorMessage) {
 		await navigateTo({path: "/yoga/account"})
-	} catch (error) {
-		store.setLoading(false)
-		store.setError('Er is iets verkeerd gegaan')
-		console.error("Login failed:", error);
 	}
 }
 
 async function register() {
-	try {
-		await store.registerUser(
-				email.value,
-				password.value,
-				name.value,
-				phone.value ? formatPhoneNumber(phone.value) : ''
-		)
+	await store.registerUser(
+		email.value,
+		password.value,
+		name.value,
+		phone.value ? formatPhoneNumber(phone.value) : ''
+	)
+
+	if(!store.errorMessage) {
 		await navigateTo({path: "/yoga/account"})
-	} catch (error) {
-		console.error("Registration failed:", error);
 	}
 }
 
@@ -111,7 +88,6 @@ const passwordStrength = computed(() => {
 	<div class="container mx-auto p-8 md:px-0 md:py-24">
 		<IsLoading :loading="isLoading"/>
 		<form class="w-full sm:w-2/3 md:w-1/2 mx-auto my-12 md:my-24">
-		{{ errorMessage }}
 			<div class="mt-8 space-y-3 darkForm">
 				<div v-if="errorMessage" class="p-4 border-red-600 border-2 bg-red-200 text-red-600 font-bold rounded">
 					{{ errorMessage }}
@@ -167,8 +143,6 @@ const passwordStrength = computed(() => {
          <UButton v-else :disabled="!password" color="primary" variant="solid" @click="register">Registeren</UButton>
          <UButton color="primary" variant="outline"
                   @click="registerForm = !registerForm">{{ registerForm ? 'Inloggen' : 'Registreren' }}</UButton>
-	        <UButton color="primary" to="/yoga/wachtwoord-vergeten"
-	                 variant="outline">Wachtwoord vergeten?</UButton>
         </span>
 			</div>
 		</form>

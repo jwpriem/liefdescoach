@@ -59,18 +59,17 @@ export const useMainStore = defineStore('main', {
                 await callback();
             } catch (error) {
                 console.log(error)
-                // if(error['response']['message'] == 'Invalid `password` param: Password must be at least 8 characters and should not be one of the commonly used password.') {
-                //     //Navigate to login
-                //     this.errorMessage = 'Wachtwoord moet minimaal 8 character zijn';
-                // } else if(error['response']['message'] == 'A user with the same id, email, or phone already exists in this project.') {
-                //     this.errorMessage = 'Emailadres is al in gebruik, probeer in te loggen';
-                // } else {
-                //     //Navigate to login
-                //     this.errorMessage = 'Er iets verkeerd gegaan';
-                // }
-                if(error != "AppwriteException: User (role: guests) missing scope (account)") {
-                    this.errorMessage = 'Er is iets verkeerd gegaan'
-                }
+
+                // Define an object mapping specific error messages to user-friendly messages
+                const errorMessages = {
+                    "AppwriteException: A user with the same id, email, or phone already exists in this project.": 'Emailadres is al in gebruik, probeer in te loggen',
+                    "AppwriteException: Invalid `password` param: Password must be at least 8 characters and should not be one of the commonly used password.": 'Wachtwoord moet minimaal 8 character zijn',
+                    "AppwriteException: Invalid credentials. Please check the email and password.": 'Verkeerde emailadres of wachtwoord. Probeer opnieuw.',
+
+                };
+                const errorOrFallback = errorMessages[error] || 'Er is iets verkeerd gegaan.'
+                // Default error message for unhandled exceptions
+                this.errorMessage = error == "AppwriteException: User (role: guests) missing scope (account)" ?  '' : errorOrFallback;
             } finally {
                 this.isLoading = false;
             }
@@ -83,6 +82,26 @@ export const useMainStore = defineStore('main', {
         },
         async setOnBehalfOf(user: User) {
             this.onBehalfOf = user
+        },
+        async login(email: string, password: string) {
+          await this.fetchWrapper(async() => {
+              const {account} = useAppwrite();
+              await account.createEmailSession(email, password);
+              await this.getUser()
+
+              // Unarchive on login if archived
+              if (this.loggedInUser.prefs['archive'] == true) {
+                  await $fetch('/api/updatePrefs', {
+                      method: 'post',
+                      body: {
+                          userId: this.loggedInUser.$id,
+                          prefs: {
+                              archive: false,
+                          },
+                      },
+                  });
+              }
+          })
         },
         async getUser() {
             await this.fetchWrapper(async () => {
