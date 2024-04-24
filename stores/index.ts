@@ -1,6 +1,4 @@
-import { defineStore } from 'pinia'
-import { Query } from 'appwrite';
-import {tryCatch} from "standard-as-callback/built/utils";
+import {defineStore} from 'pinia'
 
 // Define interfaces for your state and other types you will use
 interface User {
@@ -13,7 +11,6 @@ interface User {
     debits?: number;
     labels?: string[];
     registration?: string;
-    isAdmin?: boolean;
 }
 
 interface Student {
@@ -37,7 +34,6 @@ interface Booking {
 
 interface State {
     loggedInUser: User | null;
-    isAdmin: boolean;
     students: User[];
     lessons: Lesson[];
     myBookings: Booking[];
@@ -49,7 +45,6 @@ interface State {
 export const useMainStore = defineStore('main', {
     state: (): State => ({
         loggedInUser: null,
-        isAdmin: false,
         students: [],
         lessons: [],
         myBookings: [],
@@ -58,6 +53,26 @@ export const useMainStore = defineStore('main', {
         onBehalfOf: null
     }),
     actions: {
+        async fetchWrapper(callback: Function) {
+            this.isLoading = true;
+            try {
+                await callback();
+            } catch (error) {
+                console.log(error)
+                // if(error['response']['message'] == 'Invalid `password` param: Password must be at least 8 characters and should not be one of the commonly used password.') {
+                //     //Navigate to login
+                //     this.errorMessage = 'Wachtwoord moet minimaal 8 character zijn';
+                // } else if(error['response']['message'] == 'A user with the same id, email, or phone already exists in this project.') {
+                //     this.errorMessage = 'Emailadres is al in gebruik, probeer in te loggen';
+                // } else {
+                //     //Navigate to login
+                //     this.errorMessage = 'Er iets verkeerd gegaan';
+                // }
+                this.errorMessage = 'Er is iets verkeerd gegaan'
+            } finally {
+                this.isLoading = false;
+            }
+        },
         async setLoading(value: boolean) {
             this.isLoading = value
         },
@@ -67,121 +82,91 @@ export const useMainStore = defineStore('main', {
         async setOnBehalfOf(user: User) {
             this.onBehalfOf = user
         },
-        async getUser(){
-            try {
-                const { account } = useAppwrite();
-                const user = await account.get()
-                this.loggedInUser = user
-                this.isAdmin = this.loggedInUser.labels.includes('admin')
+        async getUser() {
+            await this.fetchWrapper(async () => {
+                const {account} = useAppwrite();
+                this.loggedInUser = await account.get()
 
-                const bookings = await $fetch('/api/bookings', {
-                    method: 'post',
-                    body: { userId: this.loggedInUser.$id }
-                })
-                this.myBookings = bookings.documents
+                await Promise.all([this.fetchLessons(), this.fetchStudents(), this.fetchBookings()]);
+            });
+        },
+        async fetchLessons() {
+            if (this.isAdmin) {
+                const lessons = await $fetch('/api/lessonsWithBookings')
+                this.lessons = lessons.documents
+            } else {
+                const lessons = await $fetch('/api/lessons')
+                this.lessons = lessons.documents
+            }
+        },
 
-                if(this.isAdmin) {
-                    const lessons = await $fetch('/api/lessonsWithBookings')
-                    this.lessons = lessons.documents
+        async fetchStudents() {
+            if (this.isAdmin) {
+                const users = await $fetch('/api/users');
+                this.students = users.users;
+            }
+        },
 
-                    const users = await $fetch('/api/users')
-                    this.students = users.users
+        async fetchBookings() {
+            const bookings = await $fetch('/api/bookings', {
+                method: 'post',
+                body: {userId: this.loggedInUser.$id}
+            })
+            this.myBookings = bookings.documents
+        },
+
+        async updateUserDetail(detailType: 'name' | 'email' | 'phone', newValue: string, password: string) {
+            await this.fetchWrapper(async () => {
+                const {account} = useAppwrite();
+
+                if (detailType === 'name') {
+                    await account.updateName(newValue, password);
                 }
-            } catch(error) {
 
-            }
-        },
-        async phoneUpdate(phone: string, password: string) {
-            try {
-                const { account, databases, ID } = useAppwrite();
-                this.isLoading = true
-                
-                await account.updatePhone(phone, password)
-                
-                this.isLoading = false
-                await this.getUser();
-            } catch(error) {
-                this.isLoading = false
-            }
-        },
-        async emailUpdate(email: string, password: string) {
-            try {
-                const { account, databases, ID } = useAppwrite();
-                this.isLoading = true
-                
-                await account.updateEmail(email, password)
+                if (detailType === 'email') {
+                    await account.updateEmail(newValue, password);
+                }
 
-                this.isLoading = false
-                await this.getUser()
-                
-            } catch(error) {
-                this.isLoading = false
-            }
+                if (detailType === 'phone') {
+                    await account.updatePhone(newValue, password);
+                }
+
+                await this.getUser(); // Refresh user details
+            });
         },
-        async nameUpdate(name: string, password: string) {
-            try {
-                const { account, databases, ID } = useAppwrite();
-                this.isLoading = true
-                
-                await account.updateName(name, password)
-                
-                this.isLoading = false
-                await this.getUser()
-                
-            } catch(error) {
-                this.isLoading = false
-            }
-        },
+
         async updatePasswordUser(password: string, newPassword: string) {
-            try {
-                const { account, databases, ID } = useAppwrite();
-                
-                this.isLoading = true
-
-                await account.updatePassword(newPassword, password)
-
-                this.isLoading = false
-                await this.getUser()
-
-            } catch(error) {
-                this.isLoading = false
-            }
+            await this.fetchWrapper(async () => {
+                const {account} = useAppwrite();
+                await account.updatePassword(newPassword, password);
+                await this.getUser(); // Refresh user details
+            });
         },
-        async updatePrefs(user: User, prefs: Object) {
-            this.loading = true
 
-            try {
+        async updatePrefs(user: User, prefs: Object) {
+            await this.fetchWrapper(async () => {
                 const data = {
                     userId: user.$id,
                     prefs: prefs
                 }
-                const { res } = await $fetch('/api/updatePrefs', {
+                const {res} = await $fetch('/api/updatePrefs', {
                     method: 'POST',
                     body: data
                 })
-
-                this.loading = false
-
-                await this.getUser()
-            } catch {
-                this.loading = false
-            }
+                await this.getUser(); // Refresh user details
+            });
         },
-        async registerUser (email: string, password: string, name: string, phone: string) {
-            try {
-                const { account, databases, ID } = useAppwrite();
-                
-                this.isLoading = true
-
+        async registerUser(email: string, password: string, name: string, phone: string) {
+            await this.fetchWrapper(async () => {
+                const {account, databases, ID} = useAppwrite();
                 const registration = await account.create(ID.unique(), email, password, name);
                 await account.createEmailSession(email, password);
 
-                if(phone) {
-                    await account.updatePhone(phone, password);
+                if (phone) {
+                    await this.updateUserDetail('phone', phone, password);
                 }
 
                 const user = await account.get();
-
                 await $fetch('/api/updatePrefs', {
                     method: 'post',
                     body: {
@@ -196,281 +181,130 @@ export const useMainStore = defineStore('main', {
                     useRuntimeConfig().public.database,
                     'students',
                     user.$id,
-                    { email: user.email, name: user.name }
-                    );
+                    {email: user.email, name: user.name}
+                );
 
-                this.getUser()
-                this.isLoading = false
+                await this.getUser(); // Refresh user details
 
-            } catch (error: any) {
-                this.isLoading = false
-                if(error['response']['message'] == 'Invalid `password` param: Password must be at least 8 characters and should not be one of the commonly used password.') {
-                    //Navigate to login
-                    this.errorMessage = 'Wachtwoord moet minimaal 8 character zijn';
-                } else if(error['response']['message'] == 'A user with the same id, email, or phone already exists in this project.') {
-                    this.errorMessage = 'Emailadres is al in gebruik, probeer in te loggen';
-                } else {
-                    //Navigate to login
-                    this.errorMessage = 'Er iets verkeerd gegaan';
-                }
-            }
+                const message = `Naam:\\n${user.name}\\n\\nEmail:\\n${user.email}\\n\\nTelefoon:\\n${user.phone}\\n\\nDatum:\\n${$rav.formatDateInDutch(user.$createdAt)}`
+                await this.sendSimpleEmail('Nieuwe gebruiker Yoga Ravennah', message)
+            });
         },
         async logoutUser() {
-            try {
-                const { account, ID } = useAppwrite();
-                
+            await this.fetchWrapper(async () => {
+                const {account} = useAppwrite();
+
                 await account.deleteSession("current");
                 this.loggedInUser = null;
-                this.isAdmin = false;
                 this.students = [];
                 this.lessons = [];
                 this.myBookings = [];
                 this.errorMessage = null;
                 this.isLoading = false;
-
-            } catch (error) {
-                throw error;
-            }
+            });
         },
-        async addCredits(credits: number, user: User){
-            try {
-                const { account, databases, ID } = useAppwrite();
-                
-                const balance = credits - user.debits
-                const data = {
-                    credits: user.credits + balance,
-                    debits: 0
-                }
 
-                await databases.updateDocument(
-                    useRuntimeConfig().public.database,
-                    'students',
-                    user.$id,
-                    data
-                    )
+        async handleBooking(lesson: Lesson) {
+            await this.fetchWrapper(async () => {
+                const {account, databases, ID} = useAppwrite();
 
-                await this.getStudents()
-                await this.getUser()
-
-            }catch (error) {
-            }
-        },
-        async getMyBookings() {
-            try {
-                const { account, databases, ID } = useAppwrite();
-                
-                const list = await databases.listDocuments(
-                    useRuntimeConfig().public.database,
-                    'bookings',
-                    [
-                        Query.equal("students", [this.loggedInUser.$id])
-                    ]
-                    )
-                
-                this.myBookings = list.documents
-                await $fetch('/api/bookings', {
-                    method: 'POST',
-                    body: { userId: this.loggedInUser.$id }
-                })
-
-            } catch (error) {
-
-            }
-        },
-        async handleBooking(lesson: Lesson){
-            try {
-
-                const user = this.onBehalfOf != null ? this.onBehalfOf : this.loggedInUser
-                
-                const { account, databases, ID } = useAppwrite();
-                
-                this.isLoading = true
+                const user = await this.getOnBehalfOrUser()
+                console.log(user)
                 // Register booking
-                const booking = await databases.createDocument(
+                await databases.createDocument(
                     useRuntimeConfig().public.database,
                     'bookings',
                     ID.unique(),
-                    { lessons: lesson.$id, students: user.$id }
-                    )
+                    {lessons: lesson.$id, students: user.$id}
+                )
 
-                // Update credits
-                const credits = await $fetch('/api/updatePrefs', {
-                    method: 'post',
-                    body: {
-                        userId: user.$id,
-                        prefs: {
-                            credits: +user.prefs['credits'] - 1
-                        }
-                    }
-                })
-
-                await this.getUser()
-                const lessonsResponse = await databases.getDocument(
-                    useRuntimeConfig().public.database,
-                    'lessons',
-                    lesson.$id,
-                    )
-                
-                // Bookingsarray for email
-                let bookingsArr: any[] = []
-                lessonsResponse.bookings.forEach((x: any) => {
-                    bookingsArr.unshift({ name: x.students.name})
-                })
-                const address = lessonsResponse.type == 'peachy bum' ? 'Kosboulevard 5 Rotterdam' : 'Emmy van Leersumhof 24a Rotterdam'
-                // Send email
-                const emailData = {
-                    body: null,
-                    email: user.email,
-                    new_booking_name: user.name,
-                    lessontype: lessonsResponse.type == 'peachy bum'? 'Peachy Bum' : 'Hatha Yoga' ,
-                    lessondate: this.formatDateInDutch(lessonsResponse.date, true),
-                    spots: 9 - lessonsResponse.bookings.length,
-                    bookings: bookingsArr,
-                    calendar_link_apple: this.getCalenderLink('apple', lessonsResponse.date, lessonsResponse.type),
-                    calendar_link_gmail: this.getCalenderLink('gmail', lessonsResponse.date, lessonsResponse.type),
-                    calendar_link_outlook: this.getCalenderLink('outlook', lessonsResponse.date, lessonsResponse.type)
-                }
-                
-                const isProd = process.env.NODE_ENV == 'production'
-
-                if(isProd) {
-                    await $fetch('/api/sendBookingConfirmation', {
-                        method: 'POST',
-                        body: emailData
-                    })
-                }
-                
-                this.onBehalfOf = null
-                this.isLoading = false
-
-            }catch (error) {
-                this.isLoading = false
-            }
-        },
-        async getBookings() {
-            try {
-                if(this.isAdmin) {
-                    const lessons = await $fetch('/api/lessonsWithBookings')
-                    this.lessons = lessons.documents
-                } else {
-                    const lessons = await $fetch('api/lessons')
-                    this.lessons = lessons.documents
-                }
-            } catch(error) {
-
-            }
+                await this.updatePrefs(user, {credits: +user.prefs['credits'] - 1})
+                this.onBehalfOf ? await this.clearOnBehalf() : await this.getUser(); // Refresh user details
+                await this.sendEmail('sendBookingConfirmation', lesson.$id)
+            });
         },
 
         async cancelBooking(booking: Booking) {
-            try {
-                const user = this.onBehalfOf != null ? this.onBehalfOf : this.loggedInUser
-
-                const { account, databases, ID } = useAppwrite();
-                
-                this.isLoading = true
-
+            await this.fetchWrapper(async () => {
+                const {databases} = useAppwrite();
+                const user = await this.getOnBehalfOrUser()
                 // Cancel booking
-                const response = await databases.deleteDocument(
+                await databases.deleteDocument(
                     useRuntimeConfig().public.database,
                     'bookings',
                     booking.$id
-                    )
-                
-                // Update credits
-                await $fetch('/api/updatePrefs', {
-                    method: 'post',
-                    body: {
-                        userId: user.$id,
-                        prefs: {
-                            credits: +user.prefs['credits'] + 1
-                        }
-                    }
+                )
+                await this.updatePrefs(user, {credits: +user.prefs['credits'] + 1})
+                this.onBehalfOf ? await this.clearOnBehalf() : await this.getUser(); // Refresh user details
+                await this.sendEmail('sendBookingCancellation', booking.lessons.$id)
+            });
+        },
+
+        async sendEmail(type: string, lessonId: string) {
+            const {databases} = useAppwrite();
+            const {$rav} = useNuxtApp();
+
+            const user = await this.getOnBehalfOrUser()
+
+            const lessonsResponse = await databases.getDocument(
+                useRuntimeConfig().public.database,
+                'lessons',
+                lessonId,
+            )
+
+            // Bookingsarray for email
+            const bookingsArr: any = []
+            lessonsResponse.bookings.forEach((x: any) => {
+                bookingsArr.unshift({name: x.students.name})
+            })
+
+            const emailData = {
+                body: null,
+                email: user.email,
+                new_booking_name: user.name,
+                lessontype: lessonsResponse.type == 'peachy bum' ? 'Peachy Bum' : 'Hatha Yoga',
+                lessondate: $rav.formatDateInDutch(lessonsResponse.date, true),
+                spots: 9 - lessonsResponse.bookings.length,
+                bookings: bookingsArr,
+                calendar_link_apple: $rav.getCalenderLink('apple', lessonsResponse.date, lessonsResponse.type),
+                calendar_link_gmail: $rav.getCalenderLink('gmail', lessonsResponse.date, lessonsResponse.type),
+                calendar_link_outlook: $rav.getCalenderLink('outlook', lessonsResponse.date, lessonsResponse.type)
+            }
+
+            const isProd = process.env.NODE_ENV == 'production'
+
+            if (isProd) {
+                await $fetch(`/api/${type}`, {
+                    method: 'POST',
+                    body: emailData
                 })
-                
-                if(this.isAdmin) {
-                    await this.getStudents()
-                }
-                await this.getUser()
-                await this.getLessons()
-                
-                this.isLoading = false
-                
-                const lessonsResponse = await databases.getDocument(
-                    useRuntimeConfig().public.database,
-                    'lessons',
-                    booking.lessons.$id,
-                    )
-                
-                // Bookingsarray for email
-                const bookingsArr: any = []
-                lessonsResponse.bookings.forEach((x: any) => {
-                    bookingsArr.unshift({ name: x.students.name})
-                })
-                
-                // Send email
-                const emailData = {
-                    booking_name: user.name,
-                    lessondate: this.formatDateInDutch(lessonsResponse.date, true),
-                    spots: 9 - lessonsResponse.bookings.length,
-                    bookings: bookingsArr
-                }
-                
-                const isProd = process.env.NODE_ENV == 'production'
-
-                if(isProd) {
-                    await $fetch('/api/sendBookingCancellation', {
-                        method: 'POST',
-                        body: emailData
-                    })
-                }
-
-            } catch(error) {
-                this.isLoading = false
-            }
-        },
-        
-        formatDateInDutch(date: string, isLesson: boolean = false) {
-            const dayjs = useDayjs()
-
-            const lessonDate = dayjs(date).utc();
-            const startTime = lessonDate.format('h.mm');
-            const endTime = lessonDate.add(1, 'hour').format('h.mm');
-            return isLesson ? `${lessonDate.format('dddd D MMMM')} van ${startTime} tot ${endTime} uur` : lessonDate.format('D MMMM YYYY');
-        },
-
-        getCalenderLink(stream: string, date: string, type: string = 'hatha yoga') {
-            const dayjs = useDayjs()
-            const lessonType = type == 'peachy bum' ? 'Peachy Bum les' : 'Hatha Yoga les'
-            const address = type == 'peachy bum' ? 'Kosboulevard 5, 3059 XZ Rotterdam' : 'Emmy van Leersumhof 24a, 3059 LT Rotterdam'
-            const lessonDate = dayjs(new Date(date)).utc()
-            const startTime = lessonDate.format('h')
-            const startMinutes = lessonDate.format('mm')
-            return `https://calndr.link/d/event/?service=${stream}&start=${lessonDate.format('YYYY-MM-DD')}%20${startTime}:${startMinutes}&title=${lessonType}%20Ravennah&timezone=Europe/Amsterdam&location=${encodeURIComponent(address)}`
-        },
-
-        async getLessons() {
-            try {
-                if(this.isAdmin) {
-                    const lessons = await $fetch('/api/lessonsWithBookings')
-                    this.lessons = lessons.documents
-                } else {
-                    const lessons = await $fetch('/api/lessons')
-                    this.lessons = lessons.documents
-                }
-            } catch(error) {
-
+            } else {
+                console.log(emailData)
             }
         },
 
-        async getStudents() {
-            try {
-                if(this.isAdmin) {
-                    const users = await $fetch('/api/users')
-                    this.students = users.users
-                }
-            } catch(error) {
+        async getOnBehalfOrUser() {
+            return this.onBehalfOf != null ? this.onBehalfOf : this.loggedInUser
+        },
 
-            }
+        async clearOnBehalf() {
+            await Promise.all([this.setOnBehalfOf(null), this.fetchLessons(), this.fetchStudents(), this.fetchBookings()]);
+        },
+
+        async sendSimpleEmail(subject: string, message: string) {
+            const mail = useMail()
+            // const toast = useToast()
+
+            await mail.send({
+                config: 0,
+                from: 'Yoga Ravennah <info@ravennah.com>',
+                subject: subject,
+                text: message
+            })
         }
+    },
+
+    getters: {
+        isAdmin: (state) => state.loggedInUser?.labels.includes('admin') || false,
     }
 })

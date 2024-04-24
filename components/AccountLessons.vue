@@ -45,8 +45,8 @@ async function book() {
 
   await store.setOnBehalfOf(JSON.parse(state.addBookingUser))
   await store.handleBooking(JSON.parse(state.addBookingLesson))
-  await store.getStudents()
-  await store.getLessons()
+  await store.fetchStudents()
+  await store.fetchLessons()
 
   state.addBookingUser = null
   state.addBookingLesson = null
@@ -66,11 +66,12 @@ async function createNewLesson() {
   })
 
   cancelLesson() // Resets the lesson creation form
-  await store.getLessons()
+  await store.fetchLessons()
   store.setLoading(false)
 }
 
 async function removeBooking(booking, lesson) {
+		await store.setOnBehalfOf(JSON.parse(state.addBookingUser))
   await store.cancelBooking(booking, lesson)
 }
 
@@ -129,7 +130,7 @@ const computedStudents = computed(() => {
       <div v-for="lesson in lessons" index="lesson.$id" class="p-4 bg-gray-800 rounded flex flex-col gap-y-3">
         <div>
           <sup class="text-emerald-500">Les</sup>
-          <span class="block -mt-2 capitalize">{{lesson.type ? lesson.type : 'hatha yoga' }}</span>
+          <span class="block -mt-2 capitalize">{{ $rav.checkLessonType(lesson.type) }}</span>
         </div>
         <div>
           <sup class="text-emerald-500">Datum</sup>

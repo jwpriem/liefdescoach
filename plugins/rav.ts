@@ -1,4 +1,4 @@
-import { defineNuxtPlugin } from '#app';
+import {defineNuxtPlugin} from '#app';
 
 const rav = {
     scrollTo(id: string) {
@@ -27,41 +27,41 @@ const rav = {
                     case 'required':
                         errorMessage = 'is een verplicht veld';
                         break;
-                        case 'email':
-                            errorMessage = 'moet een e-mailadres zijn';
-                            break;
-                            case 'numeric':
-                                errorMessage = 'moet een nummer zijn';
-                                break;
-                                case 'minLength':
-                                    errorMessage = `moet uit minstens ${validations.$params.minLength.min} karakters bestaan`;
-                                    break;
-                                    case 'maxLength':
-                                        errorMessage = `mag uit maximaal ${validations.$params.maxLength.max} karakters bestaan`;
-                                        break;
-                                        case 'sameAsPassword':
-                                            errorMessage = 'moet gelijk zijn aan huidige wachtwoord';
-                                            break;
-                                            case 'notSameAsCurrent':
-                                                errorMessage = 'mag niet gelijk zijn aan huidige wachtwoord';
-                                                break;
+                    case 'email':
+                        errorMessage = 'moet een e-mailadres zijn';
+                        break;
+                    case 'numeric':
+                        errorMessage = 'moet een nummer zijn';
+                        break;
+                    case 'minLength':
+                        errorMessage = `moet uit minstens ${validations.$params.minLength.min} karakters bestaan`;
+                        break;
+                    case 'maxLength':
+                        errorMessage = `mag uit maximaal ${validations.$params.maxLength.max} karakters bestaan`;
+                        break;
+                    case 'sameAsPassword':
+                        errorMessage = 'moet gelijk zijn aan huidige wachtwoord';
+                        break;
+                    case 'notSameAsCurrent':
+                        errorMessage = 'mag niet gelijk zijn aan huidige wachtwoord';
+                        break;
                 }
 
-                errors.push({ field: fieldName, error: errorMessage });
+                errors.push({field: fieldName, error: errorMessage});
             }
         }
 
         return errors;
-        },
+    },
 
     getErrorMessage(field: string, errors: Array<{ field: string; error: string }>) {
         const error = errors.find(error => error.field === field);
         return error ? error.error : '';
-        },
+    },
 
     formatDateInDutch(date: string, isLesson: boolean = false) {
         const dayjs = useDayjs()
-        
+
         const lessonDate = dayjs(date).utc();
         const startTime = lessonDate.format('h.mm');
         const endTime = lessonDate.add(1, 'hour').format('h.mm');
@@ -70,12 +70,11 @@ const rav = {
 
     isFutureBooking(lessonDate: string) {
         const dayjs = useDayjs()
-        
+
         return dayjs().isBefore(dayjs(new Date(lessonDate)))
     },
     checkCancelPeriod(lesson: any) {
         const dayjs = useDayjs()
-
         return dayjs().utc().isBefore(dayjs(new Date(lesson.date)).utc().subtract(1, 'day'))
     },
     getCalenderLink(stream: string, date: string, type: string = 'hatha yoga') {
@@ -105,20 +104,24 @@ const rav = {
         // Reconstruct the phone number with the country code +31
         return `+${digits}`;
 
-        },
+    },
 
     upcomingLessons(lessons: any) {
         const dayjs = useDayjs()
-        
+
         return lessons
-        .filter((lesson: any) => {
-            const lessonDate = dayjs(new Date(lesson.date))
-            return dayjs().isBefore(lessonDate)
-        })
+            .filter((lesson: any) => {
+                const lessonDate = dayjs(new Date(lesson.date))
+                return dayjs().isBefore(lessonDate)
+            })
     },
 
     checkAvailability(lesson: any, student: any) {
         return lesson ? !lesson.bookings.some((x: any) => x.students.$id == student.$id) : false
+    },
+
+    checkLessonType(type: string) {
+        return type == 'peachy bum' ? 'Peachy Bum' : 'Hatha Yoga'
     }
 };
 

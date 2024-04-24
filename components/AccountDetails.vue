@@ -34,17 +34,16 @@ function cancel() {
 async function update() {
   try {
     if (state.name !== loggedInUser.value.name) {
-      await store.nameUpdate(state.name, state.password);
+	    await store.updateUserDetail('name', state.name, state.password)
     }
     if (state.email !== loggedInUser.value.email) {
-      await store.emailUpdate(state.email, state.password);
+	    await store.updateUserDetail('email', state.email, state.password)
     }
     if (state.phone !== loggedInUser.value.phone) {
-      await store.phoneUpdate($rav.formatPhoneNumber(state.phone), state.password);
+	    await store.updateUserDetail('phone', $rav.formatPhoneNumber(state.phone), state.password)
     }
 
     cancel();
-    await store.getUser();
   } catch (error) {
     // Handle your errors here
   }

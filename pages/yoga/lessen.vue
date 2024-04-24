@@ -30,38 +30,39 @@ useHead({
     ]
 })
 
-const { data: lessons, pending } = await useFetch('/api/lessons')
+const { data: lessons } = await useFetch('/api/lessons')
 
 const loggedInUser = computed(() => store.loggedInUser);
 const isLoading = computed(() => store.isLoading);
 
-function checkBooking(id) {
+function checkBooking(id: string) {
   return store.myBookings.some(booking => booking.lessons.$id === id)
 }
 
-async function book(lesson) {
+async function book(lesson: any) {
   await store.setOnBehalfOf(store.loggedInUser)
   await store.handleBooking(lesson)
-  await store.getUser()
 	
-	const type = lesson ? 'Hatha Yoga' : 'Peachy Bum'
-	let bookings = lesson.bookings.length ? lesson.bookings.map(booking => booking.students.name + '\n').join('') : ''
-	bookings = bookings + store.loggedInUser.name + '\n'
+		const type = lesson ? 'Hatha Yoga' : 'Peachy Bum'
+		let bookings = lesson.bookings.length ? lesson.bookings.map(booking => booking.students.name + '\n').join('') : ''
+		bookings = bookings + store.loggedInUser.name + '\n'
+		
+		await mail.send({
+			config:0,
+			from: 'Yoga Ravennah <info@ravennah.com>',
+			subject: 'Nieuwe boeking Yoga Ravennah',
+			text: `Naam:\n${store.loggedInUser.name}\n\nEmail:\n${store.loggedInUser.email}\n\nDatum:\n${$rav.formatDateInDutch(lesson.date, true)}\n\nLes:\n${type}\n\nAantal plekken:\n${9 - (lesson.bookings.length + 1)}\n\nBoekingen:\n${bookings}`
+		})
 	
-	await mail.send({
-		config:0,
-		from: 'Yoga Ravennah <info@ravennah.com>',
-		subject: 'Nieuwe boeking Yoga Ravennah',
-		text: `Naam:\n${store.loggedInUser.name}\n\nEmail:\n${store.loggedInUser.email}\n\nDatum:\n${$rav.formatDateInDutch(lesson.date, true)}\n\nLes:\n${type}\n\nAantal plekken:\n${9 - (lesson.bookings.length + 1)}\n\nBoekingen:\n${bookings}`
-	})
-
-	toast.add({
-		id: 'booking',
-		title: 'Tot snel',
-		icon: 'i-heroicons-check-badge',
-		color: 'primary',
-		description: 'Je les is geboekt!'
-	})
+		toast.add({
+			id: 'booking',
+			title: 'Tot snel',
+			icon: 'i-heroicons-check-badge',
+			color: 'primary',
+			description: 'Je les is geboekt!'
+		})
+	
+		store.fetchLessons()
 }
 
 </script>
@@ -74,15 +75,15 @@ async function book(lesson) {
         <span class="emerald-underline">Les schema</span><span class="text-emerald-600">.</span>
       </h1>
       <div class="intro">
-        <div v-for="lesson in $rav.upcomingLessons(lessons.documents)" :key="lesson.$id" class="flex justify-between items-center gap-y-3 border-b py-3">
+        <div v-for="lesson in lessons.documents" :key="lesson.$id" class="flex justify-between items-center gap-y-3 border-b py-3">
           <div>
             <div class="flex align-start items-center gap-x-3">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                  stroke="currentColor" class="w-6 h-6 mr-1 inline-block stroke-current text-emerald-700">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
             </svg>
-              <b class="capitalize"><nuxt-link :to="lesson.type == 'peachy bum' ? '/yoga/peachy-bum' : '/yoga/hatha-yoga'">{{ lesson.type ? lesson.type : 'hatha yoga' }}</nuxt-link></b>
-              <span class="animate-bounce rounded-full bg-orange-300 text-orange-900 text-xs px-3 py-1" v-if="lesson.type == 'peachy bum'">New</span>
+            <b class="capitalize"><nuxt-link :to="lesson.type == 'peachy bum' ? '/yoga/peachy-bum' : '/yoga/hatha-yoga'">{{ lesson.type ? lesson.type : 'hatha yoga' }}</nuxt-link></b>
+	            <span class="animate-bounce rounded-full bg-orange-300 text-orange-900 text-xs px-3 py-1" v-if="lesson.type == 'peachy bum'">New</span>
             </div>
             <p>{{ $rav.formatDateInDutch(lesson.date, true) }} ({{ 9 - lesson.bookings.length }} {{ lesson.bookings.length == 8 ? 'plek' : 'plekken' }} )</p>
           </div>
@@ -180,7 +181,6 @@ async function book(lesson) {
         </div>
       </div>
     </div>
-   
    <Proefles />
   </div>
 </template>
