@@ -1,6 +1,8 @@
 <script lang="ts" setup>
-const store = useMainStore();
+const store = useMainStore()
+const router = useRouter()
 const {$rav} = useNuxtApp()
+const toast = useToast()
 
 const columns = [{
 	key: 'name',
@@ -84,6 +86,22 @@ async function archiveUser(userId) {
 	}
 }
 
+async function sendWhatsapp(user) {
+	if(user.phone) {
+		const telephone = user.phone.slice(1)
+		window.location.href = `https://wa.me/${telephone}?text=Hi`
+	} else {
+		toast.add({
+			id: 'no-telephone',
+			title: 'Geen telefoonnummer',
+			icon: 'i-x-circle',
+			color: 'red',
+			description: 'Helaas heeft deze gebruiker geen telefoonnummer in het account.'
+		})
+	}
+
+}
+
 const items = (row) => [
 	[
 		// 		{
@@ -99,6 +117,10 @@ const items = (row) => [
 		label: 'Archiveer',
 		icon: 'i-heroicons-archive-box-20-solid',
 		click: () => archiveUser(row.$id)
+	}, {
+		label: 'Send WhatsApp',
+		icon: 'i-heroicons-chat-bubble-bottom-center-text-20-solid',
+		click: () => sendWhatsapp(row)
 	}]
 	// }], [{
 	// 	label: 'Archiveer',
