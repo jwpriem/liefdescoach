@@ -34,28 +34,6 @@ useHead({
 })
 
 async function send(){
-	const result = await $fetch('/api/studentCheck', {
-		method: 'POST',
-		body: {
-			email: email.value
-		}
-	})
-
-	if(result.total == 1) {
-		toast.add({
-			id: 'duplicate',
-			title: 'Niet geboekt.',
-			icon: 'i-heroicons-x-mark',
-			color: 'red',
-			description: 'Je kunt helaas geen proefles meer boeken.',
-		})
-		// Clear form
-		name.value = ''
-		email.value = ''
-		lesson.value = ''
-	} else {
-		await store.setLoading(true)
-		
 		await $fetch('/api/bookTrailLesson', {
 			method: 'POST',
 			body: {
@@ -65,13 +43,11 @@ async function send(){
 			}
 		})
 		
-		const type = JSON.parse(lesson.value).type ? 'Hatha Yoga' : 'Peachy Bum'
-		
 		await mail.send({
 			config:0,
 			from: 'Yoga Ravennah <info@ravennah.com>',
 			subject: 'Proefles Yoga Ravennah',
-			text: 'Naam:\n' + name.value + '\n\nEmail:\n' + email.value + '\n\nDatum:\n' + $rav.formatDateInDutch(JSON.parse(lesson.value).date, true)  + '\n\nLes:\n' + type,
+			text: 'Naam:\n' + name.value + '\n\nEmail:\n' + email.value + '\n\nDatum:\n' + $rav.formatDateInDutch(JSON.parse(lesson.value).date, true)  + '\n\nLes:\n' + $rav.checkLessonType(JSON.parse(lesson.value).type),
 		})
 		
 		// Clear form
@@ -79,8 +55,7 @@ async function send(){
 		email.value = ''
 		lesson.value = ''
 
-		await store.getLessons()
-		await store.setLoading(false)
+		await store.fetchLessons()
 		
 		toast.add({
 			id: 'non_duplicate',
@@ -89,7 +64,6 @@ async function send(){
 			color: 'primary',
 			description: 'Je proefles is geboekt!'
 		})
-	}
 }
 
 const computedLessons = computed(() => {
