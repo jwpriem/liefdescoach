@@ -88,7 +88,7 @@ async function book(lesson: any) {
             <p>{{ $rav.formatDateInDutch(lesson.date, true) }} ({{ 9 - lesson.bookings.length }} {{ lesson.bookings.length == 8 ? 'plek' : 'plekken' }} )</p>
           </div>
           <div>
-            <UButton :disabled="checkBooking(lesson.$id)" color="primary" variant="solid" @click="book(lesson)" v-if="loggedInUser && !checkBooking(lesson.$id)">Boek</UButton>
+            <UButton :disabled="checkBooking(lesson.$id)" color="primary" variant="solid" @click="book(lesson)" v-if="loggedInUser && !checkBooking(lesson.$id) && lesson.bookings.length != 9">Boek</UButton>
             <span v-if="checkBooking(lesson.$id)" class="flex content-center"><svg xmlns="http://www.w3.org/2000/svg"
                                                                                    fill="none" viewBox="0 0 24 24"
                                                                                    stroke-width="1.5"

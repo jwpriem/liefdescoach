@@ -34,6 +34,7 @@ useHead({
 })
 
 async function send(){
+        await store.setLoading(true)
 		await $fetch('/api/bookTrailLesson', {
 			method: 'POST',
 			body: {
@@ -56,6 +57,8 @@ async function send(){
 		lesson.value = ''
 
 		await store.fetchLessons()
+        await store.setLoading(false)
+
 		
 		toast.add({
 			id: 'non_duplicate',
