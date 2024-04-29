@@ -63,8 +63,8 @@ const rav = {
         const dayjs = useDayjs()
 
         const lessonDate = dayjs(date).utc();
-        const startTime = lessonDate.format('h.mm');
-        const endTime = lessonDate.add(1, 'hour').format('h.mm');
+        const startTime = lessonDate.format('H.mm');
+        const endTime = lessonDate.add(1, 'hour').format('H.mm');
         return isLesson ? `${lessonDate.format('dddd D MMMM')} van ${startTime} tot ${endTime} uur` : lessonDate.format('D MMMM YYYY');
     },
 
@@ -82,7 +82,7 @@ const rav = {
         const lessonType = type == 'peachy bum' ? 'Peachy Bum les' : 'Hatha Yoga les'
         const address = type == 'peachy bum' ? 'Kosboulevard 5, 3059 XZ Rotterdam' : 'Emmy van Leersumhof 24a, 3059 LT Rotterdam'
         const lessonDate = dayjs(new Date(date)).utc()
-        const startTime = lessonDate.format('h')
+        const startTime = lessonDate.format('H')
         const startMinutes = lessonDate.format('mm')
         return `https://calndr.link/d/event/?service=${stream}&start=${lessonDate.format('YYYY-MM-DD')}%20${startTime}:${startMinutes}&title=${lessonType}%20Ravennah&timezone=Europe/Amsterdam&location=${encodeURIComponent(address)}`
     },
