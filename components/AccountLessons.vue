@@ -10,6 +10,8 @@ const state = reactive({
   addBookingLesson: null,
   createLesson: false,
   createLessonDate: new Date(),
+  createLessonHours: '09',
+  createLessonMinutes: '45',
   createLessonType: 'hatha yoga',
   types: [
     {
@@ -21,6 +23,12 @@ const state = reactive({
       value: 'peachy bum',
     },
   ],
+  hours: [
+    "00", "01", "02", "03", "04", "05", "06", "07", "08", "09",
+    "10", "11", "12", "13", "14", "15", "16", "17", "18", "19",
+    "20", "21", "22", "23", "24"
+  ],
+  minutes: ['00', '15', '30', '45']
 })
 
 const lessons = computed(() => store.lessons)
@@ -55,7 +63,7 @@ async function book() {
 
 async function createNewLesson() {
   store.setLoading(true)
-  state.createLessonType === 'hatha yoga' ? state.createLessonDate.setUTCHours(9, 45, 0, 0) : state.createLessonDate.setUTCHours(10, 0, 0, 0)
+  state.createLessonDate.setUTCHours(parseInt(state.createLessonHours, 10), parseInt(state.createLessonMinutes, 10), 0, 0)
 
   await $fetch('/api/createLesson', {
     method: 'post',
@@ -206,6 +214,27 @@ const computedStudents = computed(() => {
               <DatePicker v-model="state.createLessonDate" is-required @close="close" />
             </template>
           </UPopover>
+
+          <div class="flex justify-start items-center gap-x-3">
+          <USelect
+          icon="i-heroicons-clock-20-solid"
+          size="md"
+          color="primary"
+          variant="outline"
+          v-model="state.createLessonHours"
+          :options="state.hours"
+          />
+
+
+          <USelect
+          icon="i-heroicons-clock-20-solid"
+          size="md"
+          color="primary"
+          variant="outline"
+          v-model="state.createLessonMinutes"
+          :options="state.minutes"
+          />
+          </div>
 
           <USelect
             icon="i-heroicons-academic-cap-20-solid"
