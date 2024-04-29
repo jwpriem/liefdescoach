@@ -181,7 +181,7 @@ useHead({
                     <div class="w-full md:w-1/2">
                         <img
                             class="w-full h-64 md:h-96 object-center object-cover rounded-3xl shadow-xl"
-                            src="/flexibiliteit.jpg"
+                            src="/ravennah_squat_2.webp"
                         />
                     </div>
                     <div id="onlineDating" class="w-full md:w-1/2 space-y-6">

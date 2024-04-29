@@ -33,6 +33,6 @@
     "dayjs-nuxt": "^2.1.9"
   },
   "engines": {
-    "node": "20.11"
+    "node": "20"
   }
 }

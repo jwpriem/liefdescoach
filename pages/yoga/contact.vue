@@ -53,7 +53,7 @@ const isLoading = computed(() => store.isLoading);
 <template>
   <div class="">
     <IsLoading :loading="isLoading" />
-    <Header image="/yoga-sfeer.jpg">
+    <Header image="/ravennah_side_plank.webp">
       <h1 class="text-3xl md:text-6xl uppercase font-black">
         <span class="emerald-underline">Stuur een bericht</span><span class="text-emerald-600">.</span>
       </h1>

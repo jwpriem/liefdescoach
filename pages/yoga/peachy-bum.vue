@@ -38,7 +38,7 @@ useHead({
 </style>
 <template>
   <div>
-      <Header image="/peachy-bum.webp" alignment="object-middle">
+      <Header image="/ravennah_squat.webp" alignment="object-middle">
         <div class="flex justify-start items-center gap-x-6">
           <h1 class="text-3xl md:text-6xl uppercase font-black">
               <span class="orange-underline">Peachy Bum</span
