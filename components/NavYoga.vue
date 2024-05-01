@@ -3,7 +3,7 @@ const store = useMainStore()
 const router = useRouter()
 const navOpen = ref(false);
 
-await useAsyncData('loggedInUser', () => store.getUser(), { server: false })
+await useAsyncData('loggedInUser', () => Promise.all([store.getUser(),store.fetchLessons()]), { server: false })
 const toggle = () => {
     navOpen.value = !navOpen.value;
 };
