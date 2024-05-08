@@ -230,7 +230,7 @@ export const useMainStore = defineStore('main', {
                 const {account, databases, ID} = useAppwrite();
 
                 const user = await this.getOnBehalfOrUser()
-                console.log(user)
+                
                 // Register booking
                 await databases.createDocument(
                     useRuntimeConfig().public.database,
@@ -255,6 +255,7 @@ export const useMainStore = defineStore('main', {
                     'bookings',
                     booking.$id
                 )
+                
                 await this.updatePrefs(user, {credits: +user.prefs['credits'] + 1})
                 this.onBehalfOf ? await this.clearOnBehalf() : await this.getUser(); // Refresh user details
                 await this.sendEmail('sendBookingCancellation', booking.lessons.$id)
@@ -283,7 +284,7 @@ export const useMainStore = defineStore('main', {
                 body: null,
                 email: user.email,
                 new_booking_name: user.name,
-                lessontype: lessonsResponse.type == 'peachy bum' ? 'Peachy Bum' : 'Hatha Yoga',
+                lessontype: $rav.checkLessonType(lessonsResponse.type),
                 lessondate: $rav.formatDateInDutch(lessonsResponse.date, true),
                 spots: 9 - lessonsResponse.bookings.length,
                 bookings: bookingsArr,

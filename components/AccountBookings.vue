@@ -1,14 +1,22 @@
 <script setup lang="ts">
 const store = useMainStore()
+const mail = useMail()
+const { $rav } = useNuxtApp()
 
 const myBookings = computed(() => store.myBookings);
 const isAdmin = computed(() => store.isAdmin);
 
-async function removeBooking(booking, lesson) {
+async function removeBooking(booking) {
   await store.cancelBooking(
-    booking,
-    lesson
-  );
+    booking
+  )
+  
+  await mail.send({
+    config:0,
+    from: 'Yoga Ravennah <info@ravennah.com>',
+    subject: 'Annulering Yoga Ravennah',
+    text: `Naam:\n${store.loggedInUser.name}\n\nEmail:\n${store.loggedInUser.email}\n\nDatum:\n${$rav.formatDateInDutch(booking.lessons.date, true)}\n\nLes:\n${$rav.checkLessonType(booking.lessons.type)}\n\n`
+  })
 }
 </script>
 
