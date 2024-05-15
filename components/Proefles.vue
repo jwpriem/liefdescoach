@@ -9,7 +9,7 @@
               ><span class="text-emerald-700">.</span>
      </h2>
      <p class="text-2xl text-emerald-900">
-      Voor slechts <span class="text-emerald-700 font-bold">7,50 euro</span> kun je eenmalig een proefles boeken. Op deze manier kun je laagdrempelig ervaring op doen met Hatha Yoga of Peachy Bum.
+      Voor slechts <span class="text-emerald-700 font-bold">7,50 euro</span> kun je eenmalig een proefles boeken. Op deze manier kun je laagdrempelig ervaring op doen met Peachy Bum.
      </p>
      <UButton color="primary" size="xl" variant="outline" to="/yoga/proefles">Proefles boeken</UButton>
     </div>

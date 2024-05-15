@@ -1,6 +1,20 @@
+<script setup>
+const props = defineProps({
+  hideYoga: {
+    type: Boolean,
+    default: false
+  },
+  hidePeachyBum: {
+    type: Boolean,
+    default: false
+  }
+});
+</script>
+
 <template>
   <div>
     <div class="py-8">
+      <div v-if="!hideYoga">
       <p class="intro"><span
           class="text-emerald-700 text-xl md:text-2xl font-bold">Adres Studio YES Wellness</span><br>
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -17,8 +31,10 @@
         </svg>
         <u>Bekijk op Google Maps</u>
       </a>
+      </div>
     </div>
     <div class="pb-8">
+      <div v-if="!hidePeachyBum">
       <p class="intro"><span
           class="text-emerald-700 text-xl md:text-2xl font-bold">Adres Peachy Bum (buitenles)</span><br>
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -35,6 +51,7 @@
         </svg>
         <u>Bekijk op Google Maps</u>
       </a>
+    </div>
     </div>
   </div>
 </template>
