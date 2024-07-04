@@ -12,11 +12,11 @@ const props = defineProps({
 </script>
 
 <template>
-    <div class="md:min-h-screen xl:h-screen p-8 md:p-16 md:flex justify-between items-center md:space-x-16">
+    <div class="md:min-h-screen p-8 md:p-16 md:my-16 md:flex justify-between items-center md:space-x-16">
         <div class="w-full md:w-1/2 space-y-6">
           <slot/>
         </div>
-        <img :src="image" class="h-80 mt-12 md:mt-0 md:h-full rounded-3xl w-full md:w-1/2 shadow-xl object-cover"
+        <img :src="image" class="h-64 mt-12 md:mt-0 md:h-full rounded-3xl w-full md:w-1/2 shadow-xl object-cover"
              :class="alignment">
     </div>
 </template>
