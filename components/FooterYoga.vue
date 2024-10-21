@@ -35,11 +35,6 @@
               </nuxt-link>
             </li>
             <li>
-              <nuxt-link to="/yoga/peachy-bum">
-            Peachy Bum
-              </nuxt-link>
-            </li>
-            <li>
               <nuxt-link to="/yoga/tarieven">
                 Tarieven
               </nuxt-link>

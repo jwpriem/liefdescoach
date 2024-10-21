@@ -39,7 +39,7 @@ const loggedInUser = computed(() => store.loggedInUser);
       </h1>
       <p class="intro">Je kunt een losse les meedoen voor <span
         class="text-emerald-700 font-bold">&euro; 15,- per les</span> of je kunt een strippenkaart kopen van <span
-        class="text-emerald-700 font-bold">10 lessen voor &euro; 125,-</span> (&euro; 12,50 per les). Een strippenkaart is 12 maanden geldig en is te gebruiken voor zowel yoga als Peachy Bum lessen.</p>
+        class="text-emerald-700 font-bold">10 lessen voor &euro; 125,-</span> (&euro; 12,50 per les). Een strippenkaart is 12 maanden geldig.</p>
 
         <p class="intro">Een les annuleren kan tot 24 uur voor de les kosteloos.</p>
 
@@ -52,6 +52,5 @@ const loggedInUser = computed(() => store.loggedInUser);
           Les schema
         </nuxt-link>
     </Header>
-	  <Proefles />
   </div>
 </template>
