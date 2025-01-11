@@ -92,7 +92,7 @@
 							<nuxt-link to="/yoga/contact">
 								info
 								<svg
-										class="w-4 h-4 inline-block stroke-current"
+										class="h-4 -mx-1 inline-block stroke-current"
 										fill="none"
 										stroke="currentColor"
 										viewBox="0 0 24 24"
