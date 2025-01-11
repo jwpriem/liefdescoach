@@ -45,7 +45,7 @@ const loggedInUser = computed(() => store.loggedInUser);
               <span class="emerald-underline">Wat past bij jou</span
               ><span class="text-emerald-700">?</span>
 			</h2>
-			<h6 class="font-xl font-bold">Kleine strippenkaart (5 lessen): €75</h6>
+			<h6 class="font-xl font-bold">Kleine strippenkaart (5 lessen): €72,50</h6>
 			<ul>
 				<li>
 					<svg
@@ -79,7 +79,7 @@ const loggedInUser = computed(() => store.loggedInUser);
 								stroke-linejoin="round"
 						/>
 					</svg>
-					€15 per les – perfect voor als je af en toe een les wilt volgen.
+					€14,50 per les – perfect voor als je af en toe een les wilt volgen.
 				</li>
 			</ul>
 			<h6 class="font-bold">Grote strippenkaart (10 lessen): €135</h6>

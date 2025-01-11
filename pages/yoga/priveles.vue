@@ -29,7 +29,7 @@ useHead({
 
 <template>
 	<div>
-		<Header alignment="object-bottom" image="/priveles.jpeg">
+		<Header alignment="object-center" image="/priveles.jpeg">
 			<h1 class="text-3xl md:text-6xl uppercase font-black">
         <span class="emerald-underline">Privé Yogalessen</span
         ><span class="text-emerald-600">.</span>
