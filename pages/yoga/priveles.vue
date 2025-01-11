@@ -79,6 +79,41 @@ useHead({
 				</div>
 			</div>
 		</div>
+
+		<div class="p-8 md:px-0 md:py-24">
+			<div class="container mx-auto">
+				<div
+						class="md:flex justify-between items-center md:space-x-12 space-y-8 md:space-y-0"
+				>
+					<div class="w-full md:w-1/2">
+						<img
+								class="w-full h-64 md:h-96 object-center object-cover rounded-3xl shadow-xl"
+								src="/priveles-2.jpeg"
+						/>
+					</div>
+					<div id="onlineDating" class="w-full md:w-1/2 space-y-6">
+						<h2 class="text-2xl md:text-4xl uppercase font-black">
+              <span class="emerald-underline">Locatie en mogelijkheden</span
+              ><span class="text-emerald-700">.</span>
+						</h2>
+						<p class="intro">
+							Hatha yoga omvat houdingen en asana's die de mobiliteit van
+							gewrichten vergroten en de spieren versterken.
+						</p>
+						<p class="intro">Privélessen zijn altijd op aanvraag en flexibel in te plannen. We kunnen samen bepalen wat het
+							beste past:</p>
+						<ul>
+							<li class="ml-2"><p class="intro">- In mijn studio in Rotterdam Nesselande.</p></li>
+							<li class="ml-2"><p class="intro">- Bij jou thuis of op een andere gewenste locatie.</p></li>
+							<li class="ml-2"><p class="intro">- Voor één persoon of een groep.</p></li>
+						</ul>
+						<h6>Neem contact op</h6>
+						<p class="intro">Ben je benieuwd naar de mogelijkheden? Neem gerust contact met me op. Samen bespreken we jouw
+							wensen, de locatie en het aantal deelnemers. Ik kijk ernaar uit om je te helpen je yogadoelen te bereiken!</p>
+					</div>
+				</div>
+			</div>
+		</div>
 		<div class="p-8 md:px-0 md:py-24">
 			<div class="container mx-auto">
 				<div
@@ -113,40 +148,6 @@ useHead({
 								class="w-full h-64 md:h-96 object-center object-cover rounded-3xl shadow-xl"
 								src="/priveles-8.jpeg"
 						/>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="p-8 md:px-0 md:py-24">
-			<div class="container mx-auto">
-				<div
-						class="md:flex justify-between items-center md:space-x-12 space-y-8 md:space-y-0"
-				>
-					<div class="w-full md:w-1/2">
-						<img
-								class="w-full h-64 md:h-96 object-center object-cover rounded-3xl shadow-xl"
-								src="/priveles-2.jpeg"
-						/>
-					</div>
-					<div id="onlineDating" class="w-full md:w-1/2 space-y-6">
-						<h2 class="text-2xl md:text-4xl uppercase font-black">
-              <span class="emerald-underline">Locatie en mogelijkheden</span
-              ><span class="text-emerald-700">.</span>
-						</h2>
-						<p class="intro">
-							Hatha yoga omvat houdingen en asana's die de mobiliteit van
-							gewrichten vergroten en de spieren versterken.
-						</p>
-						<p class="intro">Privélessen zijn altijd op aanvraag en flexibel in te plannen. We kunnen samen bepalen wat het
-							beste past:</p>
-						<ul>
-							<li class="ml-2"><p class="intro">- In mijn studio in Rotterdam Nesselande.</p></li>
-							<li class="ml-2"><p class="intro">- Bij jou thuis of op een andere gewenste locatie.</p></li>
-							<li class="ml-2"><p class="intro">- Voor één persoon of een groep.</p></li>
-						</ul>
-						<h6>Neem contact op</h6>
-						<p class="intro">Ben je benieuwd naar de mogelijkheden? Neem gerust contact met me op. Samen bespreken we jouw
-							wensen, de locatie en het aantal deelnemers. Ik kijk ernaar uit om je te helpen je yogadoelen te bereiken!</p>
 					</div>
 				</div>
 			</div>
