@@ -103,21 +103,35 @@ const loggedInUser = computed(() => store.loggedInUser)
               Contact
             </nuxt-link>
           </li>
-          <li @click="toggle" v-if="loggedInUser">
-            <nuxt-link class="mobile-nav-item" to="/yoga/account">
-              {{ loggedInUser.name }}
-            </nuxt-link>
-          </li>
-          <li @click="toggle" v-else>
-            <nuxt-link class="mobile-nav-item" to="/yoga/login">
-              Login
-            </nuxt-link>
-          </li>
-          <li @click="toggle" v-if="loggedInUser">
-            <span class="mobile-nav-item cursor-pointer" @click="logout()">
-              Logout
-            </span>
-          </li>
+          <ClientOnly>
+            <template #fallback>
+              <!-- what SSR should show -->
+              <li @click="toggle">
+                <span class="mobile-nav-item" to="/yoga/login">Login</span>
+              </li>
+            </template>
+
+            <!-- client: real state -->
+            <li v-if="loggedInUser" @click="toggle">
+              <nuxt-link class="mobile-nav-item" to="/yoga/account">
+                {{ loggedInUser.name }}
+              </nuxt-link>
+            </li>
+            <li v-else @click="toggle">
+              <nuxt-link class="mobile-nav-item" to="/yoga/login">Login</nuxt-link>
+            </li>
+          </ClientOnly>
+          <ClientOnly>
+            <template #fallback>
+              <!-- nothing on SSR to avoid structure mismatch -->
+              <!-- or keep an empty <li> to preserve layout if needed -->
+            </template>
+            <li @click="toggle" v-if="loggedInUser">
+              <span class="mobile-nav-item cursor-pointer" @click="logout()">
+                Logout
+              </span>
+            </li>
+          </ClientOnly>
         </ul>
       </div>
     </div>
@@ -165,21 +179,31 @@ const loggedInUser = computed(() => store.loggedInUser)
             Contact
           </nuxt-link>
         </li>
-        <li v-if="loggedInUser">
-          <nuxt-link class="nav-item" to="/yoga/account">
-            {{ loggedInUser.name }}
-          </nuxt-link>
-        </li>
-        <li v-else>
-          <nuxt-link class="nav-item" to="/yoga/login">
-            Login
-          </nuxt-link>
-        </li>
-        <li v-if="loggedInUser">
-          <span class="nav-item cursor-pointer" @click="logout()">
-            Logout
-          </span>
-        </li>
+        <ClientOnly>
+          <template #fallback>
+            <li>
+              <span class="nav-item" to="/yoga/login">Login</span>
+            </li>
+          </template>
+
+          <li v-if="loggedInUser">
+            <nuxt-link class="nav-item" to="/yoga/account">
+              {{ loggedInUser.name }}
+            </nuxt-link>
+          </li>
+          <li v-else>
+            <nuxt-link class="nav-item" to="/yoga/login">Login</nuxt-link>
+          </li>
+        </ClientOnly>
+
+        <ClientOnly>
+          <template #fallback>
+            <!-- no logout on SSR -->
+          </template>
+          <li v-if="loggedInUser">
+            <span class="nav-item cursor-pointer" @click="logout()">Logout</span>
+          </li>
+        </ClientOnly>
       </ul>
       <!--<a href="https://www.instagram.com/yogaravennah" target="_blank" class="fixed bottom-0 right-0 m-4 rounded-xl font-bold text-lg px-4 py-2 bg-emerald-700 text-white hover:bg-emerald-500 cursor-pointer inline-block transition-all duration-300 ease-in-out antialiased" >-->
       <!--  Boek een les via Instagram-->

@@ -55,23 +55,39 @@ export const useMainStore = defineStore('main', {
     actions: {
         async fetchWrapper(callback: Function) {
             this.isLoading = true;
+
+            // Clear any stale banner before a new request
+            this.errorMessage = ''
+            
             try {
-                await callback();
-            } catch (error) {
-                console.log(error)
+                await callback()
+            } catch (e: any) {
+                console.error(e)
 
-                // Define an object mapping specific error messages to user-friendly messages
-                const errorMessages = {
-                    "AppwriteException: A user with the same id, email, or phone already exists in this project.": 'Emailadres is al in gebruik, probeer in te loggen',
-                    "AppwriteException: Invalid `password` param: Password must be at least 8 characters and should not be one of the commonly used password.": 'Wachtwoord moet minimaal 8 character zijn',
-                    "AppwriteException: Invalid credentials. Please check the email and password.": 'Verkeerde emailadres of wachtwoord. Probeer opnieuw.',
+                const code = e?.code ?? e?.response?.status
+                const msg  = e?.message ?? String(e)
+                // Don’t show a banner for unauthenticated calls
+                if (code === 401 || /missing scope \(account\)/i.test(msg)) {
+                    return
+                }
 
-                };
-                const errorOrFallback = errorMessages[error] || 'Er is iets verkeerd gegaan.'
-                // Default error message for unhandled exceptions
-                this.errorMessage = error == "AppwriteException: User (role: guests) missing scope (account)" ?  '' : errorOrFallback;
+                // Friendly mappings (by code or message content)
+                let friendly = 'Er is iets verkeerd gegaan.'
+                if (code === 409 || /already exists/i.test(msg)) {
+                    friendly = 'Emailadres is al in gebruik, probeer in te loggen'
+                } else if (/Invalid credentials/i.test(msg)) {
+                    friendly = 'Verkeerde e-mailadres of wachtwoord. Probeer opnieuw.'
+                } else if (/password.*at least.*8/i.test(msg)) {
+                    friendly = 'Wachtwoord moet minimaal 8 tekens zijn'
+                } else if (/Password must be between 8 and 256 characters long./i.test(msg)) {
+                    friendly = 'Wachtwoord moet minimaal 8 tekens zijn'
+                } else if (code === 429 || /too many requests/i.test(msg)) {
+                    friendly = 'Te veel pogingen, probeer later opnieuw.'
+                }
+
+                this.errorMessage = friendly
             } finally {
-                this.isLoading = false;
+                this.isLoading = false
             }
         },
         async setLoading(value: boolean) {
@@ -105,11 +121,31 @@ export const useMainStore = defineStore('main', {
         },
         async getUser() {
             await this.fetchWrapper(async () => {
-                const {account} = useAppwrite();
-                this.loggedInUser = await account.get()
+                const { account } = useAppwrite()
 
-                await Promise.all([this.fetchLessons(), this.fetchStudents(), this.fetchBookings()]);
-            });
+                try {
+                    const user = await account.get()
+                    this.loggedInUser = user
+
+                    // Only fetch protected resources if we have a session
+                    await Promise.all([
+                        this.fetchLessons(),
+                        this.fetchStudents(),
+                        this.fetchBookings(),
+                    ])
+                } catch (e: any) {
+                    const code = e?.code ?? e?.response?.status
+                    const msg  = e?.message ?? String(e)
+
+                    // Treat "no session" as logged-out state, not an error banner
+                    if (code === 401 || /missing scope \(account\)/i.test(msg)) {
+                        this.loggedInUser = null
+                        return
+                    }
+                    // Bubble up real errors to fetchWrapper
+                    throw e
+                }
+            })
         },
         async fetchLessons() {
             if (this.isAdmin) {
