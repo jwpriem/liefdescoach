@@ -13,29 +13,29 @@ body .dark {
 }
 
 h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
+h2,
+h3,
+h4,
+h5,
+h6 {
     @apply font-display text-xl font-bold antialiased uppercase;
 }
 
-  h1 {
+h1 {
     @apply text-6xl;
 }
-nav
-  h2 {
+
+h2 {
     @apply text-5xl;
 }
 
-  h3 {
+h3 {
     @apply text-4xl;
 }
 
-  h4,
-  h5,
-  h6 {
+h4,
+h5,
+h6 {
     @apply text-lg;
 }
 
@@ -57,19 +57,21 @@ p, li {
         @apply text-sm px-2 py-1 md:px-3 md:py-2;
     }
 
-  &:hover {
+    &:hover {
         @apply shadow-xl;
     }
 
-   &.rose {
+    &.rose {
         @apply bg-rose-600 text-white;
+
         &:hover {
             @apply bg-rose-700;
         }
     }
 
-&.emerald {
+    &.emerald {
         @apply ring-emerald-700 ring-2 bg-emerald-700 text-emerald-200;
+
         &:hover {
             @apply bg-emerald-600 text-emerald-100;
         }
@@ -77,13 +79,15 @@ p, li {
 
     &.orange {
         @apply ring-orange-700 ring-2 bg-orange-700 text-orange-200;
+
         &:hover {
             @apply bg-orange-600 text-orange-100;
         }
     }
 
-&.emerald-outlined {
+    &.emerald-outlined {
         @apply ring-emerald-700 ring-2 text-emerald-700;
+
         &:hover {
             @apply ring-emerald-600 bg-emerald-600 text-emerald-100;
         }
@@ -91,6 +95,7 @@ p, li {
 
     &.orange-outlined {
         @apply ring-orange-700 ring-2 text-orange-700;
+
         &:hover {
             @apply ring-orange-600 bg-orange-600 text-orange-100;
         }
@@ -98,12 +103,13 @@ p, li {
 
     &.gray {
         @apply bg-gray-200 text-rose-600;
+
         &:hover {
             @apply bg-gray-300;
         }
     }
 
-&.disabled {
+    &.disabled {
         @apply bg-gray-300 text-gray-800 ring-gray-300;
 
         &:hover {
@@ -111,7 +117,6 @@ p, li {
         }
     }
 }
-
 
 
 label {
@@ -127,7 +132,7 @@ label {
 }
 
 .bg-ravennah-yoga {
-    background-image: url('/ravennah-yoga.jpg');
+    background-image: url('/ravennah-donker.jpg');
     background-size: cover;
     background-position: center center;
 }
@@ -140,35 +145,36 @@ label {
     @apply bg-gray-950 text-emerald-100;
 
     h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
         @apply text-emerald-100;
     }
 
-  .title-dark {
+    .title-dark {
         h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
             @apply text-emerald-900;
         }
     }
 
-  .intro {
+    .intro {
         @apply text-emerald-100;
     }
 
-  .intro-dark {
+    .intro-dark {
         @apply text-emerald-900
     }
 
-.emerald-underline {
+    .emerald-underline {
         @apply relative z-10;
+
         &:before {
             @apply absolute h-6 bottom-0 left-0 -mb-1 -ml-2 bg-emerald-700 bg-opacity-25 z-0 block w-1/2;
             content: '';
@@ -177,11 +183,13 @@ label {
 
     .orange-underline {
         @apply relative z-10;
+
         &:before {
             @apply absolute h-6 bottom-0 left-0 -mb-1 -ml-2 bg-orange-700 bg-opacity-25 z-0 block w-1/2;
             content: '';
         }
     }
+
     select, input, textarea, label {
         @apply text-emerald-600;
 
@@ -191,7 +199,7 @@ label {
     }
 
 
-.nav-item {
+    .nav-item {
         @apply transition-all duration-300 ease-in-out antialiased;
 
         &:hover {
@@ -199,12 +207,12 @@ label {
         }
     }
 
-.mobile-nav-item {
+    .mobile-nav-item {
         @apply text-2xl;
     }
 
-.nav-item.nuxt-link-exact-active,
-.mobile-nav-item.nuxt-link-exact-active {
+    .nav-item.nuxt-link-exact-active,
+    .mobile-nav-item.nuxt-link-exact-active {
         @apply relative z-10 transition-all duration-300 ease-in-out antialiased;
 
         &:before {
@@ -215,70 +223,75 @@ label {
 
 }
 
-.liefdescoach { h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
+.liefdescoach {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
         @apply text-gray-950;
     }
 
-  .intro {
+    .intro {
         @apply text-gray-800;
     }
 
-  .pink-underline {
+    .pink-underline {
         @apply relative z-10;
+
         &:before {
             @apply absolute h-6 bottom-0 left-0 -mb-1 -ml-2 bg-rose-600 bg-opacity-25 z-0 block w-1/2;
             content: '';
         }
     }
 
-  .nav-item {
+    .nav-item {
         @apply transition-all duration-300 ease-in-out antialiased;
+
         &:hover {
             @apply text-rose-800;
         }
     }
-.mobile-nav-item {
+
+    .mobile-nav-item {
         @apply text-2xl;
     }
-.nav-item.nuxt-link-exact-active, .mobile-nav-item.nuxt-link-exact-active {
+
+    .nav-item.nuxt-link-exact-active, .mobile-nav-item.nuxt-link-exact-active {
         @apply relative z-10 transition-all duration-300 ease-in-out antialiased;
 
         &:before {
             @apply absolute h-2.5 bottom-0 left-0 -ml-2 bg-rose-600 bg-opacity-25 z-0 block w-full;
             content: '';
-        };
+        }
+    ;
     }
 }
 
 
 @keyframes shake {
     10%,
-  90% {
+    90% {
         transform: translate3d(-1px, 0, 0);
     }
 
-  20%,
-  80% {
+    20%,
+    80% {
         transform: translate3d(2px, 0, 0);
     }
 
-  30%,
-  50%,
-  70% {
+    30%,
+    50%,
+    70% {
         transform: translate3d(-4px, 0, 0);
     }
 
-  40%,
-  60% {
+    40%,
+    60% {
         transform: translate3d(4px, 0, 0);
     }
 }
-
 
 
 .min-height-50 {
@@ -308,7 +321,7 @@ tbody {
         @apply bg-gray-800;
     }
 
-  td {
+    td {
         @apply p-2;
         vertical-align: top;
     }
@@ -318,7 +331,7 @@ tbody {
     @apply h-6 relative inline-block;
 }
 
-  [type="checkbox"] {
+[type="checkbox"] {
     @apply w-11 h-0 cursor-pointer inline-block;
     @apply focus:outline-0 dark:focus:outline-0;
     @apply border-0 dark:border-0;
@@ -371,11 +384,11 @@ tbody {
 
 .liefdescoach {
     h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
         @apply text-gray-950;
     }
 
@@ -385,6 +398,7 @@ tbody {
 
     .pink-underline {
         @apply relative z-10;
+
         &:before {
             @apply absolute h-6 bottom-0 left-0 -mb-1 -ml-2 bg-rose-600 bg-opacity-25 z-0 block w-1/2;
             content: '';
@@ -392,8 +406,8 @@ tbody {
     }
 
     input,
-  .select-wrapper,
-  textarea {
+    .select-wrapper,
+    textarea {
         @apply bg-gray-200 text-gray-800 p-4 font-body w-full rounded border-transparent text-sm transition-all duration-300 ease-in-out;
 
         &::placeholder {
@@ -420,9 +434,11 @@ tbody {
 
     .checkbox {
         @apply bg-white border-gray-300 h-5 w-5 border border-solid rounded cursor-pointer flex justify-center items-center;
+
         &.checked {
             @apply bg-rose-600 border-rose-600 text-white;
         }
+
         &.hasError {
             @apply border border-solid border-red-600;
 
@@ -435,9 +451,11 @@ tbody {
 
     .radio {
         @apply bg-gray-200;
+
         &.checked {
             @apply bg-rose-600;
         }
+
         &.hasError {
             @apply border border-solid border-red-600;
 
