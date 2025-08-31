@@ -26,6 +26,9 @@ useHead({
 				{hid: "twitter:image", name: "twitter:image", content: ogImage},
 				]
 })
+if (!store.loggedInUser) {
+  navigateTo('/yoga/login')
+}
 
 const loggedInUser = computed(() => store.loggedInUser);
 const isAdmin = computed(() => store.isAdmin);

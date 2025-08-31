@@ -36,7 +36,7 @@ useHead({
 })
 
 if (store.loggedInUser) {
-  navigateTo('/yoga/account') // or '/account'
+  navigateTo('/yoga/account')
 } else {
   // Otherwise, check session on the client and redirect if found
   onMounted(async () => {
@@ -54,7 +54,7 @@ const normalizedEmail = computed(() => email.value.trim().toLowerCase())
 async function login() {
 	await store.login(normalizedEmail.value, password.value)
 
-	if(!store.errorMessage) {
+	if(store.loggedInUser) {
 		await navigateTo({path: "/yoga/account"})
 	}
 }

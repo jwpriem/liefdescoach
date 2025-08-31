@@ -53,25 +53,30 @@ export const useMainStore = defineStore('main', {
         onBehalfOf: null
     }),
     actions: {
-        async fetchWrapper(callback: Function) {
-            this.isLoading = true;
+        async fetchWrapper(
+            callback: () => Promise<void>,
+            opts: { ignore401?: boolean } = {}
+        ) {
+            this.isLoading = true
+            this.errorMessage = '' // clear stale
 
-            // Clear any stale banner before a new request
-            this.errorMessage = ''
-            
             try {
                 await callback()
+                return true
             } catch (e: any) {
                 console.error(e)
-
                 const code = e?.code ?? e?.response?.status
                 const msg  = e?.message ?? String(e)
-                // Don’t show a banner for unauthenticated calls
-                if (code === 401 || /missing scope \(account\)/i.test(msg)) {
-                    return
-                }
 
-                // Friendly mappings (by code or message content)
+                // Swallow only when:
+                //  - caller asked to ignore 401 OR
+                //  - it's the "guest missing scope (account)" case
+                const isGuestMissingScope = code === 401 && /missing scope \(account\)/i.test(msg)
+                if ((opts.ignore401 && code === 401) || isGuestMissingScope) {
+                    return false
+                }
+                console.log(msg)
+                // Friendly messages
                 let friendly = 'Er is iets verkeerd gegaan.'
                 if (code === 409 || /already exists/i.test(msg)) {
                     friendly = 'Emailadres is al in gebruik, probeer in te loggen'
@@ -79,13 +84,14 @@ export const useMainStore = defineStore('main', {
                     friendly = 'Verkeerde e-mailadres of wachtwoord. Probeer opnieuw.'
                 } else if (/password.*at least.*8/i.test(msg)) {
                     friendly = 'Wachtwoord moet minimaal 8 tekens zijn'
-                } else if (/Password must be between 8 and 256 characters long./i.test(msg)) {
-                    friendly = 'Wachtwoord moet minimaal 8 tekens zijn'
+                } else if (/Password must be between 8 and 256 characters long/i.test(msg)) {
+                        friendly = 'Wachtwoord moet minimaal 8 tekens zijn'
                 } else if (code === 429 || /too many requests/i.test(msg)) {
                     friendly = 'Te veel pogingen, probeer later opnieuw.'
                 }
 
                 this.errorMessage = friendly
+                return false
             } finally {
                 this.isLoading = false
             }
@@ -100,24 +106,25 @@ export const useMainStore = defineStore('main', {
             this.onBehalfOf = user
         },
         async login(email: string, password: string) {
-          await this.fetchWrapper(async() => {
-              const {account} = useAppwrite();
-              await account.createEmailSession(email, password);
-              await this.getUser()
+            const sessionOk = await this.fetchWrapper(async () => {
+                const { account } = useAppwrite()
+                await account.createEmailSession(email, password) // if this throws, sessionOk=false
+            })
 
-              // Unarchive on login if archived
-              if (this.loggedInUser.prefs['archive'] == true) {
-                  await $fetch('/api/updatePrefs', {
-                      method: 'post',
-                      body: {
-                          userId: this.loggedInUser.$id,
-                          prefs: {
-                              archive: false,
-                          },
-                      },
-                  });
-              }
-          })
+            if (!sessionOk) return
+
+            // Only runs when session creation succeeded
+            await this.getUser()
+
+            if (this.loggedInUser?.prefs?.['archive'] === true) {
+                await $fetch('/api/updatePrefs', {
+                    method: 'post',
+                    body: {
+                        userId: this.loggedInUser.$id,
+                        prefs: { archive: false },
+                    },
+                })
+            }
         },
         async getUser() {
             await this.fetchWrapper(async () => {
@@ -145,7 +152,7 @@ export const useMainStore = defineStore('main', {
                     // Bubble up real errors to fetchWrapper
                     throw e
                 }
-            })
+            }, { ignore401: true })
         },
         async fetchLessons() {
             if (this.isAdmin) {
