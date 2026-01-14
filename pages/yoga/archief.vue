@@ -55,7 +55,7 @@ function sortStudents(students) {
       </h2>
      </div>
      <div class="grid grid-cols-1 md:grid-cols-4 mt-8 gap-3">
-      <div v-for="lesson in archive.documents" index="lesson.$id" class="p-4 bg-gray-800 rounded flex flex-col gap-y-3">
+      <div v-for="lesson in archive.rows" index="lesson.$id" class="p-4 bg-gray-800 rounded flex flex-col gap-y-3">
        <div>
         <sup class="text-emerald-500">Les</sup>
         <span class="block -mt-2 capitalize">{{lesson.type ? lesson.type : 'hatha yoga' }}</span>
