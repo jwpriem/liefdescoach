@@ -157,10 +157,10 @@ export const useMainStore = defineStore('main', {
         async fetchLessons() {
             if (this.isAdmin) {
                 const lessons = await $fetch('/api/lessonsWithBookings')
-                this.lessons = lessons.documents
+                this.lessons = lessons.rows
             } else {
                 const lessons = await $fetch('/api/lessons')
-                this.lessons = lessons.documents
+                this.lessons = lessons.rows
             }
         },
 
@@ -176,7 +176,7 @@ export const useMainStore = defineStore('main', {
                 method: 'post',
                 body: {userId: this.loggedInUser.$id}
             })
-            this.myBookings = bookings.documents
+            this.myBookings = bookings.rows
         },
 
         async updateUserDetail(detailType: 'name' | 'email' | 'phone', newValue: string, password: string) {

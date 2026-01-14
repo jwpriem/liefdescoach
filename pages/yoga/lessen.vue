@@ -74,7 +74,7 @@ async function book(lesson: any) {
         <span class="emerald-underline">Les schema</span><span class="text-emerald-600">.</span>
       </h1>
       <div class="intro">
-        <div v-for="lesson in lessons.documents" :key="lesson.$id" class="flex justify-between items-center gap-y-3 border-b py-3">
+        <div v-for="lesson in lessons.rows" :key="lesson.$id" class="flex justify-between items-center gap-y-3 border-b py-3">
           <div>
             <div class="flex align-start items-center gap-x-3">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
