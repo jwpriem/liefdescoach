@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import { Client, Databases, Query, ID } from 'node-appwrite';
+import { Client, TablesDB, Query, ID } from 'node-appwrite';
 import { useRuntimeConfig } from '#imports';
 
 export default defineEventHandler(async (event) => {
@@ -11,9 +11,9 @@ export default defineEventHandler(async (event) => {
     .setProject(config.public.project) // Your project ID
     .setKey(config.appwriteKey) // Your secret API key
 
-    const databases = new Databases(client);
+    const databases = new TablesDB(client);
     const body = await readBody(event)
-    const res = await databases.createDocument(
+    const res = await databases.createRow(
         config.public.database,
         'lessons',
         ID.unique(),
