@@ -49,7 +49,7 @@ async function book(lesson: any) {
     config: 0,
     from: 'Yoga Ravennah <info@ravennah.com>',
     subject: 'Nieuwe boeking Yoga Ravennah',
-    text: `Naam:\n${store.loggedInUser.name}\n\nEmail:\n${store.loggedInUser.email}\n\nDatum:\n${$rav.formatDateInDutch(lesson.date, true)}\n\nLes:\n${$rav.checkLessonType(lesson.type)}\n\nAantal plekken:\n${9 - ((lesson.bookings?.length || 0) + 1)}\n\nBoekingen:\n${bookings}`
+    text: `Naam:\n${store.loggedInUser.name}\n\nEmail:\n${store.loggedInUser.email}\n\nDatum:\n${$rav.formatDateInDutch(lesson.date, true)}\n\nLes:\n${$rav.getLessonTitle(lesson)}\n\nAantal plekken:\n${9 - ((lesson.bookings?.length || 0) + 1)}\n\nBoekingen:\n${bookings}`
   })
 
   toast.add({
@@ -76,39 +76,16 @@ async function book(lesson: any) {
         <div v-if="lessons && lessons.rows" v-for="lesson in lessons.rows" :key="lesson.$id"
           class="flex justify-between items-center gap-y-3 border-b py-3">
           <div>
-            <div class="flex align-start items-center gap-x-3" v-if="lesson.type == 'guest lesson'">
+            <div class="flex align-start items-center gap-x-3">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                 stroke="currentColor" class="w-6 shrink-0 h-6 mr-1 inline-block stroke-current text-emerald-700">
                 <path stroke-linecap="round" stroke-linejoin="round"
                   d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
               </svg>
-              <span>Yin-Yang Yoga door
-                gastdocent <span class="text-yellow-700">{{
-                  lesson.teacher
-                  }}</span></span>
-            </div>
-
-            <div class="flex align-start items-center gap-x-3" v-if="lesson.type == 'hatha yoga'">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                stroke="currentColor" class="w-6 shrink-0 h-6 mr-1 inline-block stroke-current text-emerald-700">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-              </svg>
-              <span class="capitalize">
-                <nuxt-link to="/hatha-yoga">{{ lesson.type ? lesson.type :
-                  'hatha&nbsp;yoga' }}</nuxt-link>
+              <span v-if="lesson.type == 'hatha yoga'">
+                <nuxt-link to="/hatha-yoga" v-html="$rav.getLessonDescription(lesson)"></nuxt-link>
               </span>
-            </div>
-
-            <div class="flex align-start items-center gap-x-3" v-if="lesson.type == 'peachy  bum'">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                stroke="currentColor" class="w-6 shrink-0 h-6 mr-1 inline-block stroke-current text-emerald-700">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-              </svg>
-              <span class="capitalize">
-                {{ lesson.type }}
-              </span>
+              <span v-else v-html="$rav.getLessonDescription(lesson)"></span>
             </div>
             <p>{{ $rav.formatDateInDutch(lesson.date, true) }} ({{ 9 - (lesson.bookings?.length ||
               0) }}

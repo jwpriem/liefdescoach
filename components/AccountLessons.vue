@@ -156,10 +156,7 @@ const computedStudents = computed(() => {
         <div v-for="lesson in lessons" index="lesson.$id" class="p-4 bg-gray-800 rounded flex flex-col gap-y-3">
           <div>
             <sup class="text-emerald-500">Les</sup>
-            <span class="block -mt-2 capitalize" v-if="lesson.type == 'hatha yoga' || lesson.type == 'peachy bum'">{{
-              $rav.checkLessonType(lesson.type)
-            }}</span><span v-else class="block -mt-2">Yin-Yang Yoga door gastdocent <span class="text-yellow-600">{{
-                lesson.teacher }}</span></span>
+            <span class="block -mt-2" v-html="$rav.getLessonDescription(lesson)"></span>
           </div>
           <div>
             <sup class="text-emerald-500">Datum</sup>

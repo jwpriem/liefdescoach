@@ -328,7 +328,7 @@ export const useMainStore = defineStore('main', {
                 body: null,
                 email: user.email,
                 new_booking_name: user.name,
-                lessontype: $rav.checkLessonType(lessonsResponse.type),
+                lessontype: $rav.getLessonTitle(lessonsResponse),
                 lessondate: $rav.formatDateInDutch(lessonsResponse.date, true),
                 spots: 9 - lessonsResponse.bookings.length,
                 bookings: bookingsArr,

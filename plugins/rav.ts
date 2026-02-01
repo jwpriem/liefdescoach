@@ -122,6 +122,20 @@ const rav = {
 
     checkLessonType(type: string) {
         return type == 'peachy bum' ? 'Peachy Bum' : 'Hatha Yoga'
+    },
+
+    getLessonTitle(lesson: any) {
+        if (lesson.type == 'guest lesson') {
+            return `Yin-Yang Yoga door gastdocent ${lesson.teacher}`
+        }
+        return rav.checkLessonType(lesson.type)
+    },
+
+    getLessonDescription(lesson: any) {
+        if (lesson.type == 'guest lesson') {
+            return `Yin-Yang Yoga door gastdocent <span class="text-yellow-600">${lesson.teacher}</span>`
+        }
+        return rav.checkLessonType(lesson.type)
     }
 };
 
