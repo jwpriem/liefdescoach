@@ -7,9 +7,9 @@ export default defineEventHandler(async (event) => {
     const client = new Client();
 
     client
-    .setEndpoint('https://cloud.appwrite.io/v1') // Your API Endpoint
-    .setProject(config.public.project) // Your project ID
-    .setKey(config.appwriteKey) // Your secret API key
+        .setEndpoint('https://cloud.appwrite.io/v1') // Your API Endpoint
+        .setProject(config.public.project) // Your project ID
+        .setKey(config.appwriteKey) // Your secret API key
 
     const databases = new TablesDB(client);
     const body = await readBody(event)
@@ -19,9 +19,10 @@ export default defineEventHandler(async (event) => {
         ID.unique(),
         {
             date: body.date,
-            type: body.type
+            type: body.type,
+            teacher: body.teacher || null
         }
-        );
+    );
 
     return Object.assign({}, res)
 })

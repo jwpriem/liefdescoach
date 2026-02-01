@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Teams } from 'appwrite'
 import { format } from 'date-fns'
 const store = useMainStore()
 const { $rav } = useNuxtApp()
@@ -13,10 +14,23 @@ const state = reactive({
   createLessonHours: '09',
   createLessonMinutes: '45',
   createLessonType: 'hatha yoga',
+  createLessonTeacher: null,
+  teachers: [
+    {
+      label: 'Ravennah',
+      value: null,
+    }, {
+      label: 'Bo Bol',
+      value: 'Bo Bol',
+    }
+  ],
   types: [
     {
       label: 'Hatha Yoga',
       value: 'hatha yoga',
+    }, {
+      label: 'Gastles',
+      value: 'guest lesson',
     },
     {
       label: 'Peachy Bum',
@@ -44,6 +58,7 @@ function cancel() {
 function cancelLesson() {
   state.createLessonDate = new Date()
   state.createLessonType = 'hatha yoga'
+  state.createLessonTeacher = null
   state.createLesson = false
 }
 
@@ -70,6 +85,7 @@ async function createNewLesson() {
     body: JSON.stringify({
       date: state.createLessonDate.toISOString(),
       type: state.createLessonType,
+      teacher: state.createLessonTeacher,
     }),
   })
 
@@ -140,7 +156,8 @@ const computedStudents = computed(() => {
         <div v-for="lesson in lessons" index="lesson.$id" class="p-4 bg-gray-800 rounded flex flex-col gap-y-3">
           <div>
             <sup class="text-emerald-500">Les</sup>
-            <span class="block -mt-2 capitalize" v-if="lesson.teacher == null">{{ $rav.checkLessonType(lesson.type)
+            <span class="block -mt-2 capitalize" v-if="lesson.type == 'hatha yoga' || lesson.type == 'peachy bum'">{{
+              $rav.checkLessonType(lesson.type)
               }}</span><span v-else class="block -mt-2 text-orange-900 font-bold">Yin-Yang Yoga door gastdocent {{
                 lesson.teacher }}</span>
           </div>
@@ -220,6 +237,9 @@ const computedStudents = computed(() => {
 
           <USelect icon="i-heroicons-academic-cap-20-solid" size="md" color="primary" variant="outline"
             v-model="state.createLessonType" :options="state.types" />
+
+          <USelect icon="i-heroicons-academic-cap-20-solid" size="md" color="primary" variant="outline"
+            v-model="state.createLessonTeacher" :options="state.teachers" />
 
           <div class="flex flex-wrap gap-x-3">
             <UButton color="primary" variant="solid" @click="createNewLesson()">Voeg toe</UButton>

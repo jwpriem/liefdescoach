@@ -306,15 +306,16 @@ export const useMainStore = defineStore('main', {
         },
 
         async sendEmail(type: string, lessonId: string) {
-            const { databases } = useAppwrite();
+            const { tablesDB } = useAppwrite();
             const { $rav } = useNuxtApp();
 
             const user = await this.getOnBehalfOrUser()
 
-            const lessonsResponse = await databases.getDocument(
+            const lessonsResponse = await tablesDB.getRow(
                 useRuntimeConfig().public.database,
                 'lessons',
                 lessonId,
+                ['*', 'bookings.*', 'bookings.students.*']
             )
 
             // Bookingsarray for email
