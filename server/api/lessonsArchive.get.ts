@@ -18,6 +18,7 @@ export default defineEventHandler(async (event) => {
         config.public.database,
         'lessons',
         [
+            Query.select(['*', 'bookings.*']),
             Query.orderAsc("date"),
             Query.lessThanEqual("date", fromDate.toISOString()),
             Query.limit(100)
