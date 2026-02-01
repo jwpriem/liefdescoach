@@ -90,7 +90,7 @@ async function book(lesson: any) {
                   d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
               </svg>
               <span v-if="lesson.type == 'hatha yoga'">
-                <nuxt-link to="/hatha-yoga" v-html="$rav.getLessonDescription(lesson)"></nuxt-link>
+                <nuxt-link to="/hatha-yoga">Hatha Yoga</nuxt-link>
               </span>
               <span v-else v-html="$rav.getLessonDescription(lesson)"></span>
             </div>
