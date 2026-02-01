@@ -43,14 +43,14 @@ async function book(lesson: any) {
   await store.setOnBehalfOf(store.loggedInUser)
   await store.handleBooking(lesson)
   
-		let bookings = lesson.bookings.length ? lesson.bookings.map(booking => booking.students.name + '\n').join('') : ''
+		let bookings = lesson.bookings?.length ? lesson.bookings.map(booking => booking.students.name + '\n').join('') : ''
 		bookings = bookings + store.loggedInUser.name + '\n'
 		
 		await mail.send({
 			config:0,
 			from: 'Yoga Ravennah <info@ravennah.com>',
 			subject: 'Nieuwe boeking Yoga Ravennah',
-			text: `Naam:\n${store.loggedInUser.name}\n\nEmail:\n${store.loggedInUser.email}\n\nDatum:\n${$rav.formatDateInDutch(lesson.date, true)}\n\nLes:\n${$rav.checkLessonType(lesson.type)}\n\nAantal plekken:\n${9 - (lesson.bookings.length + 1)}\n\nBoekingen:\n${bookings}`
+			text: `Naam:\n${store.loggedInUser.name}\n\nEmail:\n${store.loggedInUser.email}\n\nDatum:\n${$rav.formatDateInDutch(lesson.date, true)}\n\nLes:\n${$rav.checkLessonType(lesson.type)}\n\nAantal plekken:\n${9 - ((lesson.bookings?.length || 0) + 1)}\n\nBoekingen:\n${bookings}`
 		})
 	
 		toast.add({
@@ -84,10 +84,10 @@ async function book(lesson: any) {
             <b class="capitalize"><nuxt-link :to="lesson.type == 'peachy bum' ? '/yoga/peachy-bum' : '/yoga/hatha-yoga'">{{ lesson.type ? lesson.type : 'hatha yoga' }}</nuxt-link></b>
 	            <span class="animate-bounce rounded-full bg-orange-300 text-orange-900 text-xs px-3 py-1" v-if="lesson.type == 'peachy bum'">New</span>
             </div>
-            <p>{{ $rav.formatDateInDutch(lesson.date, true) }} ({{ 9 - lesson.bookings.length }} {{ lesson.bookings.length == 8 ? 'plek' : 'plekken' }} )</p>
+            <p>{{ $rav.formatDateInDutch(lesson.date, true) }} ({{ 9 - (lesson.bookings?.length || 0) }} {{ (lesson.bookings?.length || 0) == 8 ? 'plek' : 'plekken' }} )</p>
           </div>
           <div>
-            <UButton :disabled="checkBooking(lesson.$id)" color="primary" variant="solid" @click="book(lesson)" v-if="loggedInUser && !checkBooking(lesson.$id) && lesson.bookings.length != 9">Boek</UButton>
+            <UButton :disabled="checkBooking(lesson.$id)" color="primary" variant="solid" @click="book(lesson)" v-if="loggedInUser && !checkBooking(lesson.$id) && (lesson.bookings?.length || 0) != 9">Boek</UButton>
             <span v-if="checkBooking(lesson.$id)" class="flex content-center"><svg xmlns="http://www.w3.org/2000/svg"
                                                                                    fill="none" viewBox="0 0 24 24"
                                                                                    stroke-width="1.5"
@@ -98,7 +98,7 @@ async function book(lesson: any) {
                 </svg>
               Geboekt
             </span>
-            <span v-if="loggedInUser && !checkBooking(lesson.$id) && lesson.bookings.length == 9" class="flex content-center">
+            <span v-if="loggedInUser && !checkBooking(lesson.$id) && (lesson.bookings?.length || 0) == 9" class="flex content-center">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"class="w-6 h-6 inline-block mx-1">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
               </svg>
