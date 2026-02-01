@@ -224,7 +224,7 @@ export const useMainStore = defineStore('main', {
             await this.fetchWrapper(async () => {
                 const { account, databases, ID } = useAppwrite();
                 const registration = await account.create(ID.unique(), email, password, name);
-                await account.createEmailSession(email, password);
+                await account.createEmailPasswordSession(email, password);
 
                 if (phone) {
                     await this.updateUserDetail('phone', phone, password);
