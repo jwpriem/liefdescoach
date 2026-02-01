@@ -11,7 +11,7 @@ const toggle = () => {
 const logout = async () => {
 	try {
 		await store.logoutUser();
-		await router.push('/yoga');
+		await router.push('/');
 	} catch (error) {
 		// Handle the error
 	}
@@ -69,52 +69,52 @@ const loggedInUser = computed(() => store.loggedInUser)
 			>
 				<ul class="w-full space-y-8">
 					<li @click="toggle">
-						<nuxt-link class="mobile-nav-item" to="/yoga/">
+						<nuxt-link class="mobile-nav-item" to="/">
 							Home
 						</nuxt-link>
 					</li>
 					<li @click="toggle">
-						<nuxt-link class="mobile-nav-item" to="/yoga/over">
+						<nuxt-link class="mobile-nav-item" to="/over">
 							Over mij
 						</nuxt-link>
 					</li>
 					<li @click="toggle">
-						<nuxt-link class="mobile-nav-item" to="/yoga/voordelen">
+						<nuxt-link class="mobile-nav-item" to="/voordelen">
 							Voordelen
 						</nuxt-link>
 					</li>
 					<li @click="toggle">
-						<nuxt-link class="mobile-nav-item" to="/yoga/lessen">
+						<nuxt-link class="mobile-nav-item" to="/lessen">
 							Les schema
 						</nuxt-link>
 					</li>
 					<li @click="toggle">
-						<nuxt-link class="mobile-nav-item" to="/yoga/priveles">
+						<nuxt-link class="mobile-nav-item" to="/priveles">
 							Priveles
 						</nuxt-link>
 					</li>
 					<li @click="toggle">
-						<nuxt-link class="mobile-nav-item" to="/yoga/hatha-yoga">
+						<nuxt-link class="mobile-nav-item" to="/hatha-yoga">
 							Hatha Yoga
 						</nuxt-link>
 					</li>
 					<li @click="toggle">
-						<nuxt-link class="mobile-nav-item" to="/yoga/tarieven">
+						<nuxt-link class="mobile-nav-item" to="/tarieven">
 							Tarieven
 						</nuxt-link>
 					</li>
 					<li @click="toggle">
-						<nuxt-link class="mobile-nav-item" to="/yoga/contact">
+						<nuxt-link class="mobile-nav-item" to="/contact">
 							Contact
 						</nuxt-link>
 					</li>
 					<li v-if="loggedInUser" @click="toggle">
-						<nuxt-link class="mobile-nav-item" to="/yoga/account">
+						<nuxt-link class="mobile-nav-item" to="/account">
 							{{ loggedInUser.name }}
 						</nuxt-link>
 					</li>
 					<li v-else @click="toggle">
-						<nuxt-link class="mobile-nav-item" to="/yoga/login">
+						<nuxt-link class="mobile-nav-item" to="/login">
 							Login
 						</nuxt-link>
 					</li>
@@ -136,52 +136,52 @@ const loggedInUser = computed(() => store.loggedInUser)
 					</nuxt-link>
 				</li>
 				<li>
-					<nuxt-link class="nav-item" to="/yoga/">
+					<nuxt-link class="nav-item" to="/">
 						Home
 					</nuxt-link>
 				</li>
 				<li>
-					<nuxt-link class="nav-item" to="/yoga/over">
+					<nuxt-link class="nav-item" to="/over">
 						Over mij
 					</nuxt-link>
 				</li>
 				<li>
-					<nuxt-link class="nav-item" to="/yoga/lessen">
+					<nuxt-link class="nav-item" to="/lessen">
 						Les schema
 					</nuxt-link>
 				</li>
 				<li>
-					<nuxt-link class="nav-item" to="/yoga/priveles">
+					<nuxt-link class="nav-item" to="/priveles">
 						Priveles
 					</nuxt-link>
 				</li>
 				<li>
-					<nuxt-link class="nav-item" to="/yoga/hatha-yoga">
+					<nuxt-link class="nav-item" to="/hatha-yoga">
 						Hatha Yoga
 					</nuxt-link>
 				</li>
 				<li>
-					<nuxt-link class="nav-item" to="/yoga/tarieven">
+					<nuxt-link class="nav-item" to="/tarieven">
 						Tarieven
 					</nuxt-link>
 				</li>
 				<li>
-					<nuxt-link class="nav-item" to="/yoga/voordelen">
+					<nuxt-link class="nav-item" to="/voordelen">
 						Voordelen
 					</nuxt-link>
 				</li>
 				<li>
-					<nuxt-link class="nav-item" to="/yoga/contact">
+					<nuxt-link class="nav-item" to="/contact">
 						Contact
 					</nuxt-link>
 				</li>
 				<li v-if="loggedInUser">
-					<nuxt-link class="nav-item" to="/yoga/account">
+					<nuxt-link class="nav-item" to="/account">
 						{{ loggedInUser.name }}
 					</nuxt-link>
 				</li>
 				<li v-else>
-					<nuxt-link class="nav-item" to="/yoga/login">
+					<nuxt-link class="nav-item" to="/login">
 						Login
 					</nuxt-link>
 				</li>

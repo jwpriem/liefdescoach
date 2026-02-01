@@ -2,7 +2,7 @@
 const title = ref('Yoga Ravennah | Lessen');
 const description = ref('Ik geef les elke zondag van 9.45u tot 10.45u bij Studio YES Wellness in Rotterdam Nesselande');
 const ogImage = ref('https://www.ravennah.com/ravennah-social.jpg');
-const pageUrl = ref('https://www.ravennah.com/yoga/lessen');
+const pageUrl = ref('https://www.ravennah.com/lessen');
 
 const store = useMainStore()
 const mail = useMail()
@@ -10,7 +10,6 @@ const toast = useToast()
 const { $rav } = useNuxtApp()
 
 definePageMeta({
-  layout: 'yoga'
 })
 
 useHead({
@@ -74,7 +73,7 @@ async function book(lesson: any) {
         <span class="emerald-underline">Les schema</span><span class="text-emerald-600">.</span>
       </h1>
       <div class="intro">
-        <div v-for="lesson in lessons.rows" :key="lesson.$id"
+        <div v-if="lessons && lessons.rows" v-for="lesson in lessons.rows" :key="lesson.$id"
           class="flex justify-between items-center gap-y-3 border-b py-3">
           <div>
             <div class="flex align-start items-center gap-x-3">
@@ -83,9 +82,10 @@ async function book(lesson: any) {
                 <path stroke-linecap="round" stroke-linejoin="round"
                   d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
               </svg>
-              <span class="capitalize" v-if="lesson.teacher == null"> <nuxt-link
-                  :to="lesson.type == 'peachy bum' ? '/yoga/peachy-bum' : '/yoga/hatha-yoga'">{{ lesson.type ?
-                    lesson.type : 'hatha yoga' }}</nuxt-link></span>
+              <span class="capitalize" v-if="lesson.teacher == null">
+                 <nuxt-link v-if="lesson.type != 'peachy bum'" to="/hatha-yoga">{{ lesson.type ? lesson.type : 'hatha yoga' }}</nuxt-link>
+                 <span v-else>{{ lesson.type }}</span>
+              </span>
 
               <span v-if="lesson.teacher != null" class="text-orange-700">Yin-Yang Yoga door
                 gastdocent {{
@@ -119,15 +119,15 @@ async function book(lesson: any) {
               </svg>
               Helaas les is vol
             </span>
-            <UButton color="primary" variant="solid" to="/yoga/login" v-if="!loggedInUser">Login om te boeken</UButton>
+            <UButton color="primary" variant="solid" to="/login" v-if="!loggedInUser">Login om te boeken</UButton>
           </div>
         </div>
       </div>
       <p class="intro">
         <span v-if="!loggedInUser">Boeken kan door
-          <nuxt-link to="/yoga/login"><u>in te loggen</u></nuxt-link>. Heb je nog geen account dan kun je een account
+          <nuxt-link to="/login"><u>in te loggen</u></nuxt-link>. Heb je nog geen account dan kun je een account
           aanmaken.</span>
-        Bekijk ook de <nuxt-link to="/yoga/tarieven"><u>tarieven</u></nuxt-link>
+        Bekijk ook de <nuxt-link to="/tarieven"><u>tarieven</u></nuxt-link>
       </p>
 
     </Header>

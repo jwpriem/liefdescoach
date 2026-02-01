@@ -2,7 +2,7 @@
 const title = ref('Yoga Ravennah | Login');
 const description = ref('Om te kunnen boeken kun je een account aanmaken en inloggen');
 const ogImage = ref('https://www.ravennah.com/ravennah-social.jpg');
-const pageUrl = ref('https://www.ravennah.com/yoga/login');
+const pageUrl = ref('https://www.ravennah.com/login');
 const email = ref('');
 const password = ref('');
 const name = ref('');
@@ -14,7 +14,7 @@ const ready = ref(false)
 const store = useMainStore()
 
 definePageMeta({
-	layout: 'yoga',
+	// layout: 'yoga',
   ssr: false
 })
 

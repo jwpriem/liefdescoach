@@ -5,13 +5,12 @@ const store = useMainStore();
 const title = ref('Yoga Ravennah | Contact');
 const description = ref('Wil je meer weten of een keer een proefles meedoen? Neem dan contact op via het formulier of mijn socials.');
 const ogImage = ref('https://www.ravennah.com/ravennah-social.jpg');
-const pageUrl = ref('https://www.ravennah.com/yoga/contact');
+const pageUrl = ref('https://www.ravennah.com/contact');
 const name = ref('');
 const email = ref('');
 const message = ref('');
 
 definePageMeta({
-    layout: 'yoga'
 })
 
 useHead({

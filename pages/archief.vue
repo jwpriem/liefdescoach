@@ -2,12 +2,12 @@
 const title = ref('Yoga Ravennah | Account');
 const description = ref('Mijn accountdetails');
 const ogImage = ref('https://www.ravennah.com/ravennah-social.jpg');
-const pageUrl = ref('https://www.ravennah.com/yoga/account');
+const pageUrl = ref('https://www.ravennah.com/account');
 
 const store = useMainStore()
 
 definePageMeta({
- layout: 'yoga'
+ // layout: 'yoga'
 })
 
 useHead({
