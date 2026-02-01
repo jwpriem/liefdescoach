@@ -92,6 +92,9 @@ async function book(lesson: any) {
               <span v-if="lesson.type == 'hatha yoga'">
                 <nuxt-link to="/hatha-yoga">Hatha Yoga</nuxt-link>
               </span>
+              <span v-else-if="lesson.type == 'guest lesson'">
+                <nuxt-link to="/bo-bol"><span v-html="$rav.getLessonDescription(lesson)"></span></nuxt-link>
+              </span>
               <span v-else v-html="$rav.getLessonDescription(lesson)"></span>
             </div>
             <p>{{ $rav.formatDateInDutch(lesson.date, true) }} ({{ 9 - (lesson.bookings?.length ||
