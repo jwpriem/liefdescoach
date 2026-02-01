@@ -11,10 +11,10 @@ export default defineEventHandler(async (event) => {
         .setProject(config.public.project) // Your project ID
         .setKey(config.appwriteKey) // Your secret API key
 
-    const databases = new TablesDB(client);
+    const tablesDB = new TablesDB(client);
     const fromDate = new Date()
 
-    const res = await databases.listRows(
+    const res = await tablesDB.listRows(
         config.public.database,
         'lessons',
         [
