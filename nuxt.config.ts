@@ -82,5 +82,20 @@ export default defineNuxtConfig({
 
   ui: {
     global: true
+  },
+
+  routeRules: {
+    '/liefdescoach/**': { redirect: '/', statusCode: 301 },
+    '/yoga': { redirect: '/', statusCode: 301 },
+    '/yoga/account': { redirect: '/account', statusCode: 301 },
+    '/yoga/archief': { redirect: '/archief', statusCode: 301 },
+    '/yoga/contact': { redirect: '/contact', statusCode: 301 },
+    '/yoga/hatha-yoga': { redirect: '/hatha-yoga', statusCode: 301 },
+    '/yoga/lessen': { redirect: '/lessen', statusCode: 301 },
+    '/yoga/login': { redirect: '/login', statusCode: 301 },
+    '/yoga/over': { redirect: '/over', statusCode: 301 },
+    '/yoga/priveles': { redirect: '/priveles', statusCode: 301 },
+    '/yoga/tarieven': { redirect: '/tarieven', statusCode: 301 },
+    '/yoga/voordelen': { redirect: '/voordelen', statusCode: 301 },
   }
 })

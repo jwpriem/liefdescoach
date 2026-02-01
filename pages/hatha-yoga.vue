@@ -2,10 +2,10 @@
 const title = ref('Yoga Ravennah | Hatha yoga');
 const description = ref('Hatha yoga omvat houdingen en asanas die de mobiliteit van gewrichten vergroten en de spieren versterken. Kom snel een keer langs voor een ontspannen les in Rotterdam Nesselande');
 const ogImage = ref('https://www.ravennah.com/ravennah-social.jpg');
-const pageUrl = ref('https://www.ravennah.com/yoga/hatha-yoga');
+const pageUrl = ref('https://www.ravennah.com/hatha-yoga');
 
 definePageMeta({
-    layout: 'yoga'
+    // layout: 'yoga'
 })
 
 useHead({
@@ -45,10 +45,10 @@ useHead({
           <div
               class="flex justify-start items-center gap-x-3"
               >
-              <nuxt-link to="/yoga/lessen" class="emerald button">
+              <nuxt-link to="/lessen" class="emerald button">
                     Les schema
               </nuxt-link>
-              <nuxt-link to="/yoga/tarieven" class="emerald-outlined button">
+              <nuxt-link to="/tarieven" class="emerald-outlined button">
                     Tarieven
               </nuxt-link>
           </div>

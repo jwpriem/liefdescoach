@@ -2,10 +2,10 @@
 const title = ref('Yoga Ravennah | Over mij');
 const description = ref('Ik ben Ravennah Matser, een optimistische, energieke, creatieve verbinder die dagelijks streeft naar bijzondere momenten. Mijn focus ligt op het verspreiden van positiviteit, het vinden van innerlijke rust.');
 const ogImage = ref('https://www.ravennah.com/ravennah-social.jpg');
-const pageUrl = ref('https://www.ravennah.com/yoga/over');
+const pageUrl = ref('https://www.ravennah.com/over');
 
 definePageMeta({
-    layout: 'yoga'
+    // layout: 'yoga'
 })
 
 useHead({
