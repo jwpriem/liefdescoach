@@ -28,7 +28,7 @@ useHead({
 
 <template>
   <div>
-    <Header alignment="object-top">
+    <Header image="/bo-bol.webp" alignment="object-top">
       <h1 class="text-3xl md:text-6xl uppercase font-black">
         <span class="emerald-underline">Bo Bol</span
         ><span class="text-emerald-600">.</span>
