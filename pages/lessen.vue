@@ -83,14 +83,15 @@ async function book(lesson: any) {
                   d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
               </svg>
               <span class="capitalize" v-if="lesson.teacher == null">
-                 <nuxt-link v-if="lesson.type != 'peachy bum'" to="/hatha-yoga">{{ lesson.type ? lesson.type : 'hatha yoga' }}</nuxt-link>
-                 <span v-else>{{ lesson.type }}</span>
+                <nuxt-link v-if="lesson.type != 'peachy bum'" to="/hatha-yoga">{{ lesson.type ? lesson.type :
+                  'hatha&nbsp;yoga' }}</nuxt-link>
+                <span v-else>{{ lesson.type }}</span>
               </span>
 
-              <span v-if="lesson.teacher != null" class="text-orange-700">Yin-Yang Yoga door
-                gastdocent {{
+              <span v-if="lesson.teacher != null">Yin-Yang Yoga door
+                gastdocent <span class="text-yellow-700">{{
                   lesson.teacher
-                }}</span>
+                }}</span></span>
               <span class="animate-bounce rounded-full bg-orange-300 text-orange-900 text-xs px-3 py-1"
                 v-if="lesson.type == 'peachy bum'">New</span>
             </div>
