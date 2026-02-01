@@ -2,12 +2,11 @@
 const title = ref('Yoga Ravennah | Tarieven');
 const description = ref('Je kunt een losse les meedoen voor € 15,- of je kunt een strippenkaart kopen van € 125,-');
 const ogImage = ref('https://www.ravennah.com/ravennah-social.jpg');
-const pageUrl = ref('https://www.ravennah.com/yoga/tarieven');
+const pageUrl = ref('https://www.ravennah.com/tarieven');
 
 const store = useMainStore()
 
 definePageMeta({
-	layout: 'yoga'
 })
 
 useHead({
@@ -169,11 +168,11 @@ const loggedInUser = computed(() => store.loggedInUser);
 
 			<p v-if="!loggedInUser" class="intro">
 				Boeken kan door
-				<nuxt-link to="/yoga/login"><u>in te loggen</u></nuxt-link>
+				<nuxt-link to="/login"><u>in te loggen</u></nuxt-link>
 				. Heb je nog geen account dan kun je een account aanmaken.
 			</p>
 
-			<nuxt-link class="emerald button" to="/yoga/lessen">
+			<nuxt-link class="emerald button" to="/lessen">
 				Les schema
 			</nuxt-link>
 		</Header>

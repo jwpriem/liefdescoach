@@ -5,10 +5,7 @@
 				<div class="w-full md:w-2/4">
 					<Yoga/>
 					<br/>
-					<small>&copy; www.ravennah.com/yoga</small><br>
-					<nuxt-link class="text-emerald-900" to="/liefdescoach">
-						<small>Ga naar Liefdescoach</small>
-					</nuxt-link>
+					<small>&copy; www.ravennah.com</small><br>
 				</div>
 				<div class="w-full md:w-1/6">
 					<h6 class="uppercase font-bold text-emerald-900">
@@ -16,37 +13,37 @@
 					</h6>
 					<ul class="font-light">
 						<li>
-							<nuxt-link to="/yoga/voordelen">
+							<nuxt-link to="/voordelen">
 								Voordelen
 							</nuxt-link>
 						</li>
 						<li>
-							<nuxt-link to="/yoga/over">
+							<nuxt-link to="/over">
 								Over mij
 							</nuxt-link>
 						</li>
 						<li>
-							<nuxt-link to="/yoga/lessen">
+							<nuxt-link to="/lessen">
 								Les schema
 							</nuxt-link>
 						</li>
 						<li>
-							<nuxt-link to="/yoga/priveles">
+							<nuxt-link to="/priveles">
 								Priveles
 							</nuxt-link>
 						</li>
 						<li>
-							<nuxt-link to="/yoga/hatha-yoga">
+							<nuxt-link to="/hatha-yoga">
 								Hatha Yoga
 							</nuxt-link>
 						</li>
 						<li>
-							<nuxt-link to="/yoga/tarieven">
+							<nuxt-link to="/tarieven">
 								Tarieven
 							</nuxt-link>
 						</li>
 						<li>
-							<nuxt-link to="/yoga/contact">
+							<nuxt-link to="/contact">
 								Contact
 							</nuxt-link>
 						</li>
@@ -89,7 +86,7 @@
 										stroke-width="2"
 								/>
 							</svg>
-							<nuxt-link to="/yoga/contact">
+							<nuxt-link to="/contact">
 								info
 								<svg
 										class="h-4 -mx-1 inline-block stroke-current"

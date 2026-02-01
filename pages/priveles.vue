@@ -2,10 +2,10 @@
 const title = ref('Yoga Ravennah | Priveles');
 const description = ref('Ontdek de voordelen van privé yogalessen bij Yoga Ravennah in Rotterdam Nesselande. Persoonlijke aandacht, flexibele locaties en lessen op maat – perfect voor individuele of groepssessies. Neem contact op voor de mogelijkheden!.');
 const ogImage = ref('https://www.ravennah.com/ravennah-social.jpg');
-const pageUrl = ref('https://www.ravennah.com/yoga/voordelen');
+const pageUrl = ref('https://www.ravennah.com/voordelen');
 
 definePageMeta({
-	layout: 'yoga'
+	// layout: 'yoga'
 })
 
 useHead({

@@ -2,10 +2,10 @@
 const title = ref('Yoga Ravennah | Voordelen');
 const description = ref('Hatha yoga biedt talloze voordelen, waaronder stressvermindering, verbeterde flexibiliteit, spierversterking, beter evenwicht en coördinatie, evenals innerlijke rust en zelfbewustzijn.');
 const ogImage = ref('https://www.ravennah.com/ravennah-social.jpg');
-const pageUrl = ref('https://www.ravennah.com/yoga/voordelen');
+const pageUrl = ref('https://www.ravennah.com/voordelen');
 
 definePageMeta({
-  layout: 'yoga'
+  // layout: 'yoga'
 })
 
 useHead({
