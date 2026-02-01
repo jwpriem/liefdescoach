@@ -158,8 +158,8 @@ const computedStudents = computed(() => {
             <sup class="text-emerald-500">Les</sup>
             <span class="block -mt-2 capitalize" v-if="lesson.type == 'hatha yoga' || lesson.type == 'peachy bum'">{{
               $rav.checkLessonType(lesson.type)
-              }}</span><span v-else class="block -mt-2 text-orange-900 font-bold">Yin-Yang Yoga door gastdocent {{
-                lesson.teacher }}</span>
+            }}</span><span v-else class="block -mt-2">Yin-Yang Yoga door gastdocent <span class="text-yellow-600">{{
+                lesson.teacher }}</span></span>
           </div>
           <div>
             <sup class="text-emerald-500">Datum</sup>
