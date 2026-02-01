@@ -79,7 +79,7 @@ async function book(lesson: any) {
           <div>
             <div class="flex align-start items-center gap-x-3">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                stroke="currentColor" class="w-6 h-6 mr-1 inline-block stroke-current text-emerald-700">
+                stroke="currentColor" class="w-6 shrink-0 h-6 mr-1 inline-block stroke-current text-emerald-700">
                 <path stroke-linecap="round" stroke-linejoin="round"
                   d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
               </svg>
@@ -87,7 +87,7 @@ async function book(lesson: any) {
                   :to="lesson.type == 'peachy bum' ? '/yoga/peachy-bum' : '/yoga/hatha-yoga'">{{ lesson.type ?
                     lesson.type : 'hatha yoga' }}</nuxt-link></span>
 
-              <span v-if="lesson.teacher != null" class="text-orange-900 font-bold">Yin-Yang Yoga door
+              <span v-if="lesson.teacher != null" class="text-orange-700">Yin-Yang Yoga door
                 gastdocent {{
                   lesson.teacher
                 }}</span>
