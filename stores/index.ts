@@ -1,4 +1,4 @@
-import {defineStore} from 'pinia'
+import { defineStore } from 'pinia'
 
 // Define interfaces for your state and other types you will use
 interface User {
@@ -66,7 +66,7 @@ export const useMainStore = defineStore('main', {
             } catch (e: any) {
                 console.error(e)
                 const code = e?.code ?? e?.response?.status
-                const msg  = e?.message ?? String(e)
+                const msg = e?.message ?? String(e)
 
                 // Swallow only when:
                 //  - caller asked to ignore 401 OR
@@ -85,7 +85,7 @@ export const useMainStore = defineStore('main', {
                 } else if (/password.*at least.*8/i.test(msg)) {
                     friendly = 'Wachtwoord moet minimaal 8 tekens zijn'
                 } else if (/Password must be between 8 and 256 characters long/i.test(msg)) {
-                        friendly = 'Wachtwoord moet minimaal 8 tekens zijn'
+                    friendly = 'Wachtwoord moet minimaal 8 tekens zijn'
                 } else if (code === 429 || /too many requests/i.test(msg)) {
                     friendly = 'Te veel pogingen, probeer later opnieuw.'
                 }
@@ -108,7 +108,7 @@ export const useMainStore = defineStore('main', {
         async login(email: string, password: string) {
             const sessionOk = await this.fetchWrapper(async () => {
                 const { account } = useAppwrite()
-                await account.createEmailSession(email, password) // if this throws, sessionOk=false
+                await account.createEmailPasswordSession(email, password) // if this throws, sessionOk=false
             })
 
             if (!sessionOk) return
@@ -142,7 +142,7 @@ export const useMainStore = defineStore('main', {
                     ])
                 } catch (e: any) {
                     const code = e?.code ?? e?.response?.status
-                    const msg  = e?.message ?? String(e)
+                    const msg = e?.message ?? String(e)
 
                     // Treat "no session" as logged-out state, not an error banner
                     if (code === 401 || /missing scope \(account\)/i.test(msg)) {
@@ -174,14 +174,14 @@ export const useMainStore = defineStore('main', {
         async fetchBookings() {
             const bookings = await $fetch('/api/bookings', {
                 method: 'post',
-                body: {userId: this.loggedInUser.$id}
+                body: { userId: this.loggedInUser.$id }
             })
             this.myBookings = bookings.rows
         },
 
         async updateUserDetail(detailType: 'name' | 'email' | 'phone', newValue: string, password: string) {
             await this.fetchWrapper(async () => {
-                const {account} = useAppwrite();
+                const { account } = useAppwrite();
 
                 if (detailType === 'name') {
                     await account.updateName(newValue, password);
@@ -201,7 +201,7 @@ export const useMainStore = defineStore('main', {
 
         async updatePasswordUser(password: string, newPassword: string) {
             await this.fetchWrapper(async () => {
-                const {account} = useAppwrite();
+                const { account } = useAppwrite();
                 await account.updatePassword(newPassword, password);
                 await this.getUser(); // Refresh user details
             });
@@ -213,7 +213,7 @@ export const useMainStore = defineStore('main', {
                     userId: user.$id,
                     prefs: prefs
                 }
-                const {res} = await $fetch('/api/updatePrefs', {
+                const { res } = await $fetch('/api/updatePrefs', {
                     method: 'POST',
                     body: data
                 })
@@ -222,7 +222,7 @@ export const useMainStore = defineStore('main', {
         },
         async registerUser(email: string, password: string, name: string, phone: string) {
             await this.fetchWrapper(async () => {
-                const {account, databases, ID} = useAppwrite();
+                const { account, databases, ID } = useAppwrite();
                 const registration = await account.create(ID.unique(), email, password, name);
                 await account.createEmailSession(email, password);
 
@@ -245,7 +245,7 @@ export const useMainStore = defineStore('main', {
                     useRuntimeConfig().public.database,
                     'students',
                     user.$id,
-                    {email: user.email, name: user.name}
+                    { email: user.email, name: user.name }
                 );
 
                 await this.getUser(); // Refresh user details
@@ -256,7 +256,7 @@ export const useMainStore = defineStore('main', {
         },
         async logoutUser() {
             await this.fetchWrapper(async () => {
-                const {account} = useAppwrite();
+                const { account } = useAppwrite();
 
                 await account.deleteSession("current");
                 this.loggedInUser = null;
@@ -270,19 +270,19 @@ export const useMainStore = defineStore('main', {
 
         async handleBooking(lesson: Lesson) {
             await this.fetchWrapper(async () => {
-                const {account, databases, ID} = useAppwrite();
+                const { account, databases, ID } = useAppwrite();
 
                 const user = await this.getOnBehalfOrUser()
-                
+
                 // Register booking
                 await databases.createDocument(
                     useRuntimeConfig().public.database,
                     'bookings',
                     ID.unique(),
-                    {lessons: lesson.$id, students: user.$id}
+                    { lessons: lesson.$id, students: user.$id }
                 )
 
-                await this.updatePrefs(user, {credits: +user.prefs['credits'] - 1})
+                await this.updatePrefs(user, { credits: +user.prefs['credits'] - 1 })
                 this.onBehalfOf ? await this.clearOnBehalf() : await this.getUser(); // Refresh user details
                 await this.sendEmail('sendBookingConfirmation', lesson.$id)
             });
@@ -290,7 +290,7 @@ export const useMainStore = defineStore('main', {
 
         async cancelBooking(booking: Booking) {
             await this.fetchWrapper(async () => {
-                const {databases} = useAppwrite();
+                const { databases } = useAppwrite();
                 const user = await this.getOnBehalfOrUser()
                 // Cancel booking
                 await databases.deleteDocument(
@@ -298,16 +298,16 @@ export const useMainStore = defineStore('main', {
                     'bookings',
                     booking.$id
                 )
-                
-                await this.updatePrefs(user, {credits: +user.prefs['credits'] + 1})
+
+                await this.updatePrefs(user, { credits: +user.prefs['credits'] + 1 })
                 this.onBehalfOf ? await this.clearOnBehalf() : await this.getUser(); // Refresh user details
                 await this.sendEmail('sendBookingCancellation', booking.lessons.$id)
             });
         },
 
         async sendEmail(type: string, lessonId: string) {
-            const {databases} = useAppwrite();
-            const {$rav} = useNuxtApp();
+            const { databases } = useAppwrite();
+            const { $rav } = useNuxtApp();
 
             const user = await this.getOnBehalfOrUser()
 
@@ -320,7 +320,7 @@ export const useMainStore = defineStore('main', {
             // Bookingsarray for email
             const bookingsArr: any = []
             lessonsResponse.bookings.forEach((x: any) => {
-                bookingsArr.unshift({name: x.students.name})
+                bookingsArr.unshift({ name: x.students.name })
             })
 
             const emailData = {
@@ -368,10 +368,10 @@ export const useMainStore = defineStore('main', {
             })
         }
     },
-    
+
     async smtpEmailTemplate(subject: string, content: string, name: string) {
         const mail = useMail()
-        
+
         const template = `
           <!doctype html>
           <html lang="en">
