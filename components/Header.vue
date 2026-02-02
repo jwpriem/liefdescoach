@@ -16,7 +16,7 @@ const props = defineProps({
         <div class="w-full md:w-1/2 space-y-6">
           <slot/>
         </div>
-        <img :src="image" class="h-64 mt-12 md:mt-0 md:h-full rounded-3xl w-full md:w-1/2 shadow-xl object-cover"
-             :class="alignment">
+        <NuxtImg :src="image" class="h-64 mt-12 md:mt-0 md:h-full rounded-3xl w-full md:w-1/2 shadow-xl object-cover"
+             :class="alignment" />
     </div>
 </template>

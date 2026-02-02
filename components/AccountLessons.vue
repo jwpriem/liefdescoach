@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Teams } from 'appwrite'
-import { format } from 'date-fns'
 const store = useMainStore()
+const dayjs = useDayjs()
 const { $rav } = useNuxtApp()
 
 const state = reactive({
@@ -216,7 +216,7 @@ const computedStudents = computed(() => {
           </h2>
 
           <UPopover :popper="{ placement: 'bottom-start' }">
-            <UButton icon="i-heroicons-calendar-days-20-solid" :label="format(state.createLessonDate, 'd MMM, yyy')" />
+            <UButton icon="i-heroicons-calendar-days-20-solid" :label="dayjs(state.createLessonDate).format('D MMM, YYYY')" />
 
             <template #panel="{ close }">
               <DatePicker v-model="state.createLessonDate" is-required @close="close" />
