@@ -173,7 +173,7 @@ async function book(lesson: any) {
       <div class="container mx-auto">
         <div class="md:flex justify-between items-center md:space-x-12 space-y-8 md:space-y-0">
           <div class="w-full md:w-1/2">
-            <img class="w-full h-64 md:h-96 object-center object-cover rounded-3xl shadow-xl"
+            <NuxtImg class="w-full h-64 md:h-96 object-center object-cover rounded-3xl shadow-xl"
               src="/flexibiliteit.jpg" />
           </div>
           <div id="address" class="w-full md:w-1/2 space-y-6">

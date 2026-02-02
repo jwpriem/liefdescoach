@@ -48,9 +48,9 @@ async function removeBooking(booking) {
        <br>
 	          <sup class="text-emerald-500">Zet in je agenda</sup>
             <div class="flex gap-x-3 my-2">
-              <a :href="$rav.getCalenderLink('apple', booking.lessons.date, booking.lessons.type)"><img src="/apple.png" class="w-6" /></a>
-              <a :href="$rav.getCalenderLink('google', booking.lessons.date, booking.lessons.type)"><img src="/gmail.png" class="w-6" /></a>
-              <a :href="$rav.getCalenderLink('outlook', booking.lessons.date, booking.lessons.type)"><img src="/outlook.png" class="w-6" /></a>
+              <a :href="$rav.getCalenderLink('apple', booking.lessons.date, booking.lessons.type)"><NuxtImg src="/apple.png" class="w-6" /></a>
+              <a :href="$rav.getCalenderLink('google', booking.lessons.date, booking.lessons.type)"><NuxtImg src="/gmail.png" class="w-6" /></a>
+              <a :href="$rav.getCalenderLink('outlook', booking.lessons.date, booking.lessons.type)"><NuxtImg src="/outlook.png" class="w-6" /></a>
             </div>
 											<br>
 	          <UButton color="primary" variant="solid" @click="removeBooking(booking)" :disabled="!$rav.checkCancelPeriod(booking.lessons)">Les annuleren</UButton>

@@ -86,7 +86,7 @@ useHead({
 						class="md:flex justify-between items-center md:space-x-12 space-y-8 md:space-y-0"
 				>
 					<div class="w-full md:w-1/2">
-						<img
+						<NuxtImg
 								class="w-full h-64 md:h-96 object-center object-cover rounded-3xl shadow-xl"
 								src="/priveles-2.jpeg"
 						/>
@@ -120,31 +120,31 @@ useHead({
 						class="md:flex justify-between items-center md:space-x-12 space-y-8 md:space-y-0"
 				>
 					<div class="w-full md:w-1/5">
-						<img
+						<NuxtImg
 								class="w-full h-64 md:h-96 object-center object-cover rounded-3xl shadow-xl"
 								src="/priveles-7.jpeg"
 						/>
 					</div>
 					<div class="w-full md:w-1/5">
-						<img
+						<NuxtImg
 								class="w-full h-64 md:h-96 object-center object-cover rounded-3xl shadow-xl"
 								src="/priveles-4.jpeg"
 						/>
 					</div>
 					<div class="w-full md:w-1/5">
-						<img
+						<NuxtImg
 								class="w-full h-64 md:h-96 object-center object-cover rounded-3xl shadow-xl"
 								src="/priveles-5.jpeg"
 						/>
 					</div>
 					<div class="w-full md:w-1/5">
-						<img
+						<NuxtImg
 								class="w-full h-64 md:h-96 object-center object-cover rounded-3xl shadow-xl"
 								src="/priveles-6.jpeg"
 						/>
 					</div>
 					<div class="w-full md:w-1/5">
-						<img
+						<NuxtImg
 								class="w-full h-64 md:h-96 object-center object-cover rounded-3xl shadow-xl"
 								src="/priveles-8.jpeg"
 						/>

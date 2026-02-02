@@ -35,8 +35,13 @@ export default defineNuxtConfig({
     '@nuxtjs/sitemap',
     '@nuxtjs/robots',
     '@zadigetvoltaire/nuxt-gtm',
-    '@nuxt/ui'
+    '@nuxt/ui',
+    '@nuxt/image'
   ],
+
+  image: {
+    domains: ['images.unsplash.com']
+  },
   
   dayjs: {
     locales: ['en', 'nl'],
