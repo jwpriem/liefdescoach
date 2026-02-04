@@ -10,7 +10,18 @@ npm run build      # Production build (outputs to .output/)
 npm run preview    # Preview production build locally
 ```
 
-No linter or test runner is configured. Node 20 is required.
+No linter is configured. Node 20 is required.
+
+### E2E Tests (Playwright)
+
+```bash
+# Requires dev server running (npm run dev) and Playwright browsers installed (npx playwright install chromium)
+TEST_EMAIL=user@example.com TEST_PASSWORD=secret npm run test:e2e          # headless
+TEST_EMAIL=user@example.com TEST_PASSWORD=secret npm run test:e2e:headed   # visible browser
+BASE_URL=http://localhost:3000 npm run test:e2e                            # custom base URL
+```
+
+Tests are in `e2e/`. The test user must exist in Appwrite Auth and have at least 1 credit for the booking test to pass.
 
 ### Database Scripts
 
