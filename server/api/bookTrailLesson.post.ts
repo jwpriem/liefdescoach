@@ -1,20 +1,38 @@
-import { ref } from 'vue';
-import { Client, TablesDB, ID } from 'node-appwrite';
-import { useRuntimeConfig } from '#imports';
+import { createError } from 'h3'
 
 export default defineEventHandler(async (event) => {
-    const config = useRuntimeConfig();
-    const client = new Client();
+    await requireAdmin(event)
+    const { tablesDB, ID, Query } = useServerAppwrite()
+    const config = useRuntimeConfig()
 
-    client
-        .setEndpoint('https://cloud.appwrite.io/v1') // Your API Endpoint
-        .setProject(config.public.project) // Your project ID
-        .setKey(config.appwriteKey) // Your secret API key
-
-    const databases = new TablesDB(client);
     const body = await readBody(event)
-    
-    const user = await databases.createRow(
+
+    // --- Input validation ---
+    if (!body?.name || typeof body.name !== 'string') {
+        throw createError({ statusCode: 400, statusMessage: 'Naam is verplicht' })
+    }
+
+    if (!body?.email || typeof body.email !== 'string') {
+        throw createError({ statusCode: 400, statusMessage: 'E-mail is verplicht' })
+    }
+
+    if (!body?.lessonId || typeof body.lessonId !== 'string') {
+        throw createError({ statusCode: 400, statusMessage: 'lessonId is verplicht' })
+    }
+
+    // --- Check lesson capacity ---
+    const lesson = await tablesDB.getRow(
+        config.public.database,
+        'lessons',
+        body.lessonId,
+        ['*', 'bookings.*']
+    )
+
+    if ((lesson.bookings?.length ?? 0) >= MAX_LESSON_CAPACITY) {
+        throw createError({ statusCode: 409, statusMessage: 'Les is vol' })
+    }
+
+    const user = await tablesDB.createRow(
         config.public.database,
         'students',
         ID.unique(),
@@ -22,9 +40,9 @@ export default defineEventHandler(async (event) => {
             name: body.name + ' (Proefles)',
             email: body.email
         }
-    );
-    
-    const res = await databases.createRow(
+    )
+
+    const res = await tablesDB.createRow(
         config.public.database,
         'bookings',
         ID.unique(),
@@ -32,7 +50,7 @@ export default defineEventHandler(async (event) => {
             students: user.$id,
             lessons: body.lessonId
         }
-    );
-    
+    )
+
     return Object.assign({}, res)
 })

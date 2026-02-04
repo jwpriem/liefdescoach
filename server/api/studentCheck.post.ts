@@ -1,25 +1,23 @@
-import { ref } from 'vue';
-import { Client, TablesDB, Query } from 'node-appwrite';
-import { useRuntimeConfig } from '#imports';
+import { createError } from 'h3'
 
 export default defineEventHandler(async (event) => {
-    const config = useRuntimeConfig();
-    const client = new Client();
+    await requireAdmin(event)
+    const { tablesDB, Query } = useServerAppwrite()
+    const config = useRuntimeConfig()
 
-    client
-        .setEndpoint('https://cloud.appwrite.io/v1') // Your API Endpoint
-        .setProject(config.public.project) // Your project ID
-        .setKey(config.appwriteKey) // Your secret API key
-
-    const databases = new TablesDB(client);
     const body = await readBody(event)
-    const res = await databases.listRows(
+
+    if (!body?.email || typeof body.email !== 'string') {
+        throw createError({ statusCode: 400, statusMessage: 'E-mail is verplicht' })
+    }
+
+    const res = await tablesDB.listRows(
         config.public.database,
         'students',
         [
             Query.equal('email', [body.email])
         ]
-    );
-    
+    )
+
     return Object.assign({}, res)
 })

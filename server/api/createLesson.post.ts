@@ -1,19 +1,33 @@
-import { ref } from 'vue';
-import { Client, TablesDB, Query, ID } from 'node-appwrite';
-import { useRuntimeConfig } from '#imports';
+import { createError } from 'h3'
+
+const VALID_LESSON_TYPES = ['hatha yoga', 'guest lesson', 'peachy bum']
 
 export default defineEventHandler(async (event) => {
-    const config = useRuntimeConfig();
-    const client = new Client();
+    await requireAdmin(event)
+    const { tablesDB, ID } = useServerAppwrite()
+    const config = useRuntimeConfig()
 
-    client
-        .setEndpoint('https://cloud.appwrite.io/v1') // Your API Endpoint
-        .setProject(config.public.project) // Your project ID
-        .setKey(config.appwriteKey) // Your secret API key
-
-    const databases = new TablesDB(client);
     const body = await readBody(event)
-    const res = await databases.createRow(
+
+    // --- Input validation ---
+    if (!body?.date || typeof body.date !== 'string') {
+        throw createError({ statusCode: 400, statusMessage: 'Datum is verplicht' })
+    }
+
+    if (!body?.type || !VALID_LESSON_TYPES.includes(body.type)) {
+        throw createError({ statusCode: 400, statusMessage: 'Ongeldig lestype' })
+    }
+
+    const lessonDate = new Date(body.date)
+    if (isNaN(lessonDate.getTime())) {
+        throw createError({ statusCode: 400, statusMessage: 'Ongeldige datum' })
+    }
+
+    if (body.teacher && typeof body.teacher !== 'string') {
+        throw createError({ statusCode: 400, statusMessage: 'Ongeldige docent' })
+    }
+
+    const res = await tablesDB.createRow(
         config.public.database,
         'lessons',
         ID.unique(),
@@ -22,7 +36,7 @@ export default defineEventHandler(async (event) => {
             type: body.type,
             teacher: body.teacher || null
         }
-    );
+    )
 
     return Object.assign({}, res)
 })

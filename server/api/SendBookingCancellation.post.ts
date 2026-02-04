@@ -1,18 +1,23 @@
-import { ref } from 'vue';
-import { ServerClient, sendEmailWithTemplate } from 'postmark';
-import { useRuntimeConfig } from '#imports';
+import { ServerClient } from 'postmark'
+import { createError } from 'h3'
 
 export default defineEventHandler(async (event) => {
-    const config = useRuntimeConfig();
+    await requireAuth(event)
+    const config = useRuntimeConfig()
     const client = new ServerClient(config.postmark)
 
     const content = await readBody(event)
-    const email = await client.sendEmailWithTemplate({
+
+    if (!content?.email || typeof content.email !== 'string') {
+        throw createError({ statusCode: 400, statusMessage: 'E-mail is verplicht' })
+    }
+
+    await client.sendEmailWithTemplate({
         "From": "info@ravennah.com",
         "To": "info@ravennah.com",
         "TemplateAlias": "lesson-cancel",
         "TemplateModel": content
     })
-    
+
     setResponseStatus(event, 202)
 })

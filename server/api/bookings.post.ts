@@ -1,27 +1,26 @@
-import { ref } from 'vue';
-import { Client, TablesDB, Query } from 'node-appwrite';
-import { useRuntimeConfig } from '#imports';
+import { createError } from 'h3'
 
 export default defineEventHandler(async (event) => {
-    const config = useRuntimeConfig();
-    const client = new Client();
+    const user = await requireAuth(event)
+    const { tablesDB, Query } = useServerAppwrite()
+    const config = useRuntimeConfig()
 
-    client
-        .setEndpoint('https://cloud.appwrite.io/v1') // Your API Endpoint
-        .setProject(config.public.project) // Your project ID
-        .setKey(config.appwriteKey) // Your secret API key
-
-    const tablesDB = new TablesDB(client);
     const body = await readBody(event)
+
+    // Users can only fetch their own bookings (admins could fetch others)
+    const targetUserId = body?.userId && typeof body.userId === 'string' && user.labels.includes('admin')
+        ? body.userId
+        : user.$id
+
     const res = await tablesDB.listRows(
         config.public.database,
         'bookings',
         [
-            Query.equal('students', [body.userId]),
+            Query.equal('students', [targetUserId]),
             Query.select(['*', 'lessons.*']),
             Query.limit(100)
         ]
-    );
+    )
 
     return Object.assign({}, res)
 })
