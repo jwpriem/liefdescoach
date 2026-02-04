@@ -12,6 +12,18 @@ npm run preview    # Preview production build locally
 
 No linter or test runner is configured. Node 20 is required.
 
+### Database Scripts
+
+Standalone `tsx` scripts in `scripts/` for Appwrite database management. Require env vars `NUXT_PUBLIC_PROJECT` and `NUXT_APPWRITE_KEY` (loaded from `.env` via dotenv).
+
+```bash
+npm run db:setup            # Create new database with lessons/bookings/students schema
+npm run db:seed-lessons     # Seed 12 weeks of Sunday 09:45 hatha yoga + 3 guest lessons
+npm run db:sync-students    # Sync Auth users into students collection
+```
+
+`db:setup` prints the new database ID to set as `NUXT_PUBLIC_DATABASE`. `db:seed-lessons` accepts `--weeks N` to customize. All scripts share `scripts/appwrite-client.ts` for client setup.
+
 ## Architecture
 
 This is a **Nuxt 3** application for "Yoga Ravennah" — a yoga studio booking system with a credit-based lesson reservation flow. The UI language is Dutch.

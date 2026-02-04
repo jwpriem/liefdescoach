@@ -8,7 +8,10 @@
     "start": "nuxt start",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "db:setup": "tsx scripts/setup-database.ts",
+    "db:seed-lessons": "tsx scripts/seed-lessons.ts",
+    "db:sync-students": "tsx scripts/sync-students.ts"
   },
   "dependencies": {
     "@nuxt/ui": "^2.15.1",
@@ -31,7 +34,9 @@
     "@nuxtjs/google-fonts": "^3.2.0",
     "@zadigetvoltaire/nuxt-gtm": "^0.0.13",
     "dayjs-nuxt": "^2.1.9",
-    "sharp": "^0.34.5"
+    "dotenv": "^17.2.3",
+    "sharp": "^0.34.5",
+    "tsx": "^4.21.0"
   },
   "engines": {
     "node": "20"
