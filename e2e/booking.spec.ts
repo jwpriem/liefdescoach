@@ -60,6 +60,10 @@ test.describe('Booking flow', () => {
         // --- Step 2: Navigate to lessons ---
         await page.goto('/lessen')
 
+        // Wait for client-side hydration to recognize the logged-in user
+        // (SSR renders "Login om te boeken" links, hydration swaps them to "Boek" buttons)
+        await expect(page.getByRole('link', { name: 'Login om te boeken' })).toBeHidden({ timeout: 15_000 })
+
         // --- Step 3: Find and click the first available "Boek" button ---
         const bookButton = page.getByRole('button', { name: 'Boek' }).first()
         const hasBookButton = await bookButton.waitFor({ state: 'visible', timeout: 15_000 }).then(() => true).catch(() => false)
@@ -112,6 +116,9 @@ test.describe('Booking flow', () => {
         }
 
         await page.goto('/lessen')
+
+        // Wait for client-side hydration to recognize the logged-in user
+        await expect(page.getByRole('link', { name: 'Login om te boeken' })).toBeHidden({ timeout: 15_000 })
 
         const bookButton = page.getByRole('button', { name: 'Boek' }).first()
         const hasBookButton = await bookButton.waitFor({ state: 'visible', timeout: 15_000 }).then(() => true).catch(() => false)
