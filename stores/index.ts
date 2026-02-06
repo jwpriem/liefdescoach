@@ -305,17 +305,18 @@ export const useMainStore = defineStore('main', {
         async handleBooking(lesson: Lesson) {
             await this.fetchWrapper(async () => {
                 const onBehalfOfUser = this.onBehalfOf
+                const isOnBehalf = onBehalfOfUser && onBehalfOfUser.$id !== this.loggedInUser?.$id
 
                 // Server handles: validation, credit check, availability, booking creation, credit deduction
                 await $fetch('/api/handleBooking', {
                     method: 'POST',
                     body: {
                         lessonId: lesson.$id,
-                        onBehalfOfUserId: onBehalfOfUser?.$id ?? null
+                        onBehalfOfUserId: isOnBehalf ? onBehalfOfUser.$id : null
                     }
                 })
 
-                onBehalfOfUser ? await this.clearOnBehalf() : await this.getUser()
+                isOnBehalf ? await this.clearOnBehalf() : await this.getUser()
                 await this.sendEmail('sendBookingConfirmation', lesson.$id)
             });
         },
@@ -323,17 +324,18 @@ export const useMainStore = defineStore('main', {
         async cancelBooking(booking: Booking) {
             await this.fetchWrapper(async () => {
                 const onBehalfOfUser = this.onBehalfOf
+                const isOnBehalf = onBehalfOfUser && onBehalfOfUser.$id !== this.loggedInUser?.$id
 
                 // Server handles: authorization, cancellation period, booking deletion, credit refund
                 const result = await $fetch('/api/cancelBooking', {
                     method: 'POST',
                     body: {
                         bookingId: booking.$id,
-                        onBehalfOfUserId: onBehalfOfUser?.$id ?? null
+                        onBehalfOfUserId: isOnBehalf ? onBehalfOfUser.$id : null
                     }
                 })
 
-                onBehalfOfUser ? await this.clearOnBehalf() : await this.getUser()
+                isOnBehalf ? await this.clearOnBehalf() : await this.getUser()
                 await this.sendEmail('sendBookingCancellation', result.lessonId)
             });
         },
