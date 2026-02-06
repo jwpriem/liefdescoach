@@ -42,7 +42,7 @@ test.describe('Authentication', () => {
         await expect(page.locator('text=Boekingen')).toBeVisible({ timeout: 10_000 })
 
         // --- Logout ---
-        await page.click('text=Logout')
+        await page.click('text=/^logout$/i')
         await page.waitForURL('**/', { timeout: 10_000 })
     })
 })
@@ -59,20 +59,15 @@ test.describe('Booking flow', () => {
 
         // --- Step 2: Navigate to lessons ---
         await page.goto('/lessen')
-        await page.waitForLoadState('networkidle')
 
         // --- Step 3: Find and click the first available "Boek" button ---
-        const bookButton = page.locator('button:has-text("Boek")').first()
-        const hasBookButton = await bookButton.isVisible().catch(() => false)
+        const bookButton = page.getByRole('button', { name: 'Boek' }).first()
+        const hasBookButton = await bookButton.waitFor({ state: 'visible', timeout: 15_000 }).then(() => true).catch(() => false)
 
         if (!hasBookButton) {
             test.skip(true, 'No available lessons to book (all full or already booked)')
             return
         }
-
-        // Get the lesson row text before booking for later verification
-        const lessonRow = bookButton.locator('xpath=ancestor::div[contains(@class,"flex justify-between")]')
-        const lessonText = await lessonRow.textContent()
 
         await bookButton.click()
 
@@ -92,7 +87,7 @@ test.describe('Booking flow', () => {
         await expect(page.locator('.bg-gray-800').first()).toBeVisible({ timeout: 10_000 })
 
         // --- Step 6: Logout ---
-        await page.click('text=Logout')
+        await page.click('text=/^logout$/i')
         await page.waitForURL('**/', { timeout: 10_000 })
     })
 
@@ -117,10 +112,9 @@ test.describe('Booking flow', () => {
         }
 
         await page.goto('/lessen')
-        await page.waitForLoadState('networkidle')
 
-        const bookButton = page.locator('button:has-text("Boek")').first()
-        const hasBookButton = await bookButton.isVisible().catch(() => false)
+        const bookButton = page.getByRole('button', { name: 'Boek' }).first()
+        const hasBookButton = await bookButton.waitFor({ state: 'visible', timeout: 15_000 }).then(() => true).catch(() => false)
 
         if (!hasBookButton) {
             test.skip(true, 'No available lessons to test')
@@ -133,7 +127,7 @@ test.describe('Booking flow', () => {
         await expect(page.locator('text=/credit/i')).toBeVisible({ timeout: 10_000 })
 
         // --- Logout ---
-        await page.click('text=Logout')
+        await page.click('text=/^logout$/i')
         await page.waitForURL('**/', { timeout: 10_000 })
     })
 })
