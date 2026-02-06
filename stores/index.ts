@@ -144,16 +144,10 @@ export const useMainStore = defineStore('main', {
             await this.fetchWrapper(async () => {
                 const { account } = useAppwrite()
 
+                // First, verify the user is authenticated with Appwrite
                 try {
                     const user = await account.get()
                     this.loggedInUser = user
-
-                    // Only fetch protected resources if we have a session
-                    await Promise.all([
-                        this.fetchLessons(),
-                        this.fetchStudents(),
-                        this.fetchBookings(),
-                    ])
                 } catch (e: any) {
                     const code = e?.code ?? e?.response?.status
                     const msg = e?.message ?? String(e)
@@ -163,8 +157,28 @@ export const useMainStore = defineStore('main', {
                         this.loggedInUser = null
                         return
                     }
-                    // Bubble up real errors to fetchWrapper
                     throw e
+                }
+
+                // Store the session in a cookie for server-side auth
+                // The Appwrite session is stored in localStorage by the SDK,
+                // so we need to pass it to our server via cookie
+                try {
+                    const session = await account.getSession('current')
+                    if (session?.secret) {
+                        document.cookie = `a_session_${useRuntimeConfig().public.project}=${session.secret}; path=/; max-age=31536000; SameSite=Lax`
+                    }
+                } catch {
+                    // Session fetch failed, but user is still logged in client-side
+                }
+
+                // Fetch protected resources (separate from auth check above)
+                if (this.loggedInUser) {
+                    await Promise.all([
+                        this.fetchLessons(),
+                        this.fetchStudents(),
+                        this.fetchBookings(),
+                    ])
                 }
             }, { ignore401: true })
         },
@@ -273,6 +287,10 @@ export const useMainStore = defineStore('main', {
                 const { account } = useAppwrite();
 
                 await account.deleteSession("current");
+
+                // Clear the session cookie we set for server-side auth
+                document.cookie = `a_session_${useRuntimeConfig().public.project}=; path=/; max-age=0`
+
                 this.loggedInUser = null;
                 this.students = [];
                 this.lessons = [];
