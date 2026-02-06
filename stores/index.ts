@@ -342,35 +342,12 @@ export const useMainStore = defineStore('main', {
         },
 
         async sendEmail(type: string, lessonId: string) {
-            const { tablesDB, Query } = useAppwrite();
-            const { $rav } = useNuxtApp();
-
             const user = await this.getOnBehalfOrUser()
 
-            const lessonsResponse = await tablesDB.getRow(
-                useRuntimeConfig().public.database,
-                'lessons',
-                lessonId,
-                [Query.select(['*', 'bookings.*', 'bookings.students.*'])]
-            )
-
-            // Bookingsarray for email
-            const bookingsArr: any = []
-            lessonsResponse.bookings.forEach((x: any) => {
-                bookingsArr.unshift({ name: x.students.name })
-            })
-
             const emailData = {
-                body: null,
+                lessonId,
                 email: user.email,
-                new_booking_name: user.name,
-                lessontype: $rav.getLessonTitle(lessonsResponse),
-                lessondate: $rav.formatDateInDutch(lessonsResponse.date, true),
-                spots: MAX_LESSON_CAPACITY - lessonsResponse.bookings.length,
-                bookings: bookingsArr,
-                calendar_link_apple: $rav.getCalenderLink('apple', lessonsResponse.date, lessonsResponse.type),
-                calendar_link_gmail: $rav.getCalenderLink('gmail', lessonsResponse.date, lessonsResponse.type),
-                calendar_link_outlook: $rav.getCalenderLink('outlook', lessonsResponse.date, lessonsResponse.type)
+                name: user.name,
             }
 
             const isProd = process.env.NODE_ENV == 'production'
@@ -381,7 +358,7 @@ export const useMainStore = defineStore('main', {
                     body: emailData
                 })
             } else {
-                console.log(emailData)
+                console.log('sendEmail', type, emailData)
             }
         },
 
