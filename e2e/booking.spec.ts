@@ -59,20 +59,15 @@ test.describe('Booking flow', () => {
 
         // --- Step 2: Navigate to lessons ---
         await page.goto('/lessen')
-        await page.waitForLoadState('networkidle')
 
         // --- Step 3: Find and click the first available "Boek" button ---
-        const bookButton = page.locator('button:has-text("Boek")').first()
-        const hasBookButton = await bookButton.isVisible().catch(() => false)
+        const bookButton = page.getByRole('button', { name: 'Boek' }).first()
+        const hasBookButton = await bookButton.waitFor({ state: 'visible', timeout: 15_000 }).then(() => true).catch(() => false)
 
         if (!hasBookButton) {
             test.skip(true, 'No available lessons to book (all full or already booked)')
             return
         }
-
-        // Get the lesson row text before booking for later verification
-        const lessonRow = bookButton.locator('xpath=ancestor::div[contains(@class,"flex justify-between")]')
-        const lessonText = await lessonRow.textContent()
 
         await bookButton.click()
 
@@ -117,10 +112,9 @@ test.describe('Booking flow', () => {
         }
 
         await page.goto('/lessen')
-        await page.waitForLoadState('networkidle')
 
-        const bookButton = page.locator('button:has-text("Boek")').first()
-        const hasBookButton = await bookButton.isVisible().catch(() => false)
+        const bookButton = page.getByRole('button', { name: 'Boek' }).first()
+        const hasBookButton = await bookButton.waitFor({ state: 'visible', timeout: 15_000 }).then(() => true).catch(() => false)
 
         if (!hasBookButton) {
             test.skip(true, 'No available lessons to test')
