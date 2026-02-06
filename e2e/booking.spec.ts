@@ -13,10 +13,30 @@
  *   npm run test:e2e   (reads from .env)
  */
 
-import { test, expect } from '@playwright/test'
+import { test, expect, Page } from '@playwright/test'
 
 const email = process.env.TEST_EMAIL
 const password = process.env.TEST_PASSWORD
+
+/**
+ * Ensure the Appwrite session cookie is set for server-side auth.
+ * The Appwrite Web SDK v21 stores sessions in localStorage (cookieFallback)
+ * rather than document.cookie when running cross-origin. The Nuxt server
+ * reads from document.cookie, so we bridge the gap here.
+ */
+async function ensureSessionCookie(page: Page) {
+    await page.evaluate(() => {
+        const stored = localStorage.getItem('cookieFallback')
+        if (stored) {
+            const cookies = JSON.parse(stored)
+            for (const [name, value] of Object.entries(cookies)) {
+                if (name.startsWith('a_session_') && !name.includes('_legacy') && value) {
+                    document.cookie = `${name}=${value}; path=/; max-age=31536000; SameSite=Lax`
+                }
+            }
+        }
+    })
+}
 
 test.beforeEach(() => {
     if (!email || !password) {
@@ -56,6 +76,7 @@ test.describe('Booking flow', () => {
         await page.fill('#password', password!)
         await page.click('button:has-text("Login")')
         await page.waitForURL('**/account', { timeout: 15_000 })
+        await ensureSessionCookie(page)
 
         // --- Step 2: Navigate to lessons ---
         await page.goto('/lessen')
@@ -105,6 +126,7 @@ test.describe('Booking flow', () => {
         await page.fill('#password', password!)
         await page.click('button:has-text("Login")')
         await page.waitForURL('**/account', { timeout: 15_000 })
+        await ensureSessionCookie(page)
 
         // Check credits — navigate to account to see the value
         const creditsText = await page.locator('text=/\\d+ credit/i').textContent().catch(() => null)
