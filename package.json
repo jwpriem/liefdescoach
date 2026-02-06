@@ -13,6 +13,7 @@
     "db:seed-lessons": "tsx --tsconfig scripts/tsconfig.json scripts/seed-lessons.ts",
     "db:sync-students": "tsx --tsconfig scripts/tsconfig.json scripts/sync-students.ts",
     "db:migrate-credits": "tsx --tsconfig scripts/tsconfig.json scripts/migrate-credits.ts",
+    "db:setup-credits": "tsx --tsconfig scripts/tsconfig.json scripts/setup-credits-collection.ts",
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed"
   },

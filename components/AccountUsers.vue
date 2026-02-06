@@ -70,6 +70,37 @@ async function addCredits(userId: string, type: string): Promise<void> {
 	}
 }
 
+const migrating = ref(false)
+const migrationResult = ref<any>(null)
+
+async function migrateCredits(): Promise<void> {
+	migrating.value = true
+	migrationResult.value = null
+	try {
+		const res = await $fetch('/api/credits/migrate', { method: 'POST' })
+		migrationResult.value = res
+		await store.getUser()
+		toast.add({
+			id: 'migration',
+			title: 'Migratie voltooid',
+			icon: 'i-heroicons-check-badge',
+			color: 'primary',
+			description: `${res.totalMigrated} credits gemigreerd, ${res.totalSkipped} overgeslagen.`
+		})
+	} catch (error) {
+		console.error('Migration failed:', error)
+		toast.add({
+			id: 'migration-error',
+			title: 'Migratie mislukt',
+			icon: 'i-heroicons-x-circle',
+			color: 'red',
+			description: 'Er ging iets mis bij het migreren van credits.'
+		})
+	} finally {
+		migrating.value = false
+	}
+}
+
 async function archiveUser(userId) {
 	try {
 		await $fetch('/api/updatePrefs', {
@@ -154,7 +185,7 @@ const filteredRows = computed(() => {
 				class="text-emerald-700">.</span>
 		</h2>
 
-		<div class="my-6 w-full flex items-center justify-start gap-x-6">
+		<div class="my-6 w-full flex items-center justify-start gap-x-6 flex-wrap gap-y-3">
 			<UFormGroup label="Filter gebruikers">
 				<UInput id="naam" v-model="q" color="primary" placeholder="Zoek gebruiker" type="text" variant="outline"/>
 			</UFormGroup>
@@ -164,6 +195,11 @@ const filteredRows = computed(() => {
 						off-icon="i-heroicons-x-mark-20-solid"
 						on-icon="i-heroicons-check-20-solid"
 				/>
+			</UFormGroup>
+			<UFormGroup label="Migratie">
+				<UButton color="gray" variant="solid" :loading="migrating" @click="migrateCredits()">
+					Migreer credits van prefs
+				</UButton>
 			</UFormGroup>
 		</div>
 

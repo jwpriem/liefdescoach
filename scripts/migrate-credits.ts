@@ -1,8 +1,11 @@
 /**
  * Migrates existing credits from Appwrite Auth user preferences to the new credits table.
  *
- * For each user with prefs.credits > 0, creates that many rows in the credits collection
- * with type 'credit_legacy' and validTo set to 1 year from now.
+ * IDEMPOTENT: Skips users who already have credit_legacy rows in the table.
+ * Safe to run multiple times.
+ *
+ * For each user with prefs.credits > 0 (and no existing legacy credits),
+ * creates that many rows with type 'credit_legacy' and validTo set to 1 year from now.
  *
  * Usage:
  *   npx tsx scripts/migrate-credits.ts
@@ -38,11 +41,25 @@ async function main() {
     const validTo = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000).toISOString() // 1 year
 
     let totalMigrated = 0
+    let totalSkipped = 0
 
     for (const user of allUsers) {
         const creditCount = parseInt(user.prefs?.credits ?? '0', 10)
         if (creditCount <= 0) {
             console.log(`  ${user.name || user.email}: 0 credits, skipping`)
+            continue
+        }
+
+        // Idempotency check: does this user already have legacy credits?
+        const existing = await databases.listDocuments(dbId, 'credits', [
+            Query.equal('studentId', [user.$id]),
+            Query.equal('type', ['credit_legacy']),
+            Query.limit(1),
+        ])
+
+        if (existing.total > 0) {
+            console.log(`  ${user.name || user.email}: already migrated (${existing.total} legacy credits exist), skipping`)
+            totalSkipped++
             continue
         }
 
@@ -64,7 +81,9 @@ async function main() {
     }
 
     console.log('\n========================================')
-    console.log(`Migration complete! ${totalMigrated} credits migrated for ${allUsers.length} users.`)
+    console.log(`Migration complete!`)
+    console.log(`  Migrated: ${totalMigrated} credits`)
+    console.log(`  Skipped:  ${totalSkipped} users (already migrated)`)
     console.log('========================================')
 }
 
