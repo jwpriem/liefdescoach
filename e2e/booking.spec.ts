@@ -42,7 +42,7 @@ test.describe('Authentication', () => {
         await expect(page.locator('text=Boekingen')).toBeVisible({ timeout: 10_000 })
 
         // --- Logout ---
-        await page.click('text=/^logout$/i')
+        await page.locator('nav span.nav-item', { hasText: /logout/i }).click()
         await page.waitForURL('**/', { timeout: 10_000 })
     })
 })
@@ -87,7 +87,7 @@ test.describe('Booking flow', () => {
         await expect(page.locator('.bg-gray-800').first()).toBeVisible({ timeout: 10_000 })
 
         // --- Step 6: Logout ---
-        await page.click('text=/^logout$/i')
+        await page.locator('nav span.nav-item', { hasText: /logout/i }).click()
         await page.waitForURL('**/', { timeout: 10_000 })
     })
 
@@ -127,7 +127,7 @@ test.describe('Booking flow', () => {
         await expect(page.locator('text=/credit/i')).toBeVisible({ timeout: 10_000 })
 
         // --- Logout ---
-        await page.click('text=/^logout$/i')
+        await page.locator('nav span.nav-item', { hasText: /logout/i }).click()
         await page.waitForURL('**/', { timeout: 10_000 })
     })
 })
