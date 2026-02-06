@@ -40,6 +40,10 @@ test.describe('Authentication', () => {
 
         // Verify the account page loaded with user content
         await expect(page.locator('text=Boekingen')).toBeVisible({ timeout: 10_000 })
+
+        // --- Logout ---
+        await page.click('text=Logout')
+        await page.waitForURL('**/', { timeout: 10_000 })
     })
 })
 
@@ -86,6 +90,10 @@ test.describe('Booking flow', () => {
         // The bookings section should contain at least one booking card
         await expect(page.locator('text=Boekingen')).toBeVisible({ timeout: 10_000 })
         await expect(page.locator('.bg-gray-800').first()).toBeVisible({ timeout: 10_000 })
+
+        // --- Step 6: Logout ---
+        await page.click('text=Logout')
+        await page.waitForURL('**/', { timeout: 10_000 })
     })
 
     test('should show error when user has no credits', async ({ page }) => {
@@ -123,5 +131,9 @@ test.describe('Booking flow', () => {
 
         // Should see an error about insufficient credits
         await expect(page.locator('text=/credit/i')).toBeVisible({ timeout: 10_000 })
+
+        // --- Logout ---
+        await page.click('text=Logout')
+        await page.waitForURL('**/', { timeout: 10_000 })
     })
 })
