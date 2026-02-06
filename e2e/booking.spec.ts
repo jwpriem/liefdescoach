@@ -19,23 +19,44 @@ const email = process.env.TEST_EMAIL
 const password = process.env.TEST_PASSWORD
 
 /**
- * Ensure the Appwrite session cookie is set for server-side auth.
- * The Appwrite Web SDK v21 stores sessions in localStorage (cookieFallback)
- * rather than document.cookie when running cross-origin. The Nuxt server
- * reads from document.cookie, so we bridge the gap here.
+ * Login and ensure the Appwrite session cookie is set for server-side auth.
+ *
+ * The Appwrite Web SDK v21 stores sessions internally (localStorage /
+ * X-Fallback-Cookies) but does not reliably set document.cookie on HTTP.
+ * The Nuxt server reads the session from document.cookie, so we capture
+ * the session secret from the Appwrite API response at creation time and
+ * set the cookie explicitly.
  */
-async function ensureSessionCookie(page: Page) {
-    await page.evaluate(() => {
-        const stored = localStorage.getItem('cookieFallback')
-        if (stored) {
-            const cookies = JSON.parse(stored)
-            for (const [name, value] of Object.entries(cookies)) {
-                if (name.startsWith('a_session_') && !name.includes('_legacy') && value) {
-                    document.cookie = `${name}=${value}; path=/; max-age=31536000; SameSite=Lax`
-                }
-            }
-        }
-    })
+async function login(page: Page) {
+    // Listen for the Appwrite session creation API response
+    const sessionResponsePromise = page.waitForResponse(
+        resp => resp.url().includes('/v1/account/sessions') && resp.ok()
+    )
+
+    await page.goto('/login')
+    await page.waitForSelector('#email')
+    await page.fill('#email', email!)
+    await page.fill('#password', password!)
+    await page.click('button:has-text("Login")')
+
+    // Capture the session secret and project ID from the API exchange
+    const sessionResponse = await sessionResponsePromise
+    const projectId = await sessionResponse.request().headerValue('x-appwrite-project')
+    const sessionData = await sessionResponse.json()
+
+    await page.waitForURL('**/account', { timeout: 15_000 })
+
+    // Set the cookie so the Nuxt server can authenticate API requests
+    if (sessionData?.secret && projectId) {
+        await page.evaluate(({ name, value }) => {
+            document.cookie = `${name}=${value}; path=/; max-age=31536000; SameSite=Lax`
+        }, { name: `a_session_${projectId}`, value: sessionData.secret })
+    }
+}
+
+async function logout(page: Page) {
+    await page.locator('nav span.nav-item', { hasText: /logout/i }).click()
+    await page.waitForURL('**/', { timeout: 10_000 })
 }
 
 test.beforeEach(() => {
@@ -46,37 +67,19 @@ test.beforeEach(() => {
 
 test.describe('Authentication', () => {
     test('should log in and redirect to account page', async ({ page }) => {
-        await page.goto('/login')
-
-        // Wait for the form to be rendered (client-side only)
-        await page.waitForSelector('#email')
-
-        await page.fill('#email', email!)
-        await page.fill('#password', password!)
-        await page.click('button:has-text("Login")')
-
-        // After login, user is redirected to the account page
-        await page.waitForURL('**/account', { timeout: 15_000 })
+        await login(page)
 
         // Verify the account page loaded with user content
         await expect(page.locator('text=Boekingen')).toBeVisible({ timeout: 10_000 })
 
-        // --- Logout ---
-        await page.locator('nav span.nav-item', { hasText: /logout/i }).click()
-        await page.waitForURL('**/', { timeout: 10_000 })
+        await logout(page)
     })
 })
 
 test.describe('Booking flow', () => {
     test('should log in and book the first available lesson', async ({ page }) => {
         // --- Step 1: Login ---
-        await page.goto('/login')
-        await page.waitForSelector('#email')
-        await page.fill('#email', email!)
-        await page.fill('#password', password!)
-        await page.click('button:has-text("Login")')
-        await page.waitForURL('**/account', { timeout: 15_000 })
-        await ensureSessionCookie(page)
+        await login(page)
 
         // --- Step 2: Navigate to lessons ---
         await page.goto('/lessen')
@@ -112,21 +115,14 @@ test.describe('Booking flow', () => {
         await expect(page.locator('.bg-gray-800').first()).toBeVisible({ timeout: 10_000 })
 
         // --- Step 6: Logout ---
-        await page.locator('nav span.nav-item', { hasText: /logout/i }).click()
-        await page.waitForURL('**/', { timeout: 10_000 })
+        await logout(page)
     })
 
     test('should show error when user has no credits', async ({ page }) => {
         // This test validates that the server rejects bookings with insufficient credits.
         // It will only fail-as-expected if the test user has 0 credits.
         // If the user has credits, the test is skipped.
-        await page.goto('/login')
-        await page.waitForSelector('#email')
-        await page.fill('#email', email!)
-        await page.fill('#password', password!)
-        await page.click('button:has-text("Login")')
-        await page.waitForURL('**/account', { timeout: 15_000 })
-        await ensureSessionCookie(page)
+        await login(page)
 
         // Check credits — navigate to account to see the value
         const creditsText = await page.locator('text=/\\d+ credit/i').textContent().catch(() => null)
@@ -156,7 +152,6 @@ test.describe('Booking flow', () => {
         await expect(page.locator('text=/credit/i')).toBeVisible({ timeout: 10_000 })
 
         // --- Logout ---
-        await page.locator('nav span.nav-item', { hasText: /logout/i }).click()
-        await page.waitForURL('**/', { timeout: 10_000 })
+        await logout(page)
     })
 })
