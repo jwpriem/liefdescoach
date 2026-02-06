@@ -2,7 +2,7 @@ import { createError } from 'h3'
 
 export default defineEventHandler(async (event) => {
     const user = await requireAuth(event)
-    const { tablesDB, users, Query } = useServerAppwrite()
+    const { tablesDB, Query } = useServerAppwrite()
     const config = useRuntimeConfig()
 
     const body = await readBody(event)
@@ -48,21 +48,35 @@ export default defineEventHandler(async (event) => {
         })
     }
 
+    // --- Release the credit that was used for this booking ---
+    const creditRes = await tablesDB.listRows(
+        config.public.database,
+        'credits',
+        [
+            Query.equal('bookingId', [body.bookingId]),
+            Query.limit(1),
+        ]
+    )
+
+    const creditRow = (creditRes.rows ?? [])[0]
+    if (creditRow) {
+        await tablesDB.updateRow(
+            config.public.database,
+            'credits',
+            creditRow.$id,
+            {
+                bookingId: null,
+                usedAt: null,
+            }
+        )
+    }
+
     // --- Delete booking ---
     await tablesDB.deleteRow(
         config.public.database,
         'bookings',
         body.bookingId
     )
-
-    // --- Refund credit ---
-    const targetUser = await users.get(targetUserId)
-    const currentCredits = parseInt(targetUser.prefs?.credits ?? '0', 10)
-    const currentPrefs = await users.getPrefs(targetUserId)
-    await users.updatePrefs(targetUserId, {
-        ...currentPrefs,
-        credits: String(currentCredits + 1)
-    })
 
     return {
         success: true,

@@ -33,6 +33,7 @@ const { data: lessons } = await useFetch('/api/lessons')
 
 const loggedInUser = computed(() => store.loggedInUser);
 const isLoading = computed(() => store.isLoading);
+const availableCredits = computed(() => store.availableCredits);
 
 function checkBooking(id: string) {
   return store.myBookings.some(booking => booking.lessons.$id === id)
@@ -103,8 +104,8 @@ async function book(lesson: any) {
                 'plek' : 'plekken' }} )</p>
           </div>
           <div>
-            <UButton :disabled="checkBooking(lesson.$id)" color="primary" variant="solid" @click="book(lesson)"
-              v-if="loggedInUser && !checkBooking(lesson.$id) && (lesson.bookings?.length || 0) != 9">Boek</UButton>
+            <UButton :disabled="checkBooking(lesson.$id) || availableCredits < 1" color="primary" variant="solid" @click="book(lesson)"
+              v-if="loggedInUser && !checkBooking(lesson.$id) && (lesson.bookings?.length || 0) != 9">{{ availableCredits < 1 ? 'Geen credits' : 'Boek' }}</UButton>
             <span v-if="checkBooking(lesson.$id)" class="flex content-center"><svg xmlns="http://www.w3.org/2000/svg"
                 fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                 class="w-6 h-6 inline-block mx-1">

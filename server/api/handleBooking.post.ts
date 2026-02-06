@@ -2,7 +2,7 @@ import { createError } from 'h3'
 
 export default defineEventHandler(async (event) => {
     const user = await requireAuth(event)
-    const { tablesDB, users, Query, ID } = useServerAppwrite()
+    const { tablesDB, Query, ID } = useServerAppwrite()
     const config = useRuntimeConfig()
 
     const body = await readBody(event)
@@ -62,28 +62,45 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 409, statusMessage: 'Gebruiker is al geboekt voor deze les' })
     }
 
-    // --- Validate credits ---
-    const targetUser = await users.get(targetUserId)
-    const currentCredits = parseInt(targetUser.prefs?.credits ?? '0', 10)
+    // --- Find an available credit (not used, not expired) ---
+    const now = new Date()
+    const availableCreditsRes = await tablesDB.listRows(
+        config.public.database,
+        'credits',
+        [
+            Query.equal('studentId', [targetUserId]),
+            Query.isNull('bookingId'),
+            Query.greaterThan('validTo', now.toISOString()),
+            Query.orderAsc('validTo'), // Use the one expiring soonest first (FIFO)
+            Query.limit(1),
+        ]
+    )
 
-    if (currentCredits < 1) {
+    const availableCredits = availableCreditsRes.rows ?? []
+    if (availableCredits.length < 1) {
         throw createError({ statusCode: 402, statusMessage: 'Onvoldoende credits' })
     }
 
+    const creditToUse = availableCredits[0]
+
     // --- Create booking ---
-    await tablesDB.createRow(
+    const booking = await tablesDB.createRow(
         config.public.database,
         'bookings',
         ID.unique(),
         { lessons: body.lessonId, students: targetUserId }
     )
 
-    // --- Deduct credit ---
-    const currentPrefs = await users.getPrefs(targetUserId)
-    await users.updatePrefs(targetUserId, {
-        ...currentPrefs,
-        credits: String(currentCredits - 1)
-    })
+    // --- Claim the credit (idempotent: bookingId acts as the key) ---
+    await tablesDB.updateRow(
+        config.public.database,
+        'credits',
+        creditToUse.$id,
+        {
+            bookingId: booking.$id,
+            usedAt: now.toISOString(),
+        }
+    )
 
     // --- Return updated booking count ---
     const updatedBookings = await tablesDB.listRows(

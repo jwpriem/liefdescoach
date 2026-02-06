@@ -40,11 +40,38 @@ interface Booking {
     students: Student;
 }
 
+interface Credit {
+    $id: string;
+    studentId: string;
+    bookingId: string | null;
+    type: string;
+    validFrom: string;
+    validTo: string;
+    createdAt: string;
+    usedAt: string | null;
+    lesson?: {
+        $id: string;
+        date: string;
+        type: string;
+        teacher: string;
+    } | null;
+}
+
+interface CreditSummary {
+    available: number;
+    used: number;
+    expired: number;
+    total: number;
+}
+
 interface State {
     loggedInUser: User | null;
     students: User[];
     lessons: Lesson[];
     myBookings: Booking[];
+    myCredits: Credit[];
+    myCreditSummary: CreditSummary | null;
+    studentCreditSummary: Record<string, number>;
     errorMessage: string | null;
     isLoading: boolean;
     onBehalfOf: User | null;
@@ -56,6 +83,9 @@ export const useMainStore = defineStore('main', {
         students: [],
         lessons: [],
         myBookings: [],
+        myCredits: [],
+        myCreditSummary: null,
+        studentCreditSummary: {},
         errorMessage: null,
         isLoading: false,
         onBehalfOf: null
@@ -180,6 +210,7 @@ export const useMainStore = defineStore('main', {
                         this.fetchLessons(),
                         this.fetchStudents(),
                         this.fetchBookings(),
+                        this.fetchCredits(),
                     ])
                 }
             }, { ignore401: true })
@@ -198,6 +229,14 @@ export const useMainStore = defineStore('main', {
             if (this.isAdmin) {
                 const users = await $fetch('/api/users');
                 this.students = users.users;
+                await this.fetchStudentCreditSummary();
+            }
+        },
+
+        async fetchStudentCreditSummary() {
+            if (this.isAdmin) {
+                const res = await $fetch('/api/credits/summary');
+                this.studentCreditSummary = res.summary;
             }
         },
 
@@ -208,6 +247,30 @@ export const useMainStore = defineStore('main', {
             })
             // Filter out bookings with deleted/unresolved lessons
             this.myBookings = bookings.rows.filter((b: any) => b.lessons && typeof b.lessons === 'object')
+        },
+
+        async fetchCredits(studentId?: string) {
+            const res = await $fetch('/api/credits/history', {
+                method: 'post',
+                body: { studentId: studentId || this.loggedInUser?.$id }
+            })
+            this.myCredits = res.credits
+            this.myCreditSummary = {
+                available: res.available,
+                used: res.credits.filter((c: any) => !!c.bookingId).length,
+                expired: res.credits.filter((c: any) => !c.bookingId && new Date(c.validTo) <= new Date()).length,
+                total: res.credits.length,
+            }
+        },
+
+        async addCredits(studentId: string, type: string) {
+            await this.fetchWrapper(async () => {
+                await $fetch('/api/credits/add', {
+                    method: 'POST',
+                    body: { studentId, type }
+                })
+                await this.getUser()
+            })
         },
 
         async updateUserDetail(detailType: 'name' | 'email' | 'phone', newValue: string, password: string) {
@@ -262,15 +325,6 @@ export const useMainStore = defineStore('main', {
                 }
 
                 const user = await account.get();
-                await $fetch('/api/updatePrefs', {
-                    method: 'post',
-                    body: {
-                        userId: user.$id,
-                        prefs: {
-                            credits: '0'
-                        }
-                    }
-                })
 
                 const res = await databases.createDocument(
                     useRuntimeConfig().public.database,
@@ -298,6 +352,9 @@ export const useMainStore = defineStore('main', {
                 this.students = [];
                 this.lessons = [];
                 this.myBookings = [];
+                this.myCredits = [];
+                this.myCreditSummary = null;
+                this.studentCreditSummary = {};
                 this.errorMessage = null;
                 this.isLoading = false;
             });
@@ -384,5 +441,6 @@ export const useMainStore = defineStore('main', {
 
     getters: {
         isAdmin: (state) => state.loggedInUser?.labels.includes('admin') || false,
+        availableCredits: (state) => state.myCreditSummary?.available ?? 0,
     }
 })
