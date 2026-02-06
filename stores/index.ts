@@ -206,7 +206,8 @@ export const useMainStore = defineStore('main', {
                 method: 'post',
                 body: { userId: this.loggedInUser.$id }
             })
-            this.myBookings = bookings.rows
+            // Filter out bookings with deleted/unresolved lessons
+            this.myBookings = bookings.rows.filter((b: any) => b.lessons && typeof b.lessons === 'object')
         },
 
         async updateUserDetail(detailType: 'name' | 'email' | 'phone', newValue: string, password: string) {

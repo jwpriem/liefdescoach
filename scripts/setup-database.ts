@@ -92,14 +92,15 @@ async function main() {
         'lessons',         // parent collection
         'bookings',        // related collection
         RelationshipType.OneToMany,
-        false,             // not two-way (Appwrite creates both sides)
+        true,              // two-way: creates 'bookings' on lessons AND 'lessons' on bookings
         'bookings',        // key on lessons
         'lessons',         // key on bookings
         RelationMutate.Cascade
     )
 
     await waitForAttribute(databases, dbId, 'lessons', 'bookings')
-    console.log('  - lessons.bookings -> bookings.lessons ready')
+    await waitForAttribute(databases, dbId, 'bookings', 'lessons')
+    console.log('  - lessons.bookings <-> bookings.lessons ready')
 
     // students -> bookings (one-to-many, set-null: deleting a student nullifies the booking reference)
     console.log('Creating relationship: students -> bookings...')
@@ -108,14 +109,15 @@ async function main() {
         'students',
         'bookings',
         RelationshipType.OneToMany,
-        false,
+        true,              // two-way: creates 'bookings' on students AND 'students' on bookings
         'bookings',        // key on students
         'students',        // key on bookings
         RelationMutate.SetNull
     )
 
     await waitForAttribute(databases, dbId, 'students', 'bookings')
-    console.log('  - students.bookings -> bookings.students ready')
+    await waitForAttribute(databases, dbId, 'bookings', 'students')
+    console.log('  - students.bookings <-> bookings.students ready')
 
     // --- Done ---
     console.log('\n========================================')

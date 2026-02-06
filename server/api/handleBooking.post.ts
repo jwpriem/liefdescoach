@@ -22,12 +22,11 @@ export default defineEventHandler(async (event) => {
         targetUserId = body.onBehalfOfUserId
     }
 
-    // --- Fetch lesson with bookings to validate availability ---
+    // --- Fetch lesson ---
     const lesson = await tablesDB.getRow(
         config.public.database,
         'lessons',
-        body.lessonId,
-        [Query.select(['*', 'bookings.*', 'bookings.students.*'])]
+        body.lessonId
     )
 
     if (!lesson) {
@@ -39,15 +38,25 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 400, statusMessage: 'Kan niet boeken voor een les in het verleden' })
     }
 
+    // --- Fetch bookings for this lesson separately ---
+    const bookingsRes = await tablesDB.listRows(
+        config.public.database,
+        'bookings',
+        [
+            Query.equal('lessons', [body.lessonId]),
+            Query.limit(100)
+        ]
+    )
+    const bookings = bookingsRes.rows ?? []
+
     // Check capacity
-    const currentBookings = lesson.bookings?.length ?? 0
-    if (currentBookings >= MAX_LESSON_CAPACITY) {
+    if (bookings.length >= MAX_LESSON_CAPACITY) {
         throw createError({ statusCode: 409, statusMessage: 'Les is vol' })
     }
 
     // Check duplicate booking
-    const alreadyBooked = lesson.bookings?.some(
-        (b: any) => b.students?.$id === targetUserId
+    const alreadyBooked = bookings.some(
+        (b: any) => b.students === targetUserId
     )
     if (alreadyBooked) {
         throw createError({ statusCode: 409, statusMessage: 'Gebruiker is al geboekt voor deze les' })
@@ -76,17 +85,19 @@ export default defineEventHandler(async (event) => {
         credits: String(currentCredits - 1)
     })
 
-    // --- Return updated lesson data for the client ---
-    const updatedLesson = await tablesDB.getRow(
+    // --- Return updated booking count ---
+    const updatedBookings = await tablesDB.listRows(
         config.public.database,
-        'lessons',
-        body.lessonId,
-        [Query.select(['*', 'bookings.*', 'bookings.students.*'])]
+        'bookings',
+        [
+            Query.equal('lessons', [body.lessonId]),
+            Query.limit(100)
+        ]
     )
 
     return {
         success: true,
-        lesson: updatedLesson,
-        spots: MAX_LESSON_CAPACITY - (updatedLesson.bookings?.length ?? 0)
+        lesson,
+        spots: MAX_LESSON_CAPACITY - (updatedBookings.rows?.length ?? 0)
     }
 })
