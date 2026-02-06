@@ -21,17 +21,22 @@ export default defineEventHandler(async (event) => {
         : user.$id
 
     // Fetch all credits for the student
-    const creditsRes = await tablesDB.listRows(
-        config.public.database,
-        'credits',
-        [
-            Query.equal('studentId', [targetUserId]),
-            Query.orderDesc('createdAt'),
-            Query.limit(500),
-        ]
-    )
-
-    const credits = creditsRes.rows ?? []
+    let credits: any[] = []
+    try {
+        const creditsRes = await tablesDB.listRows(
+            config.public.database,
+            'credits',
+            [
+                Query.equal('studentId', [targetUserId]),
+                Query.orderDesc('createdAt'),
+                Query.limit(500),
+            ]
+        )
+        credits = creditsRes.rows ?? []
+    } catch {
+        // credits collection may not exist yet
+        return { credits: [], available: 0 }
+    }
 
     // For used credits, fetch the bookings with lesson data
     const usedBookingIds = credits
