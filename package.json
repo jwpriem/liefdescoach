@@ -9,9 +9,9 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "db:setup": "tsx scripts/setup-database.ts",
-    "db:seed-lessons": "tsx scripts/seed-lessons.ts",
-    "db:sync-students": "tsx scripts/sync-students.ts",
+    "db:setup": "tsx --tsconfig scripts/tsconfig.json scripts/setup-database.ts",
+    "db:seed-lessons": "tsx --tsconfig scripts/tsconfig.json scripts/seed-lessons.ts",
+    "db:sync-students": "tsx --tsconfig scripts/tsconfig.json scripts/sync-students.ts",
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed"
   },
