@@ -59,6 +59,16 @@ async function logout(page: Page) {
     await page.waitForURL('**/', { timeout: 10_000 })
 }
 
+/**
+ * Helper: navigate from account to /lessen using client-side navigation.
+ * This preserves the Pinia store state (including loggedInUser), unlike
+ * page.goto() which triggers a full SSR reload and re-authentication.
+ */
+async function navigateToLessen(page: Page) {
+    await page.locator('nav a.nav-item', { hasText: 'Les schema' }).click()
+    await page.waitForURL('**/lessen', { timeout: 10_000 })
+}
+
 test.beforeEach(() => {
     if (!email || !password) {
         throw new Error('Set TEST_EMAIL and TEST_PASSWORD environment variables')
@@ -81,12 +91,8 @@ test.describe('Booking flow', () => {
         // --- Step 1: Login ---
         await login(page)
 
-        // --- Step 2: Navigate to lessons ---
-        await page.goto('/lessen')
-
-        // Wait for client-side hydration to recognize the logged-in user
-        // (SSR renders "Login om te boeken" links, hydration swaps them to "Boek" buttons)
-        await expect(page.getByRole('link', { name: 'Login om te boeken' })).toBeHidden({ timeout: 15_000 })
+        // --- Step 2: Navigate to lessons via client-side nav (preserves store state) ---
+        await navigateToLessen(page)
 
         // --- Step 3: Find and click the first available "Boek" button ---
         const bookButton = page.getByRole('button', { name: 'Boek' }).first()
@@ -133,10 +139,7 @@ test.describe('Booking flow', () => {
             return
         }
 
-        await page.goto('/lessen')
-
-        // Wait for client-side hydration to recognize the logged-in user
-        await expect(page.getByRole('link', { name: 'Login om te boeken' })).toBeHidden({ timeout: 15_000 })
+        await navigateToLessen(page)
 
         const bookButton = page.getByRole('button', { name: 'Boek' }).first()
         const hasBookButton = await bookButton.waitFor({ state: 'visible', timeout: 15_000 }).then(() => true).catch(() => false)
@@ -148,7 +151,7 @@ test.describe('Booking flow', () => {
 
         await bookButton.click()
 
-        // Should see an error about insufficient credits
+        // Should see an error about insufficient credits ("Onvoldoende credits")
         await expect(page.locator('text=/credit/i')).toBeVisible({ timeout: 10_000 })
 
         // --- Logout ---
