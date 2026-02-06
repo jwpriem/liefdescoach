@@ -124,8 +124,8 @@ test.describe('Booking flow', () => {
         // If the user has credits, the test is skipped.
         await login(page)
 
-        // Check credits — navigate to account to see the value
-        const creditsText = await page.locator('text=/\\d+ credit/i').textContent().catch(() => null)
+        // Check credits — the account page shows "N lessen" (or "1 les") under "Saldo"
+        const creditsText = await page.locator('text=/\\d+ les/i').textContent().catch(() => null)
         const credits = creditsText ? parseInt(creditsText.match(/(\d+)/)?.[1] ?? '0', 10) : null
 
         if (credits === null || credits > 0) {
