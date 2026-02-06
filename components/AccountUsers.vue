@@ -26,10 +26,16 @@ const columns = [{
 	key: 'actions'
 }]
 
+const creditTypes = [
+	{ label: 'Losse les (1 credit, 3 maanden)', value: 'credit_1' },
+	{ label: 'Kleine kaart (5 credits, 3 maanden)', value: 'credit_5' },
+	{ label: 'Grote kaart (10 credits, 6 maanden)', value: 'credit_10' },
+]
+
 // Using a reactive object to group related states
 const state = reactive({
 	editMode: false,
-	addCredits: null as number | null,
+	selectedCreditType: 'credit_1' as string,
 	user: null as any | null,
 	showArchived: false
 });
@@ -37,34 +43,61 @@ const state = reactive({
 const students = computed(() => store.students);
 const loggedInUser = computed(() => store.loggedInUser);
 const isAdmin = computed(() => store.isAdmin);
+const studentCreditSummary = computed(() => store.studentCreditSummary);
 
-function setUser(selectedUser: any): void { // Adjust 'any' to your user type
+function getAvailableCredits(userId: string): number {
+	return studentCreditSummary.value[userId] || 0;
+}
+
+function setUser(selectedUser: any): void {
 	state.user = selectedUser;
+	state.selectedCreditType = 'credit_1';
 	state.editMode = true;
 }
 
 function cancel(): void {
 	state.user = null;
-	state.addCredits = null;
+	state.selectedCreditType = 'credit_1';
 	state.editMode = false;
 }
 
-async function updatePrefs(userId: string, credits: number, current: number): Promise<void> {
+async function addCredits(userId: string, type: string): Promise<void> {
 	try {
-		await $fetch('/api/updatePrefs', {
-			method: 'post',
-			body: {
-				userId,
-				prefs: {
-					credits: +current + credits,
-				},
-			},
-		});
-
-		cancel(); // Use cancel function to reset state
-		await store.getUser(); // Assuming getUser is an async operation
+		await store.addCredits(userId, type);
+		cancel();
 	} catch (error) {
-		console.error('Failed to update preferences:', error);
+		console.error('Failed to add credits:', error);
+	}
+}
+
+const migrating = ref(false)
+const migrationResult = ref<any>(null)
+
+async function migrateCredits(): Promise<void> {
+	migrating.value = true
+	migrationResult.value = null
+	try {
+		const res = await $fetch('/api/credits/migrate', { method: 'POST' })
+		migrationResult.value = res
+		await store.getUser()
+		toast.add({
+			id: 'migration',
+			title: 'Migratie voltooid',
+			icon: 'i-heroicons-check-badge',
+			color: 'primary',
+			description: `${res.totalMigrated} credits gemigreerd, ${res.totalSkipped} overgeslagen.`
+		})
+	} catch (error) {
+		console.error('Migration failed:', error)
+		toast.add({
+			id: 'migration-error',
+			title: 'Migratie mislukt',
+			icon: 'i-heroicons-x-circle',
+			color: 'red',
+			description: 'Er ging iets mis bij het migreren van credits.'
+		})
+	} finally {
+		migrating.value = false
 	}
 }
 
@@ -80,7 +113,7 @@ async function archiveUser(userId) {
 			},
 		});
 
-		await store.getUser(); // Assuming getUser is an async operation
+		await store.getUser();
 	} catch (error) {
 		console.error('Failed to update preferences:', error);
 	}
@@ -103,17 +136,11 @@ async function sendWhatsapp(user) {
 }
 
 const items = (row) => [
-	[
-		// 		{
-		// 	label: 'Bewerk',
-		// 	icon: 'i-heroicons-pencil-square-20-solid',
-		// 	click: () => console.log('Edit', row.id)
-		// }, 
-		{
-			label: 'Voeg credits toe',
-			icon: 'i-heroicons-plus-20-solid',
-			click: () => setUser(row)
-		}, {
+	[{
+		label: 'Voeg credits toe',
+		icon: 'i-heroicons-plus-20-solid',
+		click: () => setUser(row)
+	}, {
 		label: 'Archiveer',
 		icon: 'i-heroicons-archive-box-20-solid',
 		click: () => archiveUser(row.$id)
@@ -122,16 +149,6 @@ const items = (row) => [
 		icon: 'i-heroicons-chat-bubble-bottom-center-text-20-solid',
 		click: () => sendWhatsapp(row)
 	}]
-	// }], [{
-	// 	label: 'Archiveer',
-	// 	icon: 'i-heroicons-archive-box-20-solid'
-	// }, {
-	// 	label: 'Move',
-	// 	icon: 'i-heroicons-arrow-right-circle-20-solid'
-	// }], [{
-	// 	label: 'Delete',
-	// 	icon: 'i-heroicons-trash-20-solid'
-	// }]
 ]
 
 const q = ref('')
@@ -141,7 +158,6 @@ const filteredUsers = computed(() => {
 		return students.value
 	} else {
 		return students.value.filter((student) => {
-			// Check if the student is archived; if 'archive' is true, do not include them in the results
 			return student.prefs && student.prefs['archive'] != true;
 		})
 	}
@@ -154,7 +170,6 @@ const filteredRows = computed(() => {
 
 			return filteredUsers.value.filter((x) => {
 				return Object.values(x).some((value) => {
-					// Ensure value is a string before calling toLowerCase()
 					return typeof value === 'string' && value.toLowerCase().includes(q.value.toLowerCase());
 				});
 			});
@@ -170,42 +185,7 @@ const filteredRows = computed(() => {
 				class="text-emerald-700">.</span>
 		</h2>
 
-		<!--		<div v-if="students.length && loggedInUser" class="w-full">-->
-		<!--			<div class="grid grid-cols-1 md:grid-cols-4 mt-8 gap-3">-->
-		<!--				<div v-for="student in students" class="p-4 bg-gray-800 rounded flex flex-col gap-y-3 w-full" index="student.$id">-->
-		<!--					<div>-->
-		<!--						<sup class="text-emerald-500">Naam</sup>-->
-		<!--						<span class="block -mt-2">{{ student.name }}</span>-->
-		<!--					</div>-->
-		<!--					<div>-->
-		<!--						<sup class="text-emerald-500">Email</sup>-->
-		<!--						<span class="block -mt-2">{{ student.email }}</span>-->
-		<!--					</div>-->
-		<!--					<div>-->
-		<!--						<sup class="text-emerald-500">Telefoon</sup>-->
-		<!--						<span v-if="student.phone" class="block -mt-2">{{ student.phone }}</span>-->
-		<!--						<span v-else class="block -mt-2">Geen telefoonnummer</span>-->
-		<!--					</div>-->
-		<!--					<div>-->
-		<!--						<sup class="text-emerald-500">Saldo</sup>-->
-		<!--						<span v-if="student.prefs" class="block -mt-2 flex flex-no-wrap align-center justify-start gap-x-2">-->
-		<!--         {{ student.prefs['credits'] }} {{ student.prefs['credits'] == 1 ? 'les' : 'lessen' }}-->
-		<!--          <svg class="w-6 h-6 cursor-pointer" fill="none" stroke="currentColor" stroke-width="1.5"-->
-		<!--               viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" @click="setUser(student)">-->
-		<!--            <path d="M12 4.5v15m7.5-7.5h-15" stroke-linecap="round" stroke-linejoin="round"/>-->
-		<!--          </svg>-->
-		<!--         </span>-->
-		<!--					</div>-->
-		<!--					<div>-->
-		<!--						<sup class="text-emerald-500">Geregistreerd</sup>-->
-		<!--						<span class="block -mt-2">{{ $rav.formatDateInDutch(student.registration) }}</span>-->
-		<!--					</div>-->
-		<!--				</div>-->
-		<!--			</div>-->
-		<!--		</div>-->
-
-
-		<div class="my-6 w-full flex items-center justify-start gap-x-6">
+		<div class="my-6 w-full flex items-center justify-start gap-x-6 flex-wrap gap-y-3">
 			<UFormGroup label="Filter gebruikers">
 				<UInput id="naam" v-model="q" color="primary" placeholder="Zoek gebruiker" type="text" variant="outline"/>
 			</UFormGroup>
@@ -216,13 +196,16 @@ const filteredRows = computed(() => {
 						on-icon="i-heroicons-check-20-solid"
 				/>
 			</UFormGroup>
+			<UFormGroup label="Migratie">
+				<UButton color="gray" variant="solid" :loading="migrating" @click="migrateCredits()">
+					Migreer credits van prefs
+				</UButton>
+			</UFormGroup>
 		</div>
 
 		<UTable v-if="students.length" :columns="columns" :rows="filteredRows">
 			<template #credits-data="{ row }">
-				{{
-					row.prefs['credits']
-				}}
+				{{ getAvailableCredits(row.$id) }}
 			</template>
 			<template #registration-data="{ row }">
 				{{
@@ -239,24 +222,27 @@ const filteredRows = computed(() => {
 		<!--Pop up for adding credits-->
 		<div v-if="state.editMode" class="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
 			<div class="w-full max-height-75 overflow-y-scroll sm:w-2/3 md:w-1/2 bg-gray-800 p-6 rounded-lg shadow-lg">
-				<!-- Your form content goes here -->
 				<div class="w-full flex flex-col gap-y-5">
 					<h2 class="text-2xl md:text-4xl uppercase font-black">
               <span class="emerald-underline text-emerald-900"
               >Voeg credits toe</span
               ><span class="text-emerald-700">.</span>
 					</h2>
+					<p>Voor: <strong>{{ state.user?.name }}</strong> (huidig saldo: {{ getAvailableCredits(state.user?.$id) }})</p>
 					<div>
-						<div class="flex items-center justify-start">
-							<label>Credits toevoegen</label>
+						<div class="flex items-center justify-start mb-2">
+							<label>Kies type</label>
 						</div>
-						<UInput id="add-credits" v-model="state.addCredits" color="primary" placeholder="Aantal credits om toe te voegen"
-						        type="number"
-						        variant="outline"/>
+						<div class="flex flex-col gap-y-2">
+							<label v-for="ct in creditTypes" :key="ct.value" class="flex items-center gap-x-2 cursor-pointer">
+								<input type="radio" :value="ct.value" v-model="state.selectedCreditType" class="accent-emerald-500" />
+								<span>{{ ct.label }}</span>
+							</label>
+						</div>
 					</div>
 					<div class="flex gap-x-3">
-						<UButton :disabled="!state.addCredits" color="primary" variant="solid"
-						         @click="updatePrefs(state.user.$id, state.addCredits, state.user.prefs['credits']), state.editMode = false">
+						<UButton color="primary" variant="solid"
+						         @click="addCredits(state.user.$id, state.selectedCreditType)">
 							Voeg credits toe
 						</UButton>
 						<UButton color="primary" variant="solid" @click="cancel()">Annuleer</UButton>

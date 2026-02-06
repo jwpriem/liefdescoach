@@ -53,10 +53,12 @@ async function main() {
     const lessons = await databases.createCollection(dbId, 'lessons', 'lessons')
     const bookings = await databases.createCollection(dbId, 'bookings', 'bookings')
     const students = await databases.createCollection(dbId, 'students', 'students')
+    const credits = await databases.createCollection(dbId, 'credits', 'credits')
 
     console.log(`  - lessons  (${lessons.$id})`)
     console.log(`  - bookings (${bookings.$id})`)
     console.log(`  - students (${students.$id})`)
+    console.log(`  - credits  (${credits.$id})`)
 
     // --- 3. Create attributes on lessons ---
     console.log('Creating attributes on "lessons"...')
@@ -71,7 +73,18 @@ async function main() {
     await databases.createStringAttribute(dbId, 'students', 'name', 255, true)
     await databases.createEmailAttribute(dbId, 'students', 'email', true)
 
-    // --- 5. Wait for all plain attributes before creating relationships ---
+    // --- 5. Create attributes on credits ---
+    console.log('Creating attributes on "credits"...')
+
+    await databases.createStringAttribute(dbId, 'credits', 'studentId', 255, true)
+    await databases.createStringAttribute(dbId, 'credits', 'bookingId', 255, false)
+    await databases.createEnumAttribute(dbId, 'credits', 'type', ['credit_1', 'credit_5', 'credit_10', 'credit_legacy'], true)
+    await databases.createDatetimeAttribute(dbId, 'credits', 'validFrom', true)
+    await databases.createDatetimeAttribute(dbId, 'credits', 'validTo', true)
+    await databases.createDatetimeAttribute(dbId, 'credits', 'createdAt', true)
+    await databases.createDatetimeAttribute(dbId, 'credits', 'usedAt', false)
+
+    // --- 6. Wait for all plain attributes before creating relationships ---
     console.log('Waiting for attributes to be available...')
 
     await Promise.all([
@@ -80,11 +93,24 @@ async function main() {
         waitForAttribute(databases, dbId, 'lessons', 'teacher'),
         waitForAttribute(databases, dbId, 'students', 'name'),
         waitForAttribute(databases, dbId, 'students', 'email'),
+        waitForAttribute(databases, dbId, 'credits', 'studentId'),
+        waitForAttribute(databases, dbId, 'credits', 'bookingId'),
+        waitForAttribute(databases, dbId, 'credits', 'type'),
+        waitForAttribute(databases, dbId, 'credits', 'validFrom'),
+        waitForAttribute(databases, dbId, 'credits', 'validTo'),
+        waitForAttribute(databases, dbId, 'credits', 'createdAt'),
+        waitForAttribute(databases, dbId, 'credits', 'usedAt'),
     ])
 
     console.log('All plain attributes ready.')
 
-    // --- 6. Create relationships ---
+    // --- 7. Create indexes on credits ---
+    console.log('Creating indexes on "credits"...')
+    await databases.createIndex(dbId, 'credits', 'idx_studentId', 'key', ['studentId'])
+    await databases.createIndex(dbId, 'credits', 'idx_bookingId', 'key', ['bookingId'])
+    await databases.createIndex(dbId, 'credits', 'idx_student_available', 'key', ['studentId', 'bookingId', 'validTo'])
+
+    // --- 8. Create relationships ---
     // lessons -> bookings (one-to-many, cascade delete: deleting a lesson deletes its bookings)
     console.log('Creating relationship: lessons -> bookings...')
     await databases.createRelationshipAttribute(

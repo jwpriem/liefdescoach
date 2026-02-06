@@ -16,6 +16,27 @@ const state = reactive({
 
 const loggedInUser = computed(() => store.loggedInUser);
 const isAdmin = computed(() => store.isAdmin);
+const myCredits = computed(() => store.myCredits);
+const availableCredits = computed(() => store.availableCredits);
+
+const creditTypeLabels: Record<string, string> = {
+  credit_1: 'Losse les',
+  credit_5: 'Kleine kaart (5)',
+  credit_10: 'Grote kaart (10)',
+  credit_legacy: 'Legacy',
+};
+
+function getCreditStatus(credit: any) {
+  if (credit.bookingId) return 'Gebruikt';
+  if (new Date(credit.validTo) <= new Date()) return 'Verlopen';
+  return 'Beschikbaar';
+}
+
+function getCreditStatusColor(credit: any) {
+  if (credit.bookingId) return 'text-gray-400';
+  if (new Date(credit.validTo) <= new Date()) return 'text-red-400';
+  return 'text-emerald-400';
+}
 
 function openEdit() {
   state.name = loggedInUser.value.name;
@@ -100,7 +121,7 @@ const passwordStrength = computed(() => {
             </div>
             <div>
               <sup class="text-emerald-500">Saldo</sup>
-              <span class="block -mt-2" >{{ loggedInUser.prefs['credits'] }} {{ loggedInUser.prefs['credits'] == 1 ? 'les' : 'lessen' }}</span>
+              <span class="block -mt-2">{{ availableCredits }} {{ availableCredits == 1 ? 'les' : 'lessen' }}</span>
             </div>
             <div>
               <sup class="text-emerald-500">Geregistreerd op</sup>
@@ -111,6 +132,39 @@ const passwordStrength = computed(() => {
               <UButton color="primary" variant="solid" v-if="!state.editPassword" @click="state.editPassword = true">Wachtwoord wijzigen</UButton>
             </div>
 
+
+          </div>
+
+          <!--Credit history table-->
+          <div v-if="myCredits.length" class="mt-8">
+            <h2 class="text-2xl md:text-4xl uppercase font-black mb-6">
+              <span class="emerald-underline text-emerald-900">Mijn credits</span><span class="text-emerald-700">.</span>
+            </h2>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left">
+                <thead>
+                  <tr class="border-b border-gray-700">
+                    <th class="py-2 px-3 text-emerald-500 text-sm font-normal">Type</th>
+                    <th class="py-2 px-3 text-emerald-500 text-sm font-normal">Status</th>
+                    <th class="py-2 px-3 text-emerald-500 text-sm font-normal">Les</th>
+                    <th class="py-2 px-3 text-emerald-500 text-sm font-normal">Docent</th>
+                    <th class="py-2 px-3 text-emerald-500 text-sm font-normal">Lesdatum</th>
+                    <th class="py-2 px-3 text-emerald-500 text-sm font-normal">Geldig tot</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="credit in myCredits" :key="credit.$id" class="border-b border-gray-700/50">
+                    <td class="py-2 px-3 text-sm">{{ creditTypeLabels[credit.type] || credit.type }}</td>
+                    <td class="py-2 px-3 text-sm" :class="getCreditStatusColor(credit)">{{ getCreditStatus(credit) }}</td>
+                    <td class="py-2 px-3 text-sm">{{ credit.lesson?.type || '-' }}</td>
+                    <td class="py-2 px-3 text-sm">{{ credit.lesson?.teacher || '-' }}</td>
+                    <td class="py-2 px-3 text-sm">{{ credit.lesson ? $rav.formatDateInDutch(credit.lesson.date) : '-' }}</td>
+                    <td class="py-2 px-3 text-sm">{{ $rav.formatDateInDutch(credit.validTo) }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
 
             <!--Pop up for editing details-->
             <div v-if="state.editAccountDetails" class="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
@@ -153,7 +207,6 @@ const passwordStrength = computed(() => {
           </div>
         </div>
       </div>
-    </div>
 
     <div v-if="state.editPassword" class="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
       <div class="w-full max-height-75 overflow-y-scroll sm:w-2/3 md:w-1/2 bg-gray-800 p-6 rounded-lg shadow-lg">
