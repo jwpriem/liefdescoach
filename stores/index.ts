@@ -160,16 +160,18 @@ export const useMainStore = defineStore('main', {
                     throw e
                 }
 
-                // Store the session in a cookie for server-side auth
-                // The Appwrite session is stored in localStorage by the SDK,
-                // so we need to pass it to our server via cookie
+                // Sync the Appwrite session to a cookie for server-side auth.
+                // The client SDK stores the session hash in localStorage (cookieFallback),
+                // not in session.secret (which is only populated with an API key).
                 try {
-                    const session = await account.getSession('current')
-                    if (session?.secret) {
-                        document.cookie = `a_session_${useRuntimeConfig().public.project}=${session.secret}; path=/; max-age=31536000; SameSite=Lax`
+                    const projectId = useRuntimeConfig().public.project
+                    const cookieFallback = JSON.parse(window.localStorage.getItem('cookieFallback') ?? '{}')
+                    const sessionHash = cookieFallback?.[`a_session_${projectId}`]
+                    if (sessionHash) {
+                        document.cookie = `a_session_${projectId}=${sessionHash}; path=/; max-age=31536000; SameSite=Lax`
                     }
                 } catch {
-                    // Session fetch failed, but user is still logged in client-side
+                    // localStorage not available or parse error
                 }
 
                 // Fetch protected resources (separate from auth check above)
