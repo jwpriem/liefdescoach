@@ -341,7 +341,7 @@ export const useMainStore = defineStore('main', {
         },
 
         async sendEmail(type: string, lessonId: string) {
-            const { tablesDB } = useAppwrite();
+            const { tablesDB, Query } = useAppwrite();
             const { $rav } = useNuxtApp();
 
             const user = await this.getOnBehalfOrUser()
@@ -350,7 +350,7 @@ export const useMainStore = defineStore('main', {
                 useRuntimeConfig().public.database,
                 'lessons',
                 lessonId,
-                ['*', 'bookings.*', 'bookings.students.*']
+                [Query.select(['*', 'bookings.*', 'bookings.students.*'])]
             )
 
             // Bookingsarray for email

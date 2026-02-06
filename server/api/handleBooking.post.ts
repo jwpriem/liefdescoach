@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
         config.public.database,
         'lessons',
         body.lessonId,
-        ['*', 'bookings.*', 'bookings.students.*']
+        [Query.select(['*', 'bookings.*', 'bookings.students.*'])]
     )
 
     if (!lesson) {
@@ -81,7 +81,7 @@ export default defineEventHandler(async (event) => {
         config.public.database,
         'lessons',
         body.lessonId,
-        ['*', 'bookings.*', 'bookings.students.*']
+        [Query.select(['*', 'bookings.*', 'bookings.students.*'])]
     )
 
     return {

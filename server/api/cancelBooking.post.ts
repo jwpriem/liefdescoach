@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
         config.public.database,
         'bookings',
         body.bookingId,
-        ['*', 'lessons.*', 'students.*']
+        [Query.select(['*', 'lessons.*', 'students.*'])]
     )
 
     if (!booking) {
