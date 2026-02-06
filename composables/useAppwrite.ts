@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import { Client, Account, Databases, TablesDB, ID } from 'appwrite';
+import { Client, Account, Databases, TablesDB, ID, Query } from 'appwrite';
 import { useRuntimeConfig } from '#imports';
 
 export function useAppwrite() {
@@ -15,5 +15,5 @@ export function useAppwrite() {
     const tablesDB = new TablesDB(client);
 
     // Return the Appwrite account and databases services, and ID for external use
-    return { account, databases, tablesDB, ID };
+    return { account, databases, tablesDB, ID, Query };
 }

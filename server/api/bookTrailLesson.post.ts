@@ -25,7 +25,7 @@ export default defineEventHandler(async (event) => {
         config.public.database,
         'lessons',
         body.lessonId,
-        ['*', 'bookings.*']
+        [Query.select(['*', 'bookings.*'])]
     )
 
     if ((lesson.bookings?.length ?? 0) >= MAX_LESSON_CAPACITY) {
