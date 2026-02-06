@@ -13,21 +13,26 @@ export default defineEventHandler(async (event) => {
     let offset = 0
     const limit = 100
 
-    while (true) {
-        const res = await tablesDB.listRows(
-            config.public.database,
-            'credits',
-            [
-                Query.isNull('bookingId'),
-                Query.greaterThan('validTo', now),
-                Query.limit(limit),
-                Query.offset(offset),
-            ]
-        )
-        const rows = res.rows ?? []
-        allCredits.push(...rows)
-        if (rows.length < limit) break
-        offset += limit
+    try {
+        while (true) {
+            const res = await tablesDB.listRows(
+                config.public.database,
+                'credits',
+                [
+                    Query.isNull('bookingId'),
+                    Query.greaterThan('validTo', now),
+                    Query.limit(limit),
+                    Query.offset(offset),
+                ]
+            )
+            const rows = res.rows ?? []
+            allCredits.push(...rows)
+            if (rows.length < limit) break
+            offset += limit
+        }
+    } catch {
+        // credits collection may not exist yet
+        return { summary: {} }
     }
 
     // Group by studentId

@@ -64,19 +64,24 @@ export default defineEventHandler(async (event) => {
 
     // --- Find an available credit (not used, not expired) ---
     const now = new Date()
-    const availableCreditsRes = await tablesDB.listRows(
-        config.public.database,
-        'credits',
-        [
-            Query.equal('studentId', [targetUserId]),
-            Query.isNull('bookingId'),
-            Query.greaterThan('validTo', now.toISOString()),
-            Query.orderAsc('validTo'), // Use the one expiring soonest first (FIFO)
-            Query.limit(1),
-        ]
-    )
+    let availableCredits: any[] = []
+    try {
+        const availableCreditsRes = await tablesDB.listRows(
+            config.public.database,
+            'credits',
+            [
+                Query.equal('studentId', [targetUserId]),
+                Query.isNull('bookingId'),
+                Query.greaterThan('validTo', now.toISOString()),
+                Query.orderAsc('validTo'), // Use the one expiring soonest first (FIFO)
+                Query.limit(1),
+            ]
+        )
+        availableCredits = availableCreditsRes.rows ?? []
+    } catch {
+        // credits collection may not exist yet
+    }
 
-    const availableCredits = availableCreditsRes.rows ?? []
     if (availableCredits.length < 1) {
         throw createError({ statusCode: 402, statusMessage: 'Onvoldoende credits' })
     }
