@@ -188,26 +188,44 @@ const filteredRows = computed(() => {
 			</UFormGroup>
 		</div>
 
-		<UTable v-if="students.length" :columns="columns" :rows="filteredRows">
+		<!-- Mobile: card layout -->
+		<div v-if="students.length" class="flex flex-col gap-y-3 md:hidden">
+			<div v-for="row in filteredRows" :key="row.$id" class="bg-gray-800 rounded p-4">
+				<div class="flex items-center justify-between mb-2">
+					<span class="font-medium">{{ row.name }}</span>
+					<span class="text-emerald-500 text-sm">{{ getAvailableCredits(row.$id) }} credits</span>
+				</div>
+				<div class="text-sm text-emerald-100/70 mb-3">
+					<div>{{ row.email }}</div>
+					<div v-if="row.phone">{{ row.phone }}</div>
+					<div>{{ $rav.formatDateInDutch(row.registration) }}</div>
+				</div>
+				<div class="flex items-center gap-x-3">
+					<UButton color="primary" icon="i-heroicons-plus-20-solid" variant="ghost" size="md" class="text-emerald-100" @click="setUser(row)" />
+					<UButton color="primary" icon="i-heroicons-archive-box-20-solid" variant="ghost" size="md" class="text-emerald-100" @click="archiveUser(row.$id)" />
+					<UButton color="primary" icon="i-heroicons-chat-bubble-bottom-center-text-20-solid" variant="ghost" size="md" class="text-emerald-100" @click="sendWhatsapp(row)" />
+				</div>
+			</div>
+		</div>
+
+		<!-- Desktop: table layout -->
+		<UTable v-if="students.length" :columns="columns" :rows="filteredRows" class="hidden md:block">
 			<template #credits-data="{ row }">
 				{{ getAvailableCredits(row.$id) }}
 			</template>
 			<template #registration-data="{ row }">
-				{{
-					$rav.formatDateInDutch(row.registration)
-				}}
+				{{ $rav.formatDateInDutch(row.registration) }}
 			</template>
-
 			<template #actions-data="{ row }">
 				<div class="flex items-center gap-x-1">
 					<UTooltip text="Voeg credits toe">
-						<UButton color="gray" icon="i-heroicons-plus-20-solid" variant="ghost" size="xs" @click="setUser(row)" />
+						<UButton icon="i-heroicons-plus-20-solid" variant="ghost" size="sm" class="text-emerald-100" @click="setUser(row)" />
 					</UTooltip>
 					<UTooltip text="Archiveer">
-						<UButton color="gray" icon="i-heroicons-archive-box-20-solid" variant="ghost" size="xs" @click="archiveUser(row.$id)" />
+						<UButton icon="i-heroicons-archive-box-20-solid" variant="ghost" size="sm" class="text-emerald-100" @click="archiveUser(row.$id)" />
 					</UTooltip>
 					<UTooltip text="WhatsApp">
-						<UButton color="gray" icon="i-heroicons-chat-bubble-bottom-center-text-20-solid" variant="ghost" size="xs" @click="sendWhatsapp(row)" />
+						<UButton icon="i-heroicons-chat-bubble-bottom-center-text-20-solid" variant="ghost" size="sm" class="text-emerald-100" @click="sendWhatsapp(row)" />
 					</UTooltip>
 				</div>
 			</template>
