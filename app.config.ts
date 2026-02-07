@@ -21,5 +21,14 @@ export default defineAppConfig({
                 padding: 'py-2 px-3',
             },
         },
+        selectMenu: {
+            option: {
+                color: 'text-emerald-100',
+                active: 'bg-gray-700 text-emerald-100',
+                selected: 'text-emerald-400',
+            },
+            background: 'bg-gray-800',
+            ring: 'ring-1 ring-gray-700',
+        },
     }
 })
