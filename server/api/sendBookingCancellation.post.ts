@@ -95,8 +95,19 @@ export default defineEventHandler(async (event) => {
 
     const failures = results.filter(r => r.status === 'rejected')
     if (failures.length) {
-        console.error('Email send failures:', failures.map(f => (f as PromiseRejectedResult).reason))
+        const reasons = failures.map(f => (f as PromiseRejectedResult).reason)
+        console.error('Email send failures:', reasons)
     }
+
+    // Log per-result for debugging
+    results.forEach((r, i) => {
+        const label = i === 0 ? 'student' : 'admin'
+        if (r.status === 'fulfilled') {
+            console.log(`[BookingCancellation] ${label} email sent:`, r.value?.accepted)
+        } else {
+            console.error(`[BookingCancellation] ${label} email failed:`, r.reason?.message ?? r.reason)
+        }
+    })
 
     setResponseStatus(event, 202)
 })
