@@ -75,7 +75,6 @@ interface State {
     errorMessage: string | null;
     isLoading: boolean;
     onBehalfOf: User | null;
-    otpUserId: string | null;
 }
 
 export const useMainStore = defineStore('main', {
@@ -89,8 +88,7 @@ export const useMainStore = defineStore('main', {
         studentCreditSummary: {},
         errorMessage: null,
         isLoading: false,
-        onBehalfOf: null,
-        otpUserId: null
+        onBehalfOf: null
     }),
     actions: {
         async fetchWrapper(
@@ -130,8 +128,6 @@ export const useMainStore = defineStore('main', {
                     friendly = 'Wachtwoord moet minimaal 8 tekens zijn'
                 } else if (/Password must be between 8 and 256 characters long/i.test(msg)) {
                     friendly = 'Wachtwoord moet minimaal 8 tekens zijn'
-                } else if (msg === 'no-account') {
-                    friendly = 'Er is geen account gevonden met dit e-mailadres. Maak eerst een account aan.'
                 } else if (code === 429 || /too many requests/i.test(msg)) {
                     friendly = 'Te veel pogingen, probeer later opnieuw.'
                 } else if (code === 402) {
@@ -175,33 +171,31 @@ export const useMainStore = defineStore('main', {
             }
         },
         async sendOtp(email: string) {
-            this.otpUserId = null
             await this.fetchWrapper(async () => {
-                // First check if the user exists (server-side) to prevent auto-creation
-                const check = await $fetch('/api/auth/check-email', {
+                await $fetch('/api/auth/send-otp', {
                     method: 'POST',
                     body: { email }
                 })
-
-                if (!check.exists) {
-                    throw { code: 404, message: 'no-account' }
-                }
-
-                // User exists — send OTP using their real userId
-                const { account } = useAppwrite()
-                const token = await account.createEmailToken(check.userId, email)
-                this.otpUserId = token.userId
             })
         },
-        async verifyOtp(otp: string) {
+        async verifyOtp(email: string, otp: string) {
             const sessionOk = await this.fetchWrapper(async () => {
-                const { account } = useAppwrite()
-                await account.createSession(this.otpUserId!, otp)
+                const res = await $fetch('/api/auth/verify-otp', {
+                    method: 'POST',
+                    body: { email, code: otp }
+                })
+
+                // Manually set the session secret so the Appwrite client SDK
+                // and server-side auth (cookie) recognise the user.
+                const projectId = useRuntimeConfig().public.project
+                const cookieFallback = JSON.parse(window.localStorage.getItem('cookieFallback') ?? '{}')
+                cookieFallback[`a_session_${projectId}`] = res.sessionSecret
+                window.localStorage.setItem('cookieFallback', JSON.stringify(cookieFallback))
+                document.cookie = `a_session_${projectId}=${res.sessionSecret}; path=/; max-age=31536000; SameSite=Lax`
             })
 
             if (!sessionOk) return
 
-            this.otpUserId = null
             await this.getUser()
         },
         async getUser() {

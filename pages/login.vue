@@ -88,7 +88,7 @@ async function sendOtp() {
 }
 
 async function verifyOtp() {
-	await store.verifyOtp(otpCode.value)
+	await store.verifyOtp(normalizedEmail.value, otpCode.value)
 
 	if (store.loggedInUser) {
 		await navigateTo({ path: '/yoga/account' })
