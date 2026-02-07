@@ -5,9 +5,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Build & Dev Commands
 
 ```bash
-npm run dev        # Dev server on localhost:3000
-npm run build      # Production build (outputs to .output/)
-npm run preview    # Preview production build locally
+yarn dev        # Dev server on localhost:3000
+yarn build      # Production build (outputs to .output/)
+yarn preview    # Preview production build locally
 ```
 
 No linter is configured. Node 20 is required.
@@ -26,10 +26,10 @@ No linter is configured. Node 20 is required.
 ### E2E Tests (Playwright)
 
 ```bash
-# Requires dev server running (npm run dev) and Playwright browsers installed (npx playwright install chromium)
-TEST_EMAIL=user@example.com TEST_PASSWORD=secret npm run test:e2e          # headless
-TEST_EMAIL=user@example.com TEST_PASSWORD=secret npm run test:e2e:headed   # visible browser
-BASE_URL=http://localhost:3000 npm run test:e2e                            # custom base URL
+# Requires dev server running (yarn dev) and Playwright browsers installed (yarn dlx playwright install chromium)
+TEST_EMAIL=user@example.com TEST_PASSWORD=secret yarn test:e2e          # headless
+TEST_EMAIL=user@example.com TEST_PASSWORD=secret yarn test:e2e:headed   # visible browser
+BASE_URL=http://localhost:3000 yarn test:e2e                            # custom base URL
 ```
 
 Tests are in `e2e/`. The test user must exist in Appwrite Auth and have at least 1 credit for the booking test to pass.
@@ -39,9 +39,9 @@ Tests are in `e2e/`. The test user must exist in Appwrite Auth and have at least
 Standalone `tsx` scripts in `scripts/` for Appwrite database management. Require env vars `NUXT_PUBLIC_PROJECT` and `NUXT_APPWRITE_KEY` (loaded from `.env` via dotenv).
 
 ```bash
-npm run db:setup            # Create new database with lessons/bookings/students schema
-npm run db:seed-lessons     # Seed 12 weeks of Sunday 09:45 hatha yoga + 3 guest lessons
-npm run db:sync-students    # Sync Auth users into students collection
+yarn db:setup            # Create new database with lessons/bookings/students schema
+yarn db:seed-lessons     # Seed 12 weeks of Sunday 09:45 hatha yoga + 3 guest lessons
+yarn db:sync-students    # Sync Auth users into students collection
 ```
 
 `db:setup` prints the new database ID to set as `NUXT_PUBLIC_DATABASE`. `db:seed-lessons` accepts `--weeks N` to customize. All scripts share `scripts/appwrite-client.ts` for client setup.

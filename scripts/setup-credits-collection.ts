@@ -3,7 +3,7 @@
  * Safe to run multiple times — skips if the collection already exists.
  *
  * Usage:
- *   npx tsx scripts/setup-credits-collection.ts
+ *   yarn tsx scripts/setup-credits-collection.ts
  *
  * Required env vars: NUXT_PUBLIC_PROJECT, NUXT_APPWRITE_KEY, NUXT_PUBLIC_DATABASE
  */

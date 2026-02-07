@@ -9,8 +9,8 @@
  * The user must have at least 1 credit to complete the booking test.
  *
  * Run:
- *   TEST_EMAIL=x@y.com TEST_PASSWORD=secret npx playwright test
- *   npm run test:e2e   (reads from .env)
+ *   TEST_EMAIL=x@y.com TEST_PASSWORD=secret yarn dlx playwright test
+ *   yarn test:e2e   (reads from .env)
  */
 
 import { test, expect, Page } from '@playwright/test'

@@ -8,7 +8,7 @@
  * creates that many rows with type 'credit_1' and validTo set to 6 months from now.
  *
  * Usage:
- *   npx tsx scripts/migrate-credits.ts
+ *   yarn tsx scripts/migrate-credits.ts
  *
  * Required env vars: NUXT_PUBLIC_PROJECT, NUXT_APPWRITE_KEY, NUXT_PUBLIC_DATABASE
  */

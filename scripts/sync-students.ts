@@ -4,7 +4,7 @@
  * Existing students are skipped (upsert by checking existence first).
  *
  * Usage:
- *   npx tsx scripts/sync-students.ts
+ *   yarn tsx scripts/sync-students.ts
  *
  * Required env vars: NUXT_PUBLIC_PROJECT, NUXT_APPWRITE_KEY, NUXT_PUBLIC_DATABASE
  */
