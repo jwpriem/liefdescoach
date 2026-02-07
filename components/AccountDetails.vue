@@ -23,7 +23,6 @@ const creditTypeLabels: Record<string, string> = {
   credit_1: 'Losse les',
   credit_5: 'Kleine kaart (5)',
   credit_10: 'Grote kaart (10)',
-  credit_legacy: 'Legacy',
 };
 
 function getCreditStatus(credit: any) {
