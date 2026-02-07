@@ -1,10 +1,13 @@
 import { createError } from 'h3'
 
 /**
- * Server-side email API. Replaces nuxt-mail's client-side sending.
+ * Server-side email API for simple notification emails.
  *
  * Body: { type: string, data: object }
- * Types: 'contact' | 'new-booking-notification' | 'booking-cancellation-notification' | 'new-user'
+ * Types: 'contact' | 'new-user'
+ *
+ * Booking/cancellation emails are handled by their own dedicated endpoints
+ * (sendBookingConfirmation / SendBookingCancellation) which send 2 emails each.
  */
 export default defineEventHandler(async (event) => {
     const body = await readBody(event)
@@ -19,12 +22,6 @@ export default defineEventHandler(async (event) => {
     switch (body.type) {
         case 'contact':
             email = contactEmail(body.data)
-            break
-        case 'new-booking-notification':
-            email = newBookingNotificationEmail(body.data)
-            break
-        case 'booking-cancellation-notification':
-            email = bookingCancellationEmail(body.data)
             break
         case 'new-user':
             email = newUserEmail(body.data)

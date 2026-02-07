@@ -42,24 +42,6 @@ async function book(lesson: any) {
   await store.setOnBehalfOf(store.loggedInUser)
   await store.handleBooking(lesson)
 
-  let bookings = lesson.bookings?.length ? lesson.bookings.map(booking => booking.students.name + '\n').join('') : ''
-  bookings = bookings + store.loggedInUser.name + '\n'
-
-  await $fetch('/api/mail/send', {
-    method: 'POST',
-    body: {
-      type: 'new-booking-notification',
-      data: {
-        name: store.loggedInUser.name,
-        email: store.loggedInUser.email,
-        lessonType: $rav.getLessonTitle(lesson),
-        lessonDate: $rav.formatDateInDutch(lesson.date, true),
-        spots: 9 - ((lesson.bookings?.length || 0) + 1),
-        bookings,
-      }
-    }
-  })
-
   toast.add({
     id: 'booking',
     title: 'Tot snel',

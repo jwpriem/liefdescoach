@@ -6,24 +6,7 @@ const myBookings = computed(() => store.myBookings);
 const isAdmin = computed(() => store.isAdmin);
 
 async function removeBooking(booking) {
-  await store.cancelBooking(
-    booking
-  )
-
-  await $fetch('/api/mail/send', {
-    method: 'POST',
-    body: {
-      type: 'booking-cancellation-notification',
-      data: {
-        name: store.loggedInUser.name,
-        email: store.loggedInUser.email,
-        lessonType: $rav.getLessonTitle(booking.lessons),
-        lessonDate: $rav.formatDateInDutch(booking.lessons.date, true),
-        spots: 0,
-        bookings: [],
-      }
-    }
-  })
+  await store.cancelBooking(booking)
 }
 </script>
 
