@@ -8,6 +8,8 @@ export default defineNuxtConfig({
     // Private keys are only available on the server
     postmark: '',
     appwriteKey: '',
+    revenuePerBooking: '14',  // NUXT_REVENUE_PER_BOOKING
+    costPerLesson: '50',      // NUXT_COST_PER_LESSON
     // Public keys that are exposed to the client
     public: {
       project: '',

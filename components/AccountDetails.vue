@@ -134,12 +134,34 @@ const passwordStrength = computed(() => {
 
           </div>
 
-          <!--Credit history table-->
+          <!--Credit history-->
           <div v-if="myCredits.length" class="mt-8">
             <h2 class="text-2xl md:text-4xl uppercase font-black mb-6">
               <span class="emerald-underline text-emerald-900">Mijn credits</span><span class="text-emerald-700">.</span>
             </h2>
-            <div class="overflow-x-auto">
+            <!-- Mobile: card layout -->
+            <div class="flex flex-col gap-y-3 md:hidden">
+              <div v-for="credit in myCredits" :key="credit.$id" class="bg-gray-800 rounded p-4">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-sm font-medium">{{ creditTypeLabels[credit.type] || credit.type }}</span>
+                  <span class="text-sm" :class="getCreditStatusColor(credit)">{{ getCreditStatus(credit) }}</span>
+                </div>
+                <div class="grid grid-cols-2 gap-y-1 text-sm">
+                  <template v-if="credit.lesson">
+                    <span class="text-emerald-500">Les</span>
+                    <span>{{ credit.lesson.type }}</span>
+                    <span class="text-emerald-500">Docent</span>
+                    <span>{{ credit.lesson.teacher }}</span>
+                    <span class="text-emerald-500">Lesdatum</span>
+                    <span>{{ $rav.formatDateInDutch(credit.lesson.date) }}</span>
+                  </template>
+                  <span class="text-emerald-500">Geldig tot</span>
+                  <span>{{ $rav.formatDateInDutch(credit.validTo) }}</span>
+                </div>
+              </div>
+            </div>
+            <!-- Desktop: table layout -->
+            <div class="hidden md:block">
               <table class="w-full text-left">
                 <thead>
                   <tr class="border-b border-gray-700">

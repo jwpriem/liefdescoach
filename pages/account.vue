@@ -47,6 +47,7 @@ const isLoading = computed(() => store.isLoading);
 				<AccountBookings v-if="myBookings" />
 				<AccountLessons v-if="isAdmin && lessons && students" />
 				<AccountUsers v-if="isAdmin && students && loggedInUser" />
+				<AccountRevenue v-if="isAdmin" />
 			</div>
 		</div>
 	</div>
