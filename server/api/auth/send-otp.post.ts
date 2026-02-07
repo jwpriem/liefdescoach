@@ -37,7 +37,7 @@ export default defineEventHandler(async (event) => {
         'otp_codes',
         [Query.equal('email', [email])]
     )
-    for (const doc of existing.documents) {
+    for (const doc of (existing.rows ?? [])) {
         await tablesDB.deleteRow(config.public.database, 'otp_codes', doc.$id)
     }
 

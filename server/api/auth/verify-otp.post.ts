@@ -1,4 +1,5 @@
 import { createError } from 'h3'
+import crypto from 'crypto'
 
 /**
  * Verifies an OTP code, deletes it from the database,
@@ -29,11 +30,13 @@ export default defineEventHandler(async (event) => {
         [Query.equal('email', [email])]
     )
 
-    if (result.total === 0) {
+    const rows = result.rows ?? []
+
+    if (rows.length === 0) {
         throw createError({ statusCode: 401, statusMessage: 'Geen code gevonden. Vraag een nieuwe code aan.' })
     }
 
-    const otpDoc = result.documents[0]
+    const otpDoc = rows[0]
 
     // 2. Check expiry
     if (new Date(otpDoc.expiresAt) < new Date()) {
@@ -46,7 +49,7 @@ export default defineEventHandler(async (event) => {
     const codeBuffer = Buffer.from(code)
     const storedBuffer = Buffer.from(otpDoc.code)
 
-    if (codeBuffer.length !== storedBuffer.length || !require('crypto').timingSafeEqual(codeBuffer, storedBuffer)) {
+    if (codeBuffer.length !== storedBuffer.length || !crypto.timingSafeEqual(codeBuffer, storedBuffer)) {
         throw createError({ statusCode: 401, statusMessage: 'Ongeldige code. Probeer opnieuw.' })
     }
 
