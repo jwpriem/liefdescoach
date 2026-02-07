@@ -19,6 +19,13 @@ const isAdmin = computed(() => store.isAdmin);
 const myCredits = computed(() => store.myCredits);
 const availableCredits = computed(() => store.availableCredits);
 
+const remindersEnabled = computed({
+  get: () => loggedInUser.value?.prefs?.reminders !== false,
+  set: async (value: boolean) => {
+    await store.updatePrefs(loggedInUser.value, { reminders: value });
+  },
+});
+
 const creditTypeLabels: Record<string, string> = {
   credit_1: 'Losse les',
   credit_5: 'Kleine kaart (5)',
@@ -126,6 +133,13 @@ const passwordStrength = computed(() => {
         <div>
           <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Geregistreerd op</span>
           <span class="block text-gray-100 mt-0.5">{{ $rav.formatDateInDutch(loggedInUser.registration) }}</span>
+        </div>
+        <div class="flex items-center justify-between pt-2 border-t border-gray-800/50">
+          <div>
+            <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Herinneringsmail</span>
+            <span class="block text-gray-400 text-xs mt-0.5">Ontvang een e-mail de avond voor je les</span>
+          </div>
+          <UToggle v-model="remindersEnabled" color="emerald" />
         </div>
       </div>
       <div class="flex gap-3 mt-6">
