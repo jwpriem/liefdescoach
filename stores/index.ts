@@ -180,18 +180,16 @@ export const useMainStore = defineStore('main', {
         },
         async verifyOtp(email: string, otp: string) {
             const sessionOk = await this.fetchWrapper(async () => {
+                // Server validates OTP and returns a login token
                 const res = await $fetch('/api/auth/verify-otp', {
                     method: 'POST',
                     body: { email, code: otp }
                 })
 
-                // Manually set the session secret so the Appwrite client SDK
-                // and server-side auth (cookie) recognise the user.
-                const projectId = useRuntimeConfig().public.project
-                const cookieFallback = JSON.parse(window.localStorage.getItem('cookieFallback') ?? '{}')
-                cookieFallback[`a_session_${projectId}`] = res.sessionSecret
-                window.localStorage.setItem('cookieFallback', JSON.stringify(cookieFallback))
-                document.cookie = `a_session_${projectId}=${res.sessionSecret}; path=/; max-age=31536000; SameSite=Lax`
+                // Let the client SDK create the session so it properly
+                // manages cookies and localStorage (cookieFallback)
+                const { account } = useAppwrite()
+                await account.createSession(res.userId, res.secret)
             })
 
             if (!sessionOk) return

@@ -41,8 +41,8 @@ const isLoading = computed(() => store.isLoading);
 <template>
 	<div>
 		<IsLoading :loading="isLoading" />
-		<div class="container mt-8 sm:mt-12 md:mt-24 mx-auto p-8 md:px-0 md:py-24">
-			<div class="flex flex-col gap-y-24">
+		<div class="container mx-auto px-4 sm:px-8 pt-28 pb-12 sm:pt-32 sm:pb-20">
+			<div class="flex flex-col gap-y-16">
 				<AccountDetails v-if="loggedInUser"/>
 				<AccountBookings v-if="myBookings" />
 				<AccountLessons v-if="isAdmin && lessons && students" />
