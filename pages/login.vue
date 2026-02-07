@@ -159,7 +159,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="min-h-[80vh] flex items-center justify-center px-4 py-12 sm:py-20">
+  <div class="min-h-[80vh] flex items-center justify-center px-4 pt-28 pb-12 sm:pt-32 sm:pb-20">
     <!-- Skeleton loader -->
     <div v-if="!ready" class="w-full max-w-md">
       <div class="animate-pulse space-y-6 rounded-2xl bg-gray-900/60 p-8">
@@ -176,7 +176,7 @@ onMounted(async () => {
       <IsLoading :loading="isLoading"></IsLoading>
 
       <!-- Card container -->
-      <div class="rounded-2xl bg-gray-900/50 border border-gray-800/80 backdrop-blur-sm shadow-2xl shadow-emerald-950/20 p-8 sm:p-10">
+      <div class="rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-2xl shadow-emerald-950/20 p-8 sm:p-10">
 
         <!-- Header -->
         <div class="text-center mb-8">
