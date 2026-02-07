@@ -2,8 +2,9 @@
 const isDev = process.env.NODE_ENV !== 'production'
 
 export default defineNuxtConfig({
+  compatibilityDate: '2026-02-07',
   devtools: { enabled: true },
-  
+
   runtimeConfig: {
     // Private keys are only available on the server
     appwriteKey: '',
@@ -18,24 +19,23 @@ export default defineNuxtConfig({
       mailPassDev: ''
     }
   },
-  
-  server: {
-    port: isDev ? 3000 : 8080, // default: 3000
-    host: isDev ? 'localhost' : '0.0.0.0' // default: localhost
+
+  devServer: {
+    port: 3000,
+    host: 'localhost'
   },
 
   // Plugins to run before rendering page (https://go.nuxtjs.dev/config-plugins)
   plugins: [
     '~/plugins/rav'
-    ],
-  
+  ],
+
   modules: [
     '@nuxtjs/google-fonts',
     '@pinia/nuxt',
     'dayjs-nuxt',
     '@nuxtjs/sitemap',
     '@nuxtjs/robots',
-    '@zadigetvoltaire/nuxt-gtm',
     '@nuxt/ui',
     '@nuxt/image'
   ],
@@ -43,50 +43,57 @@ export default defineNuxtConfig({
   image: {
     domains: ['images.unsplash.com']
   },
-  
+
   dayjs: {
     locales: ['en', 'nl'],
     plugins: ['relativeTime', 'utc', 'timezone'],
     defaultLocale: 'nl',
     defaultTimezone: 'America/New_York'
   },
-  
+
   sitemap: {
     autoLastmod: true
   },
-  
-  robots: {
-    UserAgent: '*',
-    Sitemap: 'https://www.ravennah.com/sitemap.xml'
+
+  imports: {
+    dirs: ['app/stores']
   },
-  
+
+  css: ['~/assets/css/tailwind.css'],
+
+  site: {
+    url: 'https://www.ravennah.com'
+  },
+
+  robots: {
+    // Default behavior allows all and points to sitemap (verified by sitemap module)
+  },
+
   googleFonts: {
     families: {
-      Montserrat: [200,300,400,500,600,700,800,900],
-      'Source+Sans+3': [200,300,400,500,600,700,800,900]
-      }
+      Montserrat: [200, 300, 400, 500, 600, 700, 800, 900],
+      'Source+Sans+3': [200, 300, 400, 500, 600, 700, 800, 900]
+    }
   },
-  
-  gtm: {
-    id: 'GTM-PZP28PP'
-  },
+
+
 
   ui: {
     global: true
   },
 
   routeRules: {
-    '/liefdescoach/**': { redirect: '/', statusCode: 301 },
-    '/yoga': { redirect: '/', statusCode: 301 },
-    '/yoga/account': { redirect: '/account', statusCode: 301 },
-    '/yoga/archief': { redirect: '/archief', statusCode: 301 },
-    '/yoga/contact': { redirect: '/contact', statusCode: 301 },
-    '/yoga/hatha-yoga': { redirect: '/hatha-yoga', statusCode: 301 },
-    '/yoga/lessen': { redirect: '/lessen', statusCode: 301 },
-    '/yoga/login': { redirect: '/login', statusCode: 301 },
-    '/yoga/over': { redirect: '/over', statusCode: 301 },
-    '/yoga/priveles': { redirect: '/priveles', statusCode: 301 },
-    '/yoga/tarieven': { redirect: '/tarieven', statusCode: 301 },
-    '/yoga/voordelen': { redirect: '/voordelen', statusCode: 301 },
+    '/liefdescoach/**': { redirect: { to: '/', statusCode: 301 } },
+    '/yoga': { redirect: { to: '/', statusCode: 301 } },
+    '/yoga/account': { redirect: { to: '/account', statusCode: 301 } },
+    '/yoga/archief': { redirect: { to: '/archief', statusCode: 301 } },
+    '/yoga/contact': { redirect: { to: '/contact', statusCode: 301 } },
+    '/yoga/hatha-yoga': { redirect: { to: '/hatha-yoga', statusCode: 301 } },
+    '/yoga/lessen': { redirect: { to: '/lessen', statusCode: 301 } },
+    '/yoga/login': { redirect: { to: '/login', statusCode: 301 } },
+    '/yoga/over': { redirect: { to: '/over', statusCode: 301 } },
+    '/yoga/priveles': { redirect: { to: '/priveles', statusCode: 301 } },
+    '/yoga/tarieven': { redirect: { to: '/tarieven', statusCode: 301 } },
+    '/yoga/voordelen': { redirect: { to: '/voordelen', statusCode: 301 } },
   }
 })

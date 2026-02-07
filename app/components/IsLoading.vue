@@ -10,7 +10,7 @@ const props = defineProps({
 
 <template>
 		<div>
-      <div v-if="loading" class="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
+      <div v-if="loading" class="fixed inset-0 bg-black/75 flex justify-center items-center z-50">
        <svg class="animate-spin h-16 w-16 text-white"
                  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
               <circle

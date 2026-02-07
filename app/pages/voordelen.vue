@@ -11,17 +11,17 @@ definePageMeta({
 useHead({
   title,
   meta: [
-    {hid: 'description', name: 'description', content: description},
-    {hid: 'og:title', property: 'og:title', content: title},
-    {hid: 'og:url', property: 'og:url', content: pageUrl},
-    {hid: 'og:description', property: 'og:description', content: description},
-    {hid: 'og:image', property: 'og:image', content: ogImage},
+    {content: description},
+    {content: title},
+    {content: pageUrl},
+    {content: description},
+    {content: ogImage},
 
     // twitter card
-    {hid: "twitter:title", name: "twitter:title", content: title},
-    {hid: "twitter:url", name: "twitter:url", content: pageUrl},
-    {hid: 'twitter:description', name: 'twitter:description', content: description},
-    {hid: "twitter:image", name: "twitter:image", content: ogImage},
+    {content: title},
+    {content: pageUrl},
+    {content: description},
+    {content: ogImage},
     ]
 })
 
