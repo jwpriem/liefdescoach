@@ -3,8 +3,8 @@
  * lessons for the next 12 weeks, plus 3 guest lessons with teacher Bo Bol.
  *
  * Usage:
- *   npx tsx scripts/seed-lessons.ts                # default 12 weeks
- *   npx tsx scripts/seed-lessons.ts --weeks 8      # custom weeks
+ *   yarn tsx scripts/seed-lessons.ts                # default 12 weeks
+ *   yarn tsx scripts/seed-lessons.ts --weeks 8      # custom weeks
  *
  * Required env vars: NUXT_PUBLIC_PROJECT, NUXT_APPWRITE_KEY, NUXT_PUBLIC_DATABASE
  */

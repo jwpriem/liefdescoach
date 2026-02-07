@@ -2,8 +2,8 @@
  * Creates a new Appwrite database with the lessons/bookings/students schema.
  *
  * Usage:
- *   npx tsx scripts/setup-database.ts                          # auto-generated ID
- *   npx tsx scripts/setup-database.ts --name "My Test DB"      # custom name
+ *   yarn tsx scripts/setup-database.ts                          # auto-generated ID
+ *   yarn tsx scripts/setup-database.ts --name "My Test DB"      # custom name
  *
  * Required env vars: NUXT_PUBLIC_PROJECT, NUXT_APPWRITE_KEY
  * Output: prints the new database ID to set as NUXT_PUBLIC_DATABASE
