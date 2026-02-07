@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 401, statusMessage: 'Ongeldige API-sleutel' })
     }
 
-    const { tablesDB, Query } = useServerAppwrite()
+    const { tablesDB, Query, users } = useServerAppwrite()
 
     // --- Calculate tomorrow's date range in UTC ---
     // Use Amsterdam timezone so "tomorrow" aligns with local lesson dates
@@ -63,6 +63,9 @@ export default defineEventHandler(async (event) => {
             ? `Yin-Yang Yoga door gastdocent ${fullLesson.teacher}`
             : fullLesson.type === 'peachy bum' ? 'Peachy Bum' : 'Hatha Yoga'
         const formattedDate = `${lessonDate.format('dddd D MMMM')} van ${lessonDate.format('H.mm')} tot ${lessonDate.add(1, 'hour').format('H.mm')} uur`
+        const address = fullLesson.type === 'peachy bum'
+            ? 'Kosboulevard 5, 3059 XZ Rotterdam'
+            : 'Emmy van Leersumhof 24a, 3059 LT Rotterdam'
 
         // Send reminder to each booked student
         for (const booking of bookings) {
@@ -70,10 +73,22 @@ export default defineEventHandler(async (event) => {
             if (!student || typeof student === 'string') continue
             if (!student.email) continue
 
+            // Check if student has opted out of reminder emails
+            try {
+                const prefs = await users.getPrefs(student.$id)
+                if (prefs.reminders === false) {
+                    console.log(`[LessonReminder] Skipped ${student.email} (reminders disabled)`)
+                    continue
+                }
+            } catch {
+                // If prefs can't be fetched, send the reminder (default: enabled)
+            }
+
             const mail = lessonReminderEmail({
                 name: student.name || 'Yogi',
                 lessonType,
                 lessonDate: formattedDate,
+                address,
             })
 
             try {
