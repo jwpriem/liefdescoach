@@ -30,8 +30,28 @@ export default defineEventHandler(async (event) => {
         [Query.select(['*', 'bookings.*', 'bookings.students.*'])]
     )
 
-    const bookingsArr = (lesson.bookings ?? []).map((b: any) => ({
-        name: b.students?.name ?? 'Onbekend'
+    // Resolve student names: the relationship may return an object or a raw ID string
+    const bookings = lesson.bookings ?? []
+    const unresolvedIds = bookings
+        .filter((b: any) => typeof b.students === 'string')
+        .map((b: any) => b.students)
+
+    // Look up unresolved student names from Auth users
+    const { users } = useServerAppwrite()
+    const nameMap: Record<string, string> = {}
+    for (const uid of unresolvedIds) {
+        try {
+            const u = await users.get(uid)
+            nameMap[uid] = u.name || u.email || 'Onbekend'
+        } catch {
+            nameMap[uid] = 'Onbekend'
+        }
+    }
+
+    const bookingsArr = bookings.map((b: any) => ({
+        name: typeof b.students === 'string'
+            ? (nameMap[b.students] ?? 'Onbekend')
+            : (b.students?.name ?? 'Onbekend')
     }))
 
     const lessonDate = dayjs(lesson.date).utc()
