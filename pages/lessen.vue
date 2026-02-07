@@ -73,11 +73,10 @@ async function book(lesson: any) {
                 <path stroke-linecap="round" stroke-linejoin="round"
                   d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5" />
               </svg>
-
-              <svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+              <svg svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                 stroke="currentColor" class="w-6 shrink-0 h-6 mr-1 inline-block stroke-current text-emerald-700">
                 <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                  d="M12 3v17.25m0 0c-1.472 0-2.882.265-4.185.75M12 20.25c1.472 0 2.882.265 4.185.75M18.75 4.97A48.416 48.416 0 0 0 12 4.5c-2.291 0-4.545.16-6.75.47m13.5 0c1.01.143 2.01.317 3 .52m-3-.52 2.62 10.726c.122.499-.106 1.028-.589 1.202a5.988 5.988 0 0 1-2.031.352 5.988 5.988 0 0 1-2.031-.352c-.483-.174-.711-.703-.59-1.202L18.75 4.971Zm-16.5.52c.99-.203 1.99-.377 3-.52m0 0 2.62 10.726c.122.499-.106 1.028-.589 1.202a5.989 5.989 0 0 1-2.031.352 5.989 5.989 0 0 1-2.031-.352c-.483-.174-.711-.703-.59-1.202L5.25 4.971Z" />
               </svg>
               <span v-if="lesson.type == 'hatha yoga'">
                 <nuxt-link to="/hatha-yoga">Hatha Yoga</nuxt-link>
@@ -93,26 +92,28 @@ async function book(lesson: any) {
                 'plek' : 'plekken' }} )</p>
           </div>
           <div>
-            <UButton :disabled="checkBooking(lesson.$id) || availableCredits < 1" color="primary" variant="solid" @click="book(lesson)"
-              v-if="loggedInUser && !checkBooking(lesson.$id) && (lesson.bookings?.length || 0) != 9">{{ availableCredits < 1 ? 'Geen credits' : 'Boek' }}</UButton>
-            <span v-if="checkBooking(lesson.$id)" class="flex content-center"><svg xmlns="http://www.w3.org/2000/svg"
-                fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                class="w-6 h-6 inline-block mx-1">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-              </svg>
-              Geboekt
-            </span>
-            <span v-if="loggedInUser && !checkBooking(lesson.$id) && (lesson.bookings?.length || 0) == 9"
-              class="flex content-center">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                stroke="currentColor" class="w-6 h-6 inline-block mx-1">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
-              </svg>
-              Helaas les is vol
-            </span>
-            <UButton color="primary" variant="solid" to="/login" v-if="!loggedInUser">Login om te boeken</UButton>
+            <UButton :disabled="checkBooking(lesson.$id) || availableCredits < 1" color="primary" variant="solid"
+              @click="book(lesson)"
+              v-if="loggedInUser && !checkBooking(lesson.$id) && (lesson.bookings?.length || 0) != 9">{{
+                availableCredits < 1 ? 'Geen credits' : 'Boek' }}</UButton>
+                <span v-if="checkBooking(lesson.$id)" class="flex content-center"><svg
+                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor" class="w-6 h-6 inline-block mx-1">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                  </svg>
+                  Geboekt
+                </span>
+                <span v-if="loggedInUser && !checkBooking(lesson.$id) && (lesson.bookings?.length || 0) == 9"
+                  class="flex content-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor" class="w-6 h-6 inline-block mx-1">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+                  </svg>
+                  Helaas les is vol
+                </span>
+                <UButton color="primary" variant="solid" to="/login" v-if="!loggedInUser">Login om te boeken</UButton>
           </div>
         </div>
       </div>
