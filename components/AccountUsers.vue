@@ -27,8 +27,8 @@ const columns = [{
 }]
 
 const creditTypes = [
-	{ label: 'Losse les (1 credit, 3 maanden)', value: 'credit_1' },
-	{ label: 'Kleine kaart (5 credits, 3 maanden)', value: 'credit_5' },
+	{ label: 'Losse les (1 credit, 6 maanden)', value: 'credit_1' },
+	{ label: 'Kleine kaart (5 credits, 6 maanden)', value: 'credit_5' },
 	{ label: 'Grote kaart (10 credits, 6 maanden)', value: 'credit_10' },
 ]
 
@@ -135,21 +135,6 @@ async function sendWhatsapp(user) {
 
 }
 
-const items = (row) => [
-	[{
-		label: 'Voeg credits toe',
-		icon: 'i-heroicons-plus-20-solid',
-		click: () => setUser(row)
-	}, {
-		label: 'Archiveer',
-		icon: 'i-heroicons-archive-box-20-solid',
-		click: () => archiveUser(row.$id)
-	}, {
-		label: 'Send WhatsApp',
-		icon: 'i-heroicons-chat-bubble-bottom-center-text-20-solid',
-		click: () => sendWhatsapp(row)
-	}]
-]
 
 const q = ref('')
 
@@ -214,9 +199,17 @@ const filteredRows = computed(() => {
 			</template>
 
 			<template #actions-data="{ row }">
-				<UDropdown :items="items(row)">
-					<UButton color="gray" icon="i-heroicons-ellipsis-horizontal-20-solid" variant="ghost"/>
-				</UDropdown>
+				<div class="flex items-center gap-x-1">
+					<UTooltip text="Voeg credits toe">
+						<UButton color="gray" icon="i-heroicons-plus-20-solid" variant="ghost" size="xs" @click="setUser(row)" />
+					</UTooltip>
+					<UTooltip text="Archiveer">
+						<UButton color="gray" icon="i-heroicons-archive-box-20-solid" variant="ghost" size="xs" @click="archiveUser(row.$id)" />
+					</UTooltip>
+					<UTooltip text="WhatsApp">
+						<UButton color="gray" icon="i-heroicons-chat-bubble-bottom-center-text-20-solid" variant="ghost" size="xs" @click="sendWhatsapp(row)" />
+					</UTooltip>
+				</div>
 			</template>
 		</UTable>
 		<!--Pop up for adding credits-->

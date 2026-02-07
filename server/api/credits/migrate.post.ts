@@ -3,10 +3,11 @@ import { createError } from 'h3'
 /**
  * Admin-only endpoint to migrate credits from user prefs to the credits table.
  *
- * IDEMPOTENT: Skips users who already have credit_legacy rows.
+ * IDEMPOTENT: Skips users who already have credits in the table.
+ * Skips archived users (prefs.archive === true).
  * Safe to call multiple times from the admin UI.
  *
- * Creates credit_legacy rows (valid 1 year) for each user's prefs.credits value.
+ * Creates credit_1 rows (valid 6 months) for each user's prefs.credits value.
  */
 export default defineEventHandler(async (event) => {
     await requireAdmin(event)
@@ -26,30 +27,37 @@ export default defineEventHandler(async (event) => {
 
     const now = new Date()
     const validFrom = now.toISOString()
-    const validTo = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000).toISOString()
+    const validTo = new Date(now.getFullYear(), now.getMonth() + 6, now.getDate()).toISOString()
 
     let totalMigrated = 0
     let totalSkipped = 0
+    let totalArchived = 0
     const details: string[] = []
 
     for (const user of allUsers) {
+        // Skip archived (inactive) users
+        if (user.prefs?.archive === true) {
+            totalArchived++
+            details.push(`${user.name || user.email}: gearchiveerd, overgeslagen`)
+            continue
+        }
+
         const creditCount = parseInt(user.prefs?.credits ?? '0', 10)
         if (creditCount <= 0) continue
 
-        // Idempotency check
+        // Idempotency check: does this user already have credits?
         const existing = await tablesDB.listRows(
             config.public.database,
             'credits',
             [
                 Query.equal('studentId', [user.$id]),
-                Query.equal('type', ['credit_legacy']),
                 Query.limit(1),
             ]
         )
 
         if ((existing.rows?.length ?? 0) > 0) {
             totalSkipped++
-            details.push(`${user.name || user.email}: al gemigreerd`)
+            details.push(`${user.name || user.email}: heeft al credits, overgeslagen`)
             continue
         }
 
@@ -61,7 +69,7 @@ export default defineEventHandler(async (event) => {
                 {
                     studentId: user.$id,
                     bookingId: null,
-                    type: 'credit_legacy',
+                    type: 'credit_1',
                     validFrom,
                     validTo,
                     createdAt: now.toISOString(),
@@ -78,6 +86,7 @@ export default defineEventHandler(async (event) => {
         success: true,
         totalMigrated,
         totalSkipped,
+        totalArchived,
         details,
     }
 })

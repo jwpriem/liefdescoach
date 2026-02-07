@@ -8,7 +8,7 @@ import { createError } from 'h3'
  *   - type: 'credit_1' | 'credit_5' | 'credit_10' (required)
  *
  * Creates 1, 5, or 10 credit rows depending on type.
- * Validity: credit_1 = 3 months, credit_5 = 3 months, credit_10 = 6 months.
+ * Validity: all types = 6 months.
  */
 export default defineEventHandler(async (event) => {
     await requireAdmin(event)
@@ -32,10 +32,10 @@ export default defineEventHandler(async (event) => {
         credit_10: 10,
     }
 
-    // Validity periods: 1 and 5 = 3 months, 10 = 6 months
+    // Validity periods: 1 and 5 = 6 months, 10 = 6 months
     const validityMonths: Record<string, number> = {
-        credit_1: 3,
-        credit_5: 3,
+        credit_1: 6,
+        credit_5: 6,
         credit_10: 6,
     }
 

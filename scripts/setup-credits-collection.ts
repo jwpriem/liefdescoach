@@ -55,7 +55,7 @@ async function main() {
     console.log('Creating attributes...')
     await databases.createStringAttribute(dbId, 'credits', 'studentId', 255, true)
     await databases.createStringAttribute(dbId, 'credits', 'bookingId', 255, false)
-    await databases.createEnumAttribute(dbId, 'credits', 'type', ['credit_1', 'credit_5', 'credit_10', 'credit_legacy'], true)
+    await databases.createEnumAttribute(dbId, 'credits', 'type', ['credit_1', 'credit_5', 'credit_10'], true)
     await databases.createDatetimeAttribute(dbId, 'credits', 'validFrom', true)
     await databases.createDatetimeAttribute(dbId, 'credits', 'validTo', true)
     await databases.createDatetimeAttribute(dbId, 'credits', 'createdAt', true)
