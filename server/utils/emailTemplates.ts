@@ -65,7 +65,7 @@ function wrapInLayout(title: string, contentHtml: string): string {
 </html>`
 }
 
-// ─── Helper: info card row ───────────────────────────────────────────────────
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function infoRow(label: string, value: string): string {
     return `<tr>
@@ -96,7 +96,15 @@ function primaryButton(label: string, href: string): string {
   </table>`
 }
 
-// ─── Email builders ──────────────────────────────────────────────────────────
+function participantList(bookings: { name: string }[]): string {
+    if (!bookings.length) {
+        return '<p style="font-size:14px;color:#9ca3af;margin:0;">Geen deelnemers</p>'
+    }
+    const items = bookings.map(b => `<li style="font-size:14px;color:#374151;padding:2px 0;">${b.name}</li>`).join('')
+    return `<ul style="margin:0;padding-left:20px;">${items}</ul>`
+}
+
+// ─── OTP ─────────────────────────────────────────────────────────────────────
 
 export function otpEmail(code: string): { subject: string; html: string; text: string } {
     const content = `
@@ -117,27 +125,22 @@ export function otpEmail(code: string): { subject: string; html: string; text: s
     }
 }
 
-export function bookingConfirmationEmail(data: {
+// ─── Booking: email to STUDENT ───────────────────────────────────────────────
+
+export function bookingStudentEmail(data: {
     name: string
     lessonType: string
     lessonDate: string
-    spots: number
-    bookings: { name: string }[]
     calendarLinks: { apple: string; google: string; outlook: string }
 }): { subject: string; html: string; text: string } {
-    const bookingList = data.bookings.map(b => `<li style="font-size:14px;color:#374151;padding:2px 0;">${b.name}</li>`).join('')
-
     const content = `
     ${heading('Je les is geboekt!')}
-    ${subtext(`Hoi ${data.name}, je boeking is bevestigd.`)}
+    ${subtext(`Hoi ${data.name}, bedankt voor je boeking. We kijken ernaar uit je te zien!`)}
     ${infoTable(
         infoRow('Les', data.lessonType) +
-        infoRow('Datum', data.lessonDate) +
-        infoRow('Plekken over', String(data.spots))
+        infoRow('Datum', data.lessonDate)
     )}
-    <p style="font-size:14px;font-weight:600;color:#374151;margin:20px 0 8px 0;">Deelnemers:</p>
-    <ul style="margin:0 0 20px 0;padding-left:20px;">${bookingList}</ul>
-    <p style="font-size:14px;font-weight:600;color:#374151;margin:20px 0 8px 0;">Zet in je agenda:</p>
+    <p style="font-size:14px;font-weight:600;color:#374151;margin:20px 0 8px 0;">Zet de les in je agenda:</p>
     <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto;">
       <tr>
         <td style="padding:0 6px;"><a href="${data.calendarLinks.apple}" style="display:inline-block;padding:8px 16px;font-size:13px;color:${BRAND_COLOR};border:1px solid #e5e7eb;border-radius:8px;text-decoration:none;">Apple</a></td>
@@ -145,16 +148,19 @@ export function bookingConfirmationEmail(data: {
         <td style="padding:0 6px;"><a href="${data.calendarLinks.outlook}" style="display:inline-block;padding:8px 16px;font-size:13px;color:${BRAND_COLOR};border:1px solid #e5e7eb;border-radius:8px;text-decoration:none;">Outlook</a></td>
       </tr>
     </table>
-    ${primaryButton('Bekijk mijn boekingen', SITE_URL + '/account')}`
+    ${primaryButton('Bekijk mijn boekingen', SITE_URL + '/account')}
+    <p style="font-size:13px;color:#9ca3af;text-align:center;margin-top:24px;">Tot op de mat! Namaste.</p>`
 
     return {
         subject: 'Bevestiging: je les is geboekt!',
         html: wrapInLayout('Boekingsbevestiging', content),
-        text: `Hoi ${data.name},\n\nJe les is geboekt!\n\nLes: ${data.lessonType}\nDatum: ${data.lessonDate}\nPlekken over: ${data.spots}\n\nTot snel!\nYoga Ravennah`,
+        text: `Hoi ${data.name},\n\nBedankt voor je boeking! We kijken ernaar uit je te zien.\n\nLes: ${data.lessonType}\nDatum: ${data.lessonDate}\n\nTot op de mat! Namaste.\nYoga Ravennah`,
     }
 }
 
-export function bookingCancellationEmail(data: {
+// ─── Booking: email to ADMIN (info@ravennah.com) ─────────────────────────────
+
+export function bookingAdminEmail(data: {
     name: string
     email: string
     lessonType: string
@@ -162,55 +168,86 @@ export function bookingCancellationEmail(data: {
     spots: number
     bookings: { name: string }[]
 }): { subject: string; html: string; text: string } {
-    const bookingList = data.bookings.length
-        ? data.bookings.map(b => `<li style="font-size:14px;color:#374151;padding:2px 0;">${b.name}</li>`).join('')
-        : '<li style="font-size:14px;color:#9ca3af;padding:2px 0;">Geen boekingen meer</li>'
-
     const content = `
-    ${heading('Les geannuleerd')}
-    ${subtext(`${data.name} (${data.email}) heeft een les geannuleerd.`)}
+    ${heading('Nieuwe boeking')}
+    ${subtext(`${data.name} heeft een les geboekt.`)}
     ${infoTable(
+        infoRow('Leerling', data.name) +
+        infoRow('E-mail', data.email) +
         infoRow('Les', data.lessonType) +
         infoRow('Datum', data.lessonDate) +
         infoRow('Plekken over', String(data.spots))
     )}
-    <p style="font-size:14px;font-weight:600;color:#374151;margin:20px 0 8px 0;">Resterende deelnemers:</p>
-    <ul style="margin:0;padding-left:20px;">${bookingList}</ul>`
+    <p style="font-size:14px;font-weight:600;color:#374151;margin:20px 0 8px 0;">Alle deelnemers:</p>
+    ${participantList(data.bookings)}`
+
+    const bookingNames = data.bookings.map(b => b.name).join(', ') || 'Geen'
 
     return {
-        subject: 'Annulering Yoga Ravennah',
-        html: wrapInLayout('Annulering', content),
-        text: `Annulering\n\nNaam: ${data.name}\nEmail: ${data.email}\nLes: ${data.lessonType}\nDatum: ${data.lessonDate}\nPlekken over: ${data.spots}`,
+        subject: 'Nieuwe boeking Yoga Ravennah',
+        html: wrapInLayout('Nieuwe boeking', content),
+        text: `Nieuwe boeking\n\nLeerling: ${data.name}\nE-mail: ${data.email}\nLes: ${data.lessonType}\nDatum: ${data.lessonDate}\nPlekken over: ${data.spots}\n\nAlle deelnemers: ${bookingNames}`,
     }
 }
 
-export function newBookingNotificationEmail(data: {
+// ─── Cancellation: email to STUDENT ──────────────────────────────────────────
+
+export function cancellationStudentEmail(data: {
+    name: string
+    lessonType: string
+    lessonDate: string
+}): { subject: string; html: string; text: string } {
+    const content = `
+    ${heading('Je les is geannuleerd')}
+    ${subtext(`Hoi ${data.name}, jammer dat je niet kunt komen.`)}
+    ${infoTable(
+        infoRow('Les', data.lessonType) +
+        infoRow('Datum', data.lessonDate)
+    )}
+    <p style="font-size:14px;color:#374151;text-align:center;margin:20px 0;">Je credit is teruggestort op je account. Je kunt deze gebruiken om een andere les te boeken.</p>
+    ${primaryButton('Bekijk het lesrooster', SITE_URL + '/lessen')}
+    <p style="font-size:13px;color:#9ca3af;text-align:center;margin-top:24px;">We hopen je snel weer te zien!</p>`
+
+    return {
+        subject: 'Annulering: je les is geannuleerd',
+        html: wrapInLayout('Annulering', content),
+        text: `Hoi ${data.name},\n\nJammer dat je niet kunt komen.\n\nLes: ${data.lessonType}\nDatum: ${data.lessonDate}\n\nJe credit is teruggestort op je account. Je kunt deze gebruiken om een andere les te boeken.\n\nWe hopen je snel weer te zien!\nYoga Ravennah`,
+    }
+}
+
+// ─── Cancellation: email to ADMIN (info@ravennah.com) ────────────────────────
+
+export function cancellationAdminEmail(data: {
     name: string
     email: string
     lessonType: string
     lessonDate: string
     spots: number
-    bookings: string
+    bookings: { name: string }[]
 }): { subject: string; html: string; text: string } {
     const content = `
-    ${heading('Nieuwe boeking')}
-    ${subtext(`${data.name} heeft een les geboekt.`)}
+    ${heading('Annulering')}
+    ${subtext(`${data.name} heeft een les geannuleerd.`)}
     ${infoTable(
-        infoRow('Naam', data.name) +
-        infoRow('Email', data.email) +
+        infoRow('Leerling', data.name) +
+        infoRow('E-mail', data.email) +
         infoRow('Les', data.lessonType) +
         infoRow('Datum', data.lessonDate) +
         infoRow('Plekken over', String(data.spots))
     )}
-    <p style="font-size:14px;font-weight:600;color:#374151;margin:20px 0 8px 0;">Alle boekingen:</p>
-    <p style="font-size:14px;color:#374151;white-space:pre-line;">${data.bookings}</p>`
+    <p style="font-size:14px;font-weight:600;color:#374151;margin:20px 0 8px 0;">Resterende deelnemers:</p>
+    ${participantList(data.bookings)}`
+
+    const bookingNames = data.bookings.map(b => b.name).join(', ') || 'Geen'
 
     return {
-        subject: 'Nieuwe boeking Yoga Ravennah',
-        html: wrapInLayout('Nieuwe boeking', content),
-        text: `Nieuwe boeking\n\nNaam: ${data.name}\nEmail: ${data.email}\nLes: ${data.lessonType}\nDatum: ${data.lessonDate}\nPlekken over: ${data.spots}\n\nBoekingen:\n${data.bookings}`,
+        subject: 'Annulering Yoga Ravennah',
+        html: wrapInLayout('Annulering', content),
+        text: `Annulering\n\nLeerling: ${data.name}\nE-mail: ${data.email}\nLes: ${data.lessonType}\nDatum: ${data.lessonDate}\nPlekken over: ${data.spots}\n\nResterende deelnemers: ${bookingNames}`,
     }
 }
+
+// ─── New user (to admin) ─────────────────────────────────────────────────────
 
 export function newUserEmail(data: {
     name: string
@@ -223,7 +260,7 @@ export function newUserEmail(data: {
     ${subtext('Er heeft zich een nieuwe gebruiker geregistreerd.')}
     ${infoTable(
         infoRow('Naam', data.name) +
-        infoRow('Email', data.email) +
+        infoRow('E-mail', data.email) +
         infoRow('Telefoon', data.phone || 'Niet opgegeven') +
         infoRow('Datum', data.date)
     )}
@@ -232,9 +269,11 @@ export function newUserEmail(data: {
     return {
         subject: 'Nieuwe gebruiker Yoga Ravennah',
         html: wrapInLayout('Nieuwe gebruiker', content),
-        text: `Nieuwe gebruiker\n\nNaam: ${data.name}\nEmail: ${data.email}\nTelefoon: ${data.phone || 'Niet opgegeven'}\nDatum: ${data.date}`,
+        text: `Nieuwe gebruiker\n\nNaam: ${data.name}\nE-mail: ${data.email}\nTelefoon: ${data.phone || 'Niet opgegeven'}\nDatum: ${data.date}`,
     }
 }
+
+// ─── Contact form (to admin) ─────────────────────────────────────────────────
 
 export function contactEmail(data: {
     name: string
@@ -246,7 +285,7 @@ export function contactEmail(data: {
     ${subtext(`Van ${data.name} (${data.email})`)}
     ${infoTable(
         infoRow('Naam', data.name) +
-        infoRow('Email', data.email)
+        infoRow('E-mail', data.email)
     )}
     <div style="margin:20px 0;padding:16px;background-color:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;">
       <p style="font-size:12px;font-weight:600;color:${BRAND_COLOR};text-transform:uppercase;letter-spacing:0.5px;margin:0 0 8px 0;">Bericht</p>
@@ -256,6 +295,6 @@ export function contactEmail(data: {
     return {
         subject: 'Contactformulier Yoga Ravennah',
         html: wrapInLayout('Contactformulier', content),
-        text: `Contactformulier\n\nNaam: ${data.name}\nEmail: ${data.email}\n\nBericht:\n${data.message}`,
+        text: `Contactformulier\n\nNaam: ${data.name}\nE-mail: ${data.email}\n\nBericht:\n${data.message}`,
     }
 }

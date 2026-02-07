@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 400, statusMessage: 'lessonId is verplicht' })
     }
 
-    // Fetch lesson with bookings and student names using server API key
+    // Fetch lesson with bookings and student names
     const lesson = await tablesDB.getRow(
         config.public.database,
         'lessons',
@@ -28,13 +28,11 @@ export default defineEventHandler(async (event) => {
         [Query.select(['*', 'bookings.*', 'bookings.students.*'])]
     )
 
-    // Resolve student names: the relationship may return an object or a raw ID string
     const bookings = lesson.bookings ?? []
     const unresolvedIds = bookings
         .filter((b: any) => typeof b.students === 'string')
         .map((b: any) => b.students)
 
-    // Look up unresolved student names from Auth users
     const { users } = useServerAppwrite()
     const nameMap: Record<string, string> = {}
     for (const uid of unresolvedIds) {
@@ -64,12 +62,14 @@ export default defineEventHandler(async (event) => {
     const calendarLink = (stream: string) =>
         `https://calndr.link/d/event/?service=${stream}&start=${lessonDate.format('YYYY-MM-DD')}%20${lessonDate.format('H')}:${lessonDate.format('mm')}&title=${calendarTitle}%20Ravennah&timezone=Europe/Amsterdam&location=${encodeURIComponent(address)}`
 
-    const emailContent = bookingConfirmationEmail({
+    const formattedDate = `${lessonDate.format('dddd D MMMM')} van ${lessonDate.format('H.mm')} tot ${lessonDate.add(1, 'hour').format('H.mm')} uur`
+    const spots = MAX_LESSON_CAPACITY - (lesson.bookings?.length ?? 0)
+
+    // 1. Email to the student (no participants, no spots)
+    const studentEmail = bookingStudentEmail({
         name: body.name,
         lessonType: lessontype,
-        lessonDate: `${lessonDate.format('dddd D MMMM')} van ${lessonDate.format('H.mm')} tot ${lessonDate.add(1, 'hour').format('H.mm')} uur`,
-        spots: MAX_LESSON_CAPACITY - (lesson.bookings?.length ?? 0),
-        bookings: bookingsArr,
+        lessonDate: formattedDate,
         calendarLinks: {
             apple: calendarLink('apple'),
             google: calendarLink('gmail'),
@@ -77,13 +77,32 @@ export default defineEventHandler(async (event) => {
         },
     })
 
-    await smtpTransport.sendMail({
-        from: 'Yoga Ravennah <info@ravennah.com>',
-        to: body.email,
-        subject: emailContent.subject,
-        html: emailContent.html,
-        text: emailContent.text,
+    // 2. Email to admin (with participants, spots, student info)
+    const adminEmail = bookingAdminEmail({
+        name: body.name,
+        email: body.email,
+        lessonType: lessontype,
+        lessonDate: formattedDate,
+        spots,
+        bookings: bookingsArr,
     })
+
+    await Promise.all([
+        smtpTransport.sendMail({
+            from: 'Yoga Ravennah <info@ravennah.com>',
+            to: body.email,
+            subject: studentEmail.subject,
+            html: studentEmail.html,
+            text: studentEmail.text,
+        }),
+        smtpTransport.sendMail({
+            from: 'Yoga Ravennah <info@ravennah.com>',
+            to: 'info@ravennah.com',
+            subject: adminEmail.subject,
+            html: adminEmail.html,
+            text: adminEmail.text,
+        }),
+    ])
 
     setResponseStatus(event, 202)
 })
