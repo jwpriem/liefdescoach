@@ -368,8 +368,18 @@ export const useMainStore = defineStore('main', {
                 })
                 await this.fetchCredits()
 
-                const message = `Naam:\\n${user.name}\\n\\nEmail:\\n${user.email}\\n\\nTelefoon:\\n${user.phone}\\n\\nDatum:\\n${$rav.formatDateInDutch(user.$createdAt)}`
-                await this.sendSimpleEmail('Nieuwe gebruiker Yoga Ravennah', message)
+                await $fetch('/api/mail/send', {
+                    method: 'POST',
+                    body: {
+                        type: 'new-user',
+                        data: {
+                            name: user.name,
+                            email: user.email,
+                            phone: user.phone || '',
+                            date: new Date(user.$createdAt).toLocaleDateString('nl-NL'),
+                        }
+                    }
+                })
             });
         },
         async logoutUser() {
@@ -440,16 +450,10 @@ export const useMainStore = defineStore('main', {
                 name: user.name,
             }
 
-            const isProd = process.env.NODE_ENV == 'production'
-
-            if (isProd) {
-                await $fetch(`/api/${type}`, {
-                    method: 'POST',
-                    body: emailData
-                })
-            } else {
-                console.log('sendEmail', type, emailData)
-            }
+            await $fetch(`/api/${type}`, {
+                method: 'POST',
+                body: emailData
+            })
         },
 
         async getOnBehalfOrUser() {
@@ -458,17 +462,6 @@ export const useMainStore = defineStore('main', {
 
         async clearOnBehalf() {
             await Promise.all([this.setOnBehalfOf(null), this.fetchLessons(), this.fetchStudents(), this.fetchBookings()]);
-        },
-
-        async sendSimpleEmail(subject: string, message: string) {
-            const mail = useMail()
-
-            await mail.send({
-                config: 0,
-                from: 'Yoga Ravennah <info@ravennah.com>',
-                subject: subject,
-                text: message
-            })
         }
     },
 

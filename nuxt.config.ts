@@ -6,7 +6,6 @@ export default defineNuxtConfig({
   
   runtimeConfig: {
     // Private keys are only available on the server
-    postmark: '',
     appwriteKey: '',
     revenuePerBooking: '14',  // NUXT_REVENUE_PER_BOOKING
     costPerLesson: '50',      // NUXT_COST_PER_LESSON
@@ -33,7 +32,6 @@ export default defineNuxtConfig({
     '@nuxtjs/google-fonts',
     '@pinia/nuxt',
     'dayjs-nuxt',
-    'nuxt-mail',
     '@nuxtjs/sitemap',
     '@nuxtjs/robots',
     '@zadigetvoltaire/nuxt-gtm',
@@ -50,21 +48,6 @@ export default defineNuxtConfig({
     plugins: ['relativeTime', 'utc', 'timezone'],
     defaultLocale: 'nl',
     defaultTimezone: 'America/New_York'
-  },
-  
-  mail: {
-    message: {
-      to: 'info@ravennah.com',
-    },
-    smtp: {
-      host: isDev ? "sandbox.smtp.mailtrap.io" : "mail.privateemail.com",
-      port: isDev ? 2525 : 465,
-      secure: isDev ? false : true,
-      auth: {
-        user: isDev ? process.env.NUXT_PUBLIC_MAIL_USER_DEV : "info@ravennah.com",
-        pass: isDev ? process.env.NUXT_PUBLIC_MAIL_PASS_DEV : process.env.NUXT_PUBLIC_MAIL_PASS,
-      }
-    },
   },
   
   sitemap: {

@@ -1,4 +1,3 @@
-import { ServerClient } from 'postmark'
 import { createError } from 'h3'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
@@ -11,7 +10,6 @@ export default defineEventHandler(async (event) => {
     await requireAuth(event)
     const config = useRuntimeConfig()
     const { tablesDB, Query } = useServerAppwrite()
-    const client = new ServerClient(config.postmark)
 
     const body = await readBody(event)
 
@@ -66,23 +64,25 @@ export default defineEventHandler(async (event) => {
     const calendarLink = (stream: string) =>
         `https://calndr.link/d/event/?service=${stream}&start=${lessonDate.format('YYYY-MM-DD')}%20${lessonDate.format('H')}:${lessonDate.format('mm')}&title=${calendarTitle}%20Ravennah&timezone=Europe/Amsterdam&location=${encodeURIComponent(address)}`
 
-    const templateData = {
-        email: body.email,
-        new_booking_name: body.name,
-        lessontype,
-        lessondate: `${lessonDate.format('dddd D MMMM')} van ${lessonDate.format('H.mm')} tot ${lessonDate.add(1, 'hour').format('H.mm')} uur`,
+    const emailContent = bookingConfirmationEmail({
+        name: body.name,
+        lessonType: lessontype,
+        lessonDate: `${lessonDate.format('dddd D MMMM')} van ${lessonDate.format('H.mm')} tot ${lessonDate.add(1, 'hour').format('H.mm')} uur`,
         spots: MAX_LESSON_CAPACITY - (lesson.bookings?.length ?? 0),
         bookings: bookingsArr,
-        calendar_link_apple: calendarLink('apple'),
-        calendar_link_gmail: calendarLink('gmail'),
-        calendar_link_outlook: calendarLink('outlook')
-    }
+        calendarLinks: {
+            apple: calendarLink('apple'),
+            google: calendarLink('gmail'),
+            outlook: calendarLink('outlook'),
+        },
+    })
 
-    await client.sendEmailWithTemplate({
-        "From": "info@ravennah.com",
-        "To": body.email,
-        "TemplateAlias": "lesson-student",
-        "TemplateModel": templateData
+    await smtpTransport.sendMail({
+        from: 'Yoga Ravennah <info@ravennah.com>',
+        to: body.email,
+        subject: emailContent.subject,
+        html: emailContent.html,
+        text: emailContent.text,
     })
 
     setResponseStatus(event, 202)

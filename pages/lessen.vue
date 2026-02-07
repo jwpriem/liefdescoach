@@ -5,7 +5,6 @@ const ogImage = ref('https://www.ravennah.com/ravennah-social.jpg');
 const pageUrl = ref('https://www.ravennah.com/lessen');
 
 const store = useMainStore()
-const mail = useMail()
 const toast = useToast()
 const { $rav } = useNuxtApp()
 
@@ -46,11 +45,19 @@ async function book(lesson: any) {
   let bookings = lesson.bookings?.length ? lesson.bookings.map(booking => booking.students.name + '\n').join('') : ''
   bookings = bookings + store.loggedInUser.name + '\n'
 
-  await mail.send({
-    config: 0,
-    from: 'Yoga Ravennah <info@ravennah.com>',
-    subject: 'Nieuwe boeking Yoga Ravennah',
-    text: `Naam:\n${store.loggedInUser.name}\n\nEmail:\n${store.loggedInUser.email}\n\nDatum:\n${$rav.formatDateInDutch(lesson.date, true)}\n\nLes:\n${$rav.getLessonTitle(lesson)}\n\nAantal plekken:\n${9 - ((lesson.bookings?.length || 0) + 1)}\n\nBoekingen:\n${bookings}`
+  await $fetch('/api/mail/send', {
+    method: 'POST',
+    body: {
+      type: 'new-booking-notification',
+      data: {
+        name: store.loggedInUser.name,
+        email: store.loggedInUser.email,
+        lessonType: $rav.getLessonTitle(lesson),
+        lessonDate: $rav.formatDateInDutch(lesson.date, true),
+        spots: 9 - ((lesson.bookings?.length || 0) + 1),
+        bookings,
+      }
+    }
   })
 
   toast.add({

@@ -31,10 +31,10 @@ function getCreditStatus(credit: any) {
   return 'Beschikbaar';
 }
 
-function getCreditStatusColor(credit: any) {
-  if (credit.bookingId) return 'text-gray-400';
-  if (new Date(credit.validTo) <= new Date()) return 'text-red-400';
-  return 'text-emerald-400';
+function getCreditBadgeColor(credit: any): string {
+  if (credit.bookingId) return 'red';
+  if (new Date(credit.validTo) <= new Date()) return 'orange';
+  return 'green';
 }
 
 function openEdit() {
@@ -146,7 +146,7 @@ const passwordStrength = computed(() => {
              class="rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-lg shadow-emerald-950/10 p-4">
           <div class="flex items-center justify-between mb-3">
             <span class="text-sm font-medium text-gray-200">{{ creditTypeLabels[credit.type] || credit.type }}</span>
-            <span class="text-sm font-medium" :class="getCreditStatusColor(credit)">{{ getCreditStatus(credit) }}</span>
+            <UBadge :color="getCreditBadgeColor(credit)" variant="subtle" size="xs">{{ getCreditStatus(credit) }}</UBadge>
           </div>
           <div class="grid grid-cols-2 gap-y-2 text-sm">
             <template v-if="credit.lesson">
@@ -179,7 +179,7 @@ const passwordStrength = computed(() => {
           <tbody>
             <tr v-for="credit in myCredits" :key="credit.$id" class="border-b border-gray-800/50 last:border-b-0">
               <td class="py-3 px-4 text-sm text-gray-200">{{ creditTypeLabels[credit.type] || credit.type }}</td>
-              <td class="py-3 px-4 text-sm" :class="getCreditStatusColor(credit)">{{ getCreditStatus(credit) }}</td>
+              <td class="py-3 px-4 text-sm"><UBadge :color="getCreditBadgeColor(credit)" variant="subtle" size="xs">{{ getCreditStatus(credit) }}</UBadge></td>
               <td class="py-3 px-4 text-sm text-gray-300">{{ credit.lesson?.type || '-' }}</td>
               <td class="py-3 px-4 text-sm text-gray-300">{{ credit.lesson?.teacher || '-' }}</td>
               <td class="py-3 px-4 text-sm text-gray-300">{{ credit.lesson ? $rav.formatDateInDutch(credit.lesson.date) : '-' }}</td>
