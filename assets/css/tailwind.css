@@ -198,6 +198,14 @@ label {
         }
     }
 
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        filter: invert(0.7) sepia(1) saturate(3) hue-rotate(100deg);
+    }
+
+    input[type="date"] {
+        color-scheme: dark;
+    }
+
 
     .nav-item {
         @apply transition-all duration-300 ease-in-out antialiased;
