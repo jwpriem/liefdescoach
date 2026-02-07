@@ -50,22 +50,29 @@ export default defineEventHandler(async (event) => {
         offset += limit
     }
 
-    // Fetch all bookings for these lessons
+    // Fetch all bookings for these lessons (paginate per batch)
     const lessonIds = allLessons.map((l: any) => l.$id)
     let allBookings: any[] = []
 
     for (let i = 0; i < lessonIds.length; i += 100) {
         const batch = lessonIds.slice(i, i + 100)
         if (batch.length === 0) continue
-        const res = await tablesDB.listRows(
-            config.public.database,
-            'bookings',
-            [
-                Query.equal('lessons', batch),
-                Query.limit(500),
-            ]
-        )
-        allBookings = allBookings.concat(res.rows ?? [])
+        let batchOffset = 0
+        while (true) {
+            const res = await tablesDB.listRows(
+                config.public.database,
+                'bookings',
+                [
+                    Query.equal('lessons', batch),
+                    Query.limit(limit),
+                    Query.offset(batchOffset),
+                ]
+            )
+            const rows = res.rows ?? []
+            allBookings = allBookings.concat(rows)
+            if (rows.length < limit) break
+            batchOffset += limit
+        }
     }
 
     // Count bookings per lesson
