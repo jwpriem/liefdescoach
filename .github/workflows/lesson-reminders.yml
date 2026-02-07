@@ -1,0 +1,16 @@
+name: Lesson Reminders
+
+on:
+  schedule:
+    - cron: '0 20 * * *' # Daily at 20:00 UTC (21:00 CET / 22:00 CEST)
+  workflow_dispatch: # Allow manual trigger for testing
+
+jobs:
+  send-reminders:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send lesson reminder emails
+        run: |
+          curl -sf -X POST "${{ secrets.APP_URL }}/api/sendLessonReminders" \
+            -H "Content-Type: application/json" \
+            -H "x-api-key: ${{ secrets.CRON_SECRET }}"

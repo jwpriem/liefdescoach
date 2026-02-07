@@ -7,6 +7,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     // Private keys are only available on the server
     appwriteKey: '',
+    cronSecret: '',           // NUXT_CRON_SECRET
     revenuePerBooking: '14',  // NUXT_REVENUE_PER_BOOKING
     costPerLesson: '50',      // NUXT_COST_PER_LESSON
     // Public keys that are exposed to the client

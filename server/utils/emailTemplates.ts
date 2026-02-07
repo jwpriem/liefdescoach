@@ -273,6 +273,31 @@ export function newUserEmail(data: {
     }
 }
 
+// ─── Lesson reminder (to student, day before) ───────────────────────────────
+
+export function lessonReminderEmail(data: {
+    name: string
+    lessonType: string
+    lessonDate: string
+}): { subject: string; html: string; text: string } {
+    const content = `
+    ${heading('Herinnering: je les is morgen!')}
+    ${subtext(`Hoi ${data.name}, vergeet niet dat je morgen een les hebt.`)}
+    ${infoTable(
+        infoRow('Les', data.lessonType) +
+        infoRow('Datum', data.lessonDate)
+    )}
+    <p style="font-size:14px;color:#374151;text-align:center;margin:20px 0;">We kijken ernaar uit je te zien! Vergeet je matje niet mee te nemen.</p>
+    ${primaryButton('Bekijk mijn boekingen', SITE_URL + '/account')}
+    <p style="font-size:13px;color:#9ca3af;text-align:center;margin-top:24px;">Tot op de mat! Namaste.</p>`
+
+    return {
+        subject: `Herinnering: ${data.lessonType} morgen`,
+        html: wrapInLayout('Lesherinnering', content),
+        text: `Hoi ${data.name},\n\nVergeet niet dat je morgen een les hebt!\n\nLes: ${data.lessonType}\nDatum: ${data.lessonDate}\n\nWe kijken ernaar uit je te zien! Vergeet je matje niet mee te nemen.\n\nTot op de mat! Namaste.\nYoga Ravennah`,
+    }
+}
+
 // ─── Contact form (to admin) ─────────────────────────────────────────────────
 
 export function contactEmail(data: {
