@@ -136,60 +136,65 @@ watch([dateFrom, dateTo, selectedBucket], fetchRevenue)
 
 <template>
   <div>
-    <h2 class="text-2xl md:text-4xl uppercase font-black">
+    <h2 class="text-2xl md:text-4xl uppercase font-black mb-6">
       <span class="emerald-underline text-emerald-900">Omzet</span><span class="text-emerald-700">.</span>
     </h2>
 
     <!-- Controls -->
-    <div class="my-6 w-full flex items-start justify-start gap-x-6 flex-wrap gap-y-3">
-      <UFormGroup label="Van">
-        <UInput v-model="dateFrom" type="date" color="primary" variant="outline" />
-      </UFormGroup>
-      <UFormGroup label="Tot">
-        <UInput v-model="dateTo" type="date" color="primary" variant="outline" />
-      </UFormGroup>
-      <UFormGroup label="Periode">
-        <USelectMenu v-model="selectedBucket" :options="bucketOptions" value-attribute="value" option-attribute="label" color="primary" variant="outline" />
-      </UFormGroup>
+    <div class="rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-lg shadow-emerald-950/10 p-4 sm:p-6 mb-6">
+      <div class="flex items-start justify-start gap-x-6 flex-wrap gap-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-1.5">Van</label>
+          <UInput v-model="dateFrom" type="date" color="primary" variant="outline" size="lg" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-1.5">Tot</label>
+          <UInput v-model="dateTo" type="date" color="primary" variant="outline" size="lg" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-1.5">Periode</label>
+          <USelectMenu v-model="selectedBucket" :options="bucketOptions" value-attribute="value" option-attribute="label" color="primary" variant="outline" size="lg" />
+        </div>
+      </div>
     </div>
 
     <!-- Summary cards -->
-    <div v-if="totals" class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
-      <div class="bg-gray-800 rounded p-4">
-        <sup class="text-emerald-500">Omzet</sup>
-        <span class="block -mt-2 text-lg font-medium">€{{ totals.revenue }}</span>
+    <div v-if="totals" class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+      <div class="rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-lg shadow-emerald-950/10 p-4 sm:p-5">
+        <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Omzet</span>
+        <span class="block text-lg font-semibold text-gray-100 mt-1">€{{ totals.revenue }}</span>
       </div>
-      <div class="bg-gray-800 rounded p-4">
-        <sup class="text-emerald-500">Kosten</sup>
-        <span class="block -mt-2 text-lg font-medium">€{{ totals.cost }}</span>
+      <div class="rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-lg shadow-emerald-950/10 p-4 sm:p-5">
+        <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Kosten</span>
+        <span class="block text-lg font-semibold text-gray-100 mt-1">€{{ totals.cost }}</span>
       </div>
-      <div class="bg-gray-800 rounded p-4">
-        <sup class="text-emerald-500">Winst</sup>
-        <span class="block -mt-2 text-lg font-medium" :class="totals.profit >= 0 ? 'text-emerald-400' : 'text-red-400'">€{{ totals.profit }}</span>
+      <div class="rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-lg shadow-emerald-950/10 p-4 sm:p-5">
+        <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Winst</span>
+        <span class="block text-lg font-semibold mt-1" :class="totals.profit >= 0 ? 'text-emerald-400' : 'text-red-400'">€{{ totals.profit }}</span>
       </div>
-      <div class="bg-gray-800 rounded p-4">
-        <sup class="text-emerald-500">Boekingen</sup>
-        <span class="block -mt-2 text-lg font-medium">{{ totals.bookings }}</span>
+      <div class="rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-lg shadow-emerald-950/10 p-4 sm:p-5">
+        <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Boekingen</span>
+        <span class="block text-lg font-semibold text-gray-100 mt-1">{{ totals.bookings }}</span>
       </div>
-      <div class="bg-gray-800 rounded p-4">
-        <sup class="text-emerald-500">Lessen</sup>
-        <span class="block -mt-2 text-lg font-medium">{{ totals.lessons }}</span>
+      <div class="rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-lg shadow-emerald-950/10 p-4 sm:p-5">
+        <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Lessen</span>
+        <span class="block text-lg font-semibold text-gray-100 mt-1">{{ totals.lessons }}</span>
       </div>
     </div>
 
     <!-- Chart -->
-    <div class="bg-gray-800 rounded p-4" style="height: 350px; position: relative;">
+    <div class="rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-2xl shadow-emerald-950/20 p-4 sm:p-6" style="height: 350px; position: relative;">
       <div v-if="loading" class="absolute inset-0 flex items-center justify-center">
         <UIcon name="i-heroicons-arrow-path-20-solid" class="w-6 h-6 text-emerald-500 animate-spin" />
       </div>
       <Line v-else-if="chartData.labels.length" :data="chartData" :options="chartOptions" />
-      <div v-else class="flex items-center justify-center h-full text-emerald-100/50">
+      <div v-else class="flex items-center justify-center h-full text-gray-500">
         Geen data voor deze periode
       </div>
     </div>
 
     <!-- Settings info -->
-    <p v-if="revenueData" class="text-sm text-emerald-100/50 mt-3">
+    <p v-if="revenueData" class="text-sm text-gray-500 mt-3">
       Berekend met €{{ revenueData.revenuePerBooking }} per boeking en €{{ revenueData.costPerLesson }} per les.
     </p>
   </div>

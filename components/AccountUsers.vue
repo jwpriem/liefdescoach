@@ -165,42 +165,49 @@ const filteredRows = computed(() => {
 
 <template>
 	<div v-if="isAdmin && filteredRows.length">
-		<h2 class="text-2xl md:text-4xl uppercase font-black">
+		<h2 class="text-2xl md:text-4xl uppercase font-black mb-6">
 			<span class="emerald-underline text-emerald-900">Gebruikers ({{ filteredRows.length }})</span><span
 				class="text-emerald-700">.</span>
 		</h2>
 
-		<div class="my-6 w-full flex items-center justify-start gap-x-6 flex-wrap gap-y-3">
-			<UFormGroup label="Filter gebruikers">
-				<UInput id="naam" v-model="q" color="primary" placeholder="Zoek gebruiker" type="text" variant="outline"/>
-			</UFormGroup>
-			<UFormGroup label="Gearchiveerd">
-				<UToggle
-						v-model="state.showArchived"
-						off-icon="i-heroicons-x-mark-20-solid"
-						on-icon="i-heroicons-check-20-solid"
-				/>
-			</UFormGroup>
-			<UFormGroup label="Migratie">
-				<UButton color="gray" variant="solid" :loading="migrating" @click="migrateCredits()">
-					Migreer credits van prefs
-				</UButton>
-			</UFormGroup>
+		<!-- Controls bar -->
+		<div class="rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-lg shadow-emerald-950/10 p-4 sm:p-6 mb-6">
+			<div class="flex items-start justify-start gap-x-6 flex-wrap gap-y-4">
+				<div>
+					<label class="block text-sm font-medium text-gray-300 mb-1.5">Filter gebruikers</label>
+					<UInput id="naam" v-model="q" color="primary" placeholder="Zoek gebruiker" type="text" variant="outline" size="lg"/>
+				</div>
+				<div>
+					<label class="block text-sm font-medium text-gray-300 mb-1.5">Gearchiveerd</label>
+					<UToggle
+							v-model="state.showArchived"
+							off-icon="i-heroicons-x-mark-20-solid"
+							on-icon="i-heroicons-check-20-solid"
+					/>
+				</div>
+				<div>
+					<label class="block text-sm font-medium text-gray-300 mb-1.5">Migratie</label>
+					<UButton color="gray" variant="solid" :loading="migrating" @click="migrateCredits()">
+						Migreer credits van prefs
+					</UButton>
+				</div>
+			</div>
 		</div>
 
 		<!-- Mobile: card layout -->
 		<div v-if="students.length" class="flex flex-col gap-y-3 md:hidden">
-			<div v-for="row in filteredRows" :key="row.$id" class="bg-gray-800 rounded p-4">
-				<div class="flex items-center justify-between mb-2">
-					<span class="font-medium">{{ row.name }}</span>
-					<span class="text-emerald-500 text-sm">{{ getAvailableCredits(row.$id) }} credits</span>
+			<div v-for="row in filteredRows" :key="row.$id"
+			     class="rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-lg shadow-emerald-950/10 p-4">
+				<div class="flex items-center justify-between mb-3">
+					<span class="font-medium text-gray-100">{{ row.name }}</span>
+					<span class="text-emerald-400 text-sm font-medium">{{ getAvailableCredits(row.$id) }} credits</span>
 				</div>
-				<div class="text-sm text-emerald-100/70 mb-3">
+				<div class="text-sm text-gray-400 mb-4 space-y-0.5">
 					<div>{{ row.email }}</div>
 					<div v-if="row.phone">{{ row.phone }}</div>
 					<div>{{ $rav.formatDateInDutch(row.registration) }}</div>
 				</div>
-				<div class="flex items-center gap-x-3">
+				<div class="flex items-center gap-x-2">
 					<UButton color="primary" icon="i-heroicons-plus-20-solid" variant="ghost" size="md" class="text-emerald-100" @click="setUser(row)" />
 					<UButton color="primary" icon="i-heroicons-archive-box-20-solid" variant="ghost" size="md" class="text-emerald-100" @click="archiveUser(row.$id)" />
 					<UButton color="primary" icon="i-heroicons-chat-bubble-bottom-center-text-20-solid" variant="ghost" size="md" class="text-emerald-100" @click="sendWhatsapp(row)" />
@@ -209,54 +216,54 @@ const filteredRows = computed(() => {
 		</div>
 
 		<!-- Desktop: table layout -->
-		<UTable v-if="students.length" :columns="columns" :rows="filteredRows" class="hidden md:block">
-			<template #credits-data="{ row }">
-				{{ getAvailableCredits(row.$id) }}
-			</template>
-			<template #registration-data="{ row }">
-				{{ $rav.formatDateInDutch(row.registration) }}
-			</template>
-			<template #actions-data="{ row }">
-				<div class="flex items-center gap-x-1">
-					<UTooltip text="Voeg credits toe">
-						<UButton icon="i-heroicons-plus-20-solid" variant="ghost" size="sm" class="text-emerald-100" @click="setUser(row)" />
-					</UTooltip>
-					<UTooltip text="Archiveer">
-						<UButton icon="i-heroicons-archive-box-20-solid" variant="ghost" size="sm" class="text-emerald-100" @click="archiveUser(row.$id)" />
-					</UTooltip>
-					<UTooltip text="WhatsApp">
-						<UButton icon="i-heroicons-chat-bubble-bottom-center-text-20-solid" variant="ghost" size="sm" class="text-emerald-100" @click="sendWhatsapp(row)" />
-					</UTooltip>
-				</div>
-			</template>
-		</UTable>
-		<!--Pop up for adding credits-->
-		<div v-if="state.editMode" class="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
-			<div class="w-full max-height-75 overflow-y-scroll sm:w-2/3 md:w-1/2 bg-gray-800 p-6 rounded-lg shadow-lg">
+		<div class="hidden md:block rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-2xl shadow-emerald-950/20 overflow-hidden">
+			<UTable v-if="students.length" :columns="columns" :rows="filteredRows">
+				<template #credits-data="{ row }">
+					{{ getAvailableCredits(row.$id) }}
+				</template>
+				<template #registration-data="{ row }">
+					{{ $rav.formatDateInDutch(row.registration) }}
+				</template>
+				<template #actions-data="{ row }">
+					<div class="flex items-center gap-x-1">
+						<UTooltip text="Voeg credits toe">
+							<UButton icon="i-heroicons-plus-20-solid" variant="ghost" size="sm" class="text-emerald-100" @click="setUser(row)" />
+						</UTooltip>
+						<UTooltip text="Archiveer">
+							<UButton icon="i-heroicons-archive-box-20-solid" variant="ghost" size="sm" class="text-emerald-100" @click="archiveUser(row.$id)" />
+						</UTooltip>
+						<UTooltip text="WhatsApp">
+							<UButton icon="i-heroicons-chat-bubble-bottom-center-text-20-solid" variant="ghost" size="sm" class="text-emerald-100" @click="sendWhatsapp(row)" />
+						</UTooltip>
+					</div>
+				</template>
+			</UTable>
+		</div>
+
+		<!-- Modal: Add credits -->
+		<div v-if="state.editMode" class="fixed inset-0 bg-black/75 flex justify-center items-center z-50 p-4">
+			<div class="w-full max-w-lg max-h-[75vh] overflow-y-auto rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-2xl shadow-emerald-950/20 p-8 sm:p-10">
 				<div class="w-full flex flex-col gap-y-5">
-					<h2 class="text-2xl md:text-4xl uppercase font-black">
-              <span class="emerald-underline text-emerald-900"
-              >Voeg credits toe</span
-              ><span class="text-emerald-700">.</span>
-					</h2>
-					<p>Voor: <strong>{{ state.user?.name }}</strong> (huidig saldo: {{ getAvailableCredits(state.user?.$id) }})</p>
+					<h2 class="text-2xl font-bold text-emerald-100 tracking-tight">Voeg credits toe</h2>
+
+					<p class="text-gray-300">Voor: <strong class="text-gray-100">{{ state.user?.name }}</strong> <span class="text-gray-400">(huidig saldo: {{ getAvailableCredits(state.user?.$id) }})</span></p>
+
 					<div>
-						<div class="flex items-center justify-start mb-2">
-							<label>Kies type</label>
-						</div>
+						<label class="block text-sm font-medium text-gray-300 mb-2">Kies type</label>
 						<div class="flex flex-col gap-y-2">
-							<label v-for="ct in creditTypes" :key="ct.value" class="flex items-center gap-x-2 cursor-pointer">
+							<label v-for="ct in creditTypes" :key="ct.value" class="flex items-center gap-x-3 cursor-pointer text-gray-200 hover:text-gray-100 transition-colors">
 								<input type="radio" :value="ct.value" v-model="state.selectedCreditType" class="accent-emerald-500" />
-								<span>{{ ct.label }}</span>
+								<span class="text-sm">{{ ct.label }}</span>
 							</label>
 						</div>
 					</div>
-					<div class="flex gap-x-3">
-						<UButton color="primary" variant="solid"
+
+					<div class="flex gap-3 mt-2">
+						<UButton color="primary" variant="solid" size="lg"
 						         @click="addCredits(state.user.$id, state.selectedCreditType)">
 							Voeg credits toe
 						</UButton>
-						<UButton color="primary" variant="solid" @click="cancel()">Annuleer</UButton>
+						<UButton color="primary" variant="outline" size="lg" @click="cancel()">Annuleer</UButton>
 					</div>
 				</div>
 			</div>
