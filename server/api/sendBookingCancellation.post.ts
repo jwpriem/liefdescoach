@@ -94,8 +94,8 @@ export default defineEventHandler(async (event) => {
         } catch (err: any) {
             console.error(`[BookingCancellation] ${mail.label} email failed:`, err?.message ?? err)
         }
-        // Brief pause between sends to avoid rate limiting
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        // Mailtrap free plan: max 1 email per 10 seconds
+        await new Promise(resolve => setTimeout(resolve, 10000))
     }
 
     setResponseStatus(event, 202)
