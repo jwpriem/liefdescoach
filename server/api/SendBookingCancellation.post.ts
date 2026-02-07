@@ -59,14 +59,14 @@ export default defineEventHandler(async (event) => {
     const spots = MAX_LESSON_CAPACITY - (lesson.bookings?.length ?? 0)
 
     // 1. Email to the student (no participants, no spots)
-    const studentEmail = cancellationStudentEmail({
+    const studentMail = cancellationStudentEmail({
         name: body.name,
         lessonType: lessontype,
         lessonDate: formattedDate,
     })
 
     // 2. Email to admin (with remaining participants, spots, student info)
-    const adminEmail = cancellationAdminEmail({
+    const adminMail = cancellationAdminEmail({
         name: body.name,
         email: body.email,
         lessonType: lessontype,
@@ -75,22 +75,28 @@ export default defineEventHandler(async (event) => {
         bookings: bookingsArr,
     })
 
-    await Promise.all([
+    // Send both emails independently — one failure should not block the other
+    const results = await Promise.allSettled([
         smtpTransport.sendMail({
             from: 'Yoga Ravennah <info@ravennah.com>',
             to: body.email,
-            subject: studentEmail.subject,
-            html: studentEmail.html,
-            text: studentEmail.text,
+            subject: studentMail.subject,
+            html: studentMail.html,
+            text: studentMail.text,
         }),
         smtpTransport.sendMail({
             from: 'Yoga Ravennah <info@ravennah.com>',
             to: 'info@ravennah.com',
-            subject: adminEmail.subject,
-            html: adminEmail.html,
-            text: adminEmail.text,
+            subject: adminMail.subject,
+            html: adminMail.html,
+            text: adminMail.text,
         }),
     ])
+
+    const failures = results.filter(r => r.status === 'rejected')
+    if (failures.length) {
+        console.error('Email send failures:', failures.map(f => (f as PromiseRejectedResult).reason))
+    }
 
     setResponseStatus(event, 202)
 })
