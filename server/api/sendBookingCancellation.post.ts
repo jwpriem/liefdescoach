@@ -75,39 +75,28 @@ export default defineEventHandler(async (event) => {
         bookings: bookingsArr,
     })
 
-    // Send both emails independently — one failure should not block the other
-    const results = await Promise.allSettled([
-        smtpTransport.sendMail({
-            from: 'Yoga Ravennah <info@ravennah.com>',
-            to: body.email,
-            subject: studentMail.subject,
-            html: studentMail.html,
-            text: studentMail.text,
-        }),
-        smtpTransport.sendMail({
-            from: 'Yoga Ravennah <info@ravennah.com>',
-            to: 'info@ravennah.com',
-            subject: adminMail.subject,
-            html: adminMail.html,
-            text: adminMail.text,
-        }),
-    ])
+    // Send emails sequentially with a small delay to respect SMTP rate limits
+    const emails = [
+        { label: 'student', to: body.email, ...studentMail },
+        { label: 'admin', to: 'info@ravennah.com', ...adminMail },
+    ]
 
-    const failures = results.filter(r => r.status === 'rejected')
-    if (failures.length) {
-        const reasons = failures.map(f => (f as PromiseRejectedResult).reason)
-        console.error('Email send failures:', reasons)
-    }
-
-    // Log per-result for debugging
-    results.forEach((r, i) => {
-        const label = i === 0 ? 'student' : 'admin'
-        if (r.status === 'fulfilled') {
-            console.log(`[BookingCancellation] ${label} email sent:`, r.value?.accepted)
-        } else {
-            console.error(`[BookingCancellation] ${label} email failed:`, r.reason?.message ?? r.reason)
+    for (const mail of emails) {
+        try {
+            const result = await smtpTransport.sendMail({
+                from: 'Yoga Ravennah <info@ravennah.com>',
+                to: mail.to,
+                subject: mail.subject,
+                html: mail.html,
+                text: mail.text,
+            })
+            console.log(`[BookingCancellation] ${mail.label} email sent:`, result?.accepted)
+        } catch (err: any) {
+            console.error(`[BookingCancellation] ${mail.label} email failed:`, err?.message ?? err)
         }
-    })
+        // Brief pause between sends to avoid rate limiting
+        await new Promise(resolve => setTimeout(resolve, 1000))
+    }
 
     setResponseStatus(event, 202)
 })
