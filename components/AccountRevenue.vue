@@ -16,6 +16,10 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, T
 
 const { $rav } = useNuxtApp()
 
+function formatEuro(value: number): string {
+  return new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(value)
+}
+
 const bucketOptions = [
   { label: 'Week', value: 'week' },
   { label: 'Maand', value: 'month' },
@@ -98,7 +102,7 @@ const chartOptions = computed(() => ({
     },
     tooltip: {
       callbacks: {
-        label: (ctx: any) => `${ctx.dataset.label}: €${ctx.parsed.y}`,
+        label: (ctx: any) => `${ctx.dataset.label}: ${formatEuro(ctx.parsed.y)}`,
       },
     },
   },
@@ -110,7 +114,7 @@ const chartOptions = computed(() => ({
     y: {
       ticks: {
         color: '#6ee7b7',
-        callback: (value: number) => `€${value}`,
+        callback: (value: number) => formatEuro(value),
       },
       grid: { color: 'rgba(107, 114, 128, 0.3)' },
     },
@@ -159,18 +163,18 @@ watch([dateFrom, dateTo, selectedBucket], fetchRevenue)
     </div>
 
     <!-- Summary cards -->
-    <div v-if="totals" class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-      <div class="rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-lg shadow-emerald-950/10 p-4 sm:p-5">
-        <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Omzet</span>
-        <span class="block text-lg font-semibold text-gray-100 mt-1">€{{ totals.revenue }}</span>
+    <div v-if="totals" class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+      <div class="bg-gray-800 rounded p-4">
+        <sup class="text-emerald-500">Omzet</sup>
+        <span class="block -mt-2 text-lg font-medium">{{ formatEuro(totals.revenue) }}</span>
       </div>
-      <div class="rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-lg shadow-emerald-950/10 p-4 sm:p-5">
-        <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Kosten</span>
-        <span class="block text-lg font-semibold text-gray-100 mt-1">€{{ totals.cost }}</span>
+      <div class="bg-gray-800 rounded p-4">
+        <sup class="text-emerald-500">Kosten</sup>
+        <span class="block -mt-2 text-lg font-medium">{{ formatEuro(totals.cost) }}</span>
       </div>
-      <div class="rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-lg shadow-emerald-950/10 p-4 sm:p-5">
-        <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Winst</span>
-        <span class="block text-lg font-semibold mt-1" :class="totals.profit >= 0 ? 'text-emerald-400' : 'text-red-400'">€{{ totals.profit }}</span>
+      <div class="bg-gray-800 rounded p-4">
+        <sup class="text-emerald-500">Winst</sup>
+        <span class="block -mt-2 text-lg font-medium" :class="totals.profit >= 0 ? 'text-emerald-400' : 'text-red-400'">{{ formatEuro(totals.profit) }}</span>
       </div>
       <div class="rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-lg shadow-emerald-950/10 p-4 sm:p-5">
         <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Boekingen</span>
@@ -194,8 +198,8 @@ watch([dateFrom, dateTo, selectedBucket], fetchRevenue)
     </div>
 
     <!-- Settings info -->
-    <p v-if="revenueData" class="text-sm text-gray-500 mt-3">
-      Berekend met €{{ revenueData.revenuePerBooking }} per boeking en €{{ revenueData.costPerLesson }} per les.
+    <p v-if="revenueData" class="text-sm text-emerald-100/50 mt-3">
+      Berekend met {{ formatEuro(revenueData.revenuePerBooking) }} per boeking en {{ formatEuro(revenueData.costPerLesson) }} per les.
     </p>
   </div>
 </template>
