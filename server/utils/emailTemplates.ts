@@ -21,17 +21,17 @@ function wrapInLayout(title: string, contentHtml: string): string {
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>${title}</title>
 </head>
-<body style="margin:0;padding:0;background-color:#f3f4f6;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f3f4f6;">
+<body style="margin:0;padding:0;background-color:#f3f4f6;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f3f4f6;">
 <tr><td align="center" style="padding:32px 16px;">
 
-<!-- Card -->
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background-color:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.06);">
+<!--[if mso]><table width="560" cellpadding="0" cellspacing="0" border="0" align="center"><tr><td><![endif]-->
+<table width="560" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;width:100%;background-color:#ffffff;border-radius:16px;">
 
 <!-- Header -->
 <tr>
 <td align="center" style="padding:32px 32px 24px 32px;border-bottom:1px solid #e5e7eb;">
-  <a href="${SITE_URL}" target="_blank" style="text-decoration:none;">
+  <a href="${SITE_URL}" style="text-decoration:none;">
     <img src="${LOGO_URL}" alt="Yoga Ravennah" width="48" height="48" style="display:block;border:0;width:48px;height:48px;border-radius:8px;" />
   </a>
   <p style="margin:12px 0 0 0;font-size:18px;font-weight:700;color:${BRAND_DARK};letter-spacing:-0.3px;">Yoga Ravennah</p>
@@ -57,7 +57,7 @@ function wrapInLayout(title: string, contentHtml: string): string {
 </tr>
 
 </table>
-<!-- /Card -->
+<!--[if mso]></td></tr></table><![endif]-->
 
 </td></tr>
 </table>
@@ -75,7 +75,7 @@ function infoRow(label: string, value: string): string {
 }
 
 function infoTable(rows: string): string {
-    return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;margin:20px 0;">
+    return `<table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #e5e7eb;border-radius:12px;margin:20px 0;">
     ${rows}
   </table>`
 }
@@ -89,9 +89,9 @@ function subtext(text: string): string {
 }
 
 function primaryButton(label: string, href: string): string {
-    return `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:24px auto 0 auto;">
+    return `<table cellpadding="0" cellspacing="0" border="0" style="margin:24px auto 0 auto;">
     <tr><td align="center" style="background-color:${BRAND_COLOR};border-radius:8px;">
-      <a href="${href}" target="_blank" style="display:inline-block;padding:12px 28px;font-size:14px;font-weight:600;color:#ffffff;text-decoration:none;letter-spacing:0.3px;">${label}</a>
+      <a href="${href}" style="display:inline-block;padding:12px 28px;font-size:14px;font-weight:600;color:#ffffff;text-decoration:none;letter-spacing:0.3px;">${label}</a>
     </td></tr>
   </table>`
 }
@@ -110,7 +110,7 @@ export function otpEmail(code: string): { subject: string; html: string; text: s
     const content = `
     ${heading('Je inlogcode')}
     ${subtext('Gebruik de onderstaande code om in te loggen op je account.')}
-    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto 20px auto;">
+    <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto 20px auto;">
       <tr><td style="background-color:${BRAND_LIGHT};border:2px solid ${BRAND_COLOR};border-radius:12px;padding:16px 32px;text-align:center;">
         <span style="font-size:32px;font-weight:700;letter-spacing:8px;color:${BRAND_DARK};">${code}</span>
       </td></tr>
@@ -141,7 +141,7 @@ export function bookingStudentEmail(data: {
         infoRow('Datum', data.lessonDate)
     )}
     <p style="font-size:14px;font-weight:600;color:#374151;margin:20px 0 8px 0;">Zet de les in je agenda:</p>
-    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto;">
+    <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">
       <tr>
         <td style="padding:0 6px;"><a href="${data.calendarLinks.apple}" style="display:inline-block;padding:8px 16px;font-size:13px;color:${BRAND_COLOR};border:1px solid #e5e7eb;border-radius:8px;text-decoration:none;">Apple</a></td>
         <td style="padding:0 6px;"><a href="${data.calendarLinks.google}" style="display:inline-block;padding:8px 16px;font-size:13px;color:${BRAND_COLOR};border:1px solid #e5e7eb;border-radius:8px;text-decoration:none;">Google</a></td>
@@ -287,10 +287,12 @@ export function contactEmail(data: {
         infoRow('Naam', data.name) +
         infoRow('E-mail', data.email)
     )}
-    <div style="margin:20px 0;padding:16px;background-color:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;">
-      <p style="font-size:12px;font-weight:600;color:${BRAND_COLOR};text-transform:uppercase;letter-spacing:0.5px;margin:0 0 8px 0;">Bericht</p>
-      <p style="font-size:14px;color:#374151;margin:0;white-space:pre-line;">${data.message}</p>
-    </div>`
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:20px 0;">
+      <tr><td style="padding:16px;background-color:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;">
+        <p style="font-size:12px;font-weight:600;color:${BRAND_COLOR};text-transform:uppercase;letter-spacing:0.5px;margin:0 0 8px 0;">Bericht</p>
+        <p style="font-size:14px;color:#374151;margin:0;white-space:pre-line;">${data.message}</p>
+      </td></tr>
+    </table>`
 
     return {
         subject: 'Contactformulier Yoga Ravennah',

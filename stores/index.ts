@@ -450,10 +450,15 @@ export const useMainStore = defineStore('main', {
                 name: user.name,
             }
 
-            await $fetch(`/api/${type}`, {
-                method: 'POST',
-                body: emailData
-            })
+            try {
+                await $fetch(`/api/${type}`, {
+                    method: 'POST',
+                    body: emailData
+                })
+            } catch (e) {
+                // Email failure should not block the user — the booking/cancellation already succeeded
+                console.error('sendEmail failed:', type, e)
+            }
         },
 
         async getOnBehalfOrUser() {
