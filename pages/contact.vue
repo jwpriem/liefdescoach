@@ -1,5 +1,4 @@
 <script setup lang="ts">
-const mail = useMail()
 const store = useMainStore();
 
 const title = ref('Yoga Ravennah | Contact');
@@ -32,13 +31,18 @@ useHead({
 
 async function send(){
  await store.setLoading(true)
- await mail.send({
-      config:0,
-      from: 'Yoga Ravennah <info@ravennah.com>',
-      subject: 'Contactformulier Yoga Ravennah',
-      text: 'Naam:\n' + name.value + '\n\nEmail:\n' + email.value + '\n\nBericht:\n' + message.value,
+ await $fetch('/api/mail/send', {
+   method: 'POST',
+   body: {
+     type: 'contact',
+     data: {
+       name: name.value,
+       email: email.value,
+       message: message.value,
+     }
+   }
  })
-    
+
   name.value = ''
   email.value = ''
   message.value = ''

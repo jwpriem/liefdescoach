@@ -1,6 +1,5 @@
 <script setup lang="ts">
 const store = useMainStore()
-const mail = useMail()
 const { $rav } = useNuxtApp()
 
 const myBookings = computed(() => store.myBookings);
@@ -11,11 +10,19 @@ async function removeBooking(booking) {
     booking
   )
 
-  await mail.send({
-    config:0,
-    from: 'Yoga Ravennah <info@ravennah.com>',
-    subject: 'Annulering Yoga Ravennah',
-    text: `Naam:\n${store.loggedInUser.name}\n\nEmail:\n${store.loggedInUser.email}\n\nDatum:\n${$rav.formatDateInDutch(booking.lessons.date, true)}\n\nLes:\n${$rav.getLessonTitle(booking.lessons)}\n\n`
+  await $fetch('/api/mail/send', {
+    method: 'POST',
+    body: {
+      type: 'booking-cancellation-notification',
+      data: {
+        name: store.loggedInUser.name,
+        email: store.loggedInUser.email,
+        lessonType: $rav.getLessonTitle(booking.lessons),
+        lessonDate: $rav.formatDateInDutch(booking.lessons.date, true),
+        spots: 0,
+        bookings: [],
+      }
+    }
   })
 }
 </script>

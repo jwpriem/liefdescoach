@@ -54,21 +54,15 @@ export default defineEventHandler(async (event) => {
         { email, code, userId, expiresAt }
     )
 
-    // 5. Send via SMTP
+    // 5. Send via SMTP using shared template
+    const emailContent = otpEmail(code)
+
     await smtpTransport.sendMail({
         from: 'Yoga Ravennah <info@ravennah.com>',
         to: email,
-        subject: 'Je inlogcode voor Yoga Ravennah',
-        text: `Je inlogcode is: ${code}\n\nDeze code is 10 minuten geldig.\n\nHeb je deze code niet aangevraagd? Dan kun je dit bericht negeren.`,
-        html: `
-            <div style="font-family: sans-serif; max-width: 400px; margin: 0 auto; padding: 20px;">
-                <h2 style="color: #065f46;">Yoga Ravennah</h2>
-                <p>Je inlogcode is:</p>
-                <p style="font-size: 32px; font-weight: bold; letter-spacing: 6px; color: #065f46; margin: 20px 0;">${code}</p>
-                <p style="color: #6b7280; font-size: 14px;">Deze code is 10 minuten geldig.</p>
-                <p style="color: #6b7280; font-size: 14px;">Heb je deze code niet aangevraagd? Dan kun je dit bericht negeren.</p>
-            </div>
-        `,
+        subject: emailContent.subject,
+        html: emailContent.html,
+        text: emailContent.text,
     })
 
     return { success: true }
