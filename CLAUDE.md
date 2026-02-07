@@ -12,6 +12,17 @@ npm run preview    # Preview production build locally
 
 No linter is configured. Node 20 is required.
 
+## Do
+1. Follow the DRY (Don't Repeat Yourself) pattern while creating new functionality. When a piece of code is copied or has a similarity of 90%, make it a generic reusable component
+2. Request clarity when a ambigious request is made. Never just start developing without context
+3. When a new functionality is introduced, first plan and present the solution to verify the outcome
+4. When a database migration is needed, always perform a dryrun and present the evidence before proceding
+
+## Don't
+1. Copy and reuse a piece of code
+2. Redo or adjust database migrations that already ran
+3. Delete code without running tests
+
 ### E2E Tests (Playwright)
 
 ```bash
