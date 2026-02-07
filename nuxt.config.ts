@@ -3,13 +3,13 @@ const isDev = process.env.NODE_ENV !== 'production'
 
 export default defineNuxtConfig({
   devtools: { enabled: true },
-  
+
   runtimeConfig: {
     // Private keys are only available on the server
     appwriteKey: '',
     cronSecret: '',           // NUXT_CRON_SECRET
     revenuePerBooking: '14',  // NUXT_REVENUE_PER_BOOKING
-    costPerLesson: '50',      // NUXT_COST_PER_LESSON
+    costPerLesson: '35',      // NUXT_COST_PER_LESSON
     // Public keys that are exposed to the client
     public: {
       project: '',
@@ -18,7 +18,7 @@ export default defineNuxtConfig({
       mailPassDev: ''
     }
   },
-  
+
   server: {
     port: isDev ? 3000 : 8080, // default: 3000
     host: isDev ? 'localhost' : '0.0.0.0' // default: localhost
@@ -27,8 +27,8 @@ export default defineNuxtConfig({
   // Plugins to run before rendering page (https://go.nuxtjs.dev/config-plugins)
   plugins: [
     '~/plugins/rav'
-    ],
-  
+  ],
+
   modules: [
     '@nuxtjs/google-fonts',
     '@pinia/nuxt',
@@ -43,30 +43,30 @@ export default defineNuxtConfig({
   image: {
     domains: ['images.unsplash.com']
   },
-  
+
   dayjs: {
     locales: ['en', 'nl'],
     plugins: ['relativeTime', 'utc', 'timezone'],
     defaultLocale: 'nl',
     defaultTimezone: 'America/New_York'
   },
-  
+
   sitemap: {
     autoLastmod: true
   },
-  
+
   robots: {
     UserAgent: '*',
     Sitemap: 'https://www.ravennah.com/sitemap.xml'
   },
-  
+
   googleFonts: {
     families: {
-      Montserrat: [200,300,400,500,600,700,800,900],
-      'Source+Sans+3': [200,300,400,500,600,700,800,900]
-      }
+      Montserrat: [200, 300, 400, 500, 600, 700, 800, 900],
+      'Source+Sans+3': [200, 300, 400, 500, 600, 700, 800, 900]
+    }
   },
-  
+
   gtm: {
     id: 'GTM-PZP28PP'
   },
