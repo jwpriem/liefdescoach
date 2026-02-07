@@ -31,7 +31,7 @@ export default defineEventHandler(async (event) => {
         [Query.equal('studentId', [studentId])]
     )
 
-    if (existing.total > 0) {
+    if ((existing.rows?.length ?? 0) > 0) {
         return { success: false, reason: 'Gebruiker heeft al credits' }
     }
 
