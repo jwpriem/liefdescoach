@@ -57,6 +57,19 @@ const errorMessage = computed(() => store.errorMessage);
 const isLoading = computed(() => store.isLoading);
 const normalizedEmail = computed(() => email.value.trim().toLowerCase())
 
+const pageTitle = computed(() => {
+  if (registerForm.value) return 'Account aanmaken'
+  if (loginMode.value === 'otp') return 'Inloggen met e-mailcode'
+  return 'Inloggen'
+})
+
+const pageSubtitle = computed(() => {
+  if (registerForm.value) return 'Maak een account aan om lessen te boeken'
+  if (loginMode.value === 'otp' && otpStep.value === 'code') return `We hebben een code gestuurd naar ${normalizedEmail.value}`
+  if (loginMode.value === 'otp') return 'Ontvang een eenmalige code op je e-mailadres'
+  return 'Welkom terug bij Yoga Ravennah'
+})
+
 async function login() {
 	await store.login(normalizedEmail.value, password.value)
 
@@ -146,44 +159,62 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div>
-    <div v-if="!ready" class="container mx-auto p-8 md:px-0 md:py-24">
-      <div class="animate-pulse space-y-4">
-        <div class="h-6 bg-gray-800 rounded w-1/3"></div>
-        <div class="h-10 bg-gray-800 rounded"></div>
-        <div class="h-6 bg-gray-800 rounded w-1/3"></div>
-        <div class="h-10 bg-gray-800 rounded"></div>
+  <div class="min-h-[80vh] flex items-center justify-center px-4 py-12 sm:py-20">
+    <!-- Skeleton loader -->
+    <div v-if="!ready" class="w-full max-w-md">
+      <div class="animate-pulse space-y-6 rounded-2xl bg-gray-900/60 p-8">
+        <div class="h-8 bg-gray-800 rounded-lg w-2/3"></div>
+        <div class="h-4 bg-gray-800 rounded w-full"></div>
+        <div class="h-12 bg-gray-800 rounded-lg"></div>
+        <div class="h-12 bg-gray-800 rounded-lg"></div>
+        <div class="h-12 bg-gray-800 rounded-lg w-1/2"></div>
       </div>
     </div>
 
-    <div v-else class="container mx-auto p-8 md:px-0 md:py-24">
+    <!-- Main card -->
+    <div v-else class="w-full max-w-md">
       <IsLoading :loading="isLoading"></IsLoading>
-      <form class="w-full sm:w-2/3 md:w-1/2 mx-auto my-12 md:my-24" @submit.prevent>
 
-        <!-- Login mode tabs (only visible when not in register mode) -->
-        <div v-if="!registerForm" class="flex gap-2 mb-6">
-          <UButton
-            :variant="loginMode === 'password' ? 'solid' : 'outline'"
-            color="primary"
-            @click="switchLoginMode('password')"
-          >
-            E-mail + Wachtwoord
-          </UButton>
-          <UButton
-            :variant="loginMode === 'otp' ? 'solid' : 'outline'"
-            color="primary"
-            @click="switchLoginMode('otp')"
-          >
-            E-mail code
-          </UButton>
+      <!-- Card container -->
+      <div class="rounded-2xl bg-gray-900/50 border border-gray-800/80 backdrop-blur-sm shadow-2xl shadow-emerald-950/20 p-8 sm:p-10">
+
+        <!-- Header -->
+        <div class="text-center mb-8">
+          <h1 class="text-2xl font-bold text-emerald-100 tracking-tight">{{ pageTitle }}</h1>
+          <p class="mt-2 text-sm text-gray-400">{{ pageSubtitle }}</p>
         </div>
 
-        <div class="mt-8 space-y-3 darkForm">
-          <div v-if="errorMessage" class="p-4 border-red-600 border-2 bg-red-200 text-red-600 font-bold rounded">
-            {{ errorMessage }}
+        <!-- Login mode toggle (only in login, not register) -->
+        <div v-if="!registerForm" class="mb-8">
+          <div class="flex rounded-xl bg-gray-800/60 p-1">
+            <button
+              class="flex-1 rounded-lg py-2.5 text-sm font-medium transition-all duration-200"
+              :class="loginMode === 'password'
+                ? 'bg-emerald-600 text-white shadow-md shadow-emerald-900/40'
+                : 'text-gray-400 hover:text-gray-200'"
+              @click="switchLoginMode('password')"
+            >
+              Wachtwoord
+            </button>
+            <button
+              class="flex-1 rounded-lg py-2.5 text-sm font-medium transition-all duration-200"
+              :class="loginMode === 'otp'
+                ? 'bg-emerald-600 text-white shadow-md shadow-emerald-900/40'
+                : 'text-gray-400 hover:text-gray-200'"
+              @click="switchLoginMode('otp')"
+            >
+              E-mail code
+            </button>
+          </div>
+        </div>
+
+        <form @submit.prevent>
+          <!-- Error message -->
+          <div v-if="errorMessage" class="mb-6 rounded-xl bg-red-950/40 border border-red-800/50 p-4">
+            <p class="text-sm text-red-300">{{ errorMessage }}</p>
             <button
               v-if="errorMessage?.includes('Maak eerst een account aan')"
-              class="block mt-2 underline text-red-800"
+              class="mt-2 text-sm font-medium text-red-200 underline underline-offset-2 hover:text-red-100 transition-colors"
               @click.prevent="switchToRegister"
             >
               Registreren
@@ -191,15 +222,16 @@ onMounted(async () => {
           </div>
 
           <!-- ==================== PASSWORD LOGIN / REGISTER ==================== -->
-          <template v-if="loginMode === 'password' || registerForm">
+          <div v-if="loginMode === 'password' || registerForm" class="space-y-5">
             <div>
-              <div class="flex items-center justify-start">
-                <label>E-mail</label> <sup class="required">*</sup>
-              </div>
+              <label for="email" class="block text-sm font-medium text-gray-300 mb-1.5">
+                E-mail <span class="text-red-500">*</span>
+              </label>
               <UInput id="email"
                       v-model="email"
+                      size="lg"
                       color="primary"
-                      placeholder="Je e-mailadres"
+                      placeholder="naam@voorbeeld.nl"
                       type="email"
                       variant="outline"
                       autocomplete="email"
@@ -207,61 +239,68 @@ onMounted(async () => {
                       autocorrect="off"
                       inputmode="email"/>
             </div>
+
             <div>
-              <div class="flex items-center justify-start">
-                <label>Wachtwoord <span v-if="registerForm">(minimaal 8 characters)</span></label> <sup class="required">*</sup>
-              </div>
+              <label for="password" class="block text-sm font-medium text-gray-300 mb-1.5">
+                Wachtwoord <span class="text-red-500">*</span>
+                <span v-if="registerForm" class="font-normal text-gray-500">(min. 8 tekens)</span>
+              </label>
               <UInput id="password"
                       v-model="password"
+                      size="lg"
                       color="primary"
                       placeholder="Je wachtwoord"
                       type="password"
                       variant="outline"/>
             </div>
-            <div v-if="registerForm">
-              <div v-if="passwordStrength" class="mt-3">
-                <svg v-if="passwordStrength == 'Veilig wachtwoord'" class="w-6 h-6 stroke-green-600 inline-block" fill="none"
-                     stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path
-                      d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"/>
-                </svg>
 
-                <svg v-else class="w-6 h-6 stroke-red-600 inline-block" fill="none" stroke="currentColor" stroke-width="1.5"
-                     viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" stroke-linecap="round"
-                        stroke-linejoin="round"/>
-                </svg>
-                <span :class="passwordStrength == 'Veilig wachtwoord' ? 'text-green-600' : 'text-red-600'" class="ml-2">{{
-                    passwordStrength
-                  }} </span>
-              </div>
-              <div class="flex items-center justify-start">
-                <label>Naam</label> <sup class="required">*</sup>
-              </div>
-              <UInput id="name" v-model="name" color="primary" placeholder="Je naam" variant="outline"/>
+            <!-- Password strength indicator (register only) -->
+            <div v-if="registerForm && passwordStrength" class="flex items-center gap-2">
+              <svg v-if="passwordStrength === 'Veilig wachtwoord'" class="w-4 h-4 text-emerald-400 shrink-0" fill="none"
+                   stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z"
+                      stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <svg v-else class="w-4 h-4 text-red-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2"
+                   viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"
+                      stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span class="text-xs" :class="passwordStrength === 'Veilig wachtwoord' ? 'text-emerald-400' : 'text-red-400'">
+                {{ passwordStrength }}
+              </span>
             </div>
+
+            <!-- Name field (register only) -->
             <div v-if="registerForm">
-              <div class="flex items-center justify-start">
-                <label>Telefoonnummer</label>
-              </div>
-              <UInput id="phone" v-model="phone" color="primary" placeholder="Je telefoonnummer" variant="outline"/>
+              <label for="name" class="block text-sm font-medium text-gray-300 mb-1.5">
+                Naam <span class="text-red-500">*</span>
+              </label>
+              <UInput id="name" v-model="name" size="lg" color="primary" placeholder="Je volledige naam" variant="outline"/>
             </div>
-          </template>
+
+            <!-- Phone field (register only) -->
+            <div v-if="registerForm">
+              <label for="phone" class="block text-sm font-medium text-gray-300 mb-1.5">
+                Telefoonnummer <span class="text-gray-600 font-normal">(optioneel)</span>
+              </label>
+              <UInput id="phone" v-model="phone" size="lg" color="primary" placeholder="06 12345678" variant="outline"/>
+            </div>
+          </div>
 
           <!-- ==================== OTP LOGIN ==================== -->
-          <template v-if="loginMode === 'otp' && !registerForm">
+          <div v-if="loginMode === 'otp' && !registerForm" class="space-y-5">
             <!-- Step 1: Enter email -->
             <template v-if="otpStep === 'email'">
               <div>
-                <div class="flex items-center justify-start">
-                  <label>E-mail</label> <sup class="required">*</sup>
-                </div>
+                <label for="otp-email" class="block text-sm font-medium text-gray-300 mb-1.5">
+                  E-mail <span class="text-red-500">*</span>
+                </label>
                 <UInput id="otp-email"
                         v-model="email"
+                        size="lg"
                         color="primary"
-                        placeholder="Je e-mailadres"
+                        placeholder="naam@voorbeeld.nl"
                         type="email"
                         variant="outline"
                         autocomplete="email"
@@ -269,66 +308,81 @@ onMounted(async () => {
                         autocorrect="off"
                         inputmode="email"/>
               </div>
-              <p class="text-sm text-gray-400">
-                We sturen een eenmalige code naar je e-mailadres waarmee je kunt inloggen.
-              </p>
             </template>
 
             <!-- Step 2: Enter code -->
             <template v-if="otpStep === 'code'">
-              <div class="p-3 bg-emerald-900/30 border border-emerald-700 rounded text-emerald-300 text-sm">
-                Code verstuurd naar <strong>{{ normalizedEmail }}</strong>
-              </div>
               <div>
-                <div class="flex items-center justify-start">
-                  <label>Code</label> <sup class="required">*</sup>
-                </div>
+                <label for="otp-code" class="block text-sm font-medium text-gray-300 mb-1.5">
+                  Verificatiecode <span class="text-red-500">*</span>
+                </label>
                 <UInput id="otp-code"
                         v-model="otpCode"
+                        size="lg"
                         color="primary"
-                        placeholder="Voer de 6-cijferige code in"
+                        placeholder="000000"
                         variant="outline"
                         autocomplete="one-time-code"
-                        inputmode="numeric"/>
+                        inputmode="numeric"
+                        :ui="{ base: 'text-center tracking-[0.3em] text-lg font-semibold' }"/>
               </div>
             </template>
-          </template>
-        </div>
+          </div>
 
-        <!-- ==================== ACTION BUTTONS ==================== -->
-        <div class="mt-8">
-          <span class="flex justify-start items-center gap-x-3">
-            <!-- Password login buttons -->
+          <!-- ==================== ACTION BUTTONS ==================== -->
+          <div class="mt-8 space-y-3">
+            <!-- Password login -->
             <template v-if="loginMode === 'password' && !registerForm">
-              <UButton :disabled="!password" color="primary" variant="solid"
-                       @click="login">Login</UButton>
-              <UButton color="primary" variant="outline"
-                       @click="registerForm = true">Registreren</UButton>
+              <UButton :disabled="!password" color="primary" variant="solid" size="lg" block
+                       @click="login">
+                Inloggen
+              </UButton>
+              <div class="text-center">
+                <button class="text-sm text-gray-400 hover:text-emerald-400 transition-colors"
+                        @click="registerForm = true">
+                  Nog geen account? <span class="font-medium underline underline-offset-2">Registreren</span>
+                </button>
+              </div>
             </template>
 
-            <!-- Register buttons -->
+            <!-- Register -->
             <template v-if="registerForm">
-              <UButton :disabled="!password" color="primary" variant="solid" @click="register">Registeren</UButton>
-              <UButton color="primary" variant="outline"
-                       @click="registerForm = false">Inloggen</UButton>
+              <UButton :disabled="!password || !name" color="primary" variant="solid" size="lg" block
+                       @click="register">
+                Account aanmaken
+              </UButton>
+              <div class="text-center">
+                <button class="text-sm text-gray-400 hover:text-emerald-400 transition-colors"
+                        @click="registerForm = false">
+                  Al een account? <span class="font-medium underline underline-offset-2">Inloggen</span>
+                </button>
+              </div>
             </template>
 
-            <!-- OTP buttons -->
-            <template v-if="loginMode === 'otp' && !registerForm">
-              <template v-if="otpStep === 'email'">
-                <UButton :disabled="!email" color="primary" variant="solid"
-                         @click="sendOtp">Verstuur code</UButton>
-              </template>
-              <template v-if="otpStep === 'code'">
-                <UButton :disabled="!otpCode" color="primary" variant="solid"
-                         @click="verifyOtp">Inloggen</UButton>
-                <UButton color="primary" variant="ghost"
-                         @click="resendOtp">Opnieuw versturen</UButton>
-              </template>
+            <!-- OTP: send code -->
+            <template v-if="loginMode === 'otp' && !registerForm && otpStep === 'email'">
+              <UButton :disabled="!email" color="primary" variant="solid" size="lg" block
+                       @click="sendOtp">
+                Verstuur code
+              </UButton>
             </template>
-          </span>
-        </div>
-      </form>
+
+            <!-- OTP: verify code -->
+            <template v-if="loginMode === 'otp' && !registerForm && otpStep === 'code'">
+              <UButton :disabled="!otpCode" color="primary" variant="solid" size="lg" block
+                       @click="verifyOtp">
+                Verifieer en inloggen
+              </UButton>
+              <div class="text-center">
+                <button class="text-sm text-gray-400 hover:text-emerald-400 transition-colors"
+                        @click="resendOtp">
+                  Geen code ontvangen? <span class="font-medium underline underline-offset-2">Opnieuw versturen</span>
+                </button>
+              </div>
+            </template>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 </template>
