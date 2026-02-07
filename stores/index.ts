@@ -75,6 +75,7 @@ interface State {
     errorMessage: string | null;
     isLoading: boolean;
     onBehalfOf: User | null;
+    otpUserId: string | null;
 }
 
 export const useMainStore = defineStore('main', {
@@ -88,7 +89,8 @@ export const useMainStore = defineStore('main', {
         studentCreditSummary: {},
         errorMessage: null,
         isLoading: false,
-        onBehalfOf: null
+        onBehalfOf: null,
+        otpUserId: null
     }),
     actions: {
         async fetchWrapper(
@@ -128,6 +130,8 @@ export const useMainStore = defineStore('main', {
                     friendly = 'Wachtwoord moet minimaal 8 tekens zijn'
                 } else if (/Password must be between 8 and 256 characters long/i.test(msg)) {
                     friendly = 'Wachtwoord moet minimaal 8 tekens zijn'
+                } else if (msg === 'no-account') {
+                    friendly = 'Er is geen account gevonden met dit e-mailadres. Maak eerst een account aan.'
                 } else if (code === 429 || /too many requests/i.test(msg)) {
                     friendly = 'Te veel pogingen, probeer later opnieuw.'
                 } else if (code === 402) {
@@ -169,6 +173,36 @@ export const useMainStore = defineStore('main', {
                     },
                 })
             }
+        },
+        async sendOtp(email: string) {
+            this.otpUserId = null
+            await this.fetchWrapper(async () => {
+                // First check if the user exists (server-side) to prevent auto-creation
+                const check = await $fetch('/api/auth/check-email', {
+                    method: 'POST',
+                    body: { email }
+                })
+
+                if (!check.exists) {
+                    throw { code: 404, message: 'no-account' }
+                }
+
+                // User exists — send OTP using their real userId
+                const { account } = useAppwrite()
+                const token = await account.createEmailToken(check.userId, email)
+                this.otpUserId = token.userId
+            })
+        },
+        async verifyOtp(otp: string) {
+            const sessionOk = await this.fetchWrapper(async () => {
+                const { account } = useAppwrite()
+                await account.createSession(this.otpUserId!, otp)
+            })
+
+            if (!sessionOk) return
+
+            this.otpUserId = null
+            await this.getUser()
         },
         async getUser() {
             await this.fetchWrapper(async () => {
@@ -334,6 +368,13 @@ export const useMainStore = defineStore('main', {
                 );
 
                 await this.getUser(); // Refresh user details
+
+                // Grant 1 welcome credit for the first booking
+                await $fetch('/api/credits/welcome', {
+                    method: 'POST',
+                    body: { studentId: user.$id }
+                })
+                await this.fetchCredits()
 
                 const message = `Naam:\\n${user.name}\\n\\nEmail:\\n${user.email}\\n\\nTelefoon:\\n${user.phone}\\n\\nDatum:\\n${$rav.formatDateInDutch(user.$createdAt)}`
                 await this.sendSimpleEmail('Nieuwe gebruiker Yoga Ravennah', message)
