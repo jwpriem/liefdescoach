@@ -3,10 +3,11 @@ import crypto from 'crypto'
 
 /**
  * Verifies an OTP code, deletes it from the database,
- * creates an Appwrite session, and returns the session secret.
+ * creates a login token, and returns it so the client SDK
+ * can create its own session (with proper cookie/localStorage management).
  *
  * Body: { email: string, code: string }
- * Returns: { sessionSecret: string }
+ * Returns: { userId: string, secret: string }
  */
 export default defineEventHandler(async (event) => {
     const body = await readBody(event)
@@ -56,8 +57,8 @@ export default defineEventHandler(async (event) => {
     // 4. Delete the OTP document
     await tablesDB.deleteRow(config.public.database, 'otp_codes', otpDoc.$id)
 
-    // 5. Create an Appwrite session for the user via the server SDK
-    const session = await users.createSession(otpDoc.userId)
+    // 5. Create a login token so the client SDK can create its own session
+    const token = await users.createToken(otpDoc.userId)
 
-    return { sessionSecret: session.secret }
+    return { userId: otpDoc.userId, secret: token.secret }
 })
