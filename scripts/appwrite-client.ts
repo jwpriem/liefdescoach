@@ -1,5 +1,5 @@
 import 'dotenv/config'
-import { Client, Databases, Users, Query, ID } from 'node-appwrite'
+import { Client, Databases, TablesDB, Users, Query, ID } from 'node-appwrite'
 
 export function createAppwriteClient() {
     const project = process.env.NUXT_PUBLIC_PROJECT
@@ -18,6 +18,7 @@ export function createAppwriteClient() {
     return {
         client,
         databases: new Databases(client),
+        tablesDB: new TablesDB(client),
         users: new Users(client),
         Query,
         ID,
