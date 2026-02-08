@@ -118,7 +118,7 @@ async function sendWhatsapp(plan: any) {
 			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 
 				<div v-for="plan in pricingPlans" :key="plan.name"
-					class=" bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-2xl shadow-emerald-950/20 p-8 sm:p-10 rounded-2xl shadow-xl overflow-hidden flex flex-col transition-transform hover:-translate-y-1 duration-300"
+					class=" bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-2xl shadow-emerald-950/20 rounded-2xl shadow-xl overflow-hidden flex flex-col transition-transform hover:-translate-y-1 duration-300"
 					:class="{ 'ring-2 ring-emerald-500': plan.highlight, 'ring-2 ring-yellow-500': plan.gold }">
 
 					<!-- Badge -->
