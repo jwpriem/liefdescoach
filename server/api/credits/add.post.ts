@@ -21,22 +21,24 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 400, statusMessage: 'studentId is verplicht' })
     }
 
-    const validTypes = ['credit_1', 'credit_5', 'credit_10']
+    const validTypes = ['credit_1', 'credit_5', 'credit_10', 'credit_20']
     if (!body?.type || !validTypes.includes(body.type)) {
-        throw createError({ statusCode: 400, statusMessage: 'type moet credit_1, credit_5, of credit_10 zijn' })
+        throw createError({ statusCode: 400, statusMessage: 'type moet credit_1, credit_5, credit_10 of credit_20 zijn' })
     }
 
     const creditCounts: Record<string, number> = {
         credit_1: 1,
         credit_5: 5,
         credit_10: 10,
+        credit_20: 20,
     }
 
-    // Validity periods: 1 and 5 = 6 months, 10 = 6 months
+    // Validity periods: 1 and 5 = 6 months, 10 = 6 months, 20 = 12 months
     const validityMonths: Record<string, number> = {
         credit_1: 6,
         credit_5: 6,
         credit_10: 6,
+        credit_20: 12,
     }
 
     const count = creditCounts[body.type]
