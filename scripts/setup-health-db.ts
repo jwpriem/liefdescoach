@@ -9,7 +9,7 @@ import { createAppwriteClient } from './appwrite-client'
 import { RelationshipType, RelationMutate } from 'node-appwrite'
 
 const POLL_INTERVAL_MS = 1000
-const POLL_TIMEOUT_MS = 30000
+const POLL_TIMEOUT_MS = 120000
 
 async function waitForAttribute(
     databases: any,
@@ -25,9 +25,11 @@ async function waitForAttribute(
             if (attr.status === 'failed') {
                 throw new Error(`Attribute "${key}" on "${collectionId}" failed to create`)
             }
+            console.log(`Attribute "${key}" on "${collectionId}" status: ${attr.status}, waiting...`)
         } catch (e: any) {
             // ignore 404 while waiting
-            if (e.code !== 404) throw e
+            if (e.status !== 404 && e.code !== 404) throw e
+            console.log(`Attribute "${key}" on "${collectionId}" not found (404), waiting...`)
         }
         await new Promise(r => setTimeout(r, POLL_INTERVAL_MS))
     }
@@ -89,8 +91,9 @@ async function main() {
     // We need to check if relationship already exists
     try {
         await databases.getAttribute(dbId, 'students', 'health')
-        console.log('Relationship already exists.')
+        console.log('Relationship attribute on "students" found.')
     } catch {
+        console.log('Creating relationship: students <-> health...')
         await databases.createRelationshipAttribute(
             dbId,
             'students',
@@ -101,9 +104,13 @@ async function main() {
             'student', // key on health
             RelationMutate.Cascade // Deleting student deletes health record
         )
-        await waitForAttribute(databases, dbId, 'students', 'health')
-        await waitForAttribute(databases, dbId, 'health', 'student')
     }
+
+    console.log('Waiting for relationship attributes to be ready...')
+    await Promise.all([
+        waitForAttribute(databases, dbId, 'students', 'health'),
+        waitForAttribute(databases, dbId, 'health', 'student')
+    ])
 
     console.log('Schema setup complete.')
 
