@@ -65,7 +65,8 @@ export default defineEventHandler(async (event) => {
 
     let result
     if (existing) {
-        // Update - do not re-send relationship if it's already set (OneToOne child side constraint)
+        // Update - for OneToOne child side, Appwrite seems to require the relationship as { $id: ... } to persist it
+        data.student = { $id: body.userId }
         result = await databases.updateDocument(
             config.public.database,
             'health',
@@ -73,7 +74,7 @@ export default defineEventHandler(async (event) => {
             data
         )
     } else {
-        // Create - must include relationship
+        // Create - String ID works fine here
         data.student = body.userId
         result = await databases.createDocument(
             config.public.database,
