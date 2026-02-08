@@ -29,7 +29,7 @@ async function waitForAttribute(
         } catch (e: any) {
             // ignore 404 while waiting
             if (e.status !== 404 && e.code !== 404) throw e
-            console.log(`Attribute "${key}" on "${collectionId}" not found (404), waiting...`)
+            console.log(`Waiting for attribute "${key}" on "${collectionId}" to be created...`)
         }
         await new Promise(r => setTimeout(r, POLL_INTERVAL_MS))
     }

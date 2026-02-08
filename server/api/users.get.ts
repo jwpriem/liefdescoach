@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
     // Fetch health data for these users
     const userIds = res.users.map(u => u.$id)
     const config = useRuntimeConfig()
-    const { tablesDB } = useServerAppwrite()
+    const { databases } = useServerAppwrite()
 
     let healthData: any[] = []
     if (userIds.length > 0) {
@@ -48,7 +48,7 @@ export default defineEventHandler(async (event) => {
             // Let's fetch the `health` documents where `student` is in the list of IDs.
             // `equal('student.$id', [id1, id2...])` ? Appwrite `equal` accepts array for "OR".
 
-            const healthRes = await tablesDB.listRows(
+            const healthRes = await databases.listDocuments(
                 config.public.database,
                 'health',
                 [
@@ -56,7 +56,7 @@ export default defineEventHandler(async (event) => {
                     Query.limit(100)
                 ]
             )
-            healthData = healthRes.rows
+            healthData = healthRes.documents
 
             // Debug logging to file
             const fs = await import('node:fs')

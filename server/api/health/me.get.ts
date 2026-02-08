@@ -2,10 +2,10 @@
 export default defineEventHandler(async (event) => {
     const authUser = await requireAuth(event)
     const config = useRuntimeConfig()
-    const { tablesDB, Query } = useServerAppwrite()
+    const { databases, Query } = useServerAppwrite()
 
     try {
-        const healthRes = await tablesDB.listRows(
+        const healthRes = await databases.listDocuments(
             config.public.database,
             'health',
             [
@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
         )
 
         return {
-            health: healthRes.rows[0] || null
+            health: healthRes.documents[0] || null
         }
     } catch (e: any) {
         console.error('Failed to fetch health data for user', authUser.$id, e)
