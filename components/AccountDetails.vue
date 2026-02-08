@@ -216,7 +216,7 @@ async function requestVerification() {
         <div>
           <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Saldo</span>
           <span class="block text-gray-100 mt-0.5">{{ availableCredits }} {{ availableCredits == 1 ? 'les' : 'lessen'
-            }}</span>
+          }}</span>
         </div>
         <div>
           <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Geregistreerd op</span>
@@ -240,11 +240,11 @@ async function requestVerification() {
       </div>
     </div>
 
-    <h2 v-if="isAdmin" class="text-2xl md:text-4xl uppercase font-black my-6">
+    <h2 class="text-2xl md:text-4xl uppercase font-black my-6">
       <span class="emerald-underline text-emerald-900">Medische info</span><span class="text-emerald-700">.</span>
     </h2>
 
-    <div v-if="isAdmin"
+    <div
       class="rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-2xl shadow-emerald-950/20 p-6 sm:p-8 w-full md:w-1/2">
       <div class="space-y-4">
         <!-- Medical Info Section -->
@@ -325,7 +325,7 @@ async function requestVerification() {
               <td class="py-3 px-4 text-sm text-gray-300">{{ credit.lesson?.teacher || '-' }}</td>
               <td class="py-3 px-4 text-sm text-gray-300">{{ credit.lesson ? $rav.formatDateInDutch(credit.lesson.date)
                 : '-'
-                }}</td>
+              }}</td>
               <td class="py-3 px-4 text-sm text-gray-300">{{ $rav.formatDateInDutch(credit.validTo) }}</td>
             </tr>
           </tbody>
