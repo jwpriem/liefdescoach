@@ -55,18 +55,19 @@ export default defineEventHandler(async (event) => {
         }
     }
 
+    // Build health data WITHOUT the student relationship
+    // (relationship will be set via parents.health, not health.student)
     const data: any = {
         injury,
         pregnancy,
         dueDate
     }
 
-    console.log('Saving health data:', JSON.stringify({ ...data, student: body.userId }))
+    console.log('Saving health data:', JSON.stringify({ ...data, forStudent: body.userId }))
 
     let result
     if (existing) {
-        // Update - for OneToOne child side, Appwrite seems to require the relationship as { $id: ... } to persist it
-        data.student = { $id: body.userId }
+        // Update existing health document (don't touch relationship)
         result = await databases.updateDocument(
             config.public.database,
             'health',
@@ -74,14 +75,23 @@ export default defineEventHandler(async (event) => {
             data
         )
     } else {
-        // Create - String ID works fine here
-        data.student = body.userId
+        // Create health document WITHOUT student field
         result = await databases.createDocument(
             config.public.database,
             'health',
             ID.unique(),
             data
         )
+
+        // Link it from the parent side (students.health)
+        // This is required because setting health.student directly fails on production Appwrite
+        await databases.updateDocument(
+            config.public.database,
+            'students',
+            body.userId,
+            { health: result.$id }
+        )
+        console.log('Linked health doc via students.health')
     }
 
     return { result }

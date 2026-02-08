@@ -99,7 +99,7 @@ async function main() {
             'students',
             'health',
             RelationshipType.OneToOne,
-            false, // twoWay - let's make it two-way so we can access health from student easily
+            true, // twoWay - creates both 'health' on students AND 'student' on health
             'health', // key on students
             'student', // key on health
             RelationMutate.Cascade // Deleting student deletes health record
@@ -151,30 +151,30 @@ async function main() {
                     // Check if health record already exists for this student
                     // We can try to create it.
 
+                    // Create health data WITHOUT the student relationship
                     const healthData = {
                         injury: prefs.injury,
                         pregnancy: !!(prefs.pregnancy || prefs.pregnant),
-                        dueDate: prefs.dueDate,
-                        student: user.$id // Link to student
+                        dueDate: prefs.dueDate
                     }
 
-                    // Remove undefined/null values to avoid validation errors if they are optional? 
-                    // createStringAttribute(..., false) means nullable? In Appwrite 'required=false' means nullable.
-                    // But if we pass null explicitly to API it might be fine.
-
-                    // Actually, let's create a new document ID or use ID.unique()
-                    // But since we have a OneToOne constraint, we must ensure we don't create duplicates.
-
-                    // Try to list health docs for this student? Or just create and catch error?
-                    // Easier migration strategy: 
-                    // 1. Try to create.
-
                     console.log(`Migrating data for ${user.name} (${user.$id})...`)
-                    await databases.createDocument(
+
+                    // Step 1: Create health doc WITHOUT student field
+                    const healthResult = await databases.createDocument(
                         dbId,
                         'health',
                         ID.unique(),
                         healthData
+                    )
+
+                    // Step 2: Link via parent side (students.health)
+                    // This is required because setting health.student directly fails on production
+                    await databases.updateDocument(
+                        dbId,
+                        'students',
+                        user.$id,
+                        { health: healthResult.$id }
                     )
 
                     // Clear prefs? Maybe keep them for backup for now.
