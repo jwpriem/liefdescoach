@@ -2,7 +2,7 @@ import { createError } from 'h3'
 
 export default defineEventHandler(async (event) => {
     const authUser = await requireAuth(event)
-    const { tablesDB, Query, ID } = useServerAppwrite()
+    const { databases, Query, ID } = useServerAppwrite()
     const config = useRuntimeConfig()
 
     const body = await readBody(event)
@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
 
     // Find existing health record for this user (student)
     // We search by 'student' relationship which stores the userId
-    const healthRes = await tablesDB.listRows(
+    const healthRes = await databases.listDocuments(
         config.public.database,
         'health',
         [
@@ -30,18 +30,18 @@ export default defineEventHandler(async (event) => {
         ]
     )
 
-    const existing = healthRes.rows[0]
+    const existing = healthRes.documents[0]
 
     // Verify student document exists before trying to link
     // This is critical because if the student doc is missing, the relationship will fail (or be null)
     try {
-        await tablesDB.getRow(config.public.database, 'students', body.userId)
+        await databases.getDocument(config.public.database, 'students', body.userId)
     } catch (e: any) {
         if (e.code === 404) {
             // Self-healing: Create the missing student document if it doesn't exist
             // This can happen for older accounts or if sync failed
             console.log(`Student document missing for ${body.userId}, creating it...`)
-            await tablesDB.createRow(
+            await databases.createDocument(
                 config.public.database,
                 'students',
                 body.userId,
@@ -67,7 +67,7 @@ export default defineEventHandler(async (event) => {
     let result
     if (existing) {
         // Update
-        result = await tablesDB.updateRow(
+        result = await databases.updateDocument(
             config.public.database,
             'health',
             existing.$id,
@@ -75,7 +75,7 @@ export default defineEventHandler(async (event) => {
         )
     } else {
         // Create
-        result = await tablesDB.createRow(
+        result = await databases.createDocument(
             config.public.database,
             'health',
             ID.unique(),

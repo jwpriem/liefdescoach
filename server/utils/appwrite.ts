@@ -1,4 +1,4 @@
-import { Client, Users, Query, ID } from 'node-appwrite'
+import { Client, Users, Query, ID, Databases } from 'node-appwrite'
 import { TablesDB } from 'node-appwrite'
 
 let _client: Client | null = null
@@ -14,7 +14,8 @@ export function useServerAppwrite() {
     }
 
     const tablesDB = new TablesDB(_client)
+    const databases = new Databases(_client)
     const users = new Users(_client)
 
-    return { client: _client, tablesDB, users, Query, ID }
+    return { client: _client, tablesDB, databases, users, Query, ID }
 }
