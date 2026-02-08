@@ -1,7 +1,7 @@
 import { createError } from 'h3'
 import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
-import 'dayjs/locale/nl'
+import utc from 'dayjs/plugin/utc.js'
+import 'dayjs/locale/nl.js'
 
 dayjs.extend(utc)
 dayjs.locale('nl')

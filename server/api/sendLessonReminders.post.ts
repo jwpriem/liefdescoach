@@ -1,8 +1,8 @@
 import { createError } from 'h3'
 import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
-import timezone from 'dayjs/plugin/timezone'
-import 'dayjs/locale/nl'
+import utc from 'dayjs/plugin/utc.js'
+import timezone from 'dayjs/plugin/timezone.js'
+import 'dayjs/locale/nl.js'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
