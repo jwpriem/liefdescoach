@@ -9,7 +9,7 @@ import { createAppwriteClient } from './appwrite-client'
 import { RelationshipType, RelationMutate } from 'node-appwrite'
 
 const POLL_INTERVAL_MS = 1000
-const POLL_TIMEOUT_MS = 120000
+const POLL_TIMEOUT_MS = 600000
 
 async function waitForAttribute(
     databases: any,
@@ -106,11 +106,14 @@ async function main() {
         )
     }
 
-    console.log('Waiting for relationship attributes to be ready...')
-    await Promise.all([
-        waitForAttribute(databases, dbId, 'students', 'health'),
-        waitForAttribute(databases, dbId, 'health', 'student')
-    ])
+    console.log('Waiting for relationship attributes to be ready (sequentially)...')
+    // Wait for the primary relationship first
+    console.log('Waiting for "students.health" attribute...')
+    await waitForAttribute(databases, dbId, 'students', 'health')
+
+    // Then wait for the back-reference (which might only appear after primary is ready)
+    console.log('Waiting for "health.student" attribute...')
+    await waitForAttribute(databases, dbId, 'health', 'student')
 
     console.log('Schema setup complete.')
 
