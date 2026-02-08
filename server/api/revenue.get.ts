@@ -6,10 +6,11 @@
  *   - to: ISO date string (end of range, required)
  *   - bucket: 'week' | 'month' | 'year' (default: 'week')
  *
- * Revenue = number of bookings per lesson * NUXT_REVENUE_PER_BOOKING (default 14)
- * Cost = number of lessons * NUXT_COST_PER_LESSON (default 50)
+ * Revenue logic:
+ *   - If booking has a linked credit, use that credit's per-class price.
+ *   - If no credit (legacy), use NUXT_REVENUE_PER_BOOKING (default 14).
  *
- * Returns an array of { label, revenue, cost, profit, bookings, lessons } per bucket.
+ * Cost = number of lessons * NUXT_COST_PER_LESSON (default 50)
  */
 export default defineEventHandler(async (event) => {
     await requireAdmin(event)
@@ -28,7 +29,15 @@ export default defineEventHandler(async (event) => {
     const revenuePerBooking = parseFloat(config.revenuePerBooking) || 14
     const costPerLesson = parseFloat(config.costPerLesson) || 50
 
-    // Fetch all lessons in the date range (paginate)
+    // Pricing map per credit type
+    const PRICE_MAP: Record<string, number> = {
+        'credit_1': 16.00,
+        'credit_5': 14.50,
+        'credit_10': 13.50,
+        'credit_20': 12.50
+    }
+
+    // 1. Fetch all lessons in the date range
     let allLessons: any[] = []
     let offset = 0
     const limit = 100
@@ -50,7 +59,7 @@ export default defineEventHandler(async (event) => {
         offset += limit
     }
 
-    // Fetch all bookings for these lessons (paginate per batch)
+    // 2. Fetch all bookings for these lessons
     const lessonIds = allLessons.map((l: any) => l.$id)
     let allBookings: any[] = []
 
@@ -75,16 +84,63 @@ export default defineEventHandler(async (event) => {
         }
     }
 
-    // Count bookings per lesson
-    const bookingsPerLesson: Record<string, number> = {}
-    for (const booking of allBookings) {
-        const lessonId = typeof booking.lessons === 'string' ? booking.lessons : booking.lessons?.$id
-        if (lessonId) {
-            bookingsPerLesson[lessonId] = (bookingsPerLesson[lessonId] || 0) + 1
+    // 3. Fetch credits used for these bookings to determine exact price
+    const bookingIds = allBookings.map((b: any) => b.$id)
+    const bookingToPriceMap: Record<string, number> = {}
+
+    // We only need to query if we have bookings
+    if (bookingIds.length > 0) {
+        for (let i = 0; i < bookingIds.length; i += 100) {
+            const batch = bookingIds.slice(i, i + 100)
+            if (batch.length === 0) continue
+
+            let batchOffset = 0
+            while (true) {
+                // We might need to handle the case where 'credits' collection doesn't exist yet in legacy DBs
+                try {
+                    const res = await tablesDB.listRows(
+                        config.public.database,
+                        'credits',
+                        [
+                            Query.equal('bookingId', batch),
+                            Query.limit(limit),
+                            Query.offset(batchOffset),
+                        ]
+                    )
+                    const rows = res.rows ?? []
+
+                    for (const credit of rows) {
+                        if (credit.bookingId && credit.type && PRICE_MAP[credit.type]) {
+                            bookingToPriceMap[credit.bookingId] = PRICE_MAP[credit.type]
+                        }
+                    }
+
+                    if (rows.length < limit) break
+                    batchOffset += limit
+                } catch (e) {
+                    console.error('Failed to fetch credits:', e)
+                    break
+                }
+            }
         }
     }
 
-    // Group lessons into buckets
+    // 4. Calculate stats per lesson
+    const bookingCountPerLesson: Record<string, number> = {}
+    const revenuePerLesson: Record<string, number> = {}
+
+    for (const booking of allBookings) {
+        const lessonId = typeof booking.lessons === 'string' ? booking.lessons : booking.lessons?.$id
+        if (lessonId) {
+            bookingCountPerLesson[lessonId] = (bookingCountPerLesson[lessonId] || 0) + 1
+
+            // Use specific credit price if available, otherwise default fallback
+            const price = bookingToPriceMap[booking.$id] || revenuePerBooking
+            revenuePerLesson[lessonId] = (revenuePerLesson[lessonId] || 0) + price
+        }
+    }
+
+    // 5. Group into buckets
     const buckets: Record<string, { revenue: number; cost: number; bookings: number; lessons: number }> = {}
 
     for (const lesson of allLessons) {
@@ -95,14 +151,16 @@ export default defineEventHandler(async (event) => {
             buckets[key] = { revenue: 0, cost: 0, bookings: 0, lessons: 0 }
         }
 
-        const bookingCount = bookingsPerLesson[lesson.$id] || 0
+        const count = bookingCountPerLesson[lesson.$id] || 0
+        const revenue = revenuePerLesson[lesson.$id] || 0
+
         buckets[key].lessons += 1
-        buckets[key].bookings += bookingCount
-        buckets[key].revenue += bookingCount * revenuePerBooking
+        buckets[key].bookings += count
+        buckets[key].revenue += revenue
         buckets[key].cost += costPerLesson
     }
 
-    // Convert to sorted array
+    // 6. Convert to sorted array
     const data = Object.entries(buckets)
         .sort(([a], [b]) => a.localeCompare(b))
         .map(([key, val]) => ({
@@ -116,7 +174,7 @@ export default defineEventHandler(async (event) => {
 
     return {
         data,
-        revenuePerBooking,
+        revenuePerBooking, // still returned for reference/frontend usage if needed
         costPerLesson,
     }
 })

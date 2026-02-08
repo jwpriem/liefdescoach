@@ -327,3 +327,21 @@ export function contactEmail(data: {
         text: `Contactformulier\n\nNaam: ${data.name}\nE-mail: ${data.email}\n\nBericht:\n${data.message}`,
     }
 }
+
+// ─── Verification email ──────────────────────────────────────────────────────
+
+export function verificationEmail(url: string): { subject: string; html: string; text: string } {
+    const content = `
+    ${heading('Verifieer je e-mailadres')}
+    ${subtext('Klik op de onderstaande knop om je e-mailadres te bevestigen.')}
+    <p style="font-size:14px;color:#374151;text-align:center;margin:0 0 24px 0;">Deze link is 24 uur geldig.</p>
+    ${primaryButton('Verifieer e-mail', url)}
+    <p style="font-size:13px;color:#9ca3af;text-align:center;margin-top:24px;">Werkt de knop niet? Kopieer en plak dan deze link in je browser:</p>
+    <p style="font-size:12px;color:#9ca3af;text-align:center;margin-top:4px;word-break:break-all;"><a href="${url}" style="color:${BRAND_COLOR};text-decoration:none;">${url}</a></p>`
+
+    return {
+        subject: 'Verifieer je e-mailadres voor Yoga Ravennah',
+        html: wrapInLayout('Verifieer e-mail', content),
+        text: `Verifieer je e-mailadres\n\nKlik op deze link om je e-mailadres te bevestigen:\n${url}\n\nDeze link is 24 uur geldig.`,
+    }
+}

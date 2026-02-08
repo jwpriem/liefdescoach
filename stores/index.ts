@@ -8,7 +8,7 @@ interface UserPrefs {
     [key: string]: any;
 }
 
-interface User {
+export interface User {
     $id?: string;
     email?: string;
     name?: string;
@@ -18,6 +18,13 @@ interface User {
     debits?: number;
     labels?: string[];
     registration?: string;
+    emailVerification?: boolean;
+    health?: {
+        $id?: string;
+        injury?: string;
+        pregnancy?: boolean;
+        dueDate?: string;
+    } | null;
 }
 
 interface Student {
@@ -196,6 +203,23 @@ export const useMainStore = defineStore('main', {
 
             await this.getUser()
         },
+        async requestEmailVerification() {
+            await this.fetchWrapper(async () => {
+                await $fetch('/api/auth/request-verification', {
+                    method: 'POST'
+                })
+            })
+        },
+        async verifyEmail(token: string) {
+            await this.fetchWrapper(async () => {
+                await $fetch('/api/auth/verify-email', {
+                    method: 'POST',
+                    body: { token }
+                })
+                await this.getUser() // Refresh user data to get new status
+            })
+        },
+
         async getUser() {
             await this.fetchWrapper(async () => {
                 const { account } = useAppwrite()
@@ -230,8 +254,15 @@ export const useMainStore = defineStore('main', {
                     // localStorage not available or parse error
                 }
 
-                // Fetch protected resources (separate from auth check above)
+                // Match user health data
                 if (this.loggedInUser) {
+                    try {
+                        const { health } = await $fetch('/api/health/me')
+                        this.loggedInUser = { ...this.loggedInUser, health }
+                    } catch (e) {
+                        console.error('Failed to fetch health data', e)
+                    }
+
                     await Promise.all([
                         this.fetchLessons(),
                         this.fetchStudents(),
@@ -336,6 +367,19 @@ export const useMainStore = defineStore('main', {
                 const { res } = await $fetch('/api/updatePrefs', {
                     method: 'POST',
                     body: data
+                })
+                await this.getUser(); // Refresh user details
+            });
+        },
+
+        async updateHealth(user: User, healthData: any) {
+            await this.fetchWrapper(async () => {
+                await $fetch('/api/health/update', {
+                    method: 'POST',
+                    body: {
+                        userId: user.$id,
+                        ...healthData
+                    }
                 })
                 await this.getUser(); // Refresh user details
             });
