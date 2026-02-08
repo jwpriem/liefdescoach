@@ -55,18 +55,17 @@ export default defineEventHandler(async (event) => {
         }
     }
 
-    const data = {
+    const data: any = {
         injury,
         pregnancy,
-        dueDate,
-        student: body.userId
+        dueDate
     }
 
-    console.log('Saving health data:', JSON.stringify(data))
+    console.log('Saving health data:', JSON.stringify({ ...data, student: body.userId }))
 
     let result
     if (existing) {
-        // Update
+        // Update - do not re-send relationship if it's already set (OneToOne child side constraint)
         result = await databases.updateDocument(
             config.public.database,
             'health',
@@ -74,7 +73,8 @@ export default defineEventHandler(async (event) => {
             data
         )
     } else {
-        // Create
+        // Create - must include relationship
+        data.student = body.userId
         result = await databases.createDocument(
             config.public.database,
             'health',
