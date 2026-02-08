@@ -2,7 +2,7 @@ name: Lesson Reminders
 
 on:
   schedule:
-    - cron: '0 20 * * *' # Daily at 20:00 UTC (21:00 CET / 22:00 CEST)
+  - cron: '0 11 * * *' # Daily at 11:00 UTC (12:00 CET / 13:00 CEST)
   workflow_dispatch: # Allow manual trigger for testing
 
 jobs:
