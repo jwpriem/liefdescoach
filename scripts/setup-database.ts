@@ -42,10 +42,17 @@ async function main() {
         : 'yoga-ravennah-test'
 
     // --- 1. Create database ---
-    console.log(`Creating database "${dbName}"...`)
-    const db = await databases.create(ID.unique(), dbName)
-    const dbId = db.$id
-    console.log(`Database created: ${dbId}`)
+    let dbId: string
+
+    if (process.argv.includes('--use-existing') && process.env.NUXT_PUBLIC_DATABASE) {
+        dbId = process.env.NUXT_PUBLIC_DATABASE
+        console.log(`Using existing database: ${dbId}`)
+    } else {
+        console.log(`Creating database "${dbName}"...`)
+        const db = await databases.create(ID.unique(), dbName)
+        dbId = db.$id
+        console.log(`Database created: ${dbId}`)
+    }
 
     // --- 2. Create collections ---
     console.log('Creating collections...')
