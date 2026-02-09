@@ -167,7 +167,9 @@ const computedStudents = computed(() => {
               <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Boekingen ({{ lesson.bookings?.length || 0 }}/9)</span>
               <div class="mt-1">
                 <span v-for="booking in sortStudents(lesson.bookings || [])" index="booking.$id" class="flex items-center gap-1 text-sm text-gray-300">
-                  {{ booking.students.name }}
+                  <NuxtLink :to="`/admin/users/${booking.students.$id}`" class="hover:text-emerald-400 transition-colors">
+                    {{ booking.students.name }}
+                  </NuxtLink>
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                     stroke="currentColor" class="cursor-pointer w-4 h-4 text-red-400 hover:text-red-300 transition-colors"
                     @click="removeBooking(booking, lesson)">
