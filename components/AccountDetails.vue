@@ -13,6 +13,7 @@ const state = reactive({
   name: null as string | null,
   email: null as string | null,
   phone: null as string | null,
+  dateOfBirth: null as string | null,
   injury: null as string | null,
   pregnancy: false,
   dueDate: null as string | null,
@@ -20,6 +21,7 @@ const state = reactive({
   newPassword: null as string | null,
   editAccountDetails: false,
   editHealthDetails: false,
+  editDateOfBirth: false,
   editPassword: false,
   passwordCheck: false,
 });
@@ -57,8 +59,10 @@ function getCreditBadgeColor(credit: any): string {
 
 function openEdit() {
   state.name = targetUser.value.name || null;
-  state.email = targetUser.value.email || null;
   state.phone = targetUser.value.phone || null;
+  state.dateOfBirth = targetUser.value?.dateOfBirth
+    ? new Date(targetUser.value.dateOfBirth).toISOString().slice(0, 10)
+    : null;
   state.editAccountDetails = true;
 }
 
@@ -72,11 +76,13 @@ function openEditHealth() {
 function cancel() {
   state.editAccountDetails = false;
   state.editHealthDetails = false;
+  state.editDateOfBirth = false;
   state.editPassword = false;
   state.passwordCheck = false;
   state.name = null;
   state.email = null;
   state.phone = null;
+  state.dateOfBirth = null;
   state.injury = null;
   state.pregnancy = false;
   state.dueDate = null;
@@ -85,22 +91,22 @@ function cancel() {
 }
 
 async function update() {
+  if (!targetUser.value) return;
   try {
-    if (!props.user) {
-      if (state.name !== targetUser.value.name) {
-        await store.updateUserDetail('name', state.name, state.password)
+    // Call the new update-profile API (no password required)
+    await $fetch('/api/students/update-profile', {
+      method: 'POST',
+      body: {
+        userId: targetUser.value.$id,
+        name: state.name,
+        phone: state.phone ? $rav.formatPhoneNumber(state.phone) : null,
+        dateOfBirth: state.dateOfBirth ? new Date(state.dateOfBirth).toISOString() : null
       }
-      if (state.email !== targetUser.value.email) {
-        await store.updateUserDetail('email', state.email, state.password)
-      }
-      if (state.phone !== targetUser.value.phone) {
-        await store.updateUserDetail('phone', $rav.formatPhoneNumber(state.phone), state.password)
-      }
-    }
-
+    });
+    await store.getUser(); // Refresh user details
     cancel();
   } catch (error) {
-    // Handle your errors here
+    console.error('Failed to update profile:', error);
   }
 }
 
@@ -212,6 +218,12 @@ async function requestVerification() {
           <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Telefoon</span>
           <span class="block text-gray-100 mt-0.5" v-if="targetUser.phone">{{ targetUser.phone }}</span>
           <span class="block text-gray-400 mt-0.5" v-else>Geen telefoonnummer</span>
+        </div>
+        <div>
+          <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Geboortedatum</span>
+          <span class="block text-gray-100 mt-0.5" v-if="targetUser.dateOfBirth">{{
+            $rav.formatDateInDutch(targetUser.dateOfBirth) }}</span>
+          <span class="block text-gray-400 mt-0.5" v-else>Niet opgegeven</span>
         </div>
         <div>
           <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Saldo</span>
@@ -342,11 +354,6 @@ async function requestVerification() {
           <h2 class="text-2xl font-bold text-emerald-100 tracking-tight">Bewerk gegevens</h2>
 
           <div>
-            <label for="email" class="block text-sm font-medium text-gray-300 mb-1.5">E-mail</label>
-            <UInput id="email" color="primary" v-model="state.email" variant="outline" size="lg"
-              placeholder="Je e-mailadres" />
-          </div>
-          <div>
             <label for="name" class="block text-sm font-medium text-gray-300 mb-1.5">Naam</label>
             <UInput id="name" color="primary" v-model="state.name" variant="outline" size="lg" placeholder="Je naam" />
           </div>
@@ -355,20 +362,16 @@ async function requestVerification() {
             <UInput id="phone" color="primary" v-model="state.phone" variant="outline" size="lg"
               placeholder="Je telefoonnummer" />
           </div>
-
+          <div>
+            <label for="dateOfBirth" class="block text-sm font-medium text-gray-300 mb-1.5">Geboortedatum</label>
+            <UInput type="date" id="dateOfBirth" color="primary" v-model="state.dateOfBirth" variant="outline"
+              size="lg" />
+          </div>
         </div>
 
-        <div>
-          <label for="password" class="block text-sm font-medium text-gray-300 mb-1.5">Wachtwoord (om de wijzigen op
-            te
-            slaan)</label>
-          <UInput id="password" color="primary" v-model="state.password" variant="outline" size="lg" type="password"
-            placeholder="Je wachtwoord" />
-        </div>
-        <div class="flex gap-3 mt-2">
-          <UButton color="primary" variant="solid" size="lg" @click="update()"
-            :disabled="!state.password && !props.user">
-            Opslaan</UButton>
+
+        <div class="flex gap-3 mt-4">
+          <UButton color="primary" variant="solid" size="lg" @click="update()">Opslaan</UButton>
           <UButton color="primary" variant="outline" size="lg" @click="cancel()">Annuleer</UButton>
         </div>
       </div>

@@ -13,6 +13,7 @@ export interface User {
     email?: string;
     name?: string;
     phone?: string;
+    dateOfBirth?: string;
     prefs?: UserPrefs;
     credits?: number;
     debits?: number;
@@ -254,11 +255,11 @@ export const useMainStore = defineStore('main', {
                     // localStorage not available or parse error
                 }
 
-                // Match user health data
+                // Match user health data and profile data from students collection
                 if (this.loggedInUser) {
                     try {
-                        const { health } = await $fetch('/api/health/me')
-                        this.loggedInUser = { ...this.loggedInUser, health }
+                        const { health, dateOfBirth, phone } = await $fetch('/api/health/me')
+                        this.loggedInUser = { ...this.loggedInUser, health, dateOfBirth, phone }
                     } catch (e) {
                         console.error('Failed to fetch health data', e)
                     }
@@ -384,24 +385,27 @@ export const useMainStore = defineStore('main', {
                 await this.getUser(); // Refresh user details
             });
         },
-        async registerUser(email: string, password: string, name: string, phone: string) {
+        async registerUser(email: string, password: string, name: string, phone: string, dateOfBirth: string | null = null, injury: string | null = null) {
             await this.fetchWrapper(async () => {
                 const { account, databases, ID } = useAppwrite();
                 const registration = await account.create(ID.unique(), email, password, name);
                 await account.createEmailPasswordSession(email, password);
 
-                if (phone) {
-                    await this.updateUserDetail('phone', phone, password);
-                }
-
                 const user = await account.get();
 
-                const res = await databases.createDocument(
-                    useRuntimeConfig().public.database,
-                    'students',
-                    user.$id,
-                    { email: user.email, name: user.name }
-                );
+                // Create student document via server API (has proper permissions)
+                // Pass user details for immediate post-registration (session may not be established yet)
+                // Phone is stored in the database, not in Auth
+                await $fetch('/api/students/create', {
+                    method: 'POST',
+                    body: {
+                        userId: user.$id,
+                        email: user.email,
+                        name: user.name,
+                        dateOfBirth: dateOfBirth ? new Date(dateOfBirth).toISOString() : null,
+                        phone: phone || null
+                    }
+                })
 
                 await this.getUser(); // Refresh user details
 
@@ -411,6 +415,20 @@ export const useMainStore = defineStore('main', {
                     body: { studentId: user.$id }
                 })
                 await this.fetchCredits()
+
+                // Create initial health record if injury was provided
+                if (injury) {
+                    await $fetch('/api/health/update', {
+                        method: 'POST',
+                        body: {
+                            userId: user.$id,
+                            injury: injury,
+                            pregnancy: false,
+                            dueDate: null
+                        }
+                    })
+                    await this.getUser(); // Refresh to pick up health data
+                }
 
                 await $fetch('/api/mail/send', {
                     method: 'POST',

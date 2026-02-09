@@ -72,6 +72,8 @@ async function main() {
 
     await databases.createStringAttribute(dbId, 'students', 'name', 255, true)
     await databases.createEmailAttribute(dbId, 'students', 'email', true)
+    await databases.createDatetimeAttribute(dbId, 'students', 'dateOfBirth', false)
+    await databases.createStringAttribute(dbId, 'students', 'phone', 50, false)
 
     // --- 5. Create attributes on credits ---
     console.log('Creating attributes on "credits"...')
@@ -93,6 +95,8 @@ async function main() {
         waitForAttribute(databases, dbId, 'lessons', 'teacher'),
         waitForAttribute(databases, dbId, 'students', 'name'),
         waitForAttribute(databases, dbId, 'students', 'email'),
+        waitForAttribute(databases, dbId, 'students', 'dateOfBirth'),
+        waitForAttribute(databases, dbId, 'students', 'phone'),
         waitForAttribute(databases, dbId, 'credits', 'studentId'),
         waitForAttribute(databases, dbId, 'credits', 'bookingId'),
         waitForAttribute(databases, dbId, 'credits', 'type'),
