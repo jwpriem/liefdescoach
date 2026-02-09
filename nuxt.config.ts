@@ -4,6 +4,19 @@ const isDev = process.env.NODE_ENV !== 'production'
 export default defineNuxtConfig({
   devtools: { enabled: true },
 
+  // SEO: Site-wide head configuration
+  app: {
+    head: {
+      htmlAttrs: { lang: 'nl' },
+      meta: [
+        { name: 'geo.region', content: 'NL-ZH' },
+        { name: 'geo.placename', content: 'Rotterdam' },
+        { name: 'geo.position', content: '51.9683092;4.5884189' },
+        { name: 'ICBM', content: '51.9683092, 4.5884189' }
+      ]
+    }
+  },
+
   runtimeConfig: {
     // Private keys are only available on the server
     appwriteKey: '',
