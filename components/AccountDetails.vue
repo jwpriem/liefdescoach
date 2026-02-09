@@ -287,7 +287,8 @@ async function requestVerification() {
           <div class="grid grid-cols-2 gap-y-2 text-sm">
             <template v-if="credit.lesson">
               <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Les</span>
-              <span class="text-gray-300">{{ credit.lesson.type }}</span>
+              <span class="text-gray-300">{{ credit.lesson?.type ?
+                $rav.getLessonTitle(credit.lesson) : '-' }}</span>
               <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Docent</span>
               <span class="text-gray-300">{{ credit.lesson.teacher }}</span>
               <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Lesdatum</span>
