@@ -12,8 +12,8 @@
 import { createAppwriteClient } from './appwrite-client'
 import { RelationshipType, RelationMutate } from 'node-appwrite'
 
-const POLL_INTERVAL_MS = 1000
-const POLL_TIMEOUT_MS = 30000
+const POLL_INTERVAL_MS = 2000
+const POLL_TIMEOUT_MS = 60000 // Increased timeout
 
 async function waitForAttribute(
     databases: any,
@@ -23,17 +23,57 @@ async function waitForAttribute(
 ) {
     const start = Date.now()
     while (Date.now() - start < POLL_TIMEOUT_MS) {
-        const attr = await databases.getAttribute(databaseId, collectionId, key)
-        if (attr.status === 'available') return
-        if (attr.status === 'failed') {
-            throw new Error(`Attribute "${key}" on "${collectionId}" failed to create`)
+        try {
+            const attr = await databases.getAttribute(databaseId, collectionId, key)
+            if (attr.status === 'available') return
+            if (attr.status === 'failed') {
+                throw new Error(`Attribute "${key}" on "${collectionId}" failed to create`)
+            }
+        } catch (e: any) {
+            // Ignore not found errors while waiting, it might take a moment to appear in list
+            if (e.code !== 404) console.warn(`Warning waiting for attribute ${key}: ${e.message}`)
         }
         await new Promise(r => setTimeout(r, POLL_INTERVAL_MS))
     }
     throw new Error(`Timeout waiting for attribute "${key}" on "${collectionId}"`)
 }
 
+async function createCollection(databases: any, dbId: string, name: string) {
+    try {
+        const col = await databases.createCollection(dbId, name, name)
+        console.log(`  - ${name} (${col.$id}) [CREATED]`)
+        return col
+    } catch (e: any) {
+        if (e.code === 409) {
+            console.log(`  - ${name} [EXISTS]`)
+            return { $id: name }
+        }
+        throw e
+    }
+}
+
+async function createAttribute(
+    databases: any,
+    dbId: string,
+    collId: string,
+    key: string,
+    createFn: () => Promise<any>
+) {
+    try {
+        await createFn()
+        console.log(`    + ${key} [CREATED]`)
+    } catch (e: any) {
+        if (e.code === 409) {
+            console.log(`    + ${key} [EXISTS]`)
+        } else {
+            console.error(`    ! Failed to create ${key}: ${e.message}`)
+            throw e
+        }
+    }
+}
+
 async function main() {
+    console.log('--- Database Setup Script ---')
     const { databases, ID } = createAppwriteClient()
 
     const nameArg = process.argv.indexOf('--name')
@@ -55,85 +95,96 @@ async function main() {
     }
 
     // --- 2. Create collections ---
-    console.log('Creating collections...')
+    console.log('\n2. Creating collections...')
 
-    const lessons = await databases.createCollection(dbId, 'lessons', 'lessons')
-    const bookings = await databases.createCollection(dbId, 'bookings', 'bookings')
-    const students = await databases.createCollection(dbId, 'students', 'students')
-    const credits = await databases.createCollection(dbId, 'credits', 'credits')
-
-    console.log(`  - lessons  (${lessons.$id})`)
-    console.log(`  - bookings (${bookings.$id})`)
-    console.log(`  - students (${students.$id})`)
-    console.log(`  - credits  (${credits.$id})`)
+    await createCollection(databases, dbId, 'lessons')
+    await createCollection(databases, dbId, 'bookings')
+    await createCollection(databases, dbId, 'students')
+    await createCollection(databases, dbId, 'credits')
 
     // --- 3. Create attributes on lessons ---
-    console.log('Creating attributes on "lessons"...')
+    console.log('\n3. Creating attributes on "lessons"...')
 
-    await databases.createDatetimeAttribute(dbId, 'lessons', 'date', true)
-    await databases.createStringAttribute(dbId, 'lessons', 'type', 255, false)
-    await databases.createStringAttribute(dbId, 'lessons', 'teacher', 255, false)
+    await createAttribute(databases, dbId, 'lessons', 'date', () => databases.createDatetimeAttribute(dbId, 'lessons', 'date', true))
+    await createAttribute(databases, dbId, 'lessons', 'type', () => databases.createStringAttribute(dbId, 'lessons', 'type', 255, false))
+    await createAttribute(databases, dbId, 'lessons', 'teacher', () => databases.createStringAttribute(dbId, 'lessons', 'teacher', 255, false))
 
     // --- 4. Create attributes on students ---
-    console.log('Creating attributes on "students"...')
+    console.log('\n4. Creating attributes on "students"...')
 
-    await databases.createStringAttribute(dbId, 'students', 'name', 255, true)
-    await databases.createEmailAttribute(dbId, 'students', 'email', true)
-    await databases.createDatetimeAttribute(dbId, 'students', 'dateOfBirth', false)
-    await databases.createStringAttribute(dbId, 'students', 'phone', 50, false)
+    await createAttribute(databases, dbId, 'students', 'name', () => databases.createStringAttribute(dbId, 'students', 'name', 255, true))
+    await createAttribute(databases, dbId, 'students', 'email', () => databases.createEmailAttribute(dbId, 'students', 'email', true))
+    await createAttribute(databases, dbId, 'students', 'dateOfBirth', () => databases.createDatetimeAttribute(dbId, 'students', 'dateOfBirth', false))
+    await createAttribute(databases, dbId, 'students', 'phone', () => databases.createStringAttribute(dbId, 'students', 'phone', 50, false))
 
     // --- 5. Create attributes on credits ---
-    console.log('Creating attributes on "credits"...')
+    console.log('\n5. Creating attributes on "credits"...')
 
-    await databases.createStringAttribute(dbId, 'credits', 'studentId', 255, true)
-    await databases.createStringAttribute(dbId, 'credits', 'bookingId', 255, false)
-    await databases.createEnumAttribute(dbId, 'credits', 'type', ['credit_1', 'credit_5', 'credit_10'], true)
-    await databases.createDatetimeAttribute(dbId, 'credits', 'validFrom', true)
-    await databases.createDatetimeAttribute(dbId, 'credits', 'validTo', true)
-    await databases.createDatetimeAttribute(dbId, 'credits', 'createdAt', true)
-    await databases.createDatetimeAttribute(dbId, 'credits', 'usedAt', false)
+    await createAttribute(databases, dbId, 'credits', 'studentId', () => databases.createStringAttribute(dbId, 'credits', 'studentId', 255, true))
+    await createAttribute(databases, dbId, 'credits', 'bookingId', () => databases.createStringAttribute(dbId, 'credits', 'bookingId', 255, false))
+    await createAttribute(databases, dbId, 'credits', 'type', () => databases.createEnumAttribute(dbId, 'credits', 'type', ['credit_1', 'credit_5', 'credit_10'], true))
+    await createAttribute(databases, dbId, 'credits', 'validFrom', () => databases.createDatetimeAttribute(dbId, 'credits', 'validFrom', true))
+    await createAttribute(databases, dbId, 'credits', 'validTo', () => databases.createDatetimeAttribute(dbId, 'credits', 'validTo', true))
+    await createAttribute(databases, dbId, 'credits', 'createdAt', () => databases.createDatetimeAttribute(dbId, 'credits', 'createdAt', true))
+    await createAttribute(databases, dbId, 'credits', 'usedAt', () => databases.createDatetimeAttribute(dbId, 'credits', 'usedAt', false))
 
     // --- 6. Wait for all plain attributes before creating relationships ---
-    console.log('Waiting for attributes to be available...')
+    console.log('\n6. Waiting for attributes to be available (sequential check to avoid rate limits)...')
 
-    await Promise.all([
-        waitForAttribute(databases, dbId, 'lessons', 'date'),
-        waitForAttribute(databases, dbId, 'lessons', 'type'),
-        waitForAttribute(databases, dbId, 'lessons', 'teacher'),
-        waitForAttribute(databases, dbId, 'students', 'name'),
-        waitForAttribute(databases, dbId, 'students', 'email'),
-        waitForAttribute(databases, dbId, 'students', 'dateOfBirth'),
-        waitForAttribute(databases, dbId, 'students', 'phone'),
-        waitForAttribute(databases, dbId, 'credits', 'studentId'),
-        waitForAttribute(databases, dbId, 'credits', 'bookingId'),
-        waitForAttribute(databases, dbId, 'credits', 'type'),
-        waitForAttribute(databases, dbId, 'credits', 'validFrom'),
-        waitForAttribute(databases, dbId, 'credits', 'validTo'),
-        waitForAttribute(databases, dbId, 'credits', 'createdAt'),
-        waitForAttribute(databases, dbId, 'credits', 'usedAt'),
-    ])
+    const attributesToWait = [
+        { c: 'lessons', k: 'date' },
+        { c: 'lessons', k: 'type' },
+        { c: 'lessons', k: 'teacher' },
+        { c: 'students', k: 'name' },
+        { c: 'students', k: 'email' },
+        { c: 'students', k: 'dateOfBirth' },
+        { c: 'students', k: 'phone' },
+        { c: 'credits', k: 'studentId' },
+        { c: 'credits', k: 'bookingId' },
+        { c: 'credits', k: 'type' },
+        { c: 'credits', k: 'validFrom' },
+        { c: 'credits', k: 'validTo' },
+        { c: 'credits', k: 'createdAt' },
+        { c: 'credits', k: 'usedAt' },
+    ]
+
+    for (const { c, k } of attributesToWait) {
+        process.stdout.write(`  Waiting for ${c}.${k}... `)
+        await waitForAttribute(databases, dbId, c, k)
+        console.log('OK')
+    }
 
     console.log('All plain attributes ready.')
 
     // --- 7. Create indexes on credits ---
-    console.log('Creating indexes on "credits"...')
-    await databases.createIndex(dbId, 'credits', 'idx_studentId', 'key', ['studentId'])
-    await databases.createIndex(dbId, 'credits', 'idx_bookingId', 'key', ['bookingId'])
-    await databases.createIndex(dbId, 'credits', 'idx_student_available', 'key', ['studentId', 'bookingId', 'validTo'])
+    console.log('\n7. Creating indexes on "credits"...')
+    const createIndex = async (coll: string, key: string, type: any, attrs: string[]) => {
+        try {
+            await databases.createIndex(dbId, coll, key, type, attrs)
+            console.log(`    + Index ${key} [CREATED]`)
+        } catch (e: any) {
+            if (e.code === 409) console.log(`    + Index ${key} [EXISTS]`)
+            else throw e
+        }
+    }
+
+    await createIndex('credits', 'idx_studentId', 'key', ['studentId'])
+    await createIndex('credits', 'idx_bookingId', 'key', ['bookingId'])
+    await createIndex('credits', 'idx_student_available', 'key', ['studentId', 'bookingId', 'validTo'])
 
     // --- 8. Create relationships ---
     // lessons -> bookings (one-to-many, cascade delete: deleting a lesson deletes its bookings)
-    console.log('Creating relationship: lessons -> bookings...')
-    await databases.createRelationshipAttribute(
-        dbId,
-        'lessons',         // parent collection
-        'bookings',        // related collection
-        RelationshipType.OneToMany,
-        true,              // two-way: creates 'bookings' on lessons AND 'lessons' on bookings
-        'bookings',        // key on lessons
-        'lessons',         // key on bookings
-        RelationMutate.Cascade
-    )
+    console.log('\n8. Creating relationship: lessons -> bookings...')
+
+    try {
+        await databases.createRelationshipAttribute(
+            dbId, 'lessons', 'bookings', RelationshipType.OneToMany, true, 'bookings', 'lessons', RelationMutate.Cascade
+        )
+        console.log('  Relationship created.')
+    } catch (e: any) {
+        if (e.code === 409) console.log('  Relationship exists.')
+        else throw e
+    }
 
     await waitForAttribute(databases, dbId, 'lessons', 'bookings')
     await waitForAttribute(databases, dbId, 'bookings', 'lessons')
@@ -141,16 +192,15 @@ async function main() {
 
     // students -> bookings (one-to-many, set-null: deleting a student nullifies the booking reference)
     console.log('Creating relationship: students -> bookings...')
-    await databases.createRelationshipAttribute(
-        dbId,
-        'students',
-        'bookings',
-        RelationshipType.OneToMany,
-        true,              // two-way: creates 'bookings' on students AND 'students' on bookings
-        'bookings',        // key on students
-        'students',        // key on bookings
-        RelationMutate.SetNull
-    )
+    try {
+        await databases.createRelationshipAttribute(
+            dbId, 'students', 'bookings', RelationshipType.OneToMany, true, 'bookings', 'students', RelationMutate.SetNull
+        )
+        console.log('  Relationship created.')
+    } catch (e: any) {
+        if (e.code === 409) console.log('  Relationship exists.')
+        else throw e
+    }
 
     await waitForAttribute(databases, dbId, 'students', 'bookings')
     await waitForAttribute(databases, dbId, 'bookings', 'students')

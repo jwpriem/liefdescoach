@@ -8,7 +8,7 @@
 import { createAppwriteClient } from './appwrite-client'
 import { RelationshipType, RelationMutate } from 'node-appwrite'
 
-const POLL_INTERVAL_MS = 1000
+const POLL_INTERVAL_MS = 2000
 const POLL_TIMEOUT_MS = 600000
 
 async function waitForAttribute(
@@ -25,19 +25,41 @@ async function waitForAttribute(
             if (attr.status === 'failed') {
                 throw new Error(`Attribute "${key}" on "${collectionId}" failed to create`)
             }
-            console.log(`Attribute "${key}" on "${collectionId}" status: ${attr.status}, waiting...`)
+            if (Date.now() - start > 5000 && Date.now() % 5000 < POLL_INTERVAL_MS) {
+                console.log(`Attribute "${key}" on "${collectionId}" status: ${attr.status}, waiting...`)
+            }
         } catch (e: any) {
             // ignore 404 while waiting
             if (e.status !== 404 && e.code !== 404) throw e
-            console.log(`Waiting for attribute "${key}" on "${collectionId}" to be created...`)
+            // console.log(`Waiting for attribute "${key}" on "${collectionId}" to be created...`)
         }
         await new Promise(r => setTimeout(r, POLL_INTERVAL_MS))
     }
     throw new Error(`Timeout waiting for attribute "${key}" on "${collectionId}"`)
 }
 
+async function createAttribute(
+    databases: any,
+    dbId: string,
+    collId: string,
+    key: string,
+    createFn: () => Promise<any>
+) {
+    try {
+        await createFn()
+        console.log(`  + ${key} [CREATED]`)
+    } catch (e: any) {
+        if (e.code === 409) {
+            console.log(`  + ${key} [EXISTS]`)
+        } else {
+            console.error(`  ! Failed to create ${key}: ${e.message}`)
+            throw e
+        }
+    }
+}
+
 async function main() {
-    const { client, databases, users, ID } = createAppwriteClient()
+    const { client, databases, users, ID, Query } = createAppwriteClient()
 
     // We assume the database already exists and is configured in env
     const dbId = process.env.NUXT_PUBLIC_DATABASE
@@ -60,17 +82,9 @@ async function main() {
     // --- 2. Create attributes ---
     console.log('Creating attributes on "health"...')
 
-    // We use a custom ID (studentId) for the document, so we don't strictly need a studentId attribute 
-    // if we just rely on ID, but for relationships/querying it's safer to have it explicitly or use the relationship.
-    // The user asked for a relation to the student.
-    // Since 'students' collection exists (from setup-database.ts), we should link to it.
-
-    // However, the user data is in the 'users' service (Auth) AND in 'students' collection (DB).
-    // Usually we link to the 'students' collection document.
-
-    await databases.createStringAttribute(dbId, 'health', 'injury', 1000, false)
-    await databases.createBooleanAttribute(dbId, 'health', 'pregnancy', false)
-    await databases.createDatetimeAttribute(dbId, 'health', 'dueDate', false)
+    await createAttribute(databases, dbId, 'health', 'injury', () => databases.createStringAttribute(dbId, 'health', 'injury', 1000, false))
+    await createAttribute(databases, dbId, 'health', 'pregnancy', () => databases.createBooleanAttribute(dbId, 'health', 'pregnancy', false))
+    await createAttribute(databases, dbId, 'health', 'dueDate', () => databases.createDatetimeAttribute(dbId, 'health', 'dueDate', false))
 
     console.log('Waiting for attributes...')
     await Promise.all([
@@ -125,8 +139,8 @@ async function main() {
 
     while (true) {
         const userList = await users.list([
-            `limit(100)`,
-            `offset(${offset})`
+            Query.limit(100),
+            Query.offset(offset)
         ])
 
         const userRows = userList.users
@@ -141,15 +155,13 @@ async function main() {
             if (hasInjury || hasPregnancy || dueDate) {
                 // Check if student record exists in DB (it should)
                 try {
-                    // We need the internal ID of the student document. 
-                    // Usually user.$id === student.$id in this system (based on registerUser in store)
-
-                    // Create or update health record
-                    // Since it's 1-to-1 and we want to use the same ID if possible or let Appwrite handle it via relationship
-                    // With 1-to-1, we usually set the student ID.
-
-                    // Check if health record already exists for this student
-                    // We can try to create it.
+                    // Check if student already has health record
+                    const student = await databases.getDocument(dbId, 'students', user.$id)
+                    if (student.health) {
+                        // console.log(`Student ${user.name} already has health record. Skipping.`)
+                        process.stdout.write('S')
+                        continue
+                    }
 
                     // Create health data WITHOUT the student relationship
                     const healthData = {
@@ -158,7 +170,7 @@ async function main() {
                         dueDate: prefs.dueDate
                     }
 
-                    console.log(`Migrating data for ${user.name} (${user.$id})...`)
+                    // console.log(`Migrating data for ${user.name} (${user.$id})...`)
 
                     // Step 1: Create health doc WITHOUT student field
                     const healthResult = await databases.createDocument(
@@ -177,12 +189,12 @@ async function main() {
                         { health: healthResult.$id }
                     )
 
-                    // Clear prefs? Maybe keep them for backup for now.
+                    process.stdout.write('.')
                     migratedCount++
 
                 } catch (e: any) {
-                    // likely already exists or constraint violation
-                    console.log(`Skipping ${user.name}: ${e.message}`)
+                    process.stdout.write('E')
+                    // console.log(`Skipping ${user.name}: ${e.message}`)
                 }
             }
         }
@@ -191,7 +203,7 @@ async function main() {
         offset += 100
     }
 
-    console.log(`Migration complete. Migrated ${migratedCount} records.`)
+    console.log(`\nMigration complete. Migrated ${migratedCount} records.`)
 }
 
 main().catch(console.error)

@@ -1,3 +1,13 @@
+/**
+ * Creates a new Appwrite database with the data from the old database.
+ *
+ * Usage:
+ *   yarn tsx scripts/replicate-prod-db.ts  # auto-generated ID
+ *
+ * Required env vars: NUXT_PUBLIC_PROJECT, NUXT_APPWRITE_KEY
+ * Output: prints the new database ID to set as NUXT_PUBLIC_DATABASE
+ */
+
 import 'dotenv/config'
 import { Client, Databases, ID, Query } from 'node-appwrite'
 import { exec } from 'child_process'
@@ -139,12 +149,22 @@ async function main() {
 
     console.log('Source IDs found:', sourceIds)
 
-    // 1. Create New Database
-    console.log('\n--- 1. Creating New Database ---')
-    const newDbName = 'main'
-    const newDb = await databases.create(ID.unique(), newDbName)
-    const NEW_DB_ID = newDb.$id
-    console.log(`New Database Created: ${newDbName} (${NEW_DB_ID})`)
+    // 1. Create or Select Database
+    console.log('\n--- 1. Database Setup ---')
+
+    let NEW_DB_ID: string
+    const targetArg = process.argv.indexOf('--target')
+
+    if (targetArg !== -1 && process.argv[targetArg + 1]) {
+        NEW_DB_ID = process.argv[targetArg + 1]
+        console.log(`Using existing target database: ${NEW_DB_ID}`)
+    } else {
+        console.log('Creating New Database...')
+        const newDbName = 'main'
+        const newDb = await databases.create(ID.unique(), newDbName)
+        NEW_DB_ID = newDb.$id
+        console.log(`New Database Created: ${newDbName} (${NEW_DB_ID})`)
+    }
 
     // 2. Run Setup Scripts
     // These scripts expect NUXT_PUBLIC_DATABASE in env, which we will override
