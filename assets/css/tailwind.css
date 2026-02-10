@@ -1,14 +1,13 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@import "@nuxt/ui";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@theme {
+  --font-display: 'Montserrat', sans-serif;
+  --font-body: 'Source Sans 3', sans-serif;
+}
 
 body .dark {
-    @apply font-body text-gray-600 antialiased ;
-
+    @apply font-body text-gray-600 antialiased;
     font-family: 'Source Sans 3', sans-serif;
 }
 
@@ -41,7 +40,6 @@ h6 {
 
 p, li {
     @apply font-body;
-
     font-family: 'Source Sans 3', sans-serif;
 }
 
@@ -169,14 +167,14 @@ label {
     }
 
     .intro-dark {
-        @apply text-emerald-900
+        @apply text-emerald-900;
     }
 
     .emerald-underline {
         @apply relative z-10;
 
         &:before {
-            @apply absolute h-6 bottom-0 left-0 -mb-1 -ml-2 bg-emerald-700 bg-opacity-25 z-0 block w-1/2;
+            @apply absolute h-6 bottom-0 left-0 -mb-1 -ml-2 bg-emerald-700/25 z-0 block w-1/2;
             content: '';
         }
     }
@@ -185,7 +183,7 @@ label {
         @apply relative z-10;
 
         &:before {
-            @apply absolute h-6 bottom-0 left-0 -mb-1 -ml-2 bg-orange-700 bg-opacity-25 z-0 block w-1/2;
+            @apply absolute h-6 bottom-0 left-0 -mb-1 -ml-2 bg-orange-700/25 z-0 block w-1/2;
             content: '';
         }
     }
@@ -194,7 +192,8 @@ label {
         @apply text-emerald-600;
 
         &::placeholder {
-            @apply tracking-wide italic text-sm text-emerald-100 opacity-30 subpixel-antialiased;
+            @apply tracking-wide italic text-sm text-emerald-100 opacity-30;
+            -webkit-font-smoothing: antialiased;
         }
     }
 
@@ -219,12 +218,12 @@ label {
         @apply text-2xl;
     }
 
-    .nav-item.nuxt-link-exact-active,
-    .mobile-nav-item.nuxt-link-exact-active {
+    .nav-item.router-link-exact-active,
+    .mobile-nav-item.router-link-exact-active {
         @apply relative z-10 transition-all duration-300 ease-in-out antialiased;
 
         &:before {
-            @apply absolute h-2.5 bottom-0 left-0 -ml-2 bg-emerald-700 bg-opacity-25 z-0 block w-full;
+            @apply absolute h-2.5 bottom-0 left-0 -ml-2 bg-emerald-700/25 z-0 block w-full;
             content: "";
         }
     }
@@ -249,7 +248,7 @@ label {
         @apply relative z-10;
 
         &:before {
-            @apply absolute h-6 bottom-0 left-0 -mb-1 -ml-2 bg-rose-600 bg-opacity-25 z-0 block w-1/2;
+            @apply absolute h-6 bottom-0 left-0 -mb-1 -ml-2 bg-rose-600/25 z-0 block w-1/2;
             content: '';
         }
     }
@@ -266,14 +265,13 @@ label {
         @apply text-2xl;
     }
 
-    .nav-item.nuxt-link-exact-active, .mobile-nav-item.nuxt-link-exact-active {
+    .nav-item.router-link-exact-active, .mobile-nav-item.router-link-exact-active {
         @apply relative z-10 transition-all duration-300 ease-in-out antialiased;
 
         &:before {
-            @apply absolute h-2.5 bottom-0 left-0 -ml-2 bg-rose-600 bg-opacity-25 z-0 block w-full;
+            @apply absolute h-2.5 bottom-0 left-0 -ml-2 bg-rose-600/25 z-0 block w-full;
             content: '';
         }
-    ;
     }
 }
 
@@ -364,8 +362,8 @@ tbody {
     @apply before:checked:bg-emerald-500 dark:before:checked:bg-emerald-500;
     @apply checked:after:duration-300 checked:after:translate-x-4;
 
-    @apply disabled:after:bg-opacity-75 disabled:cursor-not-allowed;
-    @apply disabled:checked:before:bg-opacity-40;
+    @apply disabled:after:bg-white/75 disabled:cursor-not-allowed;
+    @apply disabled:checked:before:bg-emerald-500/40;
 }
 
 .nav-item {
@@ -380,12 +378,12 @@ tbody {
     @apply text-2xl;
 }
 
-.nav-item.nuxt-link-exact-active,
-.mobile-nav-item.nuxt-link-exact-active {
+.nav-item.router-link-exact-active,
+.mobile-nav-item.router-link-exact-active {
     @apply relative z-10 transition-all duration-300 ease-in-out antialiased;
 
     &:before {
-        @apply absolute h-2.5 bottom-0 left-0 -ml-2 bg-emerald-700 bg-opacity-25 z-0 block w-full;
+        @apply absolute h-2.5 bottom-0 left-0 -ml-2 bg-emerald-700/25 z-0 block w-full;
         content: "";
     }
 }
@@ -408,7 +406,7 @@ tbody {
         @apply relative z-10;
 
         &:before {
-            @apply absolute h-6 bottom-0 left-0 -mb-1 -ml-2 bg-rose-600 bg-opacity-25 z-0 block w-1/2;
+            @apply absolute h-6 bottom-0 left-0 -mb-1 -ml-2 bg-rose-600/25 z-0 block w-1/2;
             content: '';
         }
     }
@@ -419,7 +417,8 @@ tbody {
         @apply bg-gray-200 text-gray-800 p-4 font-body w-full rounded border-transparent text-sm transition-all duration-300 ease-in-out;
 
         &::placeholder {
-            @apply tracking-wide italic text-sm subpixel-antialiased;
+            @apply tracking-wide italic text-sm;
+            -webkit-font-smoothing: antialiased;
         }
 
         &:disabled {
@@ -450,8 +449,8 @@ tbody {
         &.hasError {
             @apply border border-solid border-red-600;
 
-            animaition: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-            transforae: translate3d(0, 0, 0);
+            animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+            transform: translate3d(0, 0, 0);
             backface-visibility: hidden;
             perspective: 100px;
         }

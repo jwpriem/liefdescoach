@@ -1,6 +1,4 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-const isDev = process.env.NODE_ENV !== 'production'
-
 export default defineNuxtConfig({
   devtools: { enabled: true },
 
@@ -13,6 +11,23 @@ export default defineNuxtConfig({
         { name: 'geo.placename', content: 'Rotterdam' },
         { name: 'geo.position', content: '51.9683092;4.5884189' },
         { name: 'ICBM', content: '51.9683092, 4.5884189' }
+      ],
+      // GTM script (replaces @zadigetvoltaire/nuxt-gtm)
+      script: [
+        {
+          innerHTML: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-PZP28PP');`,
+          type: 'text/javascript'
+        }
+      ],
+      noscript: [
+        {
+          innerHTML: '<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PZP28PP" height="0" width="0" style="display:none;visibility:hidden"></iframe>',
+          tagPosition: 'bodyOpen'
+        }
       ]
     }
   },
@@ -32,23 +47,22 @@ export default defineNuxtConfig({
     }
   },
 
-  server: {
-    port: isDev ? 3000 : 8080, // default: 3000
-    host: isDev ? 'localhost' : '0.0.0.0' // default: localhost
+  devServer: {
+    port: 3000,
+    host: 'localhost'
   },
 
-  // Plugins to run before rendering page (https://go.nuxtjs.dev/config-plugins)
+  // Plugins to run before rendering page
   plugins: [
     '~/plugins/rav'
   ],
 
   modules: [
-    '@nuxtjs/google-fonts',
+    '@nuxt/fonts',
     '@pinia/nuxt',
     'dayjs-nuxt',
     '@nuxtjs/sitemap',
     '@nuxtjs/robots',
-    '@zadigetvoltaire/nuxt-gtm',
     '@nuxt/ui',
     '@nuxt/image'
   ],
@@ -68,25 +82,14 @@ export default defineNuxtConfig({
     autoLastmod: true
   },
 
-  robots: {
-    UserAgent: '*',
-    Sitemap: 'https://www.ravennah.com/sitemap.xml'
+  fonts: {
+    families: [
+      { name: 'Montserrat', provider: 'google', weights: [200, 300, 400, 500, 600, 700, 800, 900] },
+      { name: 'Source Sans 3', provider: 'google', weights: [200, 300, 400, 500, 600, 700, 800, 900] }
+    ]
   },
 
-  googleFonts: {
-    families: {
-      Montserrat: [200, 300, 400, 500, 600, 700, 800, 900],
-      'Source+Sans+3': [200, 300, 400, 500, 600, 700, 800, 900]
-    }
-  },
-
-  gtm: {
-    id: 'GTM-PZP28PP'
-  },
-
-  ui: {
-    global: true
-  },
+  css: ['~/assets/css/tailwind.css'],
 
   routeRules: {
     '/liefdescoach/**': { redirect: '/', statusCode: 301 },
@@ -101,5 +104,7 @@ export default defineNuxtConfig({
     '/yoga/priveles': { redirect: '/priveles', statusCode: 301 },
     '/yoga/tarieven': { redirect: '/tarieven', statusCode: 301 },
     '/yoga/voordelen': { redirect: '/voordelen', statusCode: 301 },
-  }
+  },
+
+  compatibilityDate: '2025-01-01'
 })

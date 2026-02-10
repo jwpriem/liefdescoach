@@ -20,33 +20,29 @@
     "test:e2e:headed": "playwright test --headed"
   },
   "dependencies": {
-    "@nuxt/ui": "^2.15.1",
-    "@nuxtjs/robots": "^3.0.0",
-    "@nuxtjs/sitemap": "^5.1.2",
-    "@pinia/nuxt": "^0.5.1",
+    "@nuxt/ui": "^3.0.0",
+    "@nuxtjs/robots": "^5.0.0",
+    "@nuxtjs/sitemap": "^7.0.0",
+    "@pinia/nuxt": "^0.11.0",
     "appwrite": "^21.5.0",
     "chart.js": "^4.5.1",
-    "express": "^4.18.2",
     "node-appwrite": "^21.1.0",
     "nodemailer": "^6.9.0",
-    "nuxt": "^3.10.1",
-    "pinia": "^2.1.7",
+    "nuxt": "^4.0.0",
+    "pinia": "^3.0.0",
     "v-calendar": "^3.1.2",
-    "vue": "^3.4.15",
-    "vue-chartjs": "^5.3.3",
-    "vue-router": "^4.2.5"
+    "vue-chartjs": "^5.3.3"
   },
   "devDependencies": {
-    "@nuxt/image": "^1.0.0",
-    "@nuxtjs/google-fonts": "^3.2.0",
+    "@nuxt/fonts": "^0.11.0",
+    "@nuxt/image": "^2.0.0",
     "@playwright/test": "^1.58.1",
-    "@zadigetvoltaire/nuxt-gtm": "^0.0.13",
     "dayjs-nuxt": "^2.1.9",
     "dotenv": "^17.2.3",
     "sharp": "^0.34.5",
     "tsx": "^4.21.0"
   },
   "engines": {
-    "node": "20"
+    "node": ">=20"
   }
 }
