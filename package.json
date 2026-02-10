@@ -24,6 +24,7 @@
     "@nuxtjs/robots": "^5.0.0",
     "@nuxtjs/sitemap": "^7.0.0",
     "@pinia/nuxt": "^0.11.0",
+    "@popperjs/core": "^2.11.8",
     "appwrite": "^21.5.0",
     "chart.js": "^4.5.1",
     "node-appwrite": "^21.1.0",
