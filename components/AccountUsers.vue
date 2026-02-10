@@ -5,25 +5,23 @@ const { $rav } = useNuxtApp()
 const toast = useToast()
 
 const columns = [{
-	key: 'name',
-	label: 'Name',
-	sortable: true
+	accessorKey: 'name',
+	header: 'Name',
 }, {
-	key: 'email',
-	label: 'Email',
-	sortable: true
+	accessorKey: 'email',
+	header: 'Email',
 }, {
-	key: 'status', // verification status
-	label: 'Status'
+	accessorKey: 'status',
+	header: 'Status'
 }, {
-	key: 'credits',
-	label: 'Credits'
+	accessorKey: 'credits',
+	header: 'Credits'
 }, {
-	key: 'registration',
-	label: 'Geregistreerd',
-	sortable: true
+	accessorKey: 'registration',
+	header: 'Geregistreerd',
 }, {
-	key: 'actions'
+	accessorKey: 'actions',
+	header: ''
 }]
 
 const creditTypes = [
@@ -82,19 +80,17 @@ async function migrateCredits(): Promise<void> {
 		migrationResult.value = res
 		await store.getUser()
 		toast.add({
-			id: 'migration',
 			title: 'Migratie voltooid',
 			icon: 'i-heroicons-check-badge',
-			color: 'primary',
+			color: 'success',
 			description: `${res.totalMigrated} credits gemigreerd, ${res.totalSkipped} overgeslagen.`
 		})
 	} catch (error) {
 		console.error('Migration failed:', error)
 		toast.add({
-			id: 'migration-error',
 			title: 'Migratie mislukt',
 			icon: 'i-heroicons-x-circle',
-			color: 'red',
+			color: 'error',
 			description: 'Er ging iets mis bij het migreren van credits.'
 		})
 	} finally {
@@ -126,10 +122,9 @@ async function sendWhatsapp(user) {
 		window.location.href = `https://wa.me/${telephone}?text=Hi`
 	} else {
 		toast.add({
-			id: 'no-telephone',
 			title: 'Geen telefoonnummer',
-			icon: 'i-x-circle',
-			color: 'red',
+			icon: 'i-heroicons-x-circle',
+			color: 'error',
 			description: 'Helaas heeft deze gebruiker geen telefoonnummer in het account.'
 		})
 	}
@@ -182,15 +177,9 @@ const filteredRows = computed(() => {
 				</div>
 				<div>
 					<label class="block text-sm font-medium text-gray-300 mb-1.5">Gearchiveerd</label>
-					<UToggle v-model="state.showArchived" off-icon="i-heroicons-x-mark-20-solid"
-						on-icon="i-heroicons-check-20-solid" />
+					<USwitch v-model="state.showArchived" unchecked-icon="i-heroicons-x-mark-20-solid"
+						checked-icon="i-heroicons-check-20-solid" />
 				</div>
-				<!-- <div>
-					<label class="block text-sm font-medium text-gray-300 mb-1.5">Migratie</label>
-					<UButton color="gray" variant="solid" :loading="migrating" @click="migrateCredits()">
-						Migreer credits van prefs
-					</UButton>
-				</div> -->
 			</div>
 		</div>
 
@@ -214,10 +203,10 @@ const filteredRows = computed(() => {
 					<div>
 						<div class="text-xs uppercase font-bold text-gray-500 mb-0.5">Contact</div>
 						<div class="text-gray-200">{{ row.email }} <span class="mt-1">
-								<UBadge v-if="row.emailVerification" color="green" variant="subtle" size="xs">
+								<UBadge v-if="row.emailVerification" color="success" variant="subtle" size="xs">
 									Geverifieerd
 								</UBadge>
-								<UBadge v-else color="orange" variant="subtle" size="xs">Ongeverifieerd</UBadge>
+								<UBadge v-else color="warning" variant="subtle" size="xs">Ongeverifieerd</UBadge>
 							</span></div>
 
 					</div>
@@ -248,48 +237,48 @@ const filteredRows = computed(() => {
 	<!-- Desktop: table layout -->
 	<div
 		class="hidden md:block rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-2xl shadow-emerald-950/20 overflow-hidden">
-		<UTable v-if="students.length" :columns="columns" :rows="filteredRows">
-			<template #name-data="{ row }">
+		<UTable v-if="students.length" :columns="columns" :data="filteredRows">
+			<template #name-cell="{ row }">
 				<div class="flex items-center gap-2">
-					<UButton variant="link" :to="`/admin/users/${row.$id}`" color="white"
+					<UButton variant="link" :to="`/admin/users/${row.original.$id}`" color="neutral"
 						class="p-0 font-medium hover:text-emerald-400">
-						{{ row.name }}
+						{{ row.original.name }}
 					</UButton>
-					<UTooltip v-if="row.health?.injury" :text="row.health.injury">
+					<UTooltip v-if="row.original.health?.injury" :text="row.original.health.injury">
 						<UIcon name="i-heroicons-exclamation-triangle-20-solid" class="w-5 h-5 text-red-500" />
 					</UTooltip>
-					<UTooltip v-if="row.health?.pregnancy" text="Zwanger">
+					<UTooltip v-if="row.original.health?.pregnancy" text="Zwanger">
 						<UIcon name="i-heroicons-heart-20-solid" class="w-5 h-5 text-pink-500" />
 					</UTooltip>
 				</div>
 			</template>
-			<template #credits-data="{ row }">
-				{{ getAvailableCredits(row.$id) }}
+			<template #credits-cell="{ row }">
+				{{ getAvailableCredits(row.original.$id) }}
 			</template>
-			<template #status-data="{ row }">
-				<UBadge v-if="row.emailVerification" color="green" variant="subtle" size="xs">Geverifieerd</UBadge>
-				<UBadge v-else color="orange" variant="subtle" size="xs">Ongeverifieerd</UBadge>
+			<template #status-cell="{ row }">
+				<UBadge v-if="row.original.emailVerification" color="success" variant="subtle" size="xs">Geverifieerd</UBadge>
+				<UBadge v-else color="warning" variant="subtle" size="xs">Ongeverifieerd</UBadge>
 			</template>
-			<template #registration-data="{ row }">
-				{{ $rav.formatDateInDutch(row.registration) }}
+			<template #registration-cell="{ row }">
+				{{ $rav.formatDateInDutch(row.original.registration) }}
 			</template>
-			<template #actions-data="{ row }">
+			<template #actions-cell="{ row }">
 				<div class="flex items-center gap-x-1">
 					<UTooltip text="Bekijk details">
 						<UButton icon="i-heroicons-eye-20-solid" variant="ghost" size="sm" class="text-emerald-100"
-							:to="`/admin/users/${row.$id}`" />
+							:to="`/admin/users/${row.original.$id}`" />
 					</UTooltip>
 					<UTooltip text="Voeg credits toe">
 						<UButton icon="i-heroicons-plus-20-solid" variant="ghost" size="sm" class="text-emerald-100"
-							@click="setUser(row)" />
+							@click="setUser(row.original)" />
 					</UTooltip>
 					<UTooltip text="Archiveer">
 						<UButton icon="i-heroicons-archive-box-20-solid" variant="ghost" size="sm"
-							class="text-emerald-100" @click="archiveUser(row.$id)" />
+							class="text-emerald-100" @click="archiveUser(row.original.$id)" />
 					</UTooltip>
-					<UTooltip text="WhatsApp" v-if="row.phone">
+					<UTooltip text="WhatsApp" v-if="row.original.phone">
 						<UButton icon="i-heroicons-chat-bubble-bottom-center-text-20-solid" variant="ghost" size="sm"
-							class="text-emerald-100" @click="sendWhatsapp(row)" />
+							class="text-emerald-100" @click="sendWhatsapp(row.original)" />
 					</UTooltip>
 				</div>
 			</template>

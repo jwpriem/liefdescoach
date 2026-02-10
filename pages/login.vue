@@ -312,7 +312,7 @@ onMounted(async () => {
                 </label>
                 <UInput id="otp-code" v-model="otpCode" size="lg" color="primary" placeholder="000000" variant="outline"
                   autocomplete="one-time-code" inputmode="numeric"
-                  :ui="{ base: 'text-center tracking-[0.3em] text-lg font-semibold' }" />
+                  class="text-center tracking-[0.3em] text-lg font-semibold" />
               </div>
             </template>
           </div>

@@ -169,7 +169,7 @@ async function requestVerification() {
     toast.add({
       title: 'Verificatie verzonden',
       description: 'Check je e-mailinbox (en spam) voor de verificatielink.',
-      color: 'green',
+      color: 'success',
       icon: 'i-heroicons-paper-airplane'
     })
   } catch (e) {
@@ -177,7 +177,7 @@ async function requestVerification() {
     toast.add({
       title: 'Fout bij verzenden',
       description: 'Kon verificatiemail niet versturen.',
-      color: 'red'
+      color: 'error'
     })
   }
 }
@@ -202,9 +202,9 @@ async function requestVerification() {
           <div class="flex items-center gap-x-2">
             <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Email</span>
             <div class="flex items-center gap-x-2">
-              <UBadge v-if="targetUser.emailVerification" color="green" variant="subtle" size="xs">Geverifieerd</UBadge>
+              <UBadge v-if="targetUser.emailVerification" color="success" variant="subtle" size="xs">Geverifieerd</UBadge>
               <template v-else>
-                <UBadge color="orange" variant="subtle" size="xs">Ongeverifieerd</UBadge>
+                <UBadge color="warning" variant="subtle" size="xs">Ongeverifieerd</UBadge>
                 <button @click="requestVerification" :disabled="verificationSent"
                   class="text-xs text-emerald-400 hover:text-emerald-300 underline underline-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                   {{ verificationSent ? 'Verzonden' : 'Verifieer nu' }}
@@ -239,7 +239,7 @@ async function requestVerification() {
             <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Herinneringsmail</span>
             <span class="block text-gray-400 text-xs mt-0.5">Ontvang een e-mail de avond voor je les</span>
           </div>
-          <UToggle v-model="remindersEnabled" color="emerald" />
+          <USwitch v-model="remindersEnabled" color="primary" />
         </div>
       </div>
       <div class="flex flex-col gap-3 mt-6">
@@ -438,7 +438,7 @@ async function requestVerification() {
           </div>
           <div class="flex items-center justify-between">
             <label for="pregnancy" class="block text-sm font-medium text-gray-300">Ben je zwanger?</label>
-            <UToggle v-model="state.pregnancy" color="emerald" />
+            <USwitch v-model="state.pregnancy" color="primary" />
           </div>
           <div v-if="state.pregnancy">
             <label for="dueDate" class="block text-sm font-medium text-gray-300 mb-1.5">Uitgerekende datum</label>

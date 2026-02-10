@@ -1,6 +1,6 @@
 <template>
   <NuxtLayout>
     <NuxtPage />
-	   <UNotifications />
+    <UToasts />
   </NuxtLayout>
 </template>
