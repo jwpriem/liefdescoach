@@ -158,11 +158,13 @@ test.describe('Registration flow', () => {
         }
 
         // Verify user name displays correctly
-        await expect(page.locator('text=Mijn gegevens')).toBeVisible({ timeout: 10_000 })
         await expect(page.getByRole('link', { name: user.fullName })).toBeVisible({ timeout: 10_000 })
 
-        // Verify welcome credit was granted (should show "1 les")
+        // Verify welcome credit was granted (should show "1 les" in the default "Mijn lessen" tab)
         await expect(page.locator('text=1 les').or(page.locator('text=lessen'))).toBeVisible({ timeout: 10_000 })
+
+        // Switch to "Mijn gegevens" to check profile details
+        await page.getByText('Mijn gegevens').click()
 
         // If date of birth was provided, verify it's displayed (or shows "Niet opgegeven" otherwise)
         await expect(page.locator('text=Geboortedatum')).toBeVisible({ timeout: 5_000 })
@@ -210,6 +212,9 @@ test.describe('Registration flow', () => {
 
         // Verify user name displays correctly
         await expect(page.getByRole('link', { name: minimalUser.fullName })).toBeVisible({ timeout: 10_000 })
+
+        // Switch to "Mijn gegevens" to check profile details
+        await page.getByText('Mijn gegevens').click()
 
         // Verify empty states for optional fields
         await expect(page.locator('text=Geen telefoonnummer')).toBeVisible({ timeout: 5_000 })

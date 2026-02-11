@@ -91,7 +91,7 @@ test.describe('Authentication', () => {
  * The row renders as: "<N> les" (1 credit) or "<N> lessen" (0 or 2+).
  */
 async function getCredits(page: Page): Promise<number> {
-    const saldoRow = page.locator('text=Saldo').locator('..')
+    const saldoRow = page.locator('span:has-text("Saldo"):visible').locator('..')
     await expect(saldoRow).toBeVisible({ timeout: 10_000 })
 
     const saldoText = await saldoRow.locator('span.block').innerText()
@@ -107,6 +107,9 @@ test.describe('Booking flow', () => {
         // --- Step 1: Login ---
         await login(page)
 
+        // Open "Mijn lessen" tab to see credits and bookings
+        await page.getByText('Mijn lessen').click()
+
         // --- Step 2: Read current credits on the account page ---
         const creditsBefore = await getCredits(page)
 
@@ -115,10 +118,14 @@ test.describe('Booking flow', () => {
             return
         }
 
-        // --- Step 3: Navigate to lessons via client-side nav (preserves store state) ---
-        await navigateToLessen(page)
+        // --- Step 3: Open booking modal ---
+        // Ensure we click the visible button (there might be one in hidden tabs)
+        await page.locator('button:has-text("Boek een les"):visible').first().click()
+        await expect(page.locator('.fixed.inset-0')).toBeVisible() // Modal overlay
 
-        // --- Step 4: Find and click the first available "Boek" button ---
+        // --- Step 4: Find and click the first available "Boek" button inside the modal ---
+        // Wait for lessons to load in modal
+        await page.waitForTimeout(1000)
         const bookButton = page.getByRole('button', { name: 'Boek', exact: true }).first()
         const hasBookButton = await bookButton.waitFor({ state: 'visible', timeout: 15_000 }).then(() => true).catch(() => false)
 
@@ -134,14 +141,32 @@ test.describe('Booking flow', () => {
 
         // --- Step 5: Verify booking succeeded ---
         // Wait for the number of "Geboekt" elements to increase by one
-        await expect(async () => {
-            const geboektAfter = await page.locator('text=Geboekt').count()
-            expect(geboektAfter).toBe(geboektBefore + 1)
-        }).toPass({ timeout: 15_000 })
+        try {
+            await expect(async () => {
+                const geboektAfter = await page.locator('text=Geboekt').count()
+                expect(geboektAfter).toBe(geboektBefore + 1)
+            }).toPass({ timeout: 15_000 })
+        } catch (e) {
+            // Debug: print store state
+            const storeState = await page.evaluate(() => {
+                // @ts-ignore
+                const store = window.$nuxt.$pinia.state.value.main
+                return {
+                    myBookings: store.myBookings,
+                    credits: store.myCreditSummary,
+                    loggedInUser: store.loggedInUser
+                }
+            })
+            console.log('DEBUG STORE STATE:', JSON.stringify(storeState, null, 2))
+            throw e
+        }
 
-        // --- Step 6: Navigate to account page and verify credits decreased by 1 ---
-        await page.locator('nav a.nav-item[href="/account"]').click()
-        await page.waitForURL('**/account', { timeout: 10_000 })
+        // --- Step 6: Verify credits decreased by 1 ---
+        // Close modal by clicking backdrop (top-left corner to avoid content)
+        await page.locator('.fixed.inset-0').first().click({ position: { x: 10, y: 10 } })
+
+        // Wait for modal to close
+        await expect(page.locator('.fixed.inset-0')).not.toBeVisible()
 
         const creditsAfter = await getCredits(page)
         expect(creditsAfter).toBe(creditsBefore - 1)

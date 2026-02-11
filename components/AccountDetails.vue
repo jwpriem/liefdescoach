@@ -96,7 +96,7 @@ async function updateHealth() {
   try {
     const currentHealth = targetUser.value.health || {};
     const newHealth = {
-      injury: state.injury || undefined,
+      injury: state.injury || null,
       pregnancy: state.pregnancy,
       dueDate: state.pregnancy ? state.dueDate : null
     };

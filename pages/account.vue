@@ -39,6 +39,9 @@ const lessons = computed(() => store.lessons);
 const myBookings = computed(() => store.myBookings);
 const isLoading = computed(() => store.isLoading);
 
+const showBookingModal = ref(false)
+provide('openBookingModal', () => showBookingModal.value = true)
+
 const tabs = computed<TabsItem[]>(() => {
   const items: TabsItem[] = [
     {
@@ -119,5 +122,7 @@ const tabs = computed<TabsItem[]>(() => {
 				</template>
 			</UTabs>
 		</div>
+
+		<BookingModal v-model="showBookingModal" />
 	</div>
 </template>

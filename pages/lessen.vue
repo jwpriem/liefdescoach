@@ -39,10 +39,11 @@ function checkBooking(id: string) {
 }
 
 async function book(lesson: any) {
+  if (!store.loggedInUser) return
   await store.setOnBehalfOf(store.loggedInUser)
-  const ok = await store.handleBooking(lesson)
+  await store.handleBooking(lesson)
 
-  if (ok) {
+  if (!store.errorMessage) {
     toast.add({
       id: 'booking',
       title: 'Tot snel',
