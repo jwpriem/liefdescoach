@@ -66,8 +66,8 @@ async function book() {
   state.bookForUser = false
   store.setLoading(true)
 
-  await store.setOnBehalfOf(JSON.parse(state.addBookingUser))
-  await store.handleBooking(JSON.parse(state.addBookingLesson))
+  await store.setOnBehalfOf(state.addBookingUser)
+  await store.handleBooking(state.addBookingLesson)
   await store.fetchStudents()
   await store.fetchLessons()
 
@@ -82,11 +82,11 @@ async function createNewLesson() {
 
   await $fetch('/api/createLesson', {
     method: 'post',
-    body: JSON.stringify({
+    body: {
       date: state.createLessonDate.toISOString(),
       type: state.createLessonType,
       teacher: state.createLessonTeacher,
-    }),
+    },
   })
 
   cancelLesson() // Resets the lesson creation form
@@ -95,7 +95,9 @@ async function createNewLesson() {
 }
 
 async function removeBooking(booking, lesson) {
-  await store.setOnBehalfOf(JSON.parse(state.addBookingUser))
+  // state.addBookingUser is likely null here unless we are in the middle of booking? 
+  // Preserving logic but removing JSON.parse, assuming store handles object or null.
+  await store.setOnBehalfOf(state.addBookingUser)
   await store.cancelBooking(booking, lesson)
 }
 
@@ -119,7 +121,7 @@ const computedLessons = computed(() => {
 
     return {
       label: $rav.formatDateInDutch(lesson.date) + spotsText,
-      value: JSON.stringify(lesson),
+      value: lesson,
       disabled: isFull,
     }
   })
@@ -127,10 +129,10 @@ const computedLessons = computed(() => {
 
 const computedStudents = computed(() => {
   return students.value.map(student => {
-    const isDisabled = state.addBookingLesson ? !$rav.checkAvailability(JSON.parse(state.addBookingLesson), student) : false
+    const isDisabled = state.addBookingLesson ? !$rav.checkAvailability(state.addBookingLesson, student) : false
     return {
       label: student.name,
-      value: JSON.stringify(student),
+      value: student,
       disabled: isDisabled,
     }
   })
@@ -145,15 +147,17 @@ const computedStudents = computed(() => {
           <span class="emerald-underline text-emerald-900">Lessen</span><span class="text-emerald-700">.</span>
         </h2>
         <div class="flex flex-wrap items-center gap-3 mt-4 md:mt-0">
-          <UButton color="primary" variant="solid" size="lg" @click="state.createLesson = !state.createLesson">Voeg les toe</UButton>
-          <UButton color="primary" variant="solid" size="lg" @click="state.bookForUser = !state.bookForUser">Maak boeking voor gebruiker</UButton>
+          <UButton color="primary" variant="solid" size="lg" @click="state.createLesson = !state.createLesson">Voeg les
+            toe</UButton>
+          <UButton color="primary" variant="solid" size="lg" @click="state.bookForUser = !state.bookForUser">Maak
+            boeking voor gebruiker</UButton>
           <UButton color="primary" variant="outline" size="lg" to="/archief">Archief</UButton>
         </div>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div v-for="lesson in lessons" index="lesson.$id"
-             class="rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-2xl shadow-emerald-950/20 p-6">
+        <div v-for="lesson in lessons" :key="lesson.$id"
+          class="rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-2xl shadow-emerald-950/20 p-6">
           <div class="space-y-3">
             <div>
               <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Les</span>
@@ -164,14 +168,18 @@ const computedStudents = computed(() => {
               <span class="block text-gray-100 mt-0.5">{{ $rav.formatDateInDutch(lesson.date, true) }}</span>
             </div>
             <div>
-              <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Boekingen ({{ lesson.bookings?.length || 0 }}/9)</span>
+              <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Boekingen ({{
+                lesson.bookings?.length || 0 }}/9)</span>
               <div class="mt-1">
-                <span v-for="booking in sortStudents(lesson.bookings || [])" index="booking.$id" class="flex items-center gap-1 text-sm text-gray-300">
-                  <NuxtLink :to="`/admin/users/${booking.students.$id}`" class="hover:text-emerald-400 transition-colors">
+                <span v-for="booking in sortStudents(lesson.bookings || [])" :key="booking.$id"
+                  class="flex items-center gap-1 text-sm text-gray-300">
+                  <NuxtLink :to="`/admin/users/${booking.students.$id}`"
+                    class="hover:text-emerald-400 transition-colors">
                     {{ booking.students.name }}
                   </NuxtLink>
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                    stroke="currentColor" class="cursor-pointer w-4 h-4 text-red-400 hover:text-red-300 transition-colors"
+                    stroke="currentColor"
+                    class="cursor-pointer w-4 h-4 text-red-400 hover:text-red-300 transition-colors"
                     @click="removeBooking(booking, lesson)">
                     <path stroke-linecap="round" stroke-linejoin="round"
                       d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m6 4.125 2.25 2.25m0 0 2.25 2.25M12 13.875l2.25-2.25M12 13.875l-2.25 2.25M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
@@ -188,20 +196,23 @@ const computedStudents = computed(() => {
     <!-- Modal: Book for user -->
     <div v-if="state.bookForUser && lessons.length && students.length"
       class="fixed inset-0 bg-black/75 flex justify-center items-center z-50 p-4">
-      <div class="w-full max-w-lg max-h-[75vh] overflow-y-auto rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-2xl shadow-emerald-950/20 p-8 sm:p-10">
+      <div
+        class="w-full max-w-lg max-h-[75vh] overflow-y-auto rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-2xl shadow-emerald-950/20 p-8 sm:p-10">
         <div class="w-full flex flex-col gap-y-5">
           <h2 class="text-2xl font-bold text-emerald-100 tracking-tight">Voeg boeking toe</h2>
 
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-1.5">Les</label>
-            <USelect icon="i-heroicons-academic-cap-20-solid" size="lg" color="primary" variant="outline"
-              v-model="state.addBookingLesson" :items="computedLessons" />
+            <USelectMenu icon="i-heroicons-academic-cap-20-solid" size="lg" color="primary" variant="outline"
+              v-model="state.addBookingLesson" :items="computedLessons" class="w-full" value-attribute="value"
+              option-attribute="label" />
           </div>
 
           <div v-if="state.addBookingLesson">
             <label class="block text-sm font-medium text-gray-300 mb-1.5">Gebruiker</label>
-            <USelect icon="i-heroicons-user-20-solid" size="lg" color="primary"
-              variant="outline" v-model="state.addBookingUser" :items="computedStudents" />
+            <USelectMenu icon="i-heroicons-user-20-solid" size="lg" color="primary" variant="outline"
+              v-model="state.addBookingUser" :items="computedStudents" class="w-full" value-attribute="value"
+              option-attribute="label" searchable searchable-placeholder="Zoek gebruiker..." />
           </div>
 
           <div class="flex gap-3 mt-2">
@@ -216,14 +227,17 @@ const computedStudents = computed(() => {
     <!-- Modal: Create lesson -->
     <div v-if="state.createLesson && isAdmin"
       class="fixed inset-0 bg-black/75 flex justify-center items-center z-50 p-4">
-      <div class="w-full max-w-lg max-h-[75vh] overflow-y-auto rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-2xl shadow-emerald-950/20 p-8 sm:p-10">
+      <div
+        class="w-full max-w-lg max-h-[75vh] overflow-y-auto rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-2xl shadow-emerald-950/20 p-8 sm:p-10">
         <div class="w-full flex flex-col gap-y-5">
           <h2 class="text-2xl font-bold text-emerald-100 tracking-tight">Voeg les toe</h2>
 
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-1.5">Datum</label>
-            <UPopover>
-              <UButton icon="i-heroicons-calendar-days-20-solid" size="lg" :label="dayjs(state.createLessonDate).format('D MMM, YYYY')" />
+            <UPopover class="w-full">
+              <UButton icon="i-heroicons-calendar-days-20-solid" size="lg"
+                :label="dayjs(state.createLessonDate).format('D MMM, YYYY')" color="primary" variant="outline"
+                class="w-full justify-between" />
               <template #content="{ close }">
                 <DatePicker v-model="state.createLessonDate" is-required @close="close" />
               </template>
@@ -233,23 +247,25 @@ const computedStudents = computed(() => {
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-1.5">Tijd</label>
             <div class="flex items-center gap-3">
-              <USelect icon="i-heroicons-clock-20-solid" size="lg" color="primary" variant="outline"
-                v-model="state.createLessonHours" :items="state.hours" />
-              <USelect icon="i-heroicons-clock-20-solid" size="lg" color="primary" variant="outline"
-                v-model="state.createLessonMinutes" :items="state.minutes" />
+              <USelectMenu icon="i-heroicons-clock-20-solid" size="lg" color="primary" variant="outline"
+                v-model="state.createLessonHours" :items="state.hours" class="w-full" />
+              <USelectMenu icon="i-heroicons-clock-20-solid" size="lg" color="primary" variant="outline"
+                v-model="state.createLessonMinutes" :items="state.minutes" class="w-full" />
             </div>
           </div>
 
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-1.5">Type les</label>
-            <USelect icon="i-heroicons-academic-cap-20-solid" size="lg" color="primary" variant="outline"
-              v-model="state.createLessonType" :items="state.types" />
+            <USelectMenu icon="i-heroicons-academic-cap-20-solid" size="lg" color="primary" variant="outline"
+              v-model="state.createLessonType" :items="state.types" class="w-full" value-attribute="value"
+              option-attribute="label" />
           </div>
 
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-1.5">Docent</label>
-            <USelect icon="i-heroicons-academic-cap-20-solid" size="lg" color="primary" variant="outline"
-              v-model="state.createLessonTeacher" :items="state.teachers" />
+            <USelectMenu icon="i-heroicons-academic-cap-20-solid" size="lg" color="primary" variant="outline"
+              v-model="state.createLessonTeacher" :items="state.teachers" class="w-full" value-attribute="value"
+              option-attribute="label" />
           </div>
 
           <div class="flex gap-3 mt-2">

@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
         config.public.database,
         'lessons',
         [
-            Query.select(['*', 'bookings.*']),
+            Query.select(['*', 'bookings.*', 'bookings.students.*']),
             Query.orderAsc("date"),
             Query.lessThanEqual("date", fromDate.toISOString()),
             Query.limit(100)

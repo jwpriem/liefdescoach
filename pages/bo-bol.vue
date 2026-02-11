@@ -1,27 +1,27 @@
 <script setup lang="ts">
 const title = ref('Yoga Ravennah | Bo Bol');
 const description = ref('Graag wil ik een gastdocent aan jullie voorstellen. De meesten van jullie zullen hem al kennen uit de lessen, want het is niemand minder dan Bo Bol.');
-const ogImage = ref('https://www.ravennah.com/ravennah-social.jpg');
+const ogImage = ref('https://www.ravennah.com/bo-bol-social.webp');
 const pageUrl = ref('https://www.ravennah.com/bo-bol');
 
 definePageMeta({
 })
 
 useHead({
-    title,
-    meta: [
-        {hid: 'description', name: 'description', content: description},
-        {hid: 'og:title', property: 'og:title', content: title},
-        {hid: 'og:url', property: 'og:url', content: pageUrl},
-        {hid: 'og:description', property: 'og:description', content: description},
-        {hid: 'og:image', property: 'og:image', content: ogImage},
+  title,
+  meta: [
+    { hid: 'description', name: 'description', content: description },
+    { hid: 'og:title', property: 'og:title', content: title },
+    { hid: 'og:url', property: 'og:url', content: pageUrl },
+    { hid: 'og:description', property: 'og:description', content: description },
+    { hid: 'og:image', property: 'og:image', content: ogImage },
 
-        // twitter card
-        {hid: "twitter:title", name: "twitter:title", content: title},
-        {hid: "twitter:url", name: "twitter:url", content: pageUrl},
-        {hid: 'twitter:description', name: 'twitter:description', content: description},
-        {hid: "twitter:image", name: "twitter:image", content: ogImage},
-        ]
+    // twitter card
+    { hid: "twitter:title", name: "twitter:title", content: title },
+    { hid: "twitter:url", name: "twitter:url", content: pageUrl },
+    { hid: 'twitter:description', name: 'twitter:description', content: description },
+    { hid: "twitter:image", name: "twitter:image", content: ogImage },
+  ]
 })
 
 </script>
@@ -30,12 +30,13 @@ useHead({
   <div>
     <Header image="/bo-bol.webp" alignment="object-top">
       <h1 class="text-3xl md:text-6xl uppercase font-black">
-        <span class="emerald-underline">Bo Bol</span
-        ><span class="text-emerald-600">.</span>
+        <span class="emerald-underline">Bo Bol</span><span class="text-emerald-600">.</span>
       </h1>
       <p class="intro">
-        Graag wil ik een gastdocent aan jullie voorstellen. De meesten van jullie zullen hem al kennen uit de lessen, want het is niemand minder dan Bo Bol.
-        Wat velen misschien nog niet wisten, is dat Bo ook jarenlange ervaring heeft in het lesgeven van yoga. En aangezien bij mij 1 + 1 vaak 3 is, ontstond het idee voor deze bijzondere gastles.
+        Graag wil ik een gastdocent aan jullie voorstellen. De meesten van jullie zullen hem al kennen uit de lessen,
+        want het is niemand minder dan Bo Bol.
+        Wat velen misschien nog niet wisten, is dat Bo ook jarenlange ervaring heeft in het lesgeven van yoga. En
+        aangezien bij mij 1 + 1 vaak 3 is, ontstond het idee voor deze bijzondere gastles.
       </p>
 
       <div>
@@ -61,12 +62,15 @@ useHead({
       </div>
 
       <p>
-        Met yoga wil Bo de deelnemers iets meegeven voor hun welzijn, iets wat je niet alleen op de mat, maar ook daarbuiten kunt voelen.
+        Met yoga wil Bo de deelnemers iets meegeven voor hun welzijn, iets wat je niet alleen op de mat, maar ook
+        daarbuiten kunt voelen.
       </p>
 
       <p>
-        Bo geeft inmiddels zo’n 15 jaar les, waarvan de laatste 10 jaar met een sterke focus op yin yoga. Hij volgde zijn opleiding bij Ram Jain.
-        Zijn allereerste yogales was al begin jaren ’70, waarna yoga lange tijd onderdeel bleef als onderhoud, totdat hij later weer in lesverband instapte — en uiteindelijk zelf docent werd.
+        Bo geeft inmiddels zo’n 15 jaar les, waarvan de laatste 10 jaar met een sterke focus op yin yoga. Hij volgde
+        zijn opleiding bij Ram Jain.
+        Zijn allereerste yogales was al begin jaren ’70, waarna yoga lange tijd onderdeel bleef als onderhoud, totdat
+        hij later weer in lesverband instapte — en uiteindelijk zelf docent werd.
       </p>
 
       <div>
@@ -79,7 +83,8 @@ useHead({
           <li>Begonnen met fysiotherapie</li>
           <li>Overgestapt naar verpleegkunde, met o.a. 3 jaar IC-ervaring</li>
           <li>Groepswerk & diverse functies in de zorg</li>
-          <li>De laatste 7 jaar werkzaam als maatschappelijk werker, met accent op schuldhulpverlening en begeleiding achter de voordeur</li>
+          <li>De laatste 7 jaar werkzaam als maatschappelijk werker, met accent op schuldhulpverlening en begeleiding
+            achter de voordeur</li>
         </ul>
       </div>
 
