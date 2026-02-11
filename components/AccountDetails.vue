@@ -52,9 +52,9 @@ function getCreditStatus(credit: any) {
 }
 
 function getCreditBadgeColor(credit: any): string {
-  if (credit.bookingId) return 'red';
-  if (new Date(credit.validTo) <= new Date()) return 'orange';
-  return 'green';
+  if (credit.bookingId) return 'error';
+  if (new Date(credit.validTo) <= new Date()) return 'warning';
+  return 'success';
 }
 
 function openEdit() {
