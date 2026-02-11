@@ -6,41 +6,47 @@
   --font-body: 'Source Sans 3', sans-serif;
 }
 
-body .dark {
-    @apply font-body text-gray-600 antialiased;
-    font-family: 'Source Sans 3', sans-serif;
-}
+@layer base {
+    body .dark {
+        @apply font-body text-gray-600 antialiased;
+        font-family: 'Source Sans 3', sans-serif;
+    }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-    @apply font-display text-xl font-bold antialiased uppercase;
-}
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        @apply font-display text-xl font-bold antialiased uppercase;
+    }
 
-h1 {
-    @apply text-6xl;
-}
+    h1 {
+        @apply text-6xl;
+    }
 
-h2 {
-    @apply text-5xl;
-}
+    h2 {
+        @apply text-5xl;
+    }
 
-h3 {
-    @apply text-4xl;
-}
+    h3 {
+        @apply text-4xl;
+    }
 
-h4,
-h5,
-h6 {
-    @apply text-lg;
-}
+    h4,
+    h5,
+    h6 {
+        @apply text-lg;
+    }
 
-p, li {
-    @apply font-body;
-    font-family: 'Source Sans 3', sans-serif;
+    p, li {
+        @apply font-body;
+        font-family: 'Source Sans 3', sans-serif;
+    }
+
+    button {
+        cursor: pointer;
+    }
 }
 
 .intro {
@@ -117,8 +123,10 @@ p, li {
 }
 
 
-label {
-    @apply block text-sm font-bold antialiased break-normal;
+@layer base {
+    label {
+        @apply block text-sm font-bold antialiased break-normal;
+    }
 }
 
 .required {
@@ -312,24 +320,26 @@ label {
     max-height: 75svh;
 }
 
-thead {
-    tr {
-        @apply text-left text-emerald-900;
+@layer base {
+    thead {
+        tr {
+            @apply text-left text-emerald-900;
 
-        th {
-            @apply p-2;
+            th {
+                @apply p-2;
+            }
         }
     }
-}
 
-tbody {
-    tr:nth-child(even) {
-        @apply bg-gray-800;
-    }
+    tbody {
+        tr:nth-child(even) {
+            @apply bg-gray-800;
+        }
 
-    td {
-        @apply p-2;
-        vertical-align: top;
+        td {
+            @apply p-2;
+            vertical-align: top;
+        }
     }
 }
 
