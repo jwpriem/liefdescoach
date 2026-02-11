@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { TabsItem } from '@nuxt/ui'
+
 const title = ref('Yoga Ravennah | Account');
 const description = ref('Mijn accountdetails');
 const ogImage = ref('https://www.ravennah.com/ravennah-social.jpg');
@@ -27,7 +29,7 @@ useHead({
 				]
 })
 if (!store.loggedInUser) {
-  navigateTo('/yoga/login')
+  navigateTo('/login')
 }
 
 const loggedInUser = computed(() => store.loggedInUser);
@@ -36,19 +38,91 @@ const students = computed(() => store.students);
 const lessons = computed(() => store.lessons);
 const myBookings = computed(() => store.myBookings);
 const isLoading = computed(() => store.isLoading);
+
+const showBookingModal = ref(false)
+provide('openBookingModal', () => showBookingModal.value = true)
+
+const tabs = computed<TabsItem[]>(() => {
+  const items: TabsItem[] = [
+    {
+      label: 'Mijn lessen',
+      icon: 'i-heroicons-calendar-days',
+      slot: 'lessen' as const,
+    },
+    {
+      label: 'Credits',
+      icon: 'i-heroicons-credit-card',
+      slot: 'credits' as const,
+    },
+    {
+      label: 'Mijn gegevens',
+      icon: 'i-heroicons-user-circle',
+      slot: 'gegevens' as const,
+    },
+  ]
+
+  if (isAdmin.value) {
+    items.push(
+      {
+        label: 'Lessen',
+        icon: 'i-heroicons-academic-cap',
+        slot: 'admin-lessen' as const,
+      },
+      {
+        label: 'Gebruikers',
+        icon: 'i-heroicons-users',
+        slot: 'gebruikers' as const,
+      },
+      {
+        label: 'Omzet',
+        icon: 'i-heroicons-chart-bar',
+        slot: 'omzet' as const,
+      },
+    )
+  }
+
+  return items
+})
 </script>
 
 <template>
 	<div>
 		<IsLoading :loading="isLoading" />
 		<div class="container mx-auto px-4 sm:px-8 pt-28 pb-12 sm:pt-32 sm:pb-20">
-			<div class="flex flex-col gap-y-16">
-				<AccountDetails v-if="loggedInUser"/>
-				<AccountBookings v-if="myBookings" />
-				<AccountLessons v-if="isAdmin && lessons && students" />
-				<AccountUsers v-if="isAdmin && students && loggedInUser" />
-				<AccountRevenue v-if="isAdmin" />
-			</div>
+			<UTabs :items="tabs" :unmount-on-hide="false">
+				<template #lessen>
+					<div class="pt-6">
+						<AccountBookings />
+					</div>
+				</template>
+				<template #credits>
+					<div class="pt-6">
+						<AccountCredits />
+					</div>
+				</template>
+				<template #gegevens>
+					<div class="pt-6">
+						<AccountDetails v-if="loggedInUser" />
+					</div>
+				</template>
+				<template #admin-lessen>
+					<div class="pt-6">
+						<AccountLessons v-if="isAdmin && lessons && students" />
+					</div>
+				</template>
+				<template #gebruikers>
+					<div class="pt-6">
+						<AccountUsers v-if="isAdmin && students && loggedInUser" />
+					</div>
+				</template>
+				<template #omzet>
+					<div class="pt-6">
+						<AccountRevenue v-if="isAdmin" />
+					</div>
+				</template>
+			</UTabs>
 		</div>
+
+		<BookingModal v-model="showBookingModal" />
 	</div>
 </template>

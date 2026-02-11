@@ -39,16 +39,19 @@ function checkBooking(id: string) {
 }
 
 async function book(lesson: any) {
+  if (!store.loggedInUser) return
   await store.setOnBehalfOf(store.loggedInUser)
   await store.handleBooking(lesson)
 
-  toast.add({
-    id: 'booking',
-    title: 'Tot snel',
-    icon: 'i-heroicons-check-badge',
-    color: 'primary',
-    description: 'Je les is geboekt!'
-  })
+  if (!store.errorMessage) {
+    toast.add({
+      id: 'booking',
+      title: 'Tot snel',
+      icon: 'i-heroicons-check-badge',
+      color: 'primary',
+      description: 'Je les is geboekt!'
+    })
+  }
 
   store.fetchLessons()
 }

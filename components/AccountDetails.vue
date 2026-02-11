@@ -29,7 +29,6 @@ const state = reactive({
 const loggedInUser = computed(() => store.loggedInUser);
 const targetUser = computed(() => props.user || loggedInUser.value);
 const isAdmin = computed(() => store.isAdmin);
-const myCredits = computed(() => store.myCredits);
 const availableCredits = computed(() => props.user ? (store.studentCreditSummary[props.user.$id] || 0) : store.availableCredits);
 
 const remindersEnabled = computed({
@@ -38,24 +37,6 @@ const remindersEnabled = computed({
     await store.updatePrefs(targetUser.value, { ...targetUser.value.prefs, reminders: value });
   },
 });
-
-const creditTypeLabels: Record<string, string> = {
-  credit_1: 'Losse les',
-  credit_5: 'Kleine kaart (5)',
-  credit_10: 'Grote kaart (10)',
-};
-
-function getCreditStatus(credit: any) {
-  if (credit.bookingId) return 'Gebruikt';
-  if (new Date(credit.validTo) <= new Date()) return 'Verlopen';
-  return 'Beschikbaar';
-}
-
-function getCreditBadgeColor(credit: any): string {
-  if (credit.bookingId) return 'red';
-  if (new Date(credit.validTo) <= new Date()) return 'orange';
-  return 'green';
-}
 
 function openEdit() {
   state.name = targetUser.value.name || null;
@@ -115,7 +96,7 @@ async function updateHealth() {
   try {
     const currentHealth = targetUser.value.health || {};
     const newHealth = {
-      injury: state.injury || undefined,
+      injury: state.injury || null,
       pregnancy: state.pregnancy,
       dueDate: state.pregnancy ? state.dueDate : null
     };
@@ -169,7 +150,7 @@ async function requestVerification() {
     toast.add({
       title: 'Verificatie verzonden',
       description: 'Check je e-mailinbox (en spam) voor de verificatielink.',
-      color: 'green',
+      color: 'success',
       icon: 'i-heroicons-paper-airplane'
     })
   } catch (e) {
@@ -177,7 +158,7 @@ async function requestVerification() {
     toast.add({
       title: 'Fout bij verzenden',
       description: 'Kon verificatiemail niet versturen.',
-      color: 'red'
+      color: 'error'
     })
   }
 }
@@ -202,9 +183,9 @@ async function requestVerification() {
           <div class="flex items-center gap-x-2">
             <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Email</span>
             <div class="flex items-center gap-x-2">
-              <UBadge v-if="targetUser.emailVerification" color="green" variant="subtle" size="xs">Geverifieerd</UBadge>
+              <UBadge v-if="targetUser.emailVerification" color="success" variant="subtle" size="xs">Geverifieerd</UBadge>
               <template v-else>
-                <UBadge color="orange" variant="subtle" size="xs">Ongeverifieerd</UBadge>
+                <UBadge color="warning" variant="subtle" size="xs">Ongeverifieerd</UBadge>
                 <button @click="requestVerification" :disabled="verificationSent"
                   class="text-xs text-emerald-400 hover:text-emerald-300 underline underline-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                   {{ verificationSent ? 'Verzonden' : 'Verifieer nu' }}
@@ -239,7 +220,7 @@ async function requestVerification() {
             <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Herinneringsmail</span>
             <span class="block text-gray-400 text-xs mt-0.5">Ontvang een e-mail de avond voor je les</span>
           </div>
-          <UToggle v-model="remindersEnabled" color="emerald" />
+          <USwitch v-model="remindersEnabled" color="primary" />
         </div>
       </div>
       <div class="flex flex-col gap-3 mt-6">
@@ -278,71 +259,6 @@ async function requestVerification() {
       <div class="flex flex-col gap-3 mt-6">
         <UButton color="primary" variant="solid" size="lg" class="justify-center" @click="openEditHealth()">
           Medische info bewerken</UButton>
-      </div>
-    </div>
-
-    <!-- Credit history -->
-    <div v-if="myCredits.length" class="mt-10">
-      <h2 class="text-2xl md:text-4xl uppercase font-black mb-6">
-        <span class="emerald-underline text-emerald-900">Mijn credits</span><span class="text-emerald-700">.</span>
-      </h2>
-
-      <!-- Mobile: card layout -->
-      <div class="flex flex-col gap-y-3 md:hidden">
-        <div v-for="credit in myCredits" :key="credit.$id"
-          class="rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-lg shadow-emerald-950/10 p-4">
-          <div class="flex items-center justify-between mb-3">
-            <span class="text-sm font-medium text-gray-200">{{ creditTypeLabels[credit.type] || credit.type }}</span>
-            <UBadge :color="getCreditBadgeColor(credit)" variant="subtle" size="xs">{{ getCreditStatus(credit) }}
-            </UBadge>
-          </div>
-          <div class="grid grid-cols-2 gap-y-2 text-sm">
-            <template v-if="credit.lesson">
-              <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Les</span>
-              <span class="text-gray-300">{{ credit.lesson?.type ?
-                $rav.getLessonTitle(credit.lesson) : '-' }}</span>
-              <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Docent</span>
-              <span class="text-gray-300">{{ credit.lesson.teacher }}</span>
-              <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Lesdatum</span>
-              <span class="text-gray-300">{{ $rav.formatDateInDutch(credit.lesson.date) }}</span>
-            </template>
-            <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Geldig tot</span>
-            <span class="text-gray-300">{{ $rav.formatDateInDutch(credit.validTo) }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Desktop: table layout -->
-      <div
-        class="hidden md:block rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-2xl shadow-emerald-950/20 overflow-hidden">
-        <table class="w-full text-left">
-          <thead>
-            <tr class="border-b border-gray-700/50">
-              <th class="py-3 px-4 text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Type</th>
-              <th class="py-3 px-4 text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Status</th>
-              <th class="py-3 px-4 text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Les</th>
-              <th class="py-3 px-4 text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Docent</th>
-              <th class="py-3 px-4 text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Lesdatum</th>
-              <th class="py-3 px-4 text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Geldig tot</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="credit in myCredits" :key="credit.$id" class="border-b border-gray-800/50 last:border-b-0">
-              <td class="py-3 px-4 text-sm text-gray-200">{{ creditTypeLabels[credit.type] || credit.type }}</td>
-              <td class="py-3 px-4 text-sm">
-                <UBadge :color="getCreditBadgeColor(credit)" variant="subtle" size="xs">{{ getCreditStatus(credit) }}
-                </UBadge>
-              </td>
-              <td class="py-3 px-4 text-sm text-gray-300">{{ credit.lesson?.type ?
-                $rav.getLessonTitle(credit.lesson) : '-' }}</td>
-              <td class="py-3 px-4 text-sm text-gray-300">{{ credit.lesson?.teacher || '-' }}</td>
-              <td class="py-3 px-4 text-sm text-gray-300">{{ credit.lesson ? $rav.formatDateInDutch(credit.lesson.date)
-                : '-'
-              }}</td>
-              <td class="py-3 px-4 text-sm text-gray-300">{{ $rav.formatDateInDutch(credit.validTo) }}</td>
-            </tr>
-          </tbody>
-        </table>
       </div>
     </div>
 
@@ -438,7 +354,7 @@ async function requestVerification() {
           </div>
           <div class="flex items-center justify-between">
             <label for="pregnancy" class="block text-sm font-medium text-gray-300">Ben je zwanger?</label>
-            <UToggle v-model="state.pregnancy" color="emerald" />
+            <USwitch v-model="state.pregnancy" color="primary" />
           </div>
           <div v-if="state.pregnancy">
             <label for="dueDate" class="block text-sm font-medium text-gray-300 mb-1.5">Uitgerekende datum</label>

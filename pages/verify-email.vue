@@ -53,7 +53,7 @@ onMounted(async () => {
                 <UIcon name="i-heroicons-x-circle" class="w-16 h-16 text-red-500 mx-auto mb-4" />
                 <h2 class="text-xl font-bold text-white mb-2">Verificatie mislukt</h2>
                 <p class="text-gray-300 mb-6">{{ error }}</p>
-                <UButton to="/contact" color="gray" variant="solid" block>Neem contact op</UButton>
+                <UButton to="/contact" color="neutral" variant="solid" block>Neem contact op</UButton>
             </div>
 
         </div>

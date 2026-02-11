@@ -1,6 +1,7 @@
 <template>
-  <NuxtLayout>
-    <NuxtPage />
-	   <UNotifications />
-  </NuxtLayout>
+  <UApp>
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
+  </UApp>
 </template>

@@ -3,7 +3,19 @@ const store = useMainStore()
 const { $rav } = useNuxtApp()
 
 const myBookings = computed(() => store.myBookings);
-const isAdmin = computed(() => store.isAdmin);
+const availableCredits = computed(() => store.availableCredits);
+const openBookingModal = inject('openBookingModal') as () => void
+
+const futureBookings = computed(() => {
+  if (!myBookings.value) return []
+  return myBookings.value
+    .map(b => {
+      // Normalize lessons if array (Appwrite expansion quirk)
+      const l = Array.isArray(b.lessons) ? b.lessons[0] : b.lessons
+      return { ...b, lessons: l }
+    })
+    .filter(b => b.lessons && $rav.isFutureBooking(b.lessons.date))
+})
 
 async function removeBooking(booking) {
   await store.cancelBooking(booking)
@@ -11,16 +23,38 @@ async function removeBooking(booking) {
 </script>
 
 <template>
-  <div v-if="!isAdmin">
-    <h2 class="text-2xl md:text-4xl uppercase font-black mb-6">
-     <span class="emerald-underline text-emerald-900">Boekingen</span><span class="text-emerald-700">.</span>
-   </h2>
+  <div>
+    <!-- Credit balance + quick action -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+      <div class="flex items-center gap-3">
+        <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-emerald-500/15">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-emerald-400">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z" />
+          </svg>
+        </div>
+        <div>
+          <span class="text-sm text-gray-400">Beschikbaar saldo</span>
+          <span class="block text-lg font-bold text-emerald-100">{{ availableCredits }} {{ availableCredits == 1 ? 'les' : 'lessen' }}</span>
+        </div>
+      </div>
 
-   <div class="w-full" v-if="myBookings">
-     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-       <div v-for="booking in myBookings" index="booking.$id"
-            class="rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-2xl shadow-emerald-950/20 p-6"
-            v-show="$rav.isFutureBooking(booking.lessons.date)">
+      <UButton v-if="availableCredits > 0" color="primary" variant="solid" size="lg" icon="i-heroicons-plus-20-solid" @click="openBookingModal()">
+        Boek een les
+      </UButton>
+      <UButton v-else to="/tarieven" color="primary" variant="outline" size="lg" icon="i-heroicons-shopping-cart-20-solid">
+        Koop credits
+      </UButton>
+    </div>
+
+    <!-- Upcoming bookings -->
+    <h2 class="text-2xl md:text-4xl uppercase font-black mb-6">
+      <span class="emerald-underline text-emerald-900">Boekingen</span><span class="text-emerald-700">.</span>
+    </h2>
+
+    <div class="w-full" v-if="futureBookings.length">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div v-for="booking in futureBookings" :key="booking.$id"
+             class="rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-2xl shadow-emerald-950/20 p-6">
           <div class="space-y-4">
             <div>
               <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Les</span>
@@ -56,8 +90,18 @@ async function removeBooking(booking) {
         </div>
       </div>
     </div>
-    <div class="mt-5 text-gray-400" v-else>
-      Je hebt nog geen boekingen
+    <div class="rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm p-8 text-center" v-else>
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 text-gray-600 mx-auto mb-3">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+      </svg>
+      <p class="text-gray-400 mb-4">Je hebt nog geen boekingen</p>
+      <UButton v-if="availableCredits > 0" color="primary" variant="solid" icon="i-heroicons-plus-20-solid" @click="openBookingModal()">
+        Boek je eerste les
+      </UButton>
+      <UButton v-else to="/tarieven" color="primary" variant="outline" icon="i-heroicons-shopping-cart-20-solid">
+        Koop credits om te boeken
+      </UButton>
     </div>
+
   </div>
 </template>

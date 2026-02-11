@@ -147,7 +147,7 @@ const computedStudents = computed(() => {
         <div class="flex flex-wrap items-center gap-3 mt-4 md:mt-0">
           <UButton color="primary" variant="solid" size="lg" @click="state.createLesson = !state.createLesson">Voeg les toe</UButton>
           <UButton color="primary" variant="solid" size="lg" @click="state.bookForUser = !state.bookForUser">Maak boeking voor gebruiker</UButton>
-          <UButton color="primary" variant="outline" size="lg" to="/yoga/archief">Archief</UButton>
+          <UButton color="primary" variant="outline" size="lg" to="/archief">Archief</UButton>
         </div>
       </div>
 
@@ -195,13 +195,13 @@ const computedStudents = computed(() => {
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-1.5">Les</label>
             <USelect icon="i-heroicons-academic-cap-20-solid" size="lg" color="primary" variant="outline"
-              v-model="state.addBookingLesson" :options="computedLessons" />
+              v-model="state.addBookingLesson" :items="computedLessons" />
           </div>
 
           <div v-if="state.addBookingLesson">
             <label class="block text-sm font-medium text-gray-300 mb-1.5">Gebruiker</label>
             <USelect icon="i-heroicons-user-20-solid" size="lg" color="primary"
-              variant="outline" v-model="state.addBookingUser" :options="computedStudents" />
+              variant="outline" v-model="state.addBookingUser" :items="computedStudents" />
           </div>
 
           <div class="flex gap-3 mt-2">
@@ -222,9 +222,9 @@ const computedStudents = computed(() => {
 
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-1.5">Datum</label>
-            <UPopover :popper="{ placement: 'bottom-start' }">
+            <UPopover>
               <UButton icon="i-heroicons-calendar-days-20-solid" size="lg" :label="dayjs(state.createLessonDate).format('D MMM, YYYY')" />
-              <template #panel="{ close }">
+              <template #content="{ close }">
                 <DatePicker v-model="state.createLessonDate" is-required @close="close" />
               </template>
             </UPopover>
@@ -234,22 +234,22 @@ const computedStudents = computed(() => {
             <label class="block text-sm font-medium text-gray-300 mb-1.5">Tijd</label>
             <div class="flex items-center gap-3">
               <USelect icon="i-heroicons-clock-20-solid" size="lg" color="primary" variant="outline"
-                v-model="state.createLessonHours" :options="state.hours" />
+                v-model="state.createLessonHours" :items="state.hours" />
               <USelect icon="i-heroicons-clock-20-solid" size="lg" color="primary" variant="outline"
-                v-model="state.createLessonMinutes" :options="state.minutes" />
+                v-model="state.createLessonMinutes" :items="state.minutes" />
             </div>
           </div>
 
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-1.5">Type les</label>
             <USelect icon="i-heroicons-academic-cap-20-solid" size="lg" color="primary" variant="outline"
-              v-model="state.createLessonType" :options="state.types" />
+              v-model="state.createLessonType" :items="state.types" />
           </div>
 
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-1.5">Docent</label>
             <USelect icon="i-heroicons-academic-cap-20-solid" size="lg" color="primary" variant="outline"
-              v-model="state.createLessonTeacher" :options="state.teachers" />
+              v-model="state.createLessonTeacher" :items="state.teachers" />
           </div>
 
           <div class="flex gap-3 mt-2">

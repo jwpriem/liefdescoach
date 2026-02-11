@@ -1,34 +1,25 @@
 export default defineAppConfig({
     ui: {
-        primary: 'emerald',
-        notifications: {
-            position: 'top-0 bottom-auto'
+        colors: {
+            primary: 'emerald',
+            neutral: 'gray'
         },
-        table: {
-            divide: 'divide-y divide-gray-800',
-            thead: '',
-            tbody: 'divide-y divide-gray-800',
-            tr: {
-                base: 'hover:bg-gray-800/50',
-            },
-            th: {
-                color: 'text-emerald-500',
-                font: 'font-normal',
-                padding: 'py-2 px-3',
-            },
-            td: {
-                color: 'text-emerald-100',
-                padding: 'py-2 px-3',
-            },
+        input: {
+            slots: {
+                root: 'w-full',
+                base: '!bg-gray-900/50'
+            }
         },
-        selectMenu: {
-            option: {
-                color: 'text-emerald-100',
-                active: 'bg-gray-700 text-emerald-100',
-                selected: 'text-emerald-400',
-            },
-            background: 'bg-gray-800',
-            ring: 'ring-1 ring-gray-700',
+        textarea: {
+            slots: {
+                root: 'w-full',
+                base: '!bg-gray-900/50'
+            }
         },
+        button: {
+            slots: {
+                base: 'cursor-pointer'
+            }
+        }
     }
 })

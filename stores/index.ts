@@ -480,6 +480,7 @@ export const useMainStore = defineStore('main', {
                 })
 
                 isOnBehalf ? await this.clearOnBehalf() : await this.getUser()
+                if (!isOnBehalf) await this.fetchBookings()
                 await this.sendEmail('sendBookingConfirmation', lesson.$id)
             });
         },

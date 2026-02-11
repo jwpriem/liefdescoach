@@ -157,7 +157,7 @@ watch([dateFrom, dateTo, selectedBucket], fetchRevenue)
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-300 mb-1.5">Periode</label>
-          <USelectMenu v-model="selectedBucket" :options="bucketOptions" value-attribute="value" option-attribute="label" color="primary" variant="outline" size="lg" />
+          <USelect v-model="selectedBucket" :items="bucketOptions" value-key="value" color="primary" variant="outline" size="lg" />
         </div>
       </div>
     </div>
