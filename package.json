@@ -17,7 +17,9 @@
     "db:setup-otp": "tsx --tsconfig scripts/tsconfig.json scripts/setup-otp-collection.ts",
     "db:seed-history": "tsx --tsconfig scripts/tsconfig.json scripts/seed-history.ts",
     "test:e2e": "playwright test",
-    "test:e2e:headed": "playwright test --headed"
+    "test:e2e:headed": "playwright test --headed",
+    "test:booking": "playwright test e2e/booking.spec.ts",
+    "test:registration": "playwright test e2e/registration.spec.ts"
   },
   "dependencies": {
     "@nuxt/ui": "^3.0.0",

@@ -1,4 +1,8 @@
 import { defineConfig } from '@playwright/test'
+import dotenv from 'dotenv'
+
+// Load .env so TEST_EMAIL, TEST_PASSWORD etc. are available
+dotenv.config()
 
 export default defineConfig({
     testDir: './e2e',

@@ -108,7 +108,7 @@ async function register(page: Page, user: TestUser) {
     await page.waitForSelector('#email')
 
     // Switch to register form
-    await page.click('button:has-text("Registreren")')
+    await page.click('button:has-text("Registreren")', { strict: false })
 
     // Wait for register form fields
     await page.waitForSelector('#name')
@@ -148,12 +148,18 @@ test.describe('Registration flow', () => {
 
         await register(page, user)
 
-        // Verify redirect to account page
-        await page.waitForURL('**/account', { timeout: 20_000 })
+        // Verify redirect to account page (detect server errors early)
+        const errorOrRedirect = await Promise.race([
+            page.waitForURL('**/account', { timeout: 20_000 }).then(() => 'redirected' as const),
+            page.locator('text=Server Error').waitFor({ state: 'visible', timeout: 20_000 }).then(() => 'error' as const)
+        ])
+        if (errorOrRedirect === 'error') {
+            throw new Error('Registration failed with a Server Error — the API endpoint may be down or misconfigured')
+        }
 
         // Verify user name displays correctly
         await expect(page.locator('text=Mijn gegevens')).toBeVisible({ timeout: 10_000 })
-        await expect(page.locator(`text=${user.fullName}`)).toBeVisible({ timeout: 10_000 })
+        await expect(page.getByRole('link', { name: user.fullName })).toBeVisible({ timeout: 10_000 })
 
         // Verify welcome credit was granted (should show "1 les")
         await expect(page.locator('text=1 les').or(page.locator('text=lessen'))).toBeVisible({ timeout: 10_000 })
@@ -167,7 +173,7 @@ test.describe('Registration flow', () => {
         }
 
         // Logout to clean up session
-        await page.locator('nav span.nav-item', { hasText: /logout/i }).click()
+        await page.locator('nav').getByText('Logout', { exact: true }).click()
         await page.waitForURL('**/', { timeout: 10_000 })
     })
 
@@ -193,18 +199,24 @@ test.describe('Registration flow', () => {
 
         await register(page, minimalUser)
 
-        // Verify redirect to account page
-        await page.waitForURL('**/account', { timeout: 20_000 })
+        // Verify redirect to account page (detect server errors early)
+        const errorOrRedirect = await Promise.race([
+            page.waitForURL('**/account', { timeout: 20_000 }).then(() => 'redirected' as const),
+            page.locator('text=Server Error').waitFor({ state: 'visible', timeout: 20_000 }).then(() => 'error' as const)
+        ])
+        if (errorOrRedirect === 'error') {
+            throw new Error('Registration failed with a Server Error — the API endpoint may be down or misconfigured')
+        }
 
         // Verify user name displays correctly
-        await expect(page.locator(`text=${minimalUser.fullName}`)).toBeVisible({ timeout: 10_000 })
+        await expect(page.getByRole('link', { name: minimalUser.fullName })).toBeVisible({ timeout: 10_000 })
 
         // Verify empty states for optional fields
         await expect(page.locator('text=Geen telefoonnummer')).toBeVisible({ timeout: 5_000 })
         await expect(page.locator('text=Niet opgegeven')).toBeVisible({ timeout: 5_000 }) // Date of birth empty state
 
         // Logout
-        await page.locator('nav span.nav-item', { hasText: /logout/i }).click()
+        await page.locator('nav').getByText('Logout', { exact: true }).click()
         await page.waitForURL('**/', { timeout: 10_000 })
     })
 })

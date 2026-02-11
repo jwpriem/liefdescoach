@@ -6,12 +6,14 @@ export default defineAppConfig({
         },
         input: {
             slots: {
-                root: 'w-full'
+                root: 'w-full',
+                base: 'bg-gray-900/50'
             }
         },
         textarea: {
             slots: {
-                root: 'w-full'
+                root: 'w-full',
+                base: 'bg-gray-900/50'
             }
         },
         button: {

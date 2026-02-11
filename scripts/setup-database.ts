@@ -122,7 +122,7 @@ async function main() {
 
     await createAttribute(databases, dbId, 'credits', 'studentId', () => databases.createStringAttribute(dbId, 'credits', 'studentId', 255, true))
     await createAttribute(databases, dbId, 'credits', 'bookingId', () => databases.createStringAttribute(dbId, 'credits', 'bookingId', 255, false))
-    await createAttribute(databases, dbId, 'credits', 'type', () => databases.createEnumAttribute(dbId, 'credits', 'type', ['credit_1', 'credit_5', 'credit_10'], true))
+    await createAttribute(databases, dbId, 'credits', 'type', () => databases.createEnumAttribute(dbId, 'credits', 'type', ['credit_1', 'credit_5', 'credit_10', 'credit_20'], true))
     await createAttribute(databases, dbId, 'credits', 'validFrom', () => databases.createDatetimeAttribute(dbId, 'credits', 'validFrom', true))
     await createAttribute(databases, dbId, 'credits', 'validTo', () => databases.createDatetimeAttribute(dbId, 'credits', 'validTo', true))
     await createAttribute(databases, dbId, 'credits', 'createdAt', () => databases.createDatetimeAttribute(dbId, 'credits', 'createdAt', true))
