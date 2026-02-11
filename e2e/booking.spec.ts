@@ -127,14 +127,17 @@ test.describe('Booking flow', () => {
             return
         }
 
+        // Count existing "Geboekt" elements before booking
+        const geboektBefore = await page.locator('text=Geboekt').count()
+
         await bookButton.click()
 
         // --- Step 5: Verify booking succeeded ---
-        // The toast notification "Je les is geboekt!" should appear
-        await expect(page.locator('text=Je les is geboekt!')).toBeVisible({ timeout: 15_000 })
-
-        // The "Boek" button should have changed to "Geboekt" for this lesson
-        await expect(page.locator('text=Geboekt').first()).toBeVisible({ timeout: 10_000 })
+        // Wait for the number of "Geboekt" elements to increase by one
+        await expect(async () => {
+            const geboektAfter = await page.locator('text=Geboekt').count()
+            expect(geboektAfter).toBe(geboektBefore + 1)
+        }).toPass({ timeout: 15_000 })
 
         // --- Step 6: Navigate to account page and verify credits decreased by 1 ---
         await page.locator('nav a.nav-item[href="/account"]').click()
