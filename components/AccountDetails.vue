@@ -29,7 +29,6 @@ const state = reactive({
 const loggedInUser = computed(() => store.loggedInUser);
 const targetUser = computed(() => props.user || loggedInUser.value);
 const isAdmin = computed(() => store.isAdmin);
-const myCredits = computed(() => store.myCredits);
 const availableCredits = computed(() => props.user ? (store.studentCreditSummary[props.user.$id] || 0) : store.availableCredits);
 
 const remindersEnabled = computed({
@@ -38,24 +37,6 @@ const remindersEnabled = computed({
     await store.updatePrefs(targetUser.value, { ...targetUser.value.prefs, reminders: value });
   },
 });
-
-const creditTypeLabels: Record<string, string> = {
-  credit_1: 'Losse les',
-  credit_5: 'Kleine kaart (5)',
-  credit_10: 'Grote kaart (10)',
-};
-
-function getCreditStatus(credit: any) {
-  if (credit.bookingId) return 'Gebruikt';
-  if (new Date(credit.validTo) <= new Date()) return 'Verlopen';
-  return 'Beschikbaar';
-}
-
-function getCreditBadgeColor(credit: any): string {
-  if (credit.bookingId) return 'error';
-  if (new Date(credit.validTo) <= new Date()) return 'warning';
-  return 'success';
-}
 
 function openEdit() {
   state.name = targetUser.value.name || null;
@@ -278,71 +259,6 @@ async function requestVerification() {
       <div class="flex flex-col gap-3 mt-6">
         <UButton color="primary" variant="solid" size="lg" class="justify-center" @click="openEditHealth()">
           Medische info bewerken</UButton>
-      </div>
-    </div>
-
-    <!-- Credit history -->
-    <div v-if="myCredits.length" class="mt-10">
-      <h2 class="text-2xl md:text-4xl uppercase font-black mb-6">
-        <span class="emerald-underline text-emerald-900">Mijn credits</span><span class="text-emerald-700">.</span>
-      </h2>
-
-      <!-- Mobile: card layout -->
-      <div class="flex flex-col gap-y-3 md:hidden">
-        <div v-for="credit in myCredits" :key="credit.$id"
-          class="rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-lg shadow-emerald-950/10 p-4">
-          <div class="flex items-center justify-between mb-3">
-            <span class="text-sm font-medium text-gray-200">{{ creditTypeLabels[credit.type] || credit.type }}</span>
-            <UBadge :color="getCreditBadgeColor(credit)" variant="subtle" size="xs">{{ getCreditStatus(credit) }}
-            </UBadge>
-          </div>
-          <div class="grid grid-cols-2 gap-y-2 text-sm">
-            <template v-if="credit.lesson">
-              <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Les</span>
-              <span class="text-gray-300">{{ credit.lesson?.type ?
-                $rav.getLessonTitle(credit.lesson) : '-' }}</span>
-              <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Docent</span>
-              <span class="text-gray-300">{{ credit.lesson.teacher }}</span>
-              <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Lesdatum</span>
-              <span class="text-gray-300">{{ $rav.formatDateInDutch(credit.lesson.date) }}</span>
-            </template>
-            <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Geldig tot</span>
-            <span class="text-gray-300">{{ $rav.formatDateInDutch(credit.validTo) }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Desktop: table layout -->
-      <div
-        class="hidden md:block rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-2xl shadow-emerald-950/20 overflow-hidden">
-        <table class="w-full text-left">
-          <thead>
-            <tr class="border-b border-gray-700/50">
-              <th class="py-3 px-4 text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Type</th>
-              <th class="py-3 px-4 text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Status</th>
-              <th class="py-3 px-4 text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Les</th>
-              <th class="py-3 px-4 text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Docent</th>
-              <th class="py-3 px-4 text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Lesdatum</th>
-              <th class="py-3 px-4 text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Geldig tot</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="credit in myCredits" :key="credit.$id" class="border-b border-gray-800/50 last:border-b-0">
-              <td class="py-3 px-4 text-sm text-gray-200">{{ creditTypeLabels[credit.type] || credit.type }}</td>
-              <td class="py-3 px-4 text-sm">
-                <UBadge :color="getCreditBadgeColor(credit)" variant="subtle" size="xs">{{ getCreditStatus(credit) }}
-                </UBadge>
-              </td>
-              <td class="py-3 px-4 text-sm text-gray-300">{{ credit.lesson?.type ?
-                $rav.getLessonTitle(credit.lesson) : '-' }}</td>
-              <td class="py-3 px-4 text-sm text-gray-300">{{ credit.lesson?.teacher || '-' }}</td>
-              <td class="py-3 px-4 text-sm text-gray-300">{{ credit.lesson ? $rav.formatDateInDutch(credit.lesson.date)
-                : '-'
-              }}</td>
-              <td class="py-3 px-4 text-sm text-gray-300">{{ $rav.formatDateInDutch(credit.validTo) }}</td>
-            </tr>
-          </tbody>
-        </table>
       </div>
     </div>
 

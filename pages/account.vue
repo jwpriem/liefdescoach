@@ -47,6 +47,11 @@ const tabs = computed<TabsItem[]>(() => {
       slot: 'lessen' as const,
     },
     {
+      label: 'Credits',
+      icon: 'i-heroicons-credit-card',
+      slot: 'credits' as const,
+    },
+    {
       label: 'Mijn gegevens',
       icon: 'i-heroicons-user-circle',
       slot: 'gegevens' as const,
@@ -85,6 +90,11 @@ const tabs = computed<TabsItem[]>(() => {
 				<template #lessen>
 					<div class="pt-6">
 						<AccountBookings />
+					</div>
+				</template>
+				<template #credits>
+					<div class="pt-6">
+						<AccountCredits />
 					</div>
 				</template>
 				<template #gegevens>
