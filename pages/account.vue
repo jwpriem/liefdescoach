@@ -27,7 +27,7 @@ useHead({
 				]
 })
 if (!store.loggedInUser) {
-  navigateTo('/yoga/login')
+  navigateTo('/login')
 }
 
 const loggedInUser = computed(() => store.loggedInUser);

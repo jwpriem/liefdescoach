@@ -147,7 +147,7 @@ const computedStudents = computed(() => {
         <div class="flex flex-wrap items-center gap-3 mt-4 md:mt-0">
           <UButton color="primary" variant="solid" size="lg" @click="state.createLesson = !state.createLesson">Voeg les toe</UButton>
           <UButton color="primary" variant="solid" size="lg" @click="state.bookForUser = !state.bookForUser">Maak boeking voor gebruiker</UButton>
-          <UButton color="primary" variant="outline" size="lg" to="/yoga/archief">Archief</UButton>
+          <UButton color="primary" variant="outline" size="lg" to="/archief">Archief</UButton>
         </div>
       </div>
 

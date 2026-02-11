@@ -44,13 +44,13 @@ useHead({
 })
 
 if (store.loggedInUser) {
-  navigateTo('/yoga/account')
+  navigateTo('/account')
 } else {
   // Otherwise, check session on the client and redirect if found
   onMounted(async () => {
     await store.getUser() // 401 => logged out (no banner)
     if (store.loggedInUser) {
-      navigateTo('/yoga/account') // or '/account'
+      navigateTo('/account') // or '/account'
     }
   })
 }
@@ -76,7 +76,7 @@ async function login() {
   await store.login(normalizedEmail.value, password.value)
 
   if (store.loggedInUser) {
-    await navigateTo({ path: "/yoga/account" })
+    await navigateTo({ path: "/account" })
   }
 }
 
@@ -91,7 +91,7 @@ async function register() {
   )
 
   if (!store.errorMessage) {
-    await navigateTo({ path: "/yoga/account" })
+    await navigateTo({ path: "/account" })
   }
 }
 
@@ -108,7 +108,7 @@ async function verifyOtp() {
   await store.verifyOtp(normalizedEmail.value, otpCode.value)
 
   if (store.loggedInUser) {
-    await navigateTo({ path: '/yoga/account' })
+    await navigateTo({ path: '/account' })
   }
 }
 
