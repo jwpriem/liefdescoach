@@ -479,9 +479,9 @@ export const useMainStore = defineStore('main', {
                     }
                 })
 
+                await this.sendEmail('sendBookingConfirmation', lesson.$id)
                 isOnBehalf ? await this.clearOnBehalf() : await this.getUser()
                 if (!isOnBehalf) await this.fetchBookings()
-                await this.sendEmail('sendBookingConfirmation', lesson.$id)
             });
         },
 
@@ -499,8 +499,8 @@ export const useMainStore = defineStore('main', {
                     }
                 })
 
-                isOnBehalf ? await this.clearOnBehalf() : await this.getUser()
                 await this.sendEmail('sendBookingCancellation', result.lessonId)
+                isOnBehalf ? await this.clearOnBehalf() : await this.getUser()
             });
         },
 
