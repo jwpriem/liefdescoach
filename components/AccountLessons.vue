@@ -204,15 +204,15 @@ const computedStudents = computed(() => {
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-1.5">Les</label>
             <USelectMenu icon="i-heroicons-academic-cap-20-solid" size="lg" color="primary" variant="outline"
-              v-model="state.addBookingLesson" :items="computedLessons" class="w-full" value-attribute="value"
-              option-attribute="label" />
+              v-model="state.addBookingLesson" :items="computedLessons" class="w-full" value-key="value"
+              :search-input="false" />
           </div>
 
           <div v-if="state.addBookingLesson">
             <label class="block text-sm font-medium text-gray-300 mb-1.5">Gebruiker</label>
             <USelectMenu icon="i-heroicons-user-20-solid" size="lg" color="primary" variant="outline"
-              v-model="state.addBookingUser" :items="computedStudents" class="w-full" value-attribute="value"
-              option-attribute="label" searchable searchable-placeholder="Zoek gebruiker..." />
+              v-model="state.addBookingUser" :items="computedStudents" class="w-full" value-key="value"
+              :search-input="{ placeholder: 'Zoek gebruiker...' }" />
           </div>
 
           <div class="flex gap-3 mt-2">
@@ -257,15 +257,15 @@ const computedStudents = computed(() => {
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-1.5">Type les</label>
             <USelectMenu icon="i-heroicons-academic-cap-20-solid" size="lg" color="primary" variant="outline"
-              v-model="state.createLessonType" :items="state.types" class="w-full" value-attribute="value"
-              option-attribute="label" />
+              v-model="state.createLessonType" :items="state.types" class="w-full" value-key="value"
+              :search-input="false" />
           </div>
 
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-1.5">Docent</label>
             <USelectMenu icon="i-heroicons-academic-cap-20-solid" size="lg" color="primary" variant="outline"
-              v-model="state.createLessonTeacher" :items="state.teachers" class="w-full" value-attribute="value"
-              option-attribute="label" />
+              v-model="state.createLessonTeacher" :items="state.teachers" class="w-full" value-key="value"
+              :search-input="false" />
           </div>
 
           <div class="flex gap-3 mt-2">
