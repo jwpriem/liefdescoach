@@ -89,23 +89,23 @@ const tabs = computed<TabsItem[]>(() => {
 <template>
 	<div>
 		<IsLoading :loading="isLoading" />
-		<div class="container mx-auto px-4 sm:px-8 pt-2 md:pt-32" style="padding-bottom: calc(6rem + max(env(safe-area-inset-bottom), 0px))">
-			<div v-show="activeTab === 0" class="pt-6">
+		<div class="container mx-auto px-4 sm:px-8 pt-1 md:pt-32" style="padding-bottom: calc(6rem + max(env(safe-area-inset-bottom), 0px))">
+			<div v-show="activeTab === 0" class="pt-3">
 				<AccountBookings />
 			</div>
-			<div v-show="activeTab === 1" class="pt-6">
+			<div v-show="activeTab === 1" class="pt-3">
 				<AccountCredits />
 			</div>
-			<div v-show="activeTab === 2" class="pt-6">
+			<div v-show="activeTab === 2" class="pt-3">
 				<AccountDetails v-if="loggedInUser" />
 			</div>
-			<div v-show="activeTab === 3" class="pt-6">
+			<div v-show="activeTab === 3" class="pt-3">
 				<AccountLessons v-if="isAdmin && lessons && students" />
 			</div>
-			<div v-show="activeTab === 4" class="pt-6">
+			<div v-show="activeTab === 4" class="pt-3">
 				<AccountUsers v-if="isAdmin && students && loggedInUser" />
 			</div>
-			<div v-show="activeTab === 5" class="pt-6">
+			<div v-show="activeTab === 5" class="pt-3">
 				<AccountRevenue v-if="isAdmin" />
 			</div>
 		</div>
