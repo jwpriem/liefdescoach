@@ -18,7 +18,8 @@
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",
     "test:booking": "playwright test e2e/booking.spec.ts",
-    "test:registration": "playwright test e2e/registration.spec.ts"
+    "test:registration": "playwright test e2e/registration.spec.ts",
+    "test:unit": "vitest run"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",
@@ -48,7 +49,8 @@
     "dotenv": "^17.2.3",
     "drizzle-kit": "^0.31.9",
     "sharp": "^0.34.5",
-    "tsx": "^4.21.0"
+    "tsx": "^4.21.0",
+    "vitest": "^2.1.9"
   },
   "engines": {
     "node": ">=20"
