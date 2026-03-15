@@ -87,7 +87,7 @@ const tabs = computed<TabsItem[]>(() => {
 </script>
 
 <template>
-	<div>
+	<div class="min-h-screen">
 		<IsLoading :loading="isLoading" />
 		<div class="container mx-auto px-4 sm:px-8 pt-1 md:pt-32" style="padding-bottom: calc(6rem + max(env(safe-area-inset-bottom), 0px))">
 			<div v-show="activeTab === 0" class="pt-3">
