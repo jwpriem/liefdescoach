@@ -7,6 +7,10 @@
 }
 
 @layer base {
+    html, body {
+        background-color: #030712;
+    }
+
     body .dark {
         @apply font-body text-gray-600 antialiased;
         font-family: 'Source Sans 3', sans-serif;
