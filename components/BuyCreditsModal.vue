@@ -8,10 +8,10 @@ const emit = defineEmits<{
 }>()
 
 const pricingPlans = [
-  { name: 'Losse les', credits: '1 les', price: '€ 16,00', tag: null, highlight: false, gold: false },
-  { name: 'Kleine kaart', credits: '5 lessen', price: '€ 72,50', tag: 'Probeer het uit', highlight: false, gold: false },
-  { name: 'Strippenkaart', credits: '10 lessen', price: '€ 135,00', tag: 'Meest gekozen', highlight: true, gold: false },
-  { name: 'Grote kaart', credits: '20 lessen', price: '€ 250,00', tag: 'Meest voordelig', highlight: false, gold: true },
+  { name: 'Losse les', credits: '1 les', price: '€ 16,00', perClass: null, highlight: false, gold: false },
+  { name: 'Kleine kaart', credits: '5 lessen', price: '€ 72,50', perClass: '€ 14,50 p/les', highlight: false, gold: false },
+  { name: 'Strippenkaart', credits: '10 lessen', price: '€ 135,00', perClass: '€ 13,50 p/les', highlight: true, gold: false },
+  { name: 'Grote kaart', credits: '20 lessen', price: '€ 250,00', perClass: '€ 12,50 p/les', highlight: false, gold: true },
 ]
 
 function buyPlan(plan: typeof pricingPlans[0]) {
@@ -58,17 +58,11 @@ function close() {
             @click="buyPlan(plan)"
           >
             <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
+              <div>
                 <span class="font-semibold" :class="plan.gold ? 'text-yellow-300' : plan.highlight ? 'text-emerald-300' : 'text-white'">
                   {{ plan.name }}
                 </span>
-                <span
-                  v-if="plan.tag"
-                  class="text-[10px] font-medium px-1.5 py-0.5 rounded-full"
-                  :class="plan.gold ? 'bg-yellow-700/50 text-yellow-200' : 'bg-emerald-700/50 text-emerald-200'"
-                >
-                  {{ plan.tag }}
-                </span>
+                <span v-if="plan.perClass" class="block text-xs text-gray-500 mt-0.5">{{ plan.perClass }}</span>
               </div>
               <div class="flex items-center gap-2 shrink-0">
                 <span class="text-sm text-gray-400">{{ plan.credits }}</span>
