@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc.js'
 import timezone from 'dayjs/plugin/timezone.js'
 import 'dayjs/locale/nl.js'
-import { lessons, bookings, students, userPrefs } from '../database/schema'
+import { lessons, bookings, students } from '../database/schema'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -52,6 +52,7 @@ export default defineEventHandler(async (event) => {
                 studentId: students.id,
                 studentName: students.name,
                 studentEmail: students.email,
+                studentPrefs: students.prefs,
             })
             .from(bookings)
             .innerJoin(students, eq(bookings.studentId, students.id))
@@ -72,18 +73,10 @@ export default defineEventHandler(async (event) => {
             if (!student.studentEmail) continue
 
             // Check reminder opt-out
-            if (student.studentId) {
-                const prefsRows = await db
-                    .select({ prefs: userPrefs.prefs })
-                    .from(userPrefs)
-                    .where(eq(userPrefs.userId, student.studentId))
-                    .limit(1)
-
-                const prefs = prefsRows[0]?.prefs as Record<string, any> | undefined
-                if (prefs?.reminders === false) {
-                    console.log(`[LessonReminder] Skipped ${student.studentEmail} (reminders disabled)`)
-                    continue
-                }
+            const prefs = student.studentPrefs as Record<string, any> | undefined
+            if (prefs?.reminders === false) {
+                console.log(`[LessonReminder] Skipped ${student.studentEmail} (reminders disabled)`)
+                continue
             }
 
             const mail = lessonReminderEmail({

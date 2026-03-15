@@ -81,7 +81,20 @@ async function migrateStudents() {
 
     const studentMap = new Map(studentDocs.map((s: any) => [s.$id, s]))
 
-    // 3. Merge Auth + student data
+    // 3. Fetch prefs for each auth user
+    const prefsMap = new Map<string, Record<string, any>>()
+    for (const u of authUsers as any[]) {
+        try {
+            const prefs = await users.getPrefs(u.$id)
+            if (prefs && Object.keys(prefs).length > 0) {
+                prefsMap.set(u.$id, prefs)
+            }
+        } catch {
+            // Skip if prefs can't be fetched
+        }
+    }
+
+    // 4. Merge Auth + student data + prefs
     const values = authUsers.map((u: any) => {
         const student = studentMap.get(u.$id) as any
         return {
@@ -93,6 +106,7 @@ async function migrateStudents() {
             emailVerified: u.emailVerification ?? false,
             dateOfBirth: student?.dateOfBirth ? new Date(student.dateOfBirth) : null,
             phone: student?.phone ?? null,
+            prefs: prefsMap.get(u.$id) ?? {},
             createdAt: u.$createdAt ? new Date(u.$createdAt) : new Date(),
         }
     })
@@ -126,34 +140,6 @@ async function migrateStudents() {
     return values.length
 }
 
-async function migrateUserPrefs() {
-    console.log('\n📦 Migrating user preferences...')
-
-    const authUsers = await paginateAppwrite(
-        (offset) => users.list([Query.limit(100), Query.offset(offset)]),
-        'Auth users (prefs)'
-    )
-
-    let count = 0
-    for (const u of authUsers as any[]) {
-        try {
-            const prefs = await users.getPrefs(u.$id)
-            if (prefs && Object.keys(prefs).length > 0) {
-                await db.insert(schema.userPrefs).values({
-                    id: `pref_${u.$id}`,
-                    userId: u.$id,
-                    prefs: prefs,
-                }).onConflictDoNothing()
-                count++
-            }
-        } catch {
-            // Skip if prefs can't be fetched
-        }
-    }
-
-    console.log(`  ✅ User prefs: ${count} records`)
-    return count
-}
 
 async function migrateLessons() {
     console.log('\n📦 Migrating lessons...')
@@ -324,7 +310,6 @@ async function main() {
 
     const counts = {
         students: await migrateStudents(),
-        userPrefs: await migrateUserPrefs(),
         lessons: await migrateLessons(),
         bookings: await migrateBookings(),
         credits: await migrateCredits(),

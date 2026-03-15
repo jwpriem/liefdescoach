@@ -1,5 +1,5 @@
 import { asc, eq } from 'drizzle-orm'
-import { students, health, userPrefs } from '../database/schema'
+import { students, health } from '../database/schema'
 
 export default defineEventHandler(async (event) => {
     await requireAdmin(event)
@@ -16,15 +16,14 @@ export default defineEventHandler(async (event) => {
             isAdmin: students.isAdmin,
             emailVerified: students.emailVerified,
             createdAt: students.createdAt,
+            prefs: students.prefs,
             healthId: health.id,
             injury: health.injury,
             pregnancy: health.pregnancy,
             dueDate: health.dueDate,
-            prefs: userPrefs.prefs,
         })
         .from(students)
         .leftJoin(health, eq(students.id, health.studentId))
-        .leftJoin(userPrefs, eq(students.id, userPrefs.userId))
         .orderBy(asc(students.name))
         .limit(100)
 

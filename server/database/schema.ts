@@ -12,6 +12,7 @@ export const students = pgTable('students', {
   emailVerified: boolean('email_verified').notNull().default(false),
   dateOfBirth: timestamp('date_of_birth', { withTimezone: true }),
   phone: text('phone'),
+  prefs: jsonb('prefs').notNull().default({}),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 }, (table) => [
   uniqueIndex('students_email_idx').on(table.email),
@@ -81,10 +82,3 @@ export const otpCodes = pgTable('otp_codes', {
   index('otp_codes_email_idx').on(table.email),
 ])
 
-export const userPrefs = pgTable('user_prefs', {
-  id: text('id').primaryKey(),
-  userId: text('user_id').notNull().references(() => students.id, { onDelete: 'cascade' }),
-  prefs: jsonb('prefs').notNull().default({}),
-}, (table) => [
-  uniqueIndex('user_prefs_user_id_idx').on(table.userId),
-])
