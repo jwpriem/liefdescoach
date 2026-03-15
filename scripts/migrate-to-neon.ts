@@ -184,17 +184,33 @@ async function migrateLessons() {
 async function migrateBookings() {
     console.log('\n📦 Migrating bookings...')
 
+    // Query existing student and lesson IDs from Neon to avoid FK violations
+    const existingStudents = await db.select({ id: schema.students.id }).from(schema.students)
+    const studentIds = new Set(existingStudents.map(s => s.id))
+    const existingLessons = await db.select({ id: schema.lessons.id }).from(schema.lessons)
+    const lessonIds = new Set(existingLessons.map(l => l.id))
+
     const bookings = await paginateAppwrite(
         (offset) => tablesDB.listRows(DATABASE_ID, 'bookings', [Query.limit(100), Query.offset(offset)]),
         'Bookings'
     )
 
-    const values = (bookings as any[]).map((b) => ({
+    const allValues = (bookings as any[]).map((b) => ({
         id: b.$id,
         lessonId: extractId(b.lessons)!,
         studentId: extractId(b.students),
         createdAt: b.$createdAt ? new Date(b.$createdAt) : new Date(),
-    })).filter(v => v.lessonId) // Skip bookings without a lesson
+    }))
+
+    // Filter out bookings with missing lesson or orphaned student references
+    const values = allValues.filter(v => {
+        if (!v.lessonId || !lessonIds.has(v.lessonId)) return false
+        if (v.studentId && !studentIds.has(v.studentId)) {
+            console.log(`  ⚠️ Skipping booking ${v.id}: student ${v.studentId} not found in students table`)
+            return false
+        }
+        return true
+    })
 
     if (values.length > 0) {
         for (let i = 0; i < values.length; i += 50) {
@@ -202,7 +218,8 @@ async function migrateBookings() {
         }
     }
 
-    console.log(`  ✅ Bookings: ${values.length} records`)
+    const skipped = allValues.length - values.length
+    console.log(`  ✅ Bookings: ${values.length} records${skipped > 0 ? ` (${skipped} skipped due to missing references)` : ''}`)
     return values.length
 }
 
@@ -220,7 +237,11 @@ async function migrateCredits() {
         return 0
     }
 
-    const values = credits.map((c: any) => ({
+    // Query existing student IDs to avoid FK violations
+    const existingStudents = await db.select({ id: schema.students.id }).from(schema.students)
+    const studentIds = new Set(existingStudents.map(s => s.id))
+
+    const allValues = credits.map((c: any) => ({
         id: c.$id,
         studentId: c.studentId,
         bookingId: c.bookingId ?? null,
@@ -231,13 +252,22 @@ async function migrateCredits() {
         usedAt: c.usedAt ? new Date(c.usedAt) : null,
     }))
 
+    const values = allValues.filter(v => {
+        if (v.studentId && !studentIds.has(v.studentId)) {
+            console.log(`  ⚠️ Skipping credit ${v.id}: student ${v.studentId} not found`)
+            return false
+        }
+        return true
+    })
+
     if (values.length > 0) {
         for (let i = 0; i < values.length; i += 50) {
             await db.insert(schema.credits).values(values.slice(i, i + 50)).onConflictDoNothing()
         }
     }
 
-    console.log(`  ✅ Credits: ${values.length} records`)
+    const skipped = allValues.length - values.length
+    console.log(`  ✅ Credits: ${values.length} records${skipped > 0 ? ` (${skipped} skipped due to missing references)` : ''}`)
     return values.length
 }
 
@@ -255,7 +285,11 @@ async function migrateHealth() {
         return 0
     }
 
-    const values = healthDocs.map((h: any) => ({
+    // Query existing student IDs to avoid FK violations
+    const existingStudents = await db.select({ id: schema.students.id }).from(schema.students)
+    const studentIds = new Set(existingStudents.map(s => s.id))
+
+    const allValues = healthDocs.map((h: any) => ({
         id: h.$id,
         studentId: extractId(h.student)!,
         injury: h.injury ?? null,
@@ -263,13 +297,22 @@ async function migrateHealth() {
         dueDate: h.dueDate ? new Date(h.dueDate) : null,
     })).filter(v => v.studentId)
 
+    const values = allValues.filter(v => {
+        if (!studentIds.has(v.studentId)) {
+            console.log(`  ⚠️ Skipping health record ${v.id}: student ${v.studentId} not found`)
+            return false
+        }
+        return true
+    })
+
     if (values.length > 0) {
         for (let i = 0; i < values.length; i += 50) {
             await db.insert(schema.health).values(values.slice(i, i + 50)).onConflictDoNothing()
         }
     }
 
-    console.log(`  ✅ Health: ${values.length} records`)
+    const skipped = allValues.length - values.length
+    console.log(`  ✅ Health: ${values.length} records${skipped > 0 ? ` (${skipped} skipped due to missing references)` : ''}`)
     return values.length
 }
 
