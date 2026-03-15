@@ -13,7 +13,7 @@ defineEmits<{
 
 <template>
 	<nav
-		class="fixed bottom-0 left-0 right-0 z-50 bg-gray-950 border-t border-gray-800 flex"
+		class="fixed bottom-0 left-0 right-0 z-50 bg-gray-950/80 backdrop-blur-md border-t border-gray-800/80 flex"
 		style="padding-bottom: env(safe-area-inset-bottom)"
 	>
 		<button
