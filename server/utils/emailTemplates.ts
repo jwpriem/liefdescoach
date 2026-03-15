@@ -67,10 +67,20 @@ function wrapInLayout(title: string, contentHtml: string): string {
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
+export function escapeHtml(unsafe: string): string {
+    if (!unsafe) return ''
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;")
+}
+
 function infoRow(label: string, value: string): string {
     return `<tr>
     <td style="padding:8px 12px;font-size:12px;font-weight:600;color:${BRAND_COLOR};text-transform:uppercase;letter-spacing:0.5px;vertical-align:top;width:120px;">${label}</td>
-    <td style="padding:8px 12px;font-size:14px;color:#374151;">${value}</td>
+    <td style="padding:8px 12px;font-size:14px;color:#374151;">${escapeHtml(value)}</td>
   </tr>`
 }
 
@@ -100,7 +110,7 @@ function participantList(bookings: { name: string }[]): string {
     if (!bookings.length) {
         return '<p style="font-size:14px;color:#9ca3af;margin:0;">Geen deelnemers</p>'
     }
-    const items = bookings.map(b => `<li style="font-size:14px;color:#374151;padding:2px 0;">${b.name}</li>`).join('')
+    const items = bookings.map(b => `<li style="font-size:14px;color:#374151;padding:2px 0;">${escapeHtml(b.name)}</li>`).join('')
     return `<ul style="margin:0;padding-left:20px;">${items}</ul>`
 }
 
@@ -133,9 +143,10 @@ export function bookingStudentEmail(data: {
     lessonDate: string
     calendarLinks: { apple: string; google: string; outlook: string }
 }): { subject: string; html: string; text: string } {
+    const safeName = escapeHtml(data.name)
     const content = `
     ${heading('Je les is geboekt!')}
-    ${subtext(`Hoi ${data.name}, bedankt voor je boeking. We kijken ernaar uit je te zien!`)}
+    ${subtext(`Hoi ${safeName}, bedankt voor je boeking. We kijken ernaar uit je te zien!`)}
     ${infoTable(
         infoRow('Les', data.lessonType) +
         infoRow('Datum', data.lessonDate)
@@ -168,9 +179,10 @@ export function bookingAdminEmail(data: {
     spots: number
     bookings: { name: string }[]
 }): { subject: string; html: string; text: string } {
+    const safeName = escapeHtml(data.name)
     const content = `
     ${heading('Nieuwe boeking')}
-    ${subtext(`${data.name} heeft een les geboekt.`)}
+    ${subtext(`${safeName} heeft een les geboekt.`)}
     ${infoTable(
         infoRow('Leerling', data.name) +
         infoRow('E-mail', data.email) +
@@ -197,9 +209,10 @@ export function cancellationStudentEmail(data: {
     lessonType: string
     lessonDate: string
 }): { subject: string; html: string; text: string } {
+    const safeName = escapeHtml(data.name)
     const content = `
     ${heading('Je les is geannuleerd')}
-    ${subtext(`Hoi ${data.name}, jammer dat je niet kunt komen.`)}
+    ${subtext(`Hoi ${safeName}, jammer dat je niet kunt komen.`)}
     ${infoTable(
         infoRow('Les', data.lessonType) +
         infoRow('Datum', data.lessonDate)
@@ -225,9 +238,10 @@ export function cancellationAdminEmail(data: {
     spots: number
     bookings: { name: string }[]
 }): { subject: string; html: string; text: string } {
+    const safeName = escapeHtml(data.name)
     const content = `
     ${heading('Annulering')}
-    ${subtext(`${data.name} heeft een les geannuleerd.`)}
+    ${subtext(`${safeName} heeft een les geannuleerd.`)}
     ${infoTable(
         infoRow('Leerling', data.name) +
         infoRow('E-mail', data.email) +
@@ -281,9 +295,10 @@ export function lessonReminderEmail(data: {
     lessonDate: string
     address: string
 }): { subject: string; html: string; text: string } {
+    const safeName = escapeHtml(data.name)
     const content = `
     ${heading('Herinnering: je les is morgen!')}
-    ${subtext(`Hoi ${data.name}, vergeet niet dat je morgen een les hebt.`)}
+    ${subtext(`Hoi ${safeName}, vergeet niet dat je morgen een les hebt.`)}
     ${infoTable(
         infoRow('Les', data.lessonType) +
         infoRow('Datum', data.lessonDate) +
@@ -307,9 +322,13 @@ export function contactEmail(data: {
     email: string
     message: string
 }): { subject: string; html: string; text: string } {
+    const safeName = escapeHtml(data.name)
+    const safeEmail = escapeHtml(data.email)
+    const safeMessage = escapeHtml(data.message)
+
     const content = `
     ${heading('Nieuw contactbericht')}
-    ${subtext(`Van ${data.name} (${data.email})`)}
+    ${subtext(`Van ${safeName} (${safeEmail})`)}
     ${infoTable(
         infoRow('Naam', data.name) +
         infoRow('E-mail', data.email)
@@ -317,7 +336,7 @@ export function contactEmail(data: {
     <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:20px 0;">
       <tr><td style="padding:16px;background-color:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;">
         <p style="font-size:12px;font-weight:600;color:${BRAND_COLOR};text-transform:uppercase;letter-spacing:0.5px;margin:0 0 8px 0;">Bericht</p>
-        <p style="font-size:14px;color:#374151;margin:0;white-space:pre-line;">${data.message}</p>
+        <p style="font-size:14px;color:#374151;margin:0;white-space:pre-line;">${safeMessage}</p>
       </td></tr>
     </table>`
 
