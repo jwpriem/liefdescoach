@@ -14,12 +14,12 @@ defineEmits<{
 <template>
 	<nav
 		class="fixed bottom-0 left-0 right-0 z-50 bg-gray-950/80 backdrop-blur-md border-t border-gray-800/80 flex"
-		style="padding-bottom: max(env(safe-area-inset-bottom), 8px)"
+		style="padding-bottom: max(calc(env(safe-area-inset-bottom) - 8px), 4px)"
 	>
 		<button
 			v-for="(tab, i) in tabs"
 			:key="i"
-			class="flex-1 flex flex-col items-center gap-1 py-4 transition-colors"
+			class="flex-1 flex flex-col items-center gap-1 pt-3 pb-1 transition-colors"
 			:class="modelValue === i ? 'text-emerald-400' : 'text-gray-500 hover:text-gray-300'"
 			@click="$emit('update:modelValue', i)"
 		>
