@@ -104,7 +104,7 @@ function askQuestion() {
           <div class="min-w-0">
             <span class="text-xs text-gray-400 block">Boekingen</span>
             <span class="block text-lg font-bold text-emerald-100 leading-tight">
-              {{ upcomingCount }} {{ upcomingCount === 1 ? 'komend' : 'komende' }}
+              {{ upcomingCount }}
             </span>
           </div>
         </div>
@@ -119,7 +119,7 @@ function askQuestion() {
           <div class="min-w-0">
             <span class="text-xs text-gray-400 block">Credits</span>
             <span class="block text-lg font-bold text-emerald-100 leading-tight">
-              {{ availableCredits }} {{ availableCredits === 1 ? 'beschikbaar' : 'beschikbaar' }}
+              {{ availableCredits }}
             </span>
           </div>
         </div>
@@ -137,7 +137,7 @@ function askQuestion() {
         </div>
         <div class="min-w-0">
           <span class="text-xs text-gray-400 block">Hulp nodig?</span>
-          <span class="text-sm font-semibold text-white leading-tight">Stel een vraag</span>
+          <span class="text-sm font-semibold text-white leading-tight">Whatsapp</span>
         </div>
       </button>
 

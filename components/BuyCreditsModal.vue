@@ -28,26 +28,22 @@ function close() {
   <Teleport to="body">
     <div
       v-if="modelValue"
-      class="fixed inset-0 bg-black/75 flex justify-center items-end sm:items-center z-50 p-4"
+      class="fixed inset-0 bg-black/75 flex justify-center items-center z-50 p-4"
       @click.self="close"
     >
-      <div class="w-full max-w-md rounded-2xl bg-gray-900 border border-gray-800/80 shadow-2xl shadow-black/50 overflow-hidden">
+      <div class="w-full max-w-2xl max-h-[80vh] overflow-y-auto rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-2xl shadow-emerald-950/20 p-6 sm:p-8">
         <!-- Header -->
-        <div class="flex items-center justify-between p-5 border-b border-gray-800/80">
-          <div>
-            <h2 class="text-lg font-bold text-white">Koop credits</h2>
-            <p class="text-sm text-gray-400 mt-0.5">Kies een kaart via WhatsApp</p>
-          </div>
-          <button
-            class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
-            @click="close"
-          >
-            <UIcon name="i-heroicons-x-mark" class="size-5" />
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-2xl font-bold text-emerald-100 tracking-tight">Koop credits</h2>
+          <button @click="close" class="text-gray-400 hover:text-gray-200 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+            </svg>
           </button>
         </div>
 
         <!-- Plans -->
-        <div class="p-4 flex flex-col gap-3">
+        <div class="flex flex-col gap-3">
           <button
             v-for="plan in pricingPlans"
             :key="plan.name"
@@ -79,18 +75,18 @@ function close() {
                 <span class="font-bold" :class="plan.gold ? 'text-yellow-300' : plan.highlight ? 'text-emerald-300' : 'text-white'">
                   {{ plan.price }}
                 </span>
-                <UIcon name="i-heroicons-arrow-right" class="size-4 text-gray-500" />
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-gray-500">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                </svg>
               </div>
             </div>
           </button>
         </div>
 
         <!-- Footer note -->
-        <div class="px-5 pb-5">
-          <p class="text-xs text-gray-500 text-center">
-            Je wordt doorgestuurd naar WhatsApp om de aankoop te bevestigen
-          </p>
-        </div>
+        <p class="text-xs text-gray-500 text-center mt-6">
+          Je wordt doorgestuurd naar WhatsApp om de aankoop te bevestigen
+        </p>
       </div>
     </div>
   </Teleport>
