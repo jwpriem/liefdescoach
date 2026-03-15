@@ -43,19 +43,18 @@ useHead({
   ]
 })
 
-if (store.loggedInUser) {
-  navigateTo('/account')
-} else {
-  // Check session on the client; only show the form if not logged in
-  onMounted(async () => {
-    await store.getUser() // 401 => logged out (no banner)
-    if (store.loggedInUser) {
-      navigateTo('/account')
-    } else {
-      ready.value = true
-    }
-  })
-}
+onMounted(async () => {
+  if (store.loggedInUser) {
+    navigateTo('/account')
+    return
+  }
+  await store.getUser() // 401 => logged out (no banner)
+  if (store.loggedInUser) {
+    navigateTo('/account')
+  } else {
+    ready.value = true
+  }
+})
 
 const errorMessage = computed(() => store.errorMessage);
 const isLoading = computed(() => store.isLoading);
