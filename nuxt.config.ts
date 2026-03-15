@@ -8,7 +8,7 @@ export default defineNuxtConfig({
       htmlAttrs: { lang: 'nl' },
       link: [
         { rel: 'manifest', href: '/manifest.webmanifest' },
-        { rel: 'apple-touch-icon', href: '/apple.png' },
+        { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' },
       ],
       meta: [
         { name: 'geo.region', content: 'NL-ZH' },
