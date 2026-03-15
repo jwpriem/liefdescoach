@@ -43,6 +43,34 @@ provide('openBookingModal', () => showBookingModal.value = true)
 
 const activeTab = ref(0)
 
+// Swipe gesture navigation between tabs
+const touchStartX = ref(0)
+const touchStartY = ref(0)
+const swiping = ref(false)
+
+function onSwipeStart(e: TouchEvent) {
+	touchStartX.value = e.touches[0].clientX
+	touchStartY.value = e.touches[0].clientY
+	swiping.value = true
+}
+
+function onSwipeEnd(e: TouchEvent) {
+	if (!swiping.value) return
+	swiping.value = false
+
+	const deltaX = e.changedTouches[0].clientX - touchStartX.value
+	const deltaY = e.changedTouches[0].clientY - touchStartY.value
+
+	// Only trigger if horizontal movement is dominant and exceeds threshold
+	if (Math.abs(deltaX) < 50 || Math.abs(deltaY) > Math.abs(deltaX)) return
+
+	if (deltaX < 0 && activeTab.value < tabs.value.length - 1) {
+		activeTab.value++
+	} else if (deltaX > 0 && activeTab.value > 0) {
+		activeTab.value--
+	}
+}
+
 const tabs = computed<TabsItem[]>(() => {
 	const items: TabsItem[] = [
 		{
@@ -89,7 +117,12 @@ const tabs = computed<TabsItem[]>(() => {
 <template>
 	<div class="min-h-screen">
 		<IsLoading :loading="isLoading" />
-		<div class="container mx-auto px-4 sm:px-8 pt-1 md:pt-32" style="padding-bottom: calc(6rem + max(env(safe-area-inset-bottom), 0px))">
+		<div
+			class="container mx-auto px-4 sm:px-8 pt-1 md:pt-32"
+			style="padding-bottom: calc(6rem + max(env(safe-area-inset-bottom), 0px))"
+			@touchstart.passive="onSwipeStart"
+			@touchend.passive="onSwipeEnd"
+		>
 			<div v-show="activeTab === 0" class="pt-3">
 				<AccountBookings />
 			</div>
