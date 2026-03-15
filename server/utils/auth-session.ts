@@ -60,6 +60,8 @@ export async function getSessionUser(event: H3Event) {
       email: students.email,
       isAdmin: students.isAdmin,
       emailVerified: students.emailVerified,
+      archived: students.archived,
+      reminders: students.reminders,
     })
     .from(sessions)
     .innerJoin(students, eq(sessions.userId, students.id))

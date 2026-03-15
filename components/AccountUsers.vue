@@ -104,9 +104,7 @@ async function archiveUser(userId) {
 			method: 'post',
 			body: {
 				userId,
-				prefs: {
-					archive: true,
-				},
+				archived: true,
 			},
 		});
 
@@ -139,7 +137,7 @@ const filteredUsers = computed(() => {
 		return students.value
 	} else {
 		return students.value.filter((student) => {
-			return !student.prefs?.archive;
+			return !student.archived;
 		})
 	}
 })
