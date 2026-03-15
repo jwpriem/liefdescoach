@@ -46,11 +46,13 @@ useHead({
 if (store.loggedInUser) {
   navigateTo('/account')
 } else {
-  // Otherwise, check session on the client and redirect if found
+  // Check session on the client; only show the form if not logged in
   onMounted(async () => {
     await store.getUser() // 401 => logged out (no banner)
     if (store.loggedInUser) {
-      navigateTo('/account') // or '/account'
+      navigateTo('/account')
+    } else {
+      ready.value = true
     }
   })
 }
@@ -156,10 +158,6 @@ const passwordStrength = computed(() => {
   return res
 })
 
-onMounted(async () => {
-  // Only now allow the form to render on the client
-  ready.value = true
-})
 </script>
 
 <template>
