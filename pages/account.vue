@@ -89,7 +89,7 @@ const tabs = computed<TabsItem[]>(() => {
 <template>
 	<div>
 		<IsLoading :loading="isLoading" />
-		<div class="container mx-auto px-4 sm:px-8 pt-28 pb-28 sm:pt-32 sm:pb-32">
+		<div class="container mx-auto px-4 sm:px-8 pt-2 md:pt-32 pb-32">
 			<div v-show="activeTab === 0" class="pt-6">
 				<AccountBookings />
 			</div>
