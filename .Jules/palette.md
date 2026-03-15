@@ -1,0 +1,3 @@
+## 2024-05-18 - Added ARIA labels to Icon-only buttons
+**Learning:** Found several icon-only buttons (like modal close buttons and the delete booking button in the archive) that were missing `aria-label`s. Because these buttons only contained SVGs without text, screen readers would not be able to announce their purpose, creating an accessibility barrier.
+**Action:** Next time inspecting components, always check buttons containing only SVGs. If they have no visible text, an `aria-label` in the appropriate language (Dutch for this project) must be added to describe the button's action (e.g., "Sluiten", "Verwijder boeking").
