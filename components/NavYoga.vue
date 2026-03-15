@@ -24,12 +24,14 @@ const loggedInUser = computed(() => store.loggedInUser)
 	<div>
 		<div
 				class="block md:hidden flex justify-between items-center p-6 bg-gray-950"
+			style="padding-top: max(env(safe-area-inset-top), 1.5rem)"
 		>
 			<nuxt-link class="z-50" to="/">
 				<Yoga color="#d1fae5"/>
 			</nuxt-link>
 			<div
-					class="bg-emerald-700 text-emerald-100 rounded-full h-12 w-12 flex justify-center items-center z-50 shadow-xl fixed top-0 right-0 m-6"
+					class="bg-emerald-700 text-emerald-100 rounded-full h-12 w-12 flex justify-center items-center z-50 shadow-xl fixed right-0 m-6"
+			style="top: max(env(safe-area-inset-top), 0px)"
 					@click="toggle"
 			>
 				<svg
