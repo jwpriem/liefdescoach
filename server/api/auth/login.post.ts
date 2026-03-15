@@ -45,38 +45,35 @@ export default defineEventHandler(async (event) => {
         }
     } else {
         // Password not yet migrated — try Appwrite Auth as fallback
-        try {
-            const { Client, Account } = await import('node-appwrite')
-            const config = useRuntimeConfig()
+        const { Client, Account } = await import('node-appwrite')
+        const config = useRuntimeConfig()
 
-            // We need the Appwrite project ID — check if it's still configured
-            // Note: createEmailPasswordSession is a client-side operation, no API key needed
-            const projectId = (config.public as any).project
-            if (!projectId) {
-                throw createError({ statusCode: 401, statusMessage: 'Verkeerde e-mailadres of wachtwoord. Probeer opnieuw.' })
-            }
-
-            const client = new Client()
-            client.setEndpoint('https://cloud.appwrite.io/v1').setProject(projectId)
-
-            const account = new Account(client)
-            await account.createEmailPasswordSession(email, password)
-
-            // Appwrite login succeeded — hash password and store in Neon
-            const hash = await bcrypt.hash(password, 12)
-            await db
-                .update(students)
-                .set({ passwordHash: hash })
-                .where(eq(students.id, student.id))
-
-            // Clean up the Appwrite session (we don't need it)
-            try { await account.deleteSession('current') } catch { /* ignore */ }
-        } catch (e: any) {
-            // If it's already our createError, rethrow
-            if (e?.statusCode) throw e
-
+        const projectId = (config.public as any).project
+        if (!projectId) {
             throw createError({ statusCode: 401, statusMessage: 'Verkeerde e-mailadres of wachtwoord. Probeer opnieuw.' })
         }
+
+        const appwriteClient = new Client()
+        appwriteClient.setEndpoint('https://cloud.appwrite.io/v1').setProject(projectId)
+        const account = new Account(appwriteClient)
+
+        // Verify against Appwrite — only catch auth failures here
+        try {
+            await account.createEmailPasswordSession(email, password)
+        } catch (e: any) {
+            console.error('[login] Appwrite fallback failed for', email, e?.message ?? e)
+            throw createError({ statusCode: 401, statusMessage: 'Verkeerde e-mailadres of wachtwoord. Probeer opnieuw.' })
+        }
+
+        // Appwrite login succeeded — hash and store in Neon for future logins
+        const hash = await bcrypt.hash(password, 12)
+        await db
+            .update(students)
+            .set({ passwordHash: hash })
+            .where(eq(students.id, student.id))
+
+        // Clean up the Appwrite session (we don't need it)
+        try { await account.deleteSession('current') } catch { /* ignore */ }
     }
 
     // Create session
