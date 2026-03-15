@@ -1,26 +1,33 @@
-import { createError } from 'h3'
+import { eq } from 'drizzle-orm'
+import { bookings, lessons, students } from '../database/schema'
 
 export default defineEventHandler(async (event) => {
     const user = await requireAuth(event)
-    const { tablesDB, Query } = useServerAppwrite()
-    const config = useRuntimeConfig()
+    const db = useDB()
 
     const body = await readBody(event)
 
-    // Users can only fetch their own bookings (admins could fetch others)
     const targetUserId = body?.userId && typeof body.userId === 'string' && user.labels.includes('admin')
         ? body.userId
         : user.$id
 
-    const res = await tablesDB.listRows(
-        config.public.database,
-        'bookings',
-        [
-            Query.equal('students', [targetUserId]),
-            Query.select(['*', 'lessons.*']),
-            Query.limit(100)
-        ]
-    )
+    const rows = await db
+        .select({
+            id: bookings.id,
+            bookingId: bookings.id,
+            lessonId: lessons.id,
+            lessonDate: lessons.date,
+            lessonType: lessons.type,
+            lessonTeacher: lessons.teacher,
+            studentId: bookings.studentId,
+            studentName: students.name,
+            studentEmail: students.email,
+        })
+        .from(bookings)
+        .innerJoin(lessons, eq(bookings.lessonId, lessons.id))
+        .leftJoin(students, eq(bookings.studentId, students.id))
+        .where(eq(bookings.studentId, targetUserId))
+        .limit(100)
 
-    return Object.assign({}, res)
+    return nestBookingsWithLessons(rows)
 })

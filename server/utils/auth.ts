@@ -1,7 +1,6 @@
 import { H3Event, createError } from 'h3'
-import { Client, Account } from 'node-appwrite'
 
-interface AuthenticatedUser {
+export interface AuthenticatedUser {
     $id: string
     email: string
     name: string
@@ -9,36 +8,21 @@ interface AuthenticatedUser {
 }
 
 /**
- * Verifies the user's Appwrite session from the request cookies.
+ * Verifies the user's session from the request cookies.
  * Returns the authenticated user or throws a 401 error.
  */
 export async function requireAuth(event: H3Event): Promise<AuthenticatedUser> {
-    const sessionCookie = getCookie(event, 'a_session_' + useRuntimeConfig().public.project)
-        ?? event.headers.get('x-appwrite-session')
+    const sessionUser = await getSessionUser(event)
 
-    if (!sessionCookie) {
+    if (!sessionUser) {
         throw createError({ statusCode: 401, statusMessage: 'Niet ingelogd' })
     }
 
-    try {
-        const config = useRuntimeConfig()
-        const client = new Client()
-        client
-            .setEndpoint('https://cloud.appwrite.io/v1')
-            .setProject(config.public.project)
-            .setSession(sessionCookie)
-
-        const account = new Account(client)
-        const user = await account.get()
-
-        return {
-            $id: user.$id,
-            email: user.email,
-            name: user.name,
-            labels: user.labels ?? [],
-        }
-    } catch {
-        throw createError({ statusCode: 401, statusMessage: 'Ongeldige sessie' })
+    return {
+        $id: sessionUser.userId,
+        email: sessionUser.email,
+        name: sessionUser.name,
+        labels: sessionUser.isAdmin ? ['admin'] : [],
     }
 }
 

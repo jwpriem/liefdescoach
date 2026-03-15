@@ -1,9 +1,10 @@
 import { createError } from 'h3'
+import { eq } from 'drizzle-orm'
+import { students } from '../database/schema'
 
 export default defineEventHandler(async (event) => {
     await requireAdmin(event)
-    const { tablesDB, Query } = useServerAppwrite()
-    const config = useRuntimeConfig()
+    const db = useDB()
 
     const body = await readBody(event)
 
@@ -11,13 +12,19 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 400, statusMessage: 'E-mail is verplicht' })
     }
 
-    const res = await tablesDB.listRows(
-        config.public.database,
-        'students',
-        [
-            Query.equal('email', [body.email])
-        ]
-    )
+    const rows = await db
+        .select()
+        .from(students)
+        .where(eq(students.email, body.email))
 
-    return Object.assign({}, res)
+    return {
+        rows: rows.map(r => ({
+            $id: r.id,
+            name: r.name,
+            email: r.email,
+            phone: r.phone,
+            dateOfBirth: r.dateOfBirth?.toISOString() ?? null,
+        })),
+        total: rows.length,
+    }
 })

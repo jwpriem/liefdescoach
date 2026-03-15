@@ -1,13 +1,11 @@
 import { createError } from 'h3'
 import crypto from 'crypto'
+import { eq } from 'drizzle-orm'
+import { otpCodes } from '../../database/schema'
 
 /**
  * Verifies an OTP code, deletes it from the database,
- * creates a login token, and returns it so the client SDK
- * can create its own session (with proper cookie/localStorage management).
- *
- * Body: { email: string, code: string }
- * Returns: { userId: string, secret: string }
+ * creates a session, and returns the user info.
  */
 export default defineEventHandler(async (event) => {
     const body = await readBody(event)
@@ -21,17 +19,13 @@ export default defineEventHandler(async (event) => {
 
     const email = body.email.trim().toLowerCase()
     const code = body.code.trim()
-    const { tablesDB, users, Query } = useServerAppwrite()
-    const config = useRuntimeConfig()
+    const db = useDB()
 
-    // 1. Look up OTP document by email
-    const result = await tablesDB.listRows(
-        config.public.database,
-        'otp_codes',
-        [Query.equal('email', [email])]
-    )
-
-    const rows = result.rows ?? []
+    // 1. Look up OTP by email
+    const rows = await db
+        .select()
+        .from(otpCodes)
+        .where(eq(otpCodes.email, email))
 
     if (rows.length === 0) {
         throw createError({ statusCode: 401, statusMessage: 'Geen code gevonden. Vraag een nieuwe code aan.' })
@@ -41,12 +35,11 @@ export default defineEventHandler(async (event) => {
 
     // 2. Check expiry
     if (new Date(otpDoc.expiresAt) < new Date()) {
-        // Clean up expired code
-        await tablesDB.deleteRow(config.public.database, 'otp_codes', otpDoc.$id)
+        await db.delete(otpCodes).where(eq(otpCodes.id, otpDoc.id))
         throw createError({ statusCode: 401, statusMessage: 'Code is verlopen. Vraag een nieuwe code aan.' })
     }
 
-    // 3. Verify code (constant-time comparison to prevent timing attacks)
+    // 3. Verify code (constant-time comparison)
     const codeBuffer = Buffer.from(code)
     const storedBuffer = Buffer.from(otpDoc.code)
 
@@ -54,11 +47,11 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 401, statusMessage: 'Ongeldige code. Probeer opnieuw.' })
     }
 
-    // 4. Delete the OTP document
-    await tablesDB.deleteRow(config.public.database, 'otp_codes', otpDoc.$id)
+    // 4. Delete OTP
+    await db.delete(otpCodes).where(eq(otpCodes.id, otpDoc.id))
 
-    // 5. Create a login token so the client SDK can create its own session
-    const token = await users.createToken(otpDoc.userId)
+    // 5. Create a session for the user
+    await createSession(event, otpDoc.userId)
 
-    return { userId: otpDoc.userId, secret: token.secret }
+    return { success: true, userId: otpDoc.userId }
 })

@@ -1,15 +1,14 @@
 import { createError } from 'h3'
+import { lessons } from '../database/schema'
 
-const VALID_LESSON_TYPES = ['hatha yoga', 'guest lesson', 'peachy bum']
+const VALID_LESSON_TYPES = ['hatha yoga', 'guest lesson', 'peachy bum'] as const
 
 export default defineEventHandler(async (event) => {
     await requireAdmin(event)
-    const { tablesDB, ID } = useServerAppwrite()
-    const config = useRuntimeConfig()
+    const db = useDB()
 
     const body = await readBody(event)
 
-    // --- Input validation ---
     if (!body?.date || typeof body.date !== 'string') {
         throw createError({ statusCode: 400, statusMessage: 'Datum is verplicht' })
     }
@@ -27,16 +26,19 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 400, statusMessage: 'Ongeldige docent' })
     }
 
-    const res = await tablesDB.createRow(
-        config.public.database,
-        'lessons',
-        ID.unique(),
-        {
-            date: body.date,
-            type: body.type,
-            teacher: body.teacher || null
-        }
-    )
+    const result = await db.insert(lessons).values({
+        id: generateId(),
+        date: lessonDate,
+        type: body.type as typeof VALID_LESSON_TYPES[number],
+        teacher: body.teacher || null,
+    }).returning()
 
-    return Object.assign({}, res)
+    const row = result[0]
+    return {
+        $id: row.id,
+        date: row.date?.toISOString(),
+        type: row.type,
+        teacher: row.teacher,
+        bookings: [],
+    }
 })

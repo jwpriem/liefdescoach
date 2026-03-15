@@ -1,15 +1,16 @@
 import { createError } from 'h3'
+import { eq } from 'drizzle-orm'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc.js'
 import 'dayjs/locale/nl.js'
+import { lessons, bookings, students } from '../database/schema'
 
 dayjs.extend(utc)
 dayjs.locale('nl')
 
 export default defineEventHandler(async (event) => {
     await requireAuth(event)
-    const config = useRuntimeConfig()
-    const { tablesDB, Query } = useServerAppwrite()
+    const db = useDB()
 
     const body = await readBody(event)
 
@@ -20,34 +21,24 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 400, statusMessage: 'lessonId is verplicht' })
     }
 
-    // Fetch lesson with bookings and student names
-    const lesson = await tablesDB.getRow(
-        config.public.database,
-        'lessons',
-        body.lessonId,
-        [Query.select(['*', 'bookings.*', 'bookings.students.*'])]
-    )
+    // Fetch lesson
+    const lessonRows = await db.select().from(lessons).where(eq(lessons.id, body.lessonId)).limit(1)
+    if (lessonRows.length === 0) return
 
-    const bookings = lesson.bookings ?? []
-    const unresolvedIds = bookings
-        .filter((b: any) => typeof b.students === 'string')
-        .map((b: any) => b.students)
+    const lesson = lessonRows[0]
 
-    const { users } = useServerAppwrite()
-    const nameMap: Record<string, string> = {}
-    for (const uid of unresolvedIds) {
-        try {
-            const u = await users.get(uid)
-            nameMap[uid] = u.name || u.email || 'Onbekend'
-        } catch {
-            nameMap[uid] = 'Onbekend'
-        }
-    }
+    // Fetch bookings with student data
+    const bookingRows = await db
+        .select({
+            id: bookings.id,
+            studentName: students.name,
+        })
+        .from(bookings)
+        .leftJoin(students, eq(bookings.studentId, students.id))
+        .where(eq(bookings.lessonId, body.lessonId))
 
-    const bookingsArr = bookings.map((b: any) => ({
-        name: typeof b.students === 'string'
-            ? (nameMap[b.students] ?? 'Onbekend')
-            : (b.students?.name ?? 'Onbekend')
+    const bookingsArr = bookingRows.map((b) => ({
+        name: b.studentName ?? 'Onbekend',
     }))
 
     const lessonDate = dayjs(lesson.date).utc()
@@ -63,9 +54,8 @@ export default defineEventHandler(async (event) => {
         `https://calndr.link/d/event/?service=${stream}&start=${lessonDate.format('YYYY-MM-DD')}%20${lessonDate.format('H')}:${lessonDate.format('mm')}&title=${calendarTitle}%20Ravennah&timezone=Europe/Amsterdam&location=${encodeURIComponent(address)}`
 
     const formattedDate = `${lessonDate.format('dddd D MMMM')} van ${lessonDate.format('H.mm')} tot ${lessonDate.add(1, 'hour').format('H.mm')} uur`
-    const spots = MAX_LESSON_CAPACITY - (lesson.bookings?.length ?? 0)
+    const spots = MAX_LESSON_CAPACITY - bookingRows.length
 
-    // 1. Email to the student (no participants, no spots)
     const studentMail = bookingStudentEmail({
         name: body.name,
         lessonType: lessontype,
@@ -77,7 +67,6 @@ export default defineEventHandler(async (event) => {
         },
     })
 
-    // 2. Email to admin (with participants, spots, student info)
     const adminMail = bookingAdminEmail({
         name: body.name,
         email: body.email,
@@ -87,7 +76,6 @@ export default defineEventHandler(async (event) => {
         bookings: bookingsArr,
     })
 
-    // Send emails sequentially with a small delay to respect SMTP rate limits
     const emails = [
         { label: 'student', to: body.email, ...studentMail },
         { label: 'admin', to: 'info@ravennah.com', ...adminMail },
@@ -106,7 +94,6 @@ export default defineEventHandler(async (event) => {
         } catch (err: any) {
             console.error(`[BookingConfirmation] ${mail.label} email failed:`, err?.message ?? err)
         }
-        // Mailtrap free plan: max 1 email per 10 seconds
         await new Promise(resolve => setTimeout(resolve, 10000))
     }
 

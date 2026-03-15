@@ -1,18 +1,26 @@
-export default defineEventHandler(async (event) => {
-    const { tablesDB, Query } = useServerAppwrite()
-    const config = useRuntimeConfig()
-    const fromDate = new Date()
+import { gte, asc, eq } from 'drizzle-orm'
+import { lessons, bookings } from '../database/schema'
 
-    const res = await tablesDB.listRows(
-        config.public.database,
-        'lessons',
-        [
-            Query.select(['*', 'bookings.*']),
-            Query.orderAsc("date"),
-            Query.greaterThanEqual("date", fromDate.toISOString()),
-            Query.limit(100)
-        ]
-    )
+export default defineEventHandler(async () => {
+    const db = useDB()
+    const now = new Date()
 
-    return Object.assign({}, res)
+    const lessonRows = await db
+        .select()
+        .from(lessons)
+        .where(gte(lessons.date, now))
+        .orderBy(asc(lessons.date))
+        .limit(100)
+
+    const lessonIds = lessonRows.map(l => l.id)
+    let bookingRows: any[] = []
+    if (lessonIds.length > 0) {
+        const { inArray } = await import('drizzle-orm')
+        bookingRows = await db
+            .select()
+            .from(bookings)
+            .where(inArray(bookings.lessonId, lessonIds))
+    }
+
+    return nestLessonsWithBookings(lessonRows, bookingRows)
 })
