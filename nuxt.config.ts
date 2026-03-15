@@ -7,7 +7,6 @@ export default defineNuxtConfig({
     head: {
       htmlAttrs: { lang: 'nl' },
       link: [
-        { rel: 'manifest', href: '/manifest.webmanifest' },
         { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' },
       ],
       meta: [
@@ -73,8 +72,34 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     '@nuxtjs/sitemap',
     '@nuxtjs/robots',
     '@nuxt/ui',
-    '@nuxt/image'
+    '@nuxt/image',
+    '@vite-pwa/nuxt',
   ],
+
+  pwa: {
+    registerType: 'autoUpdate',
+    manifest: {
+      name: 'Yoga Ravennah',
+      short_name: 'Ravennah',
+      description: 'Yoga studio boekingssysteem van Ravennah',
+      start_url: '/account',
+      display: 'standalone',
+      background_color: '#030712',
+      theme_color: '#047857',
+      orientation: 'portrait',
+      icons: [
+        { src: '/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+        { src: '/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
+      ],
+    },
+    workbox: {
+      navigateFallback: '/account',
+      globPatterns: ['**/*.{js,css,html,png,svg,ico,webp,jpeg,jpg,woff2}'],
+    },
+    devOptions: {
+      enabled: false,
+    },
+  },
 
   image: {
     domains: ['images.unsplash.com']
