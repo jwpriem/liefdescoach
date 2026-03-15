@@ -34,14 +34,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
   runtimeConfig: {
     // Private keys are only available on the server
-    appwriteKey: '',
-    cronSecret: '',           // NUXT_CRON_SECRET
-    revenuePerBooking: '14',  // NUXT_REVENUE_PER_BOOKING
-    costPerLesson: '35',      // NUXT_COST_PER_LESSON
+    databaseUrl: '',            // NUXT_DATABASE_URL (Neon PostgreSQL)
+    cronSecret: '',             // NUXT_CRON_SECRET
+    revenuePerBooking: '14',   // NUXT_REVENUE_PER_BOOKING
+    costPerLesson: '35',       // NUXT_COST_PER_LESSON
+    sessionSecret: '',         // NUXT_SESSION_SECRET (for signing session cookies)
     // Public keys that are exposed to the client
     public: {
-      project: '',
-      database: '',
       mailPass: '',
       mailPassDev: ''
     }

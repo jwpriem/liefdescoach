@@ -1,18 +1,12 @@
-import { createError } from 'h3'
+import { eq, desc } from 'drizzle-orm'
+import { credits, bookings, lessons } from '../../database/schema'
 
 /**
  * Fetch credit history for a student with lesson details.
- *
- * Body:
- *   - studentId: string (optional for admins, defaults to authenticated user)
- *
- * Returns credits with the associated lesson info (date, type, teacher)
- * for used credits, by looking up the booking -> lesson relationship.
  */
 export default defineEventHandler(async (event) => {
     const user = await requireAuth(event)
-    const { tablesDB, Query } = useServerAppwrite()
-    const config = useRuntimeConfig()
+    const db = useDB()
 
     const body = await readBody(event)
 
@@ -20,73 +14,49 @@ export default defineEventHandler(async (event) => {
         ? body.studentId
         : user.$id
 
-    // Fetch all credits for the student
-    let credits: any[] = []
-    try {
-        const creditsRes = await tablesDB.listRows(
-            config.public.database,
-            'credits',
-            [
-                Query.equal('studentId', [targetUserId]),
-                Query.orderDesc('createdAt'),
-                Query.limit(500),
-            ]
-        )
-        credits = creditsRes.rows ?? []
-    } catch {
-        // credits collection may not exist yet
-        return { credits: [], available: 0 }
-    }
+    // Fetch all credits with optional booking+lesson data in one query
+    const rows = await db
+        .select({
+            id: credits.id,
+            studentId: credits.studentId,
+            bookingId: credits.bookingId,
+            type: credits.type,
+            validFrom: credits.validFrom,
+            validTo: credits.validTo,
+            createdAt: credits.createdAt,
+            usedAt: credits.usedAt,
+            lessonId: lessons.id,
+            lessonDate: lessons.date,
+            lessonType: lessons.type,
+            lessonTeacher: lessons.teacher,
+        })
+        .from(credits)
+        .leftJoin(bookings, eq(credits.bookingId, bookings.id))
+        .leftJoin(lessons, eq(bookings.lessonId, lessons.id))
+        .where(eq(credits.studentId, targetUserId))
+        .orderBy(desc(credits.createdAt))
+        .limit(500)
 
-    // For used credits, fetch the bookings with lesson data
-    const usedBookingIds = credits
-        .filter((c: any) => c.bookingId)
-        .map((c: any) => c.bookingId)
-
-    let bookingsMap: Record<string, any> = {}
-
-    if (usedBookingIds.length > 0) {
-        // Fetch bookings in batches of 100
-        for (let i = 0; i < usedBookingIds.length; i += 100) {
-            const batch = usedBookingIds.slice(i, i + 100)
-            try {
-                const bookingsRes = await tablesDB.listRows(
-                    config.public.database,
-                    'bookings',
-                    [
-                        Query.equal('$id', batch),
-                        Query.select(['*', 'lessons.*']),
-                        Query.limit(100),
-                    ]
-                )
-                for (const booking of bookingsRes.rows ?? []) {
-                    bookingsMap[booking.$id] = booking
-                }
-            } catch {
-                // Bookings may have been deleted (lesson cancelled etc.)
-            }
-        }
-    }
-
-    // Enrich credits with lesson data
-    const enrichedCredits = credits.map((credit: any) => {
-        const booking = credit.bookingId ? bookingsMap[credit.bookingId] : null
-        const lesson = booking?.lessons && typeof booking.lessons === 'object' ? booking.lessons : null
-
-        return {
-            ...credit,
-            lesson: lesson ? {
-                $id: lesson.$id,
-                date: lesson.date,
-                type: lesson.type,
-                teacher: lesson.teacher,
-            } : null,
-        }
-    })
+    const enrichedCredits = rows.map((r) => ({
+        $id: r.id,
+        studentId: r.studentId,
+        bookingId: r.bookingId,
+        type: r.type,
+        validFrom: r.validFrom?.toISOString(),
+        validTo: r.validTo?.toISOString(),
+        createdAt: r.createdAt?.toISOString(),
+        usedAt: r.usedAt?.toISOString() ?? null,
+        lesson: r.lessonId ? {
+            $id: r.lessonId,
+            date: r.lessonDate?.toISOString(),
+            type: r.lessonType,
+            teacher: r.lessonTeacher,
+        } : null,
+    }))
 
     const now = new Date()
-    const available = credits.filter(
-        (c: any) => !c.bookingId && new Date(c.validTo) > now
+    const available = rows.filter(
+        (c) => !c.bookingId && c.validTo && new Date(c.validTo) > now
     ).length
 
     return {

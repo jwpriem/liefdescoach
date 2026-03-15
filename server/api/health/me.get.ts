@@ -1,40 +1,42 @@
+import { eq } from 'drizzle-orm'
+import { health, students } from '../../database/schema'
 
 export default defineEventHandler(async (event) => {
     const authUser = await requireAuth(event)
-    const config = useRuntimeConfig()
-    const { databases, Query } = useServerAppwrite()
+    const db = useDB()
 
-    let health = null
+    let healthData = null
     let dateOfBirth = null
     let phone = null
 
-    try {
-        const healthRes = await databases.listDocuments(
-            config.public.database,
-            'health',
-            [
-                Query.equal('student', [authUser.$id]),
-                Query.limit(1)
-            ]
-        )
-        health = healthRes.documents[0] || null
-    } catch (e: any) {
-        console.error('Failed to fetch health data for user', authUser.$id, e)
+    // Fetch health data
+    const healthRows = await db
+        .select()
+        .from(health)
+        .where(eq(health.studentId, authUser.$id))
+        .limit(1)
+
+    if (healthRows.length > 0) {
+        const h = healthRows[0]
+        healthData = {
+            $id: h.id,
+            injury: h.injury,
+            pregnancy: h.pregnancy,
+            dueDate: h.dueDate?.toISOString() ?? null,
+        }
     }
 
-    // Fetch dateOfBirth and phone from students collection
-    try {
-        const studentDoc = await databases.getDocument(
-            config.public.database,
-            'students',
-            authUser.$id
-        )
-        dateOfBirth = studentDoc?.dateOfBirth || null
-        phone = studentDoc?.phone || null
-    } catch (e: any) {
-        // Student document might not exist for old users
-        console.error('Failed to fetch student data for user', authUser.$id, e)
+    // Fetch student profile data
+    const studentRows = await db
+        .select({ dateOfBirth: students.dateOfBirth, phone: students.phone })
+        .from(students)
+        .where(eq(students.id, authUser.$id))
+        .limit(1)
+
+    if (studentRows.length > 0) {
+        dateOfBirth = studentRows[0].dateOfBirth?.toISOString() ?? null
+        phone = studentRows[0].phone ?? null
     }
 
-    return { health, dateOfBirth, phone }
+    return { health: healthData, dateOfBirth, phone }
 })

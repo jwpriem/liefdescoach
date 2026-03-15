@@ -1,8 +1,10 @@
 import { createError } from 'h3'
+import { and, gte, lte, eq } from 'drizzle-orm'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc.js'
 import timezone from 'dayjs/plugin/timezone.js'
 import 'dayjs/locale/nl.js'
+import { lessons, bookings, students, userPrefs } from '../database/schema'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -11,81 +13,81 @@ dayjs.locale('nl')
 export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig()
 
-    // --- Auth: verify cron secret ---
+    // Auth: verify cron secret
     const apiKey = getHeader(event, 'x-api-key')
     if (!config.cronSecret || apiKey !== config.cronSecret) {
         throw createError({ statusCode: 401, statusMessage: 'Ongeldige API-sleutel' })
     }
 
-    const { tablesDB, Query, users } = useServerAppwrite()
+    const db = useDB()
 
-    // --- Calculate tomorrow's date range in UTC ---
-    // Use Amsterdam timezone so "tomorrow" aligns with local lesson dates
+    // Calculate tomorrow's date range
     const nowAmsterdam = dayjs().tz('Europe/Amsterdam')
-    const tomorrowStart = nowAmsterdam.add(1, 'day').startOf('day').utc().toISOString()
-    const tomorrowEnd = nowAmsterdam.add(1, 'day').endOf('day').utc().toISOString()
+    const tomorrowStart = nowAmsterdam.add(1, 'day').startOf('day').utc().toDate()
+    const tomorrowEnd = nowAmsterdam.add(1, 'day').endOf('day').utc().toDate()
 
-    // --- Fetch lessons scheduled for tomorrow ---
-    const lessonsRes = await tablesDB.listRows(
-        config.public.database,
-        'lessons',
-        [
-            Query.greaterThanEqual('date', tomorrowStart),
-            Query.lessThanEqual('date', tomorrowEnd),
-            Query.limit(50),
-        ]
-    )
+    // Fetch lessons scheduled for tomorrow
+    const lessonRows = await db
+        .select()
+        .from(lessons)
+        .where(
+            and(
+                gte(lessons.date, tomorrowStart),
+                lte(lessons.date, tomorrowEnd)
+            )
+        )
+        .limit(50)
 
-    const lessons = lessonsRes.rows ?? []
-
-    if (lessons.length === 0) {
+    if (lessonRows.length === 0) {
         return { lessonsFound: 0, emailsSent: 0 }
     }
 
-    // --- For each lesson, fetch bookings with student data ---
     let emailsSent = 0
     const errors: string[] = []
 
-    for (const lesson of lessons) {
-        const fullLesson = await tablesDB.getRow(
-            config.public.database,
-            'lessons',
-            lesson.$id,
-            [Query.select(['*', 'bookings.*', 'bookings.students.*'])]
-        )
+    for (const lesson of lessonRows) {
+        // Fetch bookings with student data
+        const bookingRows = await db
+            .select({
+                studentId: students.id,
+                studentName: students.name,
+                studentEmail: students.email,
+            })
+            .from(bookings)
+            .innerJoin(students, eq(bookings.studentId, students.id))
+            .where(eq(bookings.lessonId, lesson.id))
 
-        const bookings = fullLesson.bookings ?? []
-        if (bookings.length === 0) continue
+        if (bookingRows.length === 0) continue
 
-        // Format lesson details (same pattern as sendBookingConfirmation)
-        const lessonDate = dayjs(fullLesson.date).utc()
-        const lessonType = fullLesson.type === 'guest lesson'
-            ? `Yin-Yang Yoga door gastdocent ${fullLesson.teacher}`
-            : fullLesson.type === 'peachy bum' ? 'Peachy Bum' : 'Hatha Yoga'
+        const lessonDate = dayjs(lesson.date).utc()
+        const lessonType = lesson.type === 'guest lesson'
+            ? `Yin-Yang Yoga door gastdocent ${lesson.teacher}`
+            : lesson.type === 'peachy bum' ? 'Peachy Bum' : 'Hatha Yoga'
         const formattedDate = `${lessonDate.format('dddd D MMMM')} van ${lessonDate.format('H.mm')} tot ${lessonDate.add(1, 'hour').format('H.mm')} uur`
-        const address = fullLesson.type === 'peachy bum'
+        const address = lesson.type === 'peachy bum'
             ? 'Kosboulevard 5, 3059 XZ Rotterdam'
             : 'Emmy van Leersumhof 24a, 3059 LT Rotterdam'
 
-        // Send reminder to each booked student
-        for (const booking of bookings) {
-            const student = booking.students
-            if (!student || typeof student === 'string') continue
-            if (!student.email) continue
+        for (const student of bookingRows) {
+            if (!student.studentEmail) continue
 
-            // Check if student has opted out of reminder emails
-            try {
-                const prefs = await users.getPrefs(student.$id)
-                if (prefs.reminders === false) {
-                    console.log(`[LessonReminder] Skipped ${student.email} (reminders disabled)`)
+            // Check reminder opt-out
+            if (student.studentId) {
+                const prefsRows = await db
+                    .select({ prefs: userPrefs.prefs })
+                    .from(userPrefs)
+                    .where(eq(userPrefs.userId, student.studentId))
+                    .limit(1)
+
+                const prefs = prefsRows[0]?.prefs as Record<string, any> | undefined
+                if (prefs?.reminders === false) {
+                    console.log(`[LessonReminder] Skipped ${student.studentEmail} (reminders disabled)`)
                     continue
                 }
-            } catch {
-                // If prefs can't be fetched, send the reminder (default: enabled)
             }
 
             const mail = lessonReminderEmail({
-                name: student.name || 'Yogi',
+                name: student.studentName || 'Yogi',
                 lessonType,
                 lessonDate: formattedDate,
                 address,
@@ -94,28 +96,27 @@ export default defineEventHandler(async (event) => {
             try {
                 await smtpTransport.sendMail({
                     from: 'Yoga Ravennah <info@ravennah.com>',
-                    to: student.email,
+                    to: student.studentEmail,
                     subject: mail.subject,
                     html: mail.html,
                     text: mail.text,
                 })
                 emailsSent++
-                console.log(`[LessonReminder] Sent to ${student.email} for lesson ${fullLesson.$id}`)
+                console.log(`[LessonReminder] Sent to ${student.studentEmail} for lesson ${lesson.id}`)
             } catch (err: any) {
-                const msg = `Failed to send to ${student.email}: ${err?.message ?? err}`
+                const msg = `Failed to send to ${student.studentEmail}: ${err?.message ?? err}`
                 console.error(`[LessonReminder] ${msg}`)
                 errors.push(msg)
             }
 
-            // Respect SMTP rate limits (Mailtrap: 1 per 10s, production: small delay)
             await new Promise(resolve => setTimeout(resolve, process.env.NODE_ENV !== 'production' ? 10000 : 1000))
         }
     }
 
-    console.log(`[LessonReminder] Done. Lessons: ${lessons.length}, Emails sent: ${emailsSent}, Errors: ${errors.length}`)
+    console.log(`[LessonReminder] Done. Lessons: ${lessonRows.length}, Emails sent: ${emailsSent}, Errors: ${errors.length}`)
 
     return {
-        lessonsFound: lessons.length,
+        lessonsFound: lessonRows.length,
         emailsSent,
         errors: errors.length > 0 ? errors : undefined,
     }

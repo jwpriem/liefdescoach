@@ -1,45 +1,44 @@
 import { createError } from 'h3'
+import { eq } from 'drizzle-orm'
+import { bookings, credits, lessons, students } from '../database/schema'
 
 export default defineEventHandler(async (event) => {
     const user = await requireAuth(event)
-    const { tablesDB, Query } = useServerAppwrite()
-    const config = useRuntimeConfig()
+    const db = useDB()
 
     const body = await readBody(event)
 
-    // --- Input validation ---
     if (!body?.bookingId || typeof body.bookingId !== 'string') {
         throw createError({ statusCode: 400, statusMessage: 'bookingId is verplicht' })
     }
 
-    // --- Fetch booking with related data ---
-    const booking = await tablesDB.getRow(
-        config.public.database,
-        'bookings',
-        body.bookingId,
-        [Query.select(['*', 'lessons.*', 'students.*'])]
-    )
+    // Fetch booking with lesson and student data
+    const bookingRows = await db
+        .select({
+            id: bookings.id,
+            lessonId: bookings.lessonId,
+            studentId: bookings.studentId,
+            lessonDate: lessons.date,
+            lessonType: lessons.type,
+        })
+        .from(bookings)
+        .innerJoin(lessons, eq(bookings.lessonId, lessons.id))
+        .where(eq(bookings.id, body.bookingId))
+        .limit(1)
 
-    if (!booking) {
+    if (bookingRows.length === 0) {
         throw createError({ statusCode: 404, statusMessage: 'Boeking niet gevonden' })
     }
 
-    // --- Authorization: user can cancel own booking, admin can cancel any ---
-    const bookingOwnerId = booking.students?.$id
+    const booking = bookingRows[0]
     const isAdmin = user.labels.includes('admin')
 
-    if (bookingOwnerId !== user.$id && !isAdmin) {
+    if (booking.studentId !== user.$id && !isAdmin) {
         throw createError({ statusCode: 403, statusMessage: 'Geen toegang om deze boeking te annuleren' })
     }
 
-    // Determine which user gets the credit refund
-    let targetUserId = bookingOwnerId
-    if (body.onBehalfOfUserId && typeof body.onBehalfOfUserId === 'string' && isAdmin) {
-        targetUserId = body.onBehalfOfUserId
-    }
-
-    // --- Check cancellation period (must be > 1 day before lesson) ---
-    const lessonDate = new Date(booking.lessons?.date)
+    // Check 24h cancellation window
+    const lessonDate = new Date(booking.lessonDate)
     const oneDayBefore = new Date(lessonDate.getTime() - 24 * 60 * 60 * 1000)
     if (new Date() >= oneDayBefore && !isAdmin) {
         throw createError({
@@ -48,38 +47,24 @@ export default defineEventHandler(async (event) => {
         })
     }
 
-    // --- Release the credit that was used for this booking ---
-    const creditRes = await tablesDB.listRows(
-        config.public.database,
-        'credits',
-        [
-            Query.equal('bookingId', [body.bookingId]),
-            Query.limit(1),
-        ]
-    )
+    // Release the credit
+    const creditRows = await db
+        .select()
+        .from(credits)
+        .where(eq(credits.bookingId, body.bookingId))
+        .limit(1)
 
-    const creditRow = (creditRes.rows ?? [])[0]
-    if (creditRow) {
-        await tablesDB.updateRow(
-            config.public.database,
-            'credits',
-            creditRow.$id,
-            {
-                bookingId: null,
-                usedAt: null,
-            }
-        )
+    if (creditRows.length > 0) {
+        await db.update(credits)
+            .set({ bookingId: null, usedAt: null })
+            .where(eq(credits.id, creditRows[0].id))
     }
 
-    // --- Delete booking ---
-    await tablesDB.deleteRow(
-        config.public.database,
-        'bookings',
-        body.bookingId
-    )
+    // Delete booking
+    await db.delete(bookings).where(eq(bookings.id, body.bookingId))
 
     return {
         success: true,
-        lessonId: booking.lessons?.$id
+        lessonId: booking.lessonId,
     }
 })
