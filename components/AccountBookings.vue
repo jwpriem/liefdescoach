@@ -2,29 +2,54 @@
 const store = useMainStore()
 const { $rav } = useNuxtApp()
 
-const myBookings = computed(() => store.myBookings);
-const availableCredits = computed(() => store.availableCredits);
+const myBookings = computed(() => store.myBookings)
+const availableCredits = computed(() => store.availableCredits)
 const openBookingModal = inject('openBookingModal') as () => void
 
-const futureBookings = computed(() => {
+const futureBookingGroups = computed(() => {
   if (!myBookings.value) return []
-  return myBookings.value
-    .map(b => {
-      // Normalize lessons if array (Appwrite expansion quirk)
-      const l = Array.isArray(b.lessons) ? b.lessons[0] : b.lessons
-      return { ...b, lessons: l }
+
+  const grouped = new Map<string, any>()
+
+  myBookings.value
+    .map((booking: any) => {
+      const lesson = Array.isArray(booking.lessons) ? booking.lessons[0] : booking.lessons
+      return { ...booking, lessons: lesson }
     })
-    .filter(b => b.lessons && $rav.isFutureBooking(b.lessons.date))
+    .filter((booking: any) => booking.lessons && $rav.isFutureBooking(booking.lessons.date))
+    .forEach((booking: any) => {
+      const lessonId = booking.lessons.$id
+      const current = grouped.get(lessonId)
+
+      if (!current) {
+        grouped.set(lessonId, {
+          lessonId,
+          lessons: booking.lessons,
+          bookings: [booking],
+          spots: 1,
+        })
+        return
+      }
+
+      current.bookings.push(booking)
+      current.spots += 1
+    })
+
+  return [...grouped.values()].sort((a, b) => new Date(a.lessons.date).getTime() - new Date(b.lessons.date).getTime())
 })
 
-async function removeBooking(booking) {
-  await store.cancelBooking(booking)
+async function removeBooking(bookingGroup: any) {
+  const bookingToCancel = bookingGroup.bookings[bookingGroup.bookings.length - 1]
+  await store.cancelBooking(bookingToCancel)
+}
+
+async function bookExtraSpot(lesson: any) {
+  await store.handleBooking(lesson, { extraSpot: true })
 }
 </script>
 
 <template>
   <div>
-    <!-- Credit balance + quick action -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
       <div class="flex items-center gap-3">
         <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-emerald-500/15">
@@ -46,14 +71,13 @@ async function removeBooking(booking) {
       </UButton>
     </div>
 
-    <!-- Upcoming bookings -->
     <h2 class="text-2xl md:text-4xl uppercase font-black mb-6">
       <span class="emerald-underline text-emerald-900">Boekingen</span><span class="text-emerald-700">.</span>
     </h2>
 
-    <div class="w-full" v-if="futureBookings.length">
+    <div class="w-full" v-if="futureBookingGroups.length">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div v-for="booking in futureBookings" :key="booking.$id"
+        <div v-for="bookingGroup in futureBookingGroups" :key="bookingGroup.lessonId"
              class="rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-2xl shadow-emerald-950/20 p-6">
           <div class="space-y-4">
             <div>
@@ -62,8 +86,13 @@ async function removeBooking(booking) {
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-emerald-500 shrink-0">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5" />
                 </svg>
-                <span v-html="$rav.getLessonDescription(booking.lessons)"></span>
+                <span v-html="$rav.getLessonDescription(bookingGroup.lessons)"></span>
               </span>
+            </div>
+
+            <div>
+              <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Aantal plekken</span>
+              <span class="block mt-1 text-gray-100">{{ bookingGroup.spots }} {{ bookingGroup.spots === 1 ? 'plek' : 'plekken' }}</span>
             </div>
 
             <div>
@@ -72,20 +101,23 @@ async function removeBooking(booking) {
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-emerald-500 shrink-0">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
                 </svg>
-                {{ $rav.formatDateInDutch(booking.lessons.date, true) }}
+                {{ $rav.formatDateInDutch(bookingGroup.lessons.date, true) }}
               </span>
             </div>
 
             <div>
               <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Zet in je agenda</span>
               <div class="flex gap-3 mt-2">
-                <a :href="$rav.getCalenderLink('apple', booking.lessons.date, booking.lessons.type)" class="hover:opacity-80 transition-opacity"><NuxtImg src="/apple.png" class="w-6" /></a>
-                <a :href="$rav.getCalenderLink('google', booking.lessons.date, booking.lessons.type)" class="hover:opacity-80 transition-opacity"><NuxtImg src="/gmail.png" class="w-6" /></a>
-                <a :href="$rav.getCalenderLink('outlook', booking.lessons.date, booking.lessons.type)" class="hover:opacity-80 transition-opacity"><NuxtImg src="/outlook.png" class="w-6" /></a>
+                <a :href="$rav.getCalenderLink('apple', bookingGroup.lessons.date, bookingGroup.lessons.type)" class="hover:opacity-80 transition-opacity"><NuxtImg src="/apple.png" class="w-6" /></a>
+                <a :href="$rav.getCalenderLink('google', bookingGroup.lessons.date, bookingGroup.lessons.type)" class="hover:opacity-80 transition-opacity"><NuxtImg src="/gmail.png" class="w-6" /></a>
+                <a :href="$rav.getCalenderLink('outlook', bookingGroup.lessons.date, bookingGroup.lessons.type)" class="hover:opacity-80 transition-opacity"><NuxtImg src="/outlook.png" class="w-6" /></a>
               </div>
             </div>
 
-            <UButton color="primary" variant="solid" size="lg" block @click="removeBooking(booking)" :disabled="!$rav.checkCancelPeriod(booking.lessons)">Les annuleren</UButton>
+            <div class="flex flex-col gap-2">
+              <UButton color="primary" variant="outline" size="lg" block :disabled="availableCredits < 1" @click="bookExtraSpot(bookingGroup.lessons)">Boek extra plek</UButton>
+              <UButton color="primary" variant="solid" size="lg" block @click="removeBooking(bookingGroup)" :disabled="!$rav.checkCancelPeriod(bookingGroup.lessons)">Annuleer 1 plek</UButton>
+            </div>
           </div>
         </div>
       </div>
