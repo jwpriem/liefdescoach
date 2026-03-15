@@ -27,7 +27,10 @@ export default defineEventHandler(async (event) => {
     }
     const lesson = lessonRows[0]
 
-    if (new Date(lesson.date) <= new Date()) {
+    const isAdmin = user.labels.includes('admin')
+    const isAdminBookingForStudent = isAdmin && Boolean(body.onBehalfOfUserId)
+
+    if (!isAdminBookingForStudent && new Date(lesson.date) <= new Date()) {
         throw createError({ statusCode: 400, statusMessage: 'Kan niet boeken voor een les in het verleden' })
     }
 
