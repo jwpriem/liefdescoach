@@ -50,8 +50,9 @@ export default defineEventHandler(async (event) => {
             const config = useRuntimeConfig()
 
             // We need the Appwrite project ID — check if it's still configured
+            // Note: createEmailPasswordSession is a client-side operation, no API key needed
             const projectId = (config.public as any).project
-            if (!projectId || !(config as any).appwriteKey) {
+            if (!projectId) {
                 throw createError({ statusCode: 401, statusMessage: 'Verkeerde e-mailadres of wachtwoord. Probeer opnieuw.' })
             }
 
