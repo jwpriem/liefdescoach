@@ -23,7 +23,13 @@ const store = useMainStore()
 
 definePageMeta({
   // layout: 'yoga',
-  ssr: false
+  ssr: false,
+  middleware: () => {
+    const store = useMainStore()
+    if (store.loggedInUser) {
+      return navigateTo('/account')
+    }
+  }
 })
 
 useHead({
@@ -44,13 +50,10 @@ useHead({
 })
 
 onMounted(async () => {
-  if (store.loggedInUser) {
-    navigateTo('/account')
-    return
-  }
+  if (store.loggedInUser) return
   await store.getUser() // 401 => logged out (no banner)
   if (store.loggedInUser) {
-    navigateTo('/account')
+    await navigateTo('/account', { replace: true })
   } else {
     ready.value = true
   }
