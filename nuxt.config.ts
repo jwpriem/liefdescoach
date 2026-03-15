@@ -41,6 +41,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     sessionSecret: '',         // NUXT_SESSION_SECRET (for signing session cookies)
     // Public keys that are exposed to the client
     public: {
+      project: '',                // NUXT_PUBLIC_PROJECT (Appwrite project ID — needed for lazy password migration)
       mailPass: '',
       mailPassDev: ''
     }
