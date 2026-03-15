@@ -94,7 +94,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     },
     workbox: {
       navigateFallback: '/account',
-      globPatterns: ['**/*.{js,css,html,png,svg,ico,webp,jpeg,jpg,woff2}'],
+      globPatterns: ['**/*.{js,css,html,png,svg,ico,woff2}'],
     },
     devOptions: {
       enabled: false,
