@@ -32,9 +32,9 @@ const isAdmin = computed(() => store.isAdmin);
 const availableCredits = computed(() => props.user ? (store.studentCreditSummary[props.user.$id] || 0) : store.availableCredits);
 
 const remindersEnabled = computed({
-  get: () => targetUser.value?.prefs?.reminders !== false,
+  get: () => targetUser.value?.reminders !== false,
   set: async (value: boolean) => {
-    await store.updatePrefs(targetUser.value, { ...targetUser.value.prefs, reminders: value });
+    await store.updateReminders(targetUser.value, value);
   },
 });
 

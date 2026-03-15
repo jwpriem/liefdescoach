@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, boolean, jsonb, pgEnum, index, uniqueIndex } from 'drizzle-orm/pg-core'
+import { pgTable, text, timestamp, boolean, pgEnum, index, uniqueIndex } from 'drizzle-orm/pg-core'
 
 export const creditTypeEnum = pgEnum('credit_type', ['credit_1', 'credit_5', 'credit_10', 'credit_20'])
 export const lessonTypeEnum = pgEnum('lesson_type', ['hatha yoga', 'guest lesson', 'peachy bum'])
@@ -12,7 +12,8 @@ export const students = pgTable('students', {
   emailVerified: boolean('email_verified').notNull().default(false),
   dateOfBirth: timestamp('date_of_birth', { withTimezone: true }),
   phone: text('phone'),
-  prefs: jsonb('prefs').notNull().default({}),
+  archived: boolean('archived').notNull().default(false),
+  reminders: boolean('reminders').notNull().default(true),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 }, (table) => [
   uniqueIndex('students_email_idx').on(table.email),

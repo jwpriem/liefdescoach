@@ -81,22 +81,30 @@ async function migrateStudents() {
 
     const studentMap = new Map(studentDocs.map((s: any) => [s.$id, s]))
 
-    // 3. Fetch prefs for each auth user
+    // 3. Fetch prefs for each auth user and map to columns
+    const knownPrefKeys = new Set(['archive', 'reminders', 'credits'])
     const prefsMap = new Map<string, Record<string, any>>()
     for (const u of authUsers as any[]) {
         try {
             const prefs = await users.getPrefs(u.$id)
             if (prefs && Object.keys(prefs).length > 0) {
                 prefsMap.set(u.$id, prefs)
+                // Warn about unknown pref keys
+                for (const key of Object.keys(prefs)) {
+                    if (!knownPrefKeys.has(key)) {
+                        console.warn(`  ⚠️  Unknown pref key "${key}" for user ${u.$id} (${u.email}): ${JSON.stringify(prefs[key])}`)
+                    }
+                }
             }
         } catch {
             // Skip if prefs can't be fetched
         }
     }
 
-    // 4. Merge Auth + student data + prefs
+    // 4. Merge Auth + student data + prefs columns
     const values = authUsers.map((u: any) => {
         const student = studentMap.get(u.$id) as any
+        const prefs = prefsMap.get(u.$id)
         return {
             id: u.$id,
             name: u.name || student?.name || 'Unknown',
@@ -106,7 +114,8 @@ async function migrateStudents() {
             emailVerified: u.emailVerification ?? false,
             dateOfBirth: student?.dateOfBirth ? new Date(student.dateOfBirth) : null,
             phone: student?.phone ?? null,
-            prefs: prefsMap.get(u.$id) ?? {},
+            archived: prefs?.archive === true,
+            reminders: prefs?.reminders !== false,
             createdAt: u.$createdAt ? new Date(u.$createdAt) : new Date(),
         }
     })
@@ -123,6 +132,8 @@ async function migrateStudents() {
                 emailVerified: false,
                 dateOfBirth: doc.dateOfBirth ? new Date(doc.dateOfBirth) : null,
                 phone: doc.phone ?? null,
+                archived: false,
+                reminders: true,
                 createdAt: doc.$createdAt ? new Date(doc.$createdAt) : new Date(),
             })
         }

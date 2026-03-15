@@ -2,19 +2,14 @@ import { defineStore } from 'pinia'
 
 export const MAX_LESSON_CAPACITY = 9
 
-interface UserPrefs {
-    credits?: string;
-    archive?: boolean;
-    [key: string]: any;
-}
-
 export interface User {
     $id?: string;
     email?: string;
     name?: string;
     phone?: string;
     dateOfBirth?: string;
-    prefs?: UserPrefs;
+    archived?: boolean;
+    reminders?: boolean;
     credits?: number;
     debits?: number;
     labels?: string[];
@@ -162,12 +157,12 @@ export const useMainStore = defineStore('main', {
 
             await this.getUser()
 
-            if (this.loggedInUser?.prefs?.['archive'] === true) {
+            if (this.loggedInUser?.archived === true) {
                 await $fetch('/api/updatePrefs', {
                     method: 'post',
                     body: {
                         userId: this.loggedInUser.$id,
-                        prefs: { archive: false },
+                        archived: false,
                     },
                 })
             }
@@ -328,15 +323,11 @@ export const useMainStore = defineStore('main', {
             });
         },
 
-        async updatePrefs(user: User, prefs: Object) {
+        async updateReminders(user: User, reminders: boolean) {
             await this.fetchWrapper(async () => {
-                const data = {
-                    userId: user.$id,
-                    prefs: prefs
-                }
                 await $fetch('/api/updatePrefs', {
                     method: 'POST',
-                    body: data
+                    body: { userId: user.$id, reminders }
                 })
                 await this.getUser()
             });

@@ -52,7 +52,7 @@ export default defineEventHandler(async (event) => {
                 studentId: students.id,
                 studentName: students.name,
                 studentEmail: students.email,
-                studentPrefs: students.prefs,
+                reminders: students.reminders,
             })
             .from(bookings)
             .innerJoin(students, eq(bookings.studentId, students.id))
@@ -73,8 +73,7 @@ export default defineEventHandler(async (event) => {
             if (!student.studentEmail) continue
 
             // Check reminder opt-out
-            const prefs = student.studentPrefs as Record<string, any> | undefined
-            if (prefs?.reminders === false) {
+            if (student.reminders === false) {
                 console.log(`[LessonReminder] Skipped ${student.studentEmail} (reminders disabled)`)
                 continue
             }

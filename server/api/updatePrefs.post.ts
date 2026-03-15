@@ -12,33 +12,28 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 400, statusMessage: 'userId is verplicht' })
     }
 
-    if (!body?.prefs || typeof body.prefs !== 'object') {
-        throw createError({ statusCode: 400, statusMessage: 'prefs is verplicht' })
-    }
-
-    // Non-admins can only update their own prefs
+    // Non-admins can only update their own preferences
     if (body.userId !== authUser.$id && !authUser.labels.includes('admin')) {
         throw createError({ statusCode: 403, statusMessage: 'Geen toegang' })
     }
 
-    // Get current prefs from students table
-    const existing = await db
-        .select({ prefs: students.prefs })
-        .from(students)
-        .where(eq(students.id, body.userId))
-        .limit(1)
+    const updates: Record<string, any> = {}
 
-    if (existing.length === 0) {
-        throw createError({ statusCode: 404, statusMessage: 'Gebruiker niet gevonden' })
+    if (typeof body.archived === 'boolean') {
+        updates.archived = body.archived
+    }
+    if (typeof body.reminders === 'boolean') {
+        updates.reminders = body.reminders
     }
 
-    const currentPrefs = (existing[0].prefs as Record<string, any>) ?? {}
-    const newPrefs = { ...currentPrefs, ...body.prefs }
+    if (Object.keys(updates).length === 0) {
+        throw createError({ statusCode: 400, statusMessage: 'Geen geldige velden om bij te werken' })
+    }
 
     await db
         .update(students)
-        .set({ prefs: newPrefs })
+        .set(updates)
         .where(eq(students.id, body.userId))
 
-    return { res: newPrefs }
+    return { ok: true }
 })

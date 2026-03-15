@@ -1,5 +1,5 @@
 {
-  "id": "4c837923-29e4-4b3d-b6d7-ad0f8788cbe4",
+  "id": "19a41abe-1e54-4103-873b-d01c909e5fb2",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -567,12 +567,19 @@
           "primaryKey": false,
           "notNull": false
         },
-        "prefs": {
-          "name": "prefs",
-          "type": "jsonb",
+        "archived": {
+          "name": "archived",
+          "type": "boolean",
           "primaryKey": false,
           "notNull": true,
-          "default": "'{}'::jsonb"
+          "default": false
+        },
+        "reminders": {
+          "name": "reminders",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
         },
         "created_at": {
           "name": "created_at",

@@ -59,7 +59,8 @@ CREATE TABLE "students" (
 	"email_verified" boolean DEFAULT false NOT NULL,
 	"date_of_birth" timestamp with time zone,
 	"phone" text,
-	"prefs" jsonb DEFAULT '{}'::jsonb NOT NULL,
+	"archived" boolean DEFAULT false NOT NULL,
+	"reminders" boolean DEFAULT true NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now()
 );
 --> statement-breakpoint

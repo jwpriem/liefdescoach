@@ -16,7 +16,8 @@ export default defineEventHandler(async (event) => {
             isAdmin: students.isAdmin,
             emailVerified: students.emailVerified,
             createdAt: students.createdAt,
-            prefs: students.prefs,
+            archived: students.archived,
+            reminders: students.reminders,
             healthId: health.id,
             injury: health.injury,
             pregnancy: health.pregnancy,
@@ -36,13 +37,14 @@ export default defineEventHandler(async (event) => {
         labels: r.isAdmin ? ['admin'] : [],
         emailVerification: r.emailVerified,
         registration: r.createdAt?.toISOString() ?? null,
+        archived: r.archived,
+        reminders: r.reminders,
         health: r.healthId ? {
             $id: r.healthId,
             injury: r.injury,
             pregnancy: r.pregnancy,
             dueDate: r.dueDate?.toISOString() ?? null,
         } : null,
-        prefs: (r.prefs as Record<string, any>) ?? {},
     }))
 
     return { users, total: users.length }

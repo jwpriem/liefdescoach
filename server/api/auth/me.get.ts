@@ -9,14 +9,13 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 401, statusMessage: 'Niet ingelogd' })
     }
 
-    const prefs = (sessionUser.prefs as Record<string, any>) ?? {}
-
     return {
         $id: sessionUser.userId,
         email: sessionUser.email,
         name: sessionUser.name,
         labels: sessionUser.isAdmin ? ['admin'] : [],
         emailVerification: sessionUser.emailVerified,
-        prefs,
+        archived: sessionUser.archived,
+        reminders: sessionUser.reminders,
     }
 })
