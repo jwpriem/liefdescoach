@@ -9,7 +9,7 @@ const pageUrl = ref('https://www.ravennah.com/account');
 const store = useMainStore()
 
 definePageMeta({
-	// layout: 'yoga'
+	layout: 'app'
 })
 
 useHead({
