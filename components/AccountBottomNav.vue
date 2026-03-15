@@ -19,12 +19,12 @@ defineEmits<{
 		<button
 			v-for="(tab, i) in tabs"
 			:key="i"
-			class="flex-1 flex flex-col items-center gap-1 py-3 text-xs transition-colors"
+			class="flex-1 flex flex-col items-center gap-1 py-4 transition-colors"
 			:class="modelValue === i ? 'text-emerald-400' : 'text-gray-500 hover:text-gray-300'"
 			@click="$emit('update:modelValue', i)"
 		>
-			<UIcon :name="tab.icon as string" class="size-5 shrink-0" />
-			<span class="hidden sm:block truncate max-w-full px-1">{{ tab.label }}</span>
+			<UIcon :name="tab.icon as string" class="size-7 shrink-0" />
+			<span class="text-[10px] leading-tight truncate max-w-full px-0.5">{{ tab.label }}</span>
 		</button>
 	</nav>
 </template>
