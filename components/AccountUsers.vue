@@ -139,7 +139,7 @@ const filteredUsers = computed(() => {
 		return students.value
 	} else {
 		return students.value.filter((student) => {
-			return student.prefs && student.prefs['archive'] != true;
+			return !student.prefs?.archive;
 		})
 	}
 })
