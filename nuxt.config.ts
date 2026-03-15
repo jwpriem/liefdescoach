@@ -18,7 +18,7 @@ export default defineNuxtConfig({
         { name: 'mobile-web-app-capable', content: 'yes' },
         { name: 'apple-mobile-web-app-capable', content: 'yes' },
         { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' },
-        { name: 'apple-mobile-web-app-title', content: 'Ravennah' },
+        { name: 'apple-mobile-web-app-title', content: 'Yoga Ravennah' },
         { name: 'theme-color', content: '#047857' },
       ],
       // GTM script (replaces @zadigetvoltaire/nuxt-gtm)
@@ -81,7 +81,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     registerType: 'autoUpdate',
     manifest: {
       name: 'Yoga Ravennah',
-      short_name: 'Ravennah',
+      short_name: 'Yoga Ravennah',
       description: 'Yoga studio boekingssysteem van Ravennah',
       start_url: '/account',
       display: 'standalone',
