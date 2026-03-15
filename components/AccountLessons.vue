@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Teams } from 'appwrite'
 const store = useMainStore()
 const dayjs = useDayjs()
 const { $rav } = useNuxtApp()
@@ -67,7 +66,7 @@ async function book() {
   store.setLoading(true)
 
   await store.setOnBehalfOf(state.addBookingUser)
-  await store.handleBooking(state.addBookingLesson)
+  await store.handleBooking(state.addBookingLesson, { extraSpot: true })
   await store.fetchStudents()
   await store.fetchLessons()
 
@@ -105,10 +104,27 @@ function sortStudents(students) {
   if (!Array.isArray(students)) return [];
 
   return [...students].sort((a, b) => {
-    const nameA = a.name || "";
-    const nameB = b.name || "";
+    const nameA = a?.students?.name || a?.name || "";
+    const nameB = b?.students?.name || b?.name || "";
     return nameA.localeCompare(nameB);
   });
+}
+
+
+function getLessonBookingsWithLabels(lessonBookings) {
+  if (!Array.isArray(lessonBookings)) return []
+
+  const counters = new Map<string, number>()
+  return sortStudents(lessonBookings).map((booking) => {
+    const studentId = booking?.students?.$id || booking?.students?.id || booking?.$id
+    const currentCount = counters.get(studentId) ?? 0
+    counters.set(studentId, currentCount + 1)
+
+    return {
+      ...booking,
+      isExtraSpot: currentCount >= 1,
+    }
+  })
 }
 
 const computedLessons = computed(() => {
@@ -129,7 +145,7 @@ const computedLessons = computed(() => {
 
 const computedStudents = computed(() => {
   return students.value.map(student => {
-    const isDisabled = state.addBookingLesson ? !$rav.checkAvailability(state.addBookingLesson, student) : false
+    const isDisabled = false
     return {
       label: student.name,
       value: student,
@@ -171,11 +187,11 @@ const computedStudents = computed(() => {
               <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Boekingen ({{
                 lesson.bookings?.length || 0 }}/9)</span>
               <div class="mt-1">
-                <span v-for="booking in sortStudents(lesson.bookings || [])" :key="booking.$id"
+                <span v-for="booking in getLessonBookingsWithLabels(lesson.bookings || [])" :key="booking.$id"
                   class="flex items-center gap-1 text-sm text-gray-300">
                   <NuxtLink :to="`/admin/users/${booking.students.$id}`"
                     class="hover:text-emerald-400 transition-colors">
-                    {{ booking.students.name }}
+                    {{ booking.students.name }}<span v-if="booking.isExtraSpot" class="text-emerald-400"> (extra plek)</span>
                   </NuxtLink>
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                     stroke="currentColor"

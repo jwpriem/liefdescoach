@@ -31,6 +31,8 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 400, statusMessage: 'Kan niet boeken voor een les in het verleden' })
     }
 
+    const allowDuplicateBooking = body.extraSpot === true
+
     // Check capacity and duplicates
     const existingBookings = await db
         .select()
@@ -41,7 +43,7 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 409, statusMessage: 'Les is vol' })
     }
 
-    if (existingBookings.some(b => b.studentId === targetUserId)) {
+    if (!allowDuplicateBooking && existingBookings.some(b => b.studentId === targetUserId)) {
         throw createError({ statusCode: 409, statusMessage: 'Gebruiker is al geboekt voor deze les' })
     }
 

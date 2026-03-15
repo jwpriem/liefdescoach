@@ -414,7 +414,7 @@ export const useMainStore = defineStore('main', {
             });
         },
 
-        async handleBooking(lesson: Lesson) {
+        async handleBooking(lesson: Lesson, options: { extraSpot?: boolean } = {}) {
             await this.fetchWrapper(async () => {
                 const onBehalfOfUser = this.onBehalfOf
                 const isOnBehalf = onBehalfOfUser && onBehalfOfUser.$id !== this.loggedInUser?.$id
@@ -423,7 +423,8 @@ export const useMainStore = defineStore('main', {
                     method: 'POST',
                     body: {
                         lessonId: lesson.$id,
-                        onBehalfOfUserId: isOnBehalf ? onBehalfOfUser.$id : null
+                        onBehalfOfUserId: isOnBehalf ? onBehalfOfUser.$id : null,
+                        extraSpot: options.extraSpot === true,
                     }
                 })
 
