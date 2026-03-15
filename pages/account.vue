@@ -42,6 +42,7 @@ const showBookingModal = ref(false)
 provide('openBookingModal', () => showBookingModal.value = true)
 
 const activeTab = ref(0)
+const currentSlot = computed(() => tabs.value[activeTab.value]?.slot)
 
 // Swipe gesture navigation between tabs
 const touchStartX = ref(0)
@@ -72,7 +73,17 @@ function onSwipeEnd(e: TouchEvent) {
 }
 
 const tabs = computed<TabsItem[]>(() => {
-	const items: TabsItem[] = [
+	const items: TabsItem[] = []
+
+	if (!isAdmin.value) {
+		items.push({
+			label: 'Dashboard',
+			icon: 'i-heroicons-home',
+			slot: 'dashboard' as const,
+		})
+	}
+
+	items.push(
 		{
 			label: 'Mijn lessen',
 			icon: 'i-heroicons-calendar-days',
@@ -88,7 +99,7 @@ const tabs = computed<TabsItem[]>(() => {
 			icon: 'i-heroicons-user-circle',
 			slot: 'gegevens' as const,
 		},
-	]
+	)
 
 	if (isAdmin.value) {
 		items.push(
@@ -123,22 +134,25 @@ const tabs = computed<TabsItem[]>(() => {
 			@touchstart.passive="onSwipeStart"
 			@touchend.passive="onSwipeEnd"
 		>
-			<div v-show="activeTab === 0" class="pt-3">
+			<div v-show="currentSlot === 'dashboard'" class="pt-3">
+				<AccountDashboard v-if="!isAdmin && loggedInUser" />
+			</div>
+			<div v-show="currentSlot === 'lessen'" class="pt-3">
 				<AccountBookings />
 			</div>
-			<div v-show="activeTab === 1" class="pt-3">
+			<div v-show="currentSlot === 'credits'" class="pt-3">
 				<AccountCredits />
 			</div>
-			<div v-show="activeTab === 2" class="pt-3">
+			<div v-show="currentSlot === 'gegevens'" class="pt-3">
 				<AccountDetails v-if="loggedInUser" />
 			</div>
-			<div v-show="activeTab === 3" class="pt-3">
+			<div v-show="currentSlot === 'admin-lessen'" class="pt-3">
 				<AccountLessons v-if="isAdmin && lessons && students" />
 			</div>
-			<div v-show="activeTab === 4" class="pt-3">
+			<div v-show="currentSlot === 'gebruikers'" class="pt-3">
 				<AccountUsers v-if="isAdmin && students && loggedInUser" />
 			</div>
-			<div v-show="activeTab === 5" class="pt-3">
+			<div v-show="currentSlot === 'omzet'" class="pt-3">
 				<AccountRevenue v-if="isAdmin" />
 			</div>
 		</div>

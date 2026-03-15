@@ -5,6 +5,8 @@ const { $rav } = useNuxtApp();
 const myCredits = computed(() => store.myCredits);
 const availableCredits = computed(() => store.availableCredits);
 
+const showBuyCredits = ref(false);
+
 const creditTypeLabels: Record<string, string> = {
   credit_1: 'Losse les',
   credit_5: 'Kleine kaart (5)',
@@ -40,7 +42,7 @@ function getCreditBadgeColor(credit: any): string {
         </div>
       </div>
 
-      <UButton to="/tarieven" color="primary" variant="outline" size="lg" icon="i-heroicons-shopping-cart-20-solid">
+      <UButton color="primary" variant="outline" size="lg" icon="i-heroicons-shopping-cart-20-solid" @click="showBuyCredits = true">
         Koop credits
       </UButton>
     </div>
@@ -113,5 +115,7 @@ function getCreditBadgeColor(credit: any): string {
     <div class="rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm p-8 text-center" v-else>
       <p class="text-gray-400">Je hebt nog geen credits</p>
     </div>
+
+    <BuyCreditsModal v-model="showBuyCredits" />
   </div>
 </template>
