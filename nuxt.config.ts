@@ -9,6 +9,7 @@ export default defineNuxtConfig({
       link: [
         { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' },
       ],
+      viewport: 'width=device-width, initial-scale=1, viewport-fit=cover',
       meta: [
         { name: 'geo.region', content: 'NL-ZH' },
         { name: 'geo.placename', content: 'Rotterdam' },
@@ -16,7 +17,7 @@ export default defineNuxtConfig({
         { name: 'ICBM', content: '51.9683092, 4.5884189' },
         { name: 'mobile-web-app-capable', content: 'yes' },
         { name: 'apple-mobile-web-app-capable', content: 'yes' },
-        { name: 'apple-mobile-web-app-status-bar-style', content: 'black' },
+        { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' },
         { name: 'apple-mobile-web-app-title', content: 'Ravennah' },
         { name: 'theme-color', content: '#047857' },
       ],
