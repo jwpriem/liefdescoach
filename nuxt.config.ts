@@ -6,11 +6,20 @@ export default defineNuxtConfig({
   app: {
     head: {
       htmlAttrs: { lang: 'nl' },
+      link: [
+        { rel: 'manifest', href: '/manifest.webmanifest' },
+        { rel: 'apple-touch-icon', href: '/apple.png' },
+      ],
       meta: [
         { name: 'geo.region', content: 'NL-ZH' },
         { name: 'geo.placename', content: 'Rotterdam' },
         { name: 'geo.position', content: '51.9683092;4.5884189' },
-        { name: 'ICBM', content: '51.9683092, 4.5884189' }
+        { name: 'ICBM', content: '51.9683092, 4.5884189' },
+        { name: 'mobile-web-app-capable', content: 'yes' },
+        { name: 'apple-mobile-web-app-capable', content: 'yes' },
+        { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' },
+        { name: 'apple-mobile-web-app-title', content: 'Ravennah' },
+        { name: 'theme-color', content: '#047857' },
       ],
       // GTM script (replaces @zadigetvoltaire/nuxt-gtm)
       script: [

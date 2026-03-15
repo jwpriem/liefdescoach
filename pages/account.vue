@@ -36,11 +36,12 @@ const loggedInUser = computed(() => store.loggedInUser);
 const isAdmin = computed(() => store.isAdmin);
 const students = computed(() => store.students);
 const lessons = computed(() => store.lessons);
-const myBookings = computed(() => store.myBookings);
 const isLoading = computed(() => store.isLoading);
 
 const showBookingModal = ref(false)
 provide('openBookingModal', () => showBookingModal.value = true)
+
+const activeTab = ref(0)
 
 const tabs = computed<TabsItem[]>(() => {
 	const items: TabsItem[] = [
@@ -83,56 +84,33 @@ const tabs = computed<TabsItem[]>(() => {
 
 	return items
 })
-
-const tabsUi = computed(() => ({
-	list: {
-		base: `grid w-full ${isAdmin.value ? 'grid-cols-6' : 'grid-cols-3'}`,
-		tab: { base: 'justify-center' }
-	}
-}))
 </script>
 
 <template>
 	<div>
 		<IsLoading :loading="isLoading" />
-		<div class="container mx-auto px-4 sm:px-8 pt-28 pb-12 sm:pt-32 sm:pb-20">
-			<UTabs :items="tabs" :ui="tabsUi" :unmount-on-hide="false">
-				<template #default="{ item, selected }">
-					<span class="truncate hidden md:block">{{ item.label }}</span>
-				</template>
-				<template #lessen>
-					<div class="pt-6">
-						<AccountBookings />
-					</div>
-				</template>
-				<template #credits>
-					<div class="pt-6">
-						<AccountCredits />
-					</div>
-				</template>
-				<template #gegevens>
-					<div class="pt-6">
-						<AccountDetails v-if="loggedInUser" />
-					</div>
-				</template>
-				<template #admin-lessen>
-					<div class="pt-6">
-						<AccountLessons v-if="isAdmin && lessons && students" />
-					</div>
-				</template>
-				<template #gebruikers>
-					<div class="pt-6">
-						<AccountUsers v-if="isAdmin && students && loggedInUser" />
-					</div>
-				</template>
-				<template #omzet>
-					<div class="pt-6">
-						<AccountRevenue v-if="isAdmin" />
-					</div>
-				</template>
-			</UTabs>
+		<div class="container mx-auto px-4 sm:px-8 pt-28 pb-28 sm:pt-32 sm:pb-32">
+			<div v-show="activeTab === 0" class="pt-6">
+				<AccountBookings />
+			</div>
+			<div v-show="activeTab === 1" class="pt-6">
+				<AccountCredits />
+			</div>
+			<div v-show="activeTab === 2" class="pt-6">
+				<AccountDetails v-if="loggedInUser" />
+			</div>
+			<div v-show="activeTab === 3" class="pt-6">
+				<AccountLessons v-if="isAdmin && lessons && students" />
+			</div>
+			<div v-show="activeTab === 4" class="pt-6">
+				<AccountUsers v-if="isAdmin && students && loggedInUser" />
+			</div>
+			<div v-show="activeTab === 5" class="pt-6">
+				<AccountRevenue v-if="isAdmin" />
+			</div>
 		</div>
 
+		<AccountBottomNav :tabs="tabs" v-model="activeTab" />
 		<BookingModal v-model="showBookingModal" />
 	</div>
 </template>
