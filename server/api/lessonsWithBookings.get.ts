@@ -1,4 +1,4 @@
-import { gte, asc, eq } from 'drizzle-orm'
+import { gte, lt, asc, desc, eq } from 'drizzle-orm'
 import { lessons, bookings, students } from '../database/schema'
 
 export default defineEventHandler(async (event) => {
@@ -6,12 +6,23 @@ export default defineEventHandler(async (event) => {
     const db = useDB()
     const now = new Date()
 
-    const lessonRows = await db
+    const futureLessonRows = await db
         .select()
         .from(lessons)
         .where(gte(lessons.date, now))
         .orderBy(asc(lessons.date))
         .limit(100)
+
+    const [latestPastLesson] = await db
+        .select()
+        .from(lessons)
+        .where(lt(lessons.date, now))
+        .orderBy(desc(lessons.date))
+        .limit(1)
+
+    const lessonRows = latestPastLesson
+        ? [latestPastLesson, ...futureLessonRows]
+        : futureLessonRows
 
     const lessonIds = lessonRows.map(l => l.id)
     let bookingRows: any[] = []
