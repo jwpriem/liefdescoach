@@ -37,6 +37,8 @@ export default defineEventHandler(async (event) => {
 
     const student = rows[0]
 
+    console.log('[login] student found:', email, 'hasPasswordHash:', !!student.passwordHash)
+
     if (student.passwordHash) {
         // Password already migrated to Neon — verify directly
         const valid = await bcrypt.compare(password, student.passwordHash)
@@ -49,6 +51,7 @@ export default defineEventHandler(async (event) => {
         const config = useRuntimeConfig()
 
         const projectId = (config.public as any).project
+        console.log('[login] Appwrite fallback — projectId configured:', !!projectId)
         if (!projectId) {
             throw createError({ statusCode: 401, statusMessage: 'Verkeerde e-mailadres of wachtwoord. Probeer opnieuw.' })
         }
