@@ -1,5 +1,5 @@
 import { gte, lt, asc, desc, eq } from 'drizzle-orm'
-import { lessons, bookings, students } from '../database/schema'
+import { lessons, bookings, students, health } from '../database/schema'
 
 export default defineEventHandler(async (event) => {
     await requireAdmin(event)
@@ -35,9 +35,12 @@ export default defineEventHandler(async (event) => {
                 studentId: bookings.studentId,
                 studentName: students.name,
                 studentEmail: students.email,
+                studentInjury: health.injury,
+                studentPregnancy: health.pregnancy,
             })
             .from(bookings)
             .leftJoin(students, eq(bookings.studentId, students.id))
+            .leftJoin(health, eq(health.studentId, students.id))
             .where(inArray(bookings.lessonId, lessonIds))
     }
 
