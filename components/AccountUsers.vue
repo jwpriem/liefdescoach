@@ -176,14 +176,14 @@ const filteredRows = computed(() => {
 				</div>
 				<div>
 					<label class="block text-sm font-medium text-gray-300 mb-1.5">Gearchiveerd</label>
-					<USwitch v-model="state.showArchived" unchecked-icon="i-lucide-x"
-						checked-icon="i-lucide-check" />
+					<USwitch v-model="state.showArchived" unchecked-icon="i-lucide-x" checked-icon="i-lucide-check" />
 				</div>
 			</div>
 		</div>
 
 		<!-- Empty state -->
-		<div v-if="!filteredRows.length" class="rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-lg shadow-emerald-950/10 p-8 text-center text-gray-400">
+		<div v-if="!filteredRows.length"
+			class="rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-lg shadow-emerald-950/10 p-8 text-center text-gray-400">
 			Geen gebruikers gevonden voor "{{ q.trim() }}".
 		</div>
 
@@ -195,7 +195,7 @@ const filteredRows = computed(() => {
 					<span class="font-medium text-gray-100 flex items-center gap-2">
 						{{ row.name }}
 						<UTooltip v-if="row.health?.injury" :text="row.health.injury">
-							<UIcon name="i-lucide-bandage" class="w-5 h-5 text-red-500" />
+							<UIcon name="i-lucide-heart-pulse" class="w-5 h-5 text-red-500" />
 						</UTooltip>
 						<UTooltip v-if="row.health?.pregnancy" text="Zwanger">
 							<UIcon name="i-lucide-baby" class="w-5 h-5 text-pink-500" />
@@ -229,8 +229,8 @@ const filteredRows = computed(() => {
 					<UButton block color="primary" icon="i-lucide-archive" variant="soft" size="lg"
 						class="justify-center text-emerald-100 bg-emerald-500/10 hover:bg-emerald-500/20"
 						@click="archiveUser(row.$id)" />
-					<UButton :disabled="!row.phone" block color="primary"
-						icon="i-lucide-message-circle" variant="soft" size="lg"
+					<UButton :disabled="!row.phone" block color="primary" icon="i-lucide-message-circle-more"
+						variant="soft" size="lg"
 						class="justify-center text-emerald-100 bg-emerald-500/10 hover:bg-emerald-500/20 disabled:opacity-30 disabled:cursor-not-allowed"
 						@click="sendWhatsapp(row)" />
 				</div>
@@ -240,52 +240,53 @@ const filteredRows = computed(() => {
 		<!-- Desktop: table layout -->
 		<div
 			class="hidden md:block rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-2xl shadow-emerald-950/20 overflow-hidden">
-		<UTable v-if="filteredRows.length" :columns="columns" :data="filteredRows">
-			<template #name-cell="{ row }">
-				<div class="flex items-center gap-2">
-					<UButton variant="link" color="neutral" @click="navigateTo(`/admin/users/${row.original.$id}`)"
-						class="p-0 font-medium hover:text-emerald-400">
-						{{ row.original.name }}
-					</UButton>
-					<UTooltip v-if="row.original.health?.injury" :text="row.original.health.injury">
-						<UIcon name="i-lucide-bandage" class="w-5 h-5 text-red-500" />
-					</UTooltip>
-					<UTooltip v-if="row.original.health?.pregnancy" text="Zwanger">
-						<UIcon name="i-lucide-baby" class="w-5 h-5 text-pink-500" />
-					</UTooltip>
-				</div>
-			</template>
-			<template #credits-cell="{ row }">
-				{{ getAvailableCredits(row.original.$id) }}
-			</template>
-			<template #status-cell="{ row }">
-				<UBadge v-if="row.original.emailVerification" color="success" variant="subtle" size="xs">Geverifieerd</UBadge>
-				<UBadge v-else color="warning" variant="subtle" size="xs">Ongeverifieerd</UBadge>
-			</template>
-			<template #registration-cell="{ row }">
-				{{ $rav.formatDateInDutch(row.original.registration) }}
-			</template>
-			<template #actions-cell="{ row }">
-				<div class="flex items-center gap-x-1">
-					<UTooltip text="Bekijk details">
-						<UButton icon="i-lucide-eye" variant="ghost" size="sm" class="text-emerald-100"
-							@click="navigateTo(`/admin/users/${row.original.$id}`)" />
-					</UTooltip>
-					<UTooltip text="Voeg credits toe">
-						<UButton icon="i-lucide-plus" variant="ghost" size="sm" class="text-emerald-100"
-							@click="setUser(row.original)" />
-					</UTooltip>
-					<UTooltip text="Archiveer">
-						<UButton icon="i-lucide-archive" variant="ghost" size="sm"
-							class="text-emerald-100" @click="archiveUser(row.original.$id)" />
-					</UTooltip>
-					<UTooltip text="WhatsApp" v-if="row.original.phone">
-						<UButton icon="i-lucide-message-circle" variant="ghost" size="sm"
-							class="text-emerald-100" @click="sendWhatsapp(row.original)" />
-					</UTooltip>
-				</div>
-			</template>
-		</UTable>
+			<UTable v-if="filteredRows.length" :columns="columns" :data="filteredRows">
+				<template #name-cell="{ row }">
+					<div class="flex items-center gap-2">
+						<UButton variant="link" color="neutral" @click="navigateTo(`/admin/users/${row.original.$id}`)"
+							class="p-0 font-medium hover:text-emerald-400">
+							{{ row.original.name }}
+						</UButton>
+						<UTooltip v-if="row.original.health?.injury" :text="row.original.health.injury">
+							<UIcon name="i-lucide-heart-pulse" class="w-5 h-5 text-red-500" />
+						</UTooltip>
+						<UTooltip v-if="row.original.health?.pregnancy" text="Zwanger">
+							<UIcon name="i-lucide-baby" class="w-5 h-5 text-pink-500" />
+						</UTooltip>
+					</div>
+				</template>
+				<template #credits-cell="{ row }">
+					{{ getAvailableCredits(row.original.$id) }}
+				</template>
+				<template #status-cell="{ row }">
+					<UBadge v-if="row.original.emailVerification" color="success" variant="subtle" size="xs">
+						Geverifieerd</UBadge>
+					<UBadge v-else color="warning" variant="subtle" size="xs">Ongeverifieerd</UBadge>
+				</template>
+				<template #registration-cell="{ row }">
+					{{ $rav.formatDateInDutch(row.original.registration) }}
+				</template>
+				<template #actions-cell="{ row }">
+					<div class="flex items-center gap-x-1">
+						<UTooltip text="Bekijk details">
+							<UButton icon="i-lucide-eye" variant="ghost" size="sm" class="text-emerald-100"
+								@click="navigateTo(`/admin/users/${row.original.$id}`)" />
+						</UTooltip>
+						<UTooltip text="Voeg credits toe">
+							<UButton icon="i-lucide-plus" variant="ghost" size="sm" class="text-emerald-100"
+								@click="setUser(row.original)" />
+						</UTooltip>
+						<UTooltip text="Archiveer">
+							<UButton icon="i-lucide-archive" variant="ghost" size="sm" class="text-emerald-100"
+								@click="archiveUser(row.original.$id)" />
+						</UTooltip>
+						<UTooltip text="WhatsApp" v-if="row.original.phone">
+							<UButton icon="i-lucide-message-circle-more" variant="ghost" size="sm"
+								class="text-emerald-100" @click="sendWhatsapp(row.original)" />
+						</UTooltip>
+					</div>
+				</template>
+			</UTable>
 		</div>
 	</div>
 

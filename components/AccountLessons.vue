@@ -179,11 +179,12 @@ async function deleteManagedLesson(lesson: any) {
           <span class="emerald-underline text-emerald-900">Lessen</span><span class="text-emerald-700">.</span>
         </h2>
         <div class="flex flex-wrap items-center gap-3 mt-4 md:mt-0">
-          <UButton color="primary" variant="solid" size="lg" @click="state.createLesson = !state.createLesson">Voeg les
-            toe</UButton>
-          <UButton color="primary" variant="solid" size="lg" @click="state.bookForUser = !state.bookForUser">Maak
-            boeking voor gebruiker</UButton>
-          <UButton color="primary" variant="outline" size="lg" to="/archief">Archief</UButton>
+          <UButton color="primary" icon="i-lucide-graduation-cap" variant="solid" size="lg"
+            @click="state.createLesson = !state.createLesson">Nieuwe les</UButton>
+          <UButton color="primary" icon="i-lucide-calendar-plus" variant="solid" size="lg"
+            @click="state.bookForUser = !state.bookForUser">Maak
+            boeking</UButton>
+          <UButton color="primary" icon="i-lucide-archive" variant="outline" size="lg" to="/archief">Archief</UButton>
         </div>
       </div>
 
@@ -196,7 +197,7 @@ async function deleteManagedLesson(lesson: any) {
                 <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Les</span>
                 <span class="block text-gray-100 mt-0.5" v-html="$rav.getLessonDescription(lesson)"></span>
               </div>
-              <UButton icon="i-heroicons-cog-6-tooth-20-solid" variant="ghost" size="sm"
+              <UButton icon="i-lucide-settings" variant="ghost" size="md"
                 class="text-gray-400 hover:text-white -mt-1 -mr-2" @click="openManage(lesson)" />
             </div>
             <div>
@@ -209,12 +210,12 @@ async function deleteManagedLesson(lesson: any) {
               <div class="mt-1">
                 <span v-for="booking in getLessonBookingsWithLabels(lesson.bookings || [])" :key="booking.$id"
                   class="flex items-center gap-1 text-base text-gray-300">
-                  <span
-                    class="hover:text-emerald-400 transition-colors cursor-pointer"
+                  <span class="hover:text-emerald-400 transition-colors cursor-pointer"
                     @click="navigateTo(`/admin/users/${booking.students.$id}`)">
-                    {{ booking.students.name }}<span v-if="booking.isExtraSpot" class="text-emerald-400"> (extra plek)</span>
+                    {{ booking.students.name }}<span v-if="booking.isExtraSpot" class="text-emerald-400"> (extra
+                      plek)</span>
                   </span>
-                  <UIcon v-if="booking.students.injury" name="i-lucide-clipboard-plus"
+                  <UIcon v-if="booking.students.injury" name="i-lucide-heart-pulse"
                     class="w-4 h-4 text-red-500 flex-shrink-0 cursor-pointer hover:text-red-400 transition-colors"
                     @click="state.injuryPopup = { name: booking.students.name, injury: booking.students.injury }" />
                   <UTooltip v-if="booking.students.pregnancy" text="Zwanger">
@@ -236,7 +237,7 @@ async function deleteManagedLesson(lesson: any) {
         class="w-full max-w-md rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-2xl shadow-emerald-950/20 p-8">
         <div class="flex items-center justify-between mb-4">
           <div class="flex items-center gap-2">
-            <UIcon name="i-lucide-clipboard-plus" class="w-5 h-5 text-red-500" />
+            <UIcon name="i-lucide-heart-pulse" class="w-5 h-5 text-red-500" />
             <h2 class="text-xl font-bold text-emerald-100 tracking-tight">Blessure info</h2>
           </div>
           <UButton icon="i-lucide-x" color="gray" variant="ghost" size="sm" @click="state.injuryPopup = null" />
@@ -263,8 +264,8 @@ async function deleteManagedLesson(lesson: any) {
 
           <div v-if="state.addBookingLesson">
             <label class="block text-sm font-medium text-gray-300 mb-1.5">Gebruiker</label>
-            <USelectMenu icon="i-lucide-user" size="lg" color="primary" variant="outline"
-              v-model="state.addBookingUser" :items="computedStudents" class="w-full" value-key="value"
+            <USelectMenu icon="i-lucide-user" size="lg" color="primary" variant="outline" v-model="state.addBookingUser"
+              :items="computedStudents" class="w-full" value-key="value"
               :search-input="{ placeholder: 'Zoek gebruiker...' }" />
           </div>
 
@@ -286,8 +287,8 @@ async function deleteManagedLesson(lesson: any) {
             <h2 class="text-2xl font-bold text-emerald-100 tracking-tight">Les beheren</h2>
             <p class="text-gray-400 text-sm mt-1">{{ $rav.formatDateInDutch(managedLesson.date, true) }}</p>
           </div>
-          <UButton icon="i-heroicons-x-mark-20-solid" variant="ghost" size="sm" class="text-gray-400 hover:text-white -mt-1 -mr-2"
-            @click="closeManage()" />
+          <UButton icon="i-heroicons-x-mark-20-solid" variant="ghost" size="sm"
+            class="text-gray-400 hover:text-white -mt-1 -mr-2" @click="closeManage()" />
         </div>
 
         <div class="mb-6">
@@ -306,8 +307,7 @@ async function deleteManagedLesson(lesson: any) {
                 </UTooltip>
               </span>
               <UButton icon="i-heroicons-trash-20-solid" variant="ghost" size="xs"
-                class="text-red-400 hover:text-red-300"
-                @click="removeBooking(booking, managedLesson); closeManage()" />
+                class="text-red-400 hover:text-red-300" @click="removeBooking(booking, managedLesson); closeManage()" />
             </div>
           </div>
           <p v-else class="text-sm text-gray-500">Geen deelnemers.</p>
