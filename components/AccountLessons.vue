@@ -189,10 +189,11 @@ const computedStudents = computed(() => {
               <div class="mt-1">
                 <span v-for="booking in getLessonBookingsWithLabels(lesson.bookings || [])" :key="booking.$id"
                   class="flex items-center gap-1 text-sm text-gray-300">
-                  <NuxtLink :to="`/admin/users/${booking.students.$id}`"
-                    class="hover:text-emerald-400 transition-colors">
+                  <span
+                    class="hover:text-emerald-400 transition-colors cursor-pointer"
+                    @click="navigateTo(`/admin/users/${booking.students.$id}`)">
                     {{ booking.students.name }}<span v-if="booking.isExtraSpot" class="text-emerald-400"> (extra plek)</span>
-                  </NuxtLink>
+                  </span>
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                     stroke="currentColor"
                     class="cursor-pointer w-4 h-4 text-red-400 hover:text-red-300 transition-colors"

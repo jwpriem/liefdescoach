@@ -96,11 +96,12 @@ if (!isAdmin.value) {
                 <div class="space-y-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
                   <div v-for="booking in sortStudents(lesson.bookings || [])" :key="booking.$id"
                     class="flex items-center justify-between group/booking p-2 rounded hover:bg-gray-800/50 transition-colors">
-                    <NuxtLink :to="`/admin/users/${booking.students?.$id}`"
-                      class="text-sm text-gray-300 hover:text-emerald-400 transition-colors flex items-center gap-2">
+                    <span
+                      class="text-sm text-gray-300 hover:text-emerald-400 transition-colors flex items-center gap-2 cursor-pointer"
+                      @click="navigateTo(`/admin/users/${booking.students?.$id}`)">
                       <div class="w-1.5 h-1.5 rounded-full bg-emerald-500/50"></div>
                       {{ booking.students?.name || 'Onbekende gebruiker' }}
-                    </NuxtLink>
+                    </span>
                     <button @click="removeBooking(booking, lesson)" aria-label="Verwijder boeking"
                       class="opacity-0 group-hover/booking:opacity-100 p-1 hover:bg-red-500/10 rounded transition-all"
                       title="Verwijder boeking">
