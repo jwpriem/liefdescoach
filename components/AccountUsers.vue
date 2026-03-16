@@ -143,30 +143,23 @@ const filteredUsers = computed(() => {
 })
 
 const filteredRows = computed(() => {
-	if (!q.value) {
+	const normalized = q.value.trim().replace(/\s+/g, ' ')
+	if (!normalized) {
 		return filteredUsers.value
 	}
 
-	// ⚡ Bolt: Performance optimization
-	// 1. Move the `.toLowerCase()` calculation outside the filter loop so it only happens once.
-	// 2. Instead of iterating over `Object.values(x)` which checks every property (including IDs and internal data),
-	//    we specifically check only the relevant fields: name, email, and phone.
-	// This reduces the computational overhead significantly during search.
-	const searchTerm = q.value.toLowerCase();
+	const tokens = normalized.toLowerCase().split(' ')
 
 	return filteredUsers.value.filter((x) => {
-		return (
-			(x.name && x.name.toLowerCase().includes(searchTerm)) ||
-			(x.email && x.email.toLowerCase().includes(searchTerm)) ||
-			(x.phone && x.phone.toLowerCase().includes(searchTerm))
-		);
-	});
+		const searchable = [x.name, x.email, x.phone].filter(Boolean).join(' ').toLowerCase()
+		return tokens.every(token => searchable.includes(token))
+	})
 })
 
 </script>
 
 <template>
-	<div v-if="isAdmin && filteredRows.length">
+	<div v-if="isAdmin">
 		<h2 class="text-2xl md:text-4xl uppercase font-black mb-6">
 			<span class="emerald-underline text-emerald-900">Gebruikers ({{ filteredRows.length }})</span><span
 				class="text-emerald-700">.</span>
@@ -189,8 +182,13 @@ const filteredRows = computed(() => {
 			</div>
 		</div>
 
+		<!-- Empty state -->
+		<div v-if="!filteredRows.length" class="rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-lg shadow-emerald-950/10 p-8 text-center text-gray-400">
+			Geen gebruikers gevonden voor "{{ q.trim() }}".
+		</div>
+
 		<!-- Mobile: card layout -->
-		<div v-if="students.length" class="flex flex-col gap-y-3 md:hidden">
+		<div v-else class="flex flex-col gap-y-3 md:hidden">
 			<div v-for="row in filteredRows" :key="row.$id"
 				class="rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-lg shadow-emerald-950/10 p-4">
 				<div class="flex items-center justify-between mb-3">
@@ -238,12 +236,11 @@ const filteredRows = computed(() => {
 				</div>
 			</div>
 		</div>
-	</div>
 
-	<!-- Desktop: table layout -->
-	<div
-		class="hidden md:block rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-2xl shadow-emerald-950/20 overflow-hidden">
-		<UTable v-if="students.length" :columns="columns" :data="filteredRows">
+		<!-- Desktop: table layout -->
+		<div
+			class="hidden md:block rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-2xl shadow-emerald-950/20 overflow-hidden">
+		<UTable v-if="filteredRows.length" :columns="columns" :data="filteredRows">
 			<template #name-cell="{ row }">
 				<div class="flex items-center gap-2">
 					<UButton variant="link" :to="`/admin/users/${row.original.$id}`" color="neutral"
@@ -289,6 +286,7 @@ const filteredRows = computed(() => {
 				</div>
 			</template>
 		</UTable>
+		</div>
 	</div>
 
 	<!-- Modal: Add credits -->
