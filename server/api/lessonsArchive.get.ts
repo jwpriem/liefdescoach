@@ -1,17 +1,21 @@
-import { lte, asc, eq } from 'drizzle-orm'
+import { lte, gte, desc, eq, and } from 'drizzle-orm'
 import { lessons, bookings, students, health } from '../database/schema'
 
 export default defineEventHandler(async (event) => {
     await requireAdmin(event)
     const db = useDB()
-    const now = new Date()
+    const query = getQuery(event)
+
+    const toDate = query.to ? new Date(query.to as string) : new Date()
+    const fromDate = query.from
+        ? new Date(query.from as string)
+        : new Date(new Date().setMonth(new Date().getMonth() - 3))
 
     const lessonRows = await db
         .select()
         .from(lessons)
-        .where(lte(lessons.date, now))
-        .orderBy(asc(lessons.date))
-        .limit(100)
+        .where(and(gte(lessons.date, fromDate), lte(lessons.date, toDate)))
+        .orderBy(desc(lessons.date))
 
     const lessonIds = lessonRows.map(l => l.id)
     let bookingRows: any[] = []
