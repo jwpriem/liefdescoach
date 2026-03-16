@@ -103,8 +103,12 @@ async function removeBooking(booking, lesson) {
 
 const { sortStudents, getLessonBookingsWithLabels } = useLessonBookings()
 
+const futureLessons = computed(() =>
+  lessons.value.filter(l => dayjs(new Date(l.date)).isAfter(dayjs()))
+)
+
 const computedLessons = computed(() => {
-  return lessons.value.map(lesson => {
+  return futureLessons.value.map(lesson => {
     const bookingsLength = lesson.bookings?.length || 0
     const spots = 9 - bookingsLength
     const isFull = bookingsLength === 9
@@ -164,7 +168,7 @@ async function deleteManagedLesson(lesson: any) {
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div v-for="lesson in lessons" :key="lesson.$id"
+        <div v-for="lesson in futureLessons" :key="lesson.$id"
           class="rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-2xl shadow-emerald-950/20 p-6">
           <div class="space-y-3">
             <div class="flex items-start justify-between">
