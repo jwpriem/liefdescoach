@@ -194,6 +194,12 @@ const computedStudents = computed(() => {
                     @click="navigateTo(`/admin/users/${booking.students.$id}`)">
                     {{ booking.students.name }}<span v-if="booking.isExtraSpot" class="text-emerald-400"> (extra plek)</span>
                   </span>
+                  <UTooltip v-if="booking.students.injury" :text="booking.students.injury">
+                    <UIcon name="i-heroicons-plus-circle-20-solid" class="w-4 h-4 text-red-500 flex-shrink-0" />
+                  </UTooltip>
+                  <UTooltip v-if="booking.students.pregnancy" text="Zwanger">
+                    <UIcon name="i-heroicons-sparkles-20-solid" class="w-4 h-4 text-pink-500 flex-shrink-0" />
+                  </UTooltip>
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                     stroke="currentColor"
                     class="cursor-pointer w-4 h-4 text-red-400 hover:text-red-300 transition-colors"

@@ -95,7 +95,7 @@ export function nestLessonsWithBookings(
       $id: b.id,
       lessons: b.lessonId,
       students: includeStudents && b.studentName
-        ? { $id: b.studentId, name: b.studentName, email: b.studentEmail }
+        ? { $id: b.studentId, name: b.studentName, email: b.studentEmail, injury: b.studentInjury ?? null, pregnancy: b.studentPregnancy ?? false }
         : b.studentId,
     }
     bookingsByLesson.get(lessonId)!.push(booking)

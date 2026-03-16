@@ -195,10 +195,10 @@ const filteredRows = computed(() => {
 					<span class="font-medium text-gray-100 flex items-center gap-2">
 						{{ row.name }}
 						<UTooltip v-if="row.health?.injury" :text="row.health.injury">
-							<UIcon name="i-heroicons-exclamation-triangle-20-solid" class="w-5 h-5 text-red-500" />
+							<UIcon name="i-heroicons-plus-circle-20-solid" class="w-5 h-5 text-red-500" />
 						</UTooltip>
 						<UTooltip v-if="row.health?.pregnancy" text="Zwanger">
-							<UIcon name="i-heroicons-heart-20-solid" class="w-5 h-5 text-pink-500" />
+							<UIcon name="i-heroicons-sparkles-20-solid" class="w-5 h-5 text-pink-500" />
 						</UTooltip>
 					</span>
 					<span class="text-emerald-400 text-sm font-medium">{{ getAvailableCredits(row.$id) }} credits</span>
@@ -248,10 +248,10 @@ const filteredRows = computed(() => {
 						{{ row.original.name }}
 					</UButton>
 					<UTooltip v-if="row.original.health?.injury" :text="row.original.health.injury">
-						<UIcon name="i-heroicons-exclamation-triangle-20-solid" class="w-5 h-5 text-red-500" />
+						<UIcon name="i-heroicons-plus-circle-20-solid" class="w-5 h-5 text-red-500" />
 					</UTooltip>
 					<UTooltip v-if="row.original.health?.pregnancy" text="Zwanger">
-						<UIcon name="i-heroicons-heart-20-solid" class="w-5 h-5 text-pink-500" />
+						<UIcon name="i-heroicons-sparkles-20-solid" class="w-5 h-5 text-pink-500" />
 					</UTooltip>
 				</div>
 			</template>
