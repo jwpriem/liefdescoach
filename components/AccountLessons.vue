@@ -108,7 +108,7 @@ const futureLessons = computed(() =>
 )
 
 const computedLessons = computed(() => {
-  return futureLessons.value.map(lesson => {
+  return lessons.value.map(lesson => {
     const bookingsLength = lesson.bookings?.length || 0
     const spots = 9 - bookingsLength
     const isFull = bookingsLength === 9
