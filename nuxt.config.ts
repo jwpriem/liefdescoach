@@ -63,7 +63,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
   // Plugins to run before rendering page
   plugins: [
-    '~/plugins/rav'
+    '~/plugins/rav',
+    '~/plugins/ios26-history-patch.client',
   ],
 
   modules: [
