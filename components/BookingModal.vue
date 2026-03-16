@@ -29,7 +29,7 @@ async function book(lesson: any) {
     toast.add({
       id: 'booking',
       title: 'Tot snel',
-      icon: 'i-heroicons-check-badge',
+      icon: 'i-lucide-badge-check',
       color: 'primary',
       description: 'Je les is geboekt!'
     })

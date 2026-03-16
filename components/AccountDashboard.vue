@@ -56,7 +56,7 @@ function askQuestion() {
             <p class="text-sm text-emerald-300/80 mt-1 capitalize">{{ $rav.formatDateInDutch(nextBooking.lessons.date, true) }}</p>
           </div>
           <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-emerald-500/20 shrink-0">
-            <UIcon name="i-heroicons-calendar-days" class="size-6 text-emerald-400" />
+            <UIcon name="i-lucide-calendar-days" class="size-6 text-emerald-400" />
           </div>
         </div>
       </div>
@@ -75,7 +75,7 @@ function askQuestion() {
           color="primary"
           variant="solid"
           size="sm"
-          icon="i-heroicons-plus-20-solid"
+          icon="i-lucide-plus"
           @click="openBookingModal()"
         >
           Boek
@@ -85,7 +85,7 @@ function askQuestion() {
           color="primary"
           variant="outline"
           size="sm"
-          icon="i-heroicons-shopping-cart-20-solid"
+          icon="i-lucide-shopping-cart"
           @click="showBuyCredits = true"
         >
           Credits
@@ -99,7 +99,7 @@ function askQuestion() {
       <div class="rounded-2xl border border-gray-800/80 bg-gray-950/50 backdrop-blur-sm p-4">
         <div class="flex items-center gap-3">
           <div class="flex items-center justify-center w-9 h-9 rounded-xl bg-emerald-500/15 shrink-0">
-            <UIcon name="i-heroicons-calendar-days" class="size-5 text-emerald-400" />
+            <UIcon name="i-lucide-calendar-days" class="size-5 text-emerald-400" />
           </div>
           <div class="min-w-0">
             <span class="text-xs text-gray-400 block">Boekingen</span>
@@ -114,7 +114,7 @@ function askQuestion() {
       <div class="rounded-2xl border border-gray-800/80 bg-gray-950/50 backdrop-blur-sm p-4">
         <div class="flex items-center gap-3">
           <div class="flex items-center justify-center w-9 h-9 rounded-xl bg-emerald-500/15 shrink-0">
-            <UIcon name="i-heroicons-credit-card" class="size-5 text-emerald-400" />
+            <UIcon name="i-lucide-credit-card" class="size-5 text-emerald-400" />
           </div>
           <div class="min-w-0">
             <span class="text-xs text-gray-400 block">Credits</span>
@@ -133,7 +133,7 @@ function askQuestion() {
         @click="askQuestion"
       >
         <div class="flex items-center justify-center w-9 h-9 rounded-xl bg-emerald-500/15 shrink-0">
-          <UIcon name="i-heroicons-chat-bubble-left-ellipsis" class="size-5 text-emerald-400" />
+          <UIcon name="i-lucide-message-circle-more" class="size-5 text-emerald-400" />
         </div>
         <div class="min-w-0">
           <span class="text-xs text-gray-400 block">Hulp nodig?</span>
@@ -146,7 +146,7 @@ function askQuestion() {
         @click="showBuyCredits = true"
       >
         <div class="flex items-center justify-center w-9 h-9 rounded-xl bg-emerald-500/15 shrink-0">
-          <UIcon name="i-heroicons-shopping-cart" class="size-5 text-emerald-400" />
+          <UIcon name="i-lucide-shopping-cart" class="size-5 text-emerald-400" />
         </div>
         <div class="min-w-0">
           <span class="text-xs text-gray-400 block">Meer lessen?</span>

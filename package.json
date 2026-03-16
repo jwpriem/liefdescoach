@@ -42,6 +42,7 @@
     "vue-chartjs": "^5.3.3"
   },
   "devDependencies": {
+    "@iconify-json/lucide": "^1.2.27",
     "@nuxt/fonts": "^0.11.0",
     "@nuxt/image": "^2.0.0",
     "@playwright/test": "^1.58.1",

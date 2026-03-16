@@ -151,7 +151,7 @@ async function requestVerification() {
       title: 'Verificatie verzonden',
       description: 'Check je e-mailinbox (en spam) voor de verificatielink.',
       color: 'success',
-      icon: 'i-heroicons-paper-airplane'
+      icon: 'i-lucide-send'
     })
   } catch (e) {
     verificationSent.value = false

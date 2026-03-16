@@ -36,13 +36,13 @@ onMounted(async () => {
             class="w-full max-w-md p-8 rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm text-center">
 
             <div v-if="verifying" class="py-8">
-                <UIcon name="i-heroicons-arrow-path" class="w-12 h-12 text-emerald-500 animate-spin mx-auto mb-4" />
+                <UIcon name="i-lucide-refresh-cw" class="w-12 h-12 text-emerald-500 animate-spin mx-auto mb-4" />
                 <h2 class="text-xl font-bold text-white mb-2">Verifiëren...</h2>
                 <p class="text-gray-400">Een moment geduld aub.</p>
             </div>
 
             <div v-else-if="success" class="py-8">
-                <UIcon name="i-heroicons-check-circle" class="w-16 h-16 text-emerald-500 mx-auto mb-4" />
+                <UIcon name="i-lucide-check-circle" class="w-16 h-16 text-emerald-500 mx-auto mb-4" />
                 <h2 class="text-2xl font-bold text-white mb-2">E-mail geverifieerd!</h2>
                 <p class="text-gray-300 mb-6">Je e-mailadres is succesvol bevestigd. Je wordt nu doorgestuurd naar je
                     account.</p>
@@ -50,7 +50,7 @@ onMounted(async () => {
             </div>
 
             <div v-else class="py-8">
-                <UIcon name="i-heroicons-x-circle" class="w-16 h-16 text-red-500 mx-auto mb-4" />
+                <UIcon name="i-lucide-x-circle" class="w-16 h-16 text-red-500 mx-auto mb-4" />
                 <h2 class="text-xl font-bold text-white mb-2">Verificatie mislukt</h2>
                 <p class="text-gray-300 mb-6">{{ error }}</p>
                 <UButton to="/contact" color="neutral" variant="solid" block>Neem contact op</UButton>

@@ -42,7 +42,7 @@ function getCreditBadgeColor(credit: any): string {
         </div>
       </div>
 
-      <UButton color="primary" variant="outline" size="lg" icon="i-heroicons-shopping-cart-20-solid" @click="showBuyCredits = true">
+      <UButton color="primary" variant="outline" size="lg" icon="i-lucide-shopping-cart" @click="showBuyCredits = true">
         Koop credits
       </UButton>
     </div>
