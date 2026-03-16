@@ -94,12 +94,15 @@ const tabs = computed<TabsItem[]>(() => {
 			icon: 'i-heroicons-credit-card',
 			slot: 'credits' as const,
 		},
-		{
+	)
+
+	if (!isAdmin.value) {
+		items.push({
 			label: 'Mijn gegevens',
 			icon: 'i-heroicons-user-circle',
 			slot: 'gegevens' as const,
-		},
-	)
+		})
+	}
 
 	if (isAdmin.value) {
 		items.push(
