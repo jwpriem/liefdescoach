@@ -41,8 +41,16 @@ const isLoading = computed(() => store.isLoading);
 const showBookingModal = ref(false)
 provide('openBookingModal', () => showBookingModal.value = true)
 
+const route = useRoute()
 const activeTab = ref(0)
 const currentSlot = computed(() => tabs.value[activeTab.value]?.slot)
+
+onMounted(() => {
+  if (route.query.tab) {
+    const idx = tabs.value.findIndex(t => t.slot === route.query.tab)
+    if (idx !== -1) activeTab.value = idx
+  }
+})
 
 // Swipe gesture navigation between tabs
 const touchStartX = ref(0)

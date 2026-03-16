@@ -83,7 +83,10 @@ const tabs: TabsItem[] = [
   { label: 'Studenten', icon: 'i-lucide-users', slot: 'gebruikers' as const },
   { label: 'Omzet', icon: 'i-lucide-bar-chart-2', slot: 'omzet' as const },
 ]
-watch(activeTab, () => navigateTo('/account'))
+watch(activeTab, (newVal) => {
+  const slot = tabs[newVal]?.slot
+  navigateTo(slot ? `/account?tab=${slot}` : '/account')
+})
 </script>
 
 <template>
@@ -100,7 +103,7 @@ watch(activeTab, () => navigateTo('/account'))
             class="text-2xl md:text-3xl font-bold bg-gradient-to-r from-emerald-400 to-teal-500 bg-clip-text text-transparent uppercase tracking-wide">
             Lessen Archief
           </h2>
-          <UButton color="primary" icon="i-lucide-arrow-left" variant="outline" size="lg" to="/account"
+          <UButton color="primary" icon="i-lucide-arrow-left" variant="outline" size="lg" to="/account?tab=admin-lessen"
             class="mt-4 md:mt-0">
             Terug
           </UButton>
