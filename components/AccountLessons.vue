@@ -153,6 +153,21 @@ const computedStudents = computed(() => {
     }
   })
 })
+
+const managedLesson = ref<any>(null)
+
+function openManage(lesson: any) {
+  managedLesson.value = lesson
+}
+
+function closeManage() {
+  managedLesson.value = null
+}
+
+async function deleteManagedLesson(lesson: any) {
+  closeManage()
+  await store.deleteLesson(lesson.$id)
+}
 </script>
 
 <template>
@@ -175,9 +190,13 @@ const computedStudents = computed(() => {
         <div v-for="lesson in lessons" :key="lesson.$id"
           class="rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-2xl shadow-emerald-950/20 p-6">
           <div class="space-y-3">
-            <div>
-              <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Les</span>
-              <span class="block text-gray-100 mt-0.5" v-html="$rav.getLessonDescription(lesson)"></span>
+            <div class="flex items-start justify-between">
+              <div>
+                <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Les</span>
+                <span class="block text-gray-100 mt-0.5" v-html="$rav.getLessonDescription(lesson)"></span>
+              </div>
+              <UButton icon="i-heroicons-cog-6-tooth-20-solid" variant="ghost" size="sm"
+                class="text-gray-400 hover:text-white -mt-1 -mr-2" @click="openManage(lesson)" />
             </div>
             <div>
               <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Datum</span>
@@ -200,13 +219,6 @@ const computedStudents = computed(() => {
                   <UTooltip v-if="booking.students.pregnancy" text="Zwanger">
                     <UIcon name="i-heroicons-sparkles-20-solid" class="w-4 h-4 text-pink-500 flex-shrink-0" />
                   </UTooltip>
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                    stroke="currentColor"
-                    class="cursor-pointer w-4 h-4 text-red-400 hover:text-red-300 transition-colors"
-                    @click="removeBooking(booking, lesson)">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                      d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m6 4.125 2.25 2.25m0 0 2.25 2.25M12 13.875l2.25-2.25M12 13.875l-2.25 2.25M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
-                  </svg>
                 </span>
                 <span v-if="!lesson.bookings?.length" class="text-sm text-gray-500">Geen boekingen</span>
               </div>
@@ -243,6 +255,51 @@ const computedStudents = computed(() => {
               :disabled="!state.addBookingUser && !state.addBookingLesson">Voeg toe</UButton>
             <UButton color="primary" variant="outline" size="lg" @click="cancel()">Annuleer</UButton>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Manage lesson -->
+    <div v-if="managedLesson" class="fixed inset-0 bg-black/75 flex justify-center items-center z-50 p-4">
+      <div
+        class="w-full max-w-lg max-h-[75vh] overflow-y-auto rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-2xl shadow-emerald-950/20 p-8 sm:p-10">
+        <div class="flex items-start justify-between mb-6">
+          <div>
+            <h2 class="text-2xl font-bold text-emerald-100 tracking-tight">Les beheren</h2>
+            <p class="text-gray-400 text-sm mt-1">{{ $rav.formatDateInDutch(managedLesson.date, true) }}</p>
+          </div>
+          <UButton icon="i-heroicons-x-mark-20-solid" variant="ghost" size="sm" class="text-gray-400 hover:text-white -mt-1 -mr-2"
+            @click="closeManage()" />
+        </div>
+
+        <div class="mb-6">
+          <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Deelnemer verwijderen</h3>
+          <div v-if="managedLesson.bookings?.length" class="flex flex-col gap-2">
+            <div v-for="booking in getLessonBookingsWithLabels(managedLesson.bookings)" :key="booking.$id"
+              class="flex items-center justify-between rounded-xl bg-gray-900/60 border border-gray-800/50 px-4 py-2.5">
+              <span class="flex items-center gap-2 text-sm text-gray-200">
+                {{ booking.students.name }}
+                <span v-if="booking.isExtraSpot" class="text-emerald-400 text-xs">(extra plek)</span>
+                <UTooltip v-if="booking.students.injury" :text="booking.students.injury">
+                  <UIcon name="i-heroicons-plus-circle-20-solid" class="w-4 h-4 text-red-500" />
+                </UTooltip>
+                <UTooltip v-if="booking.students.pregnancy" text="Zwanger">
+                  <UIcon name="i-heroicons-sparkles-20-solid" class="w-4 h-4 text-pink-500" />
+                </UTooltip>
+              </span>
+              <UButton icon="i-heroicons-trash-20-solid" variant="ghost" size="xs"
+                class="text-red-400 hover:text-red-300"
+                @click="removeBooking(booking, managedLesson); closeManage()" />
+            </div>
+          </div>
+          <p v-else class="text-sm text-gray-500">Geen deelnemers.</p>
+        </div>
+
+        <div class="border-t border-gray-800/50 pt-6">
+          <UButton color="error" variant="soft" icon="i-heroicons-trash-20-solid"
+            @click="deleteManagedLesson(managedLesson)">
+            Les verwijderen
+          </UButton>
         </div>
       </div>
     </div>

@@ -446,6 +446,13 @@ export const useMainStore = defineStore('main', {
             });
         },
 
+        async deleteLesson(lessonId: string) {
+            await this.fetchWrapper(async () => {
+                await $fetch('/api/deleteLesson', { method: 'POST', body: { lessonId } })
+                await this.getLessons()
+            })
+        },
+
         async sendEmail(type: string, lessonId: string) {
             const user = await this.getOnBehalfOrUser()
 
