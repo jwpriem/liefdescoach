@@ -6,6 +6,7 @@ const { $rav } = useNuxtApp()
 const open = defineModel<boolean>({ default: false })
 
 const lessons = computed(() => store.lessons)
+const futureLessons = computed(() => lessons.value.filter(l => $rav.isFutureBooking(l.date)))
 const availableCredits = computed(() => store.availableCredits)
 
 function checkBooking(id: string) {
@@ -75,8 +76,8 @@ onMounted(() => {
       </div>
 
       <!-- Lessons list -->
-      <div v-if="lessons.length" class="flex flex-col gap-y-3">
-        <div v-for="lesson in lessons" :key="lesson.$id"
+      <div v-if="futureLessons.length" class="flex flex-col gap-y-3">
+        <div v-for="lesson in futureLessons" :key="lesson.$id"
           class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-gray-800/50 p-4 transition-colors"
           :class="checkBooking(lesson.$id) ? 'bg-emerald-500/5' : 'bg-gray-900/30'">
 
