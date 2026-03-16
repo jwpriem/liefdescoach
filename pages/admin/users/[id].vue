@@ -61,7 +61,7 @@ function formatEuro(value: number) {
         <div v-if="user" class="container mx-auto px-4 sm:px-8 pt-28 pb-12 sm:pt-32 sm:pb-20">
 
             <!-- Back button -->
-            <UButton @click="navigateTo('/account')" icon="i-heroicons-arrow-left-20-solid" variant="ghost"
+            <UButton @click="navigateTo('/account')" icon="i-lucide-arrow-left" variant="ghost"
                 class="mb-6 text-gray-400 hover:text-white">
                 Terug naar overzicht
             </UButton>
@@ -107,7 +107,7 @@ function formatEuro(value: number) {
             </div>
         </div>
         <div v-else class="flex justify-center pt-40">
-            <UIcon name="i-heroicons-arrow-path-20-solid" class="animate-spin text-emerald-500 w-8 h-8" />
+            <UIcon name="i-lucide-refresh-cw" class="animate-spin text-emerald-500 w-8 h-8" />
         </div>
     </div>
 </template>

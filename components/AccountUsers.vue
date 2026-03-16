@@ -81,7 +81,7 @@ async function migrateCredits(): Promise<void> {
 		await store.getUser()
 		toast.add({
 			title: 'Migratie voltooid',
-			icon: 'i-heroicons-check-badge',
+			icon: 'i-lucide-badge-check',
 			color: 'success',
 			description: `${res.totalMigrated} credits gemigreerd, ${res.totalSkipped} overgeslagen.`
 		})
@@ -89,7 +89,7 @@ async function migrateCredits(): Promise<void> {
 		console.error('Migration failed:', error)
 		toast.add({
 			title: 'Migratie mislukt',
-			icon: 'i-heroicons-x-circle',
+			icon: 'i-lucide-x-circle',
 			color: 'error',
 			description: 'Er ging iets mis bij het migreren van credits.'
 		})
@@ -121,7 +121,7 @@ async function sendWhatsapp(user) {
 	} else {
 		toast.add({
 			title: 'Geen telefoonnummer',
-			icon: 'i-heroicons-x-circle',
+			icon: 'i-lucide-x-circle',
 			color: 'error',
 			description: 'Helaas heeft deze gebruiker geen telefoonnummer in het account.'
 		})
@@ -176,8 +176,8 @@ const filteredRows = computed(() => {
 				</div>
 				<div>
 					<label class="block text-sm font-medium text-gray-300 mb-1.5">Gearchiveerd</label>
-					<USwitch v-model="state.showArchived" unchecked-icon="i-heroicons-x-mark-20-solid"
-						checked-icon="i-heroicons-check-20-solid" />
+					<USwitch v-model="state.showArchived" unchecked-icon="i-lucide-x"
+						checked-icon="i-lucide-check" />
 				</div>
 			</div>
 		</div>
@@ -195,10 +195,10 @@ const filteredRows = computed(() => {
 					<span class="font-medium text-gray-100 flex items-center gap-2">
 						{{ row.name }}
 						<UTooltip v-if="row.health?.injury" :text="row.health.injury">
-							<UIcon name="i-heroicons-plus-circle-20-solid" class="w-5 h-5 text-red-500" />
+							<UIcon name="i-lucide-bandage" class="w-5 h-5 text-red-500" />
 						</UTooltip>
 						<UTooltip v-if="row.health?.pregnancy" text="Zwanger">
-							<UIcon name="i-heroicons-sparkles-20-solid" class="w-5 h-5 text-pink-500" />
+							<UIcon name="i-lucide-baby" class="w-5 h-5 text-pink-500" />
 						</UTooltip>
 					</span>
 					<span class="text-emerald-400 text-sm font-medium">{{ getAvailableCredits(row.$id) }} credits</span>
@@ -220,17 +220,17 @@ const filteredRows = computed(() => {
 					</div>
 				</div>
 				<div class="grid grid-cols-4 gap-2 border-t border-gray-800/50 pt-3 mt-3">
-					<UButton block color="primary" icon="i-heroicons-eye-20-solid" variant="soft" size="lg"
+					<UButton block color="primary" icon="i-lucide-eye" variant="soft" size="lg"
 						class="justify-center text-emerald-100 bg-emerald-500/10 hover:bg-emerald-500/20"
 						@click="navigateTo(`/admin/users/${row.$id}`)" />
-					<UButton block color="primary" icon="i-heroicons-plus-20-solid" variant="soft" size="lg"
+					<UButton block color="primary" icon="i-lucide-plus" variant="soft" size="lg"
 						class="justify-center text-emerald-100 bg-emerald-500/10 hover:bg-emerald-500/20"
 						@click="setUser(row)" />
-					<UButton block color="primary" icon="i-heroicons-archive-box-20-solid" variant="soft" size="lg"
+					<UButton block color="primary" icon="i-lucide-archive" variant="soft" size="lg"
 						class="justify-center text-emerald-100 bg-emerald-500/10 hover:bg-emerald-500/20"
 						@click="archiveUser(row.$id)" />
 					<UButton :disabled="!row.phone" block color="primary"
-						icon="i-heroicons-chat-bubble-bottom-center-text-20-solid" variant="soft" size="lg"
+						icon="i-lucide-message-circle" variant="soft" size="lg"
 						class="justify-center text-emerald-100 bg-emerald-500/10 hover:bg-emerald-500/20 disabled:opacity-30 disabled:cursor-not-allowed"
 						@click="sendWhatsapp(row)" />
 				</div>
@@ -248,10 +248,10 @@ const filteredRows = computed(() => {
 						{{ row.original.name }}
 					</UButton>
 					<UTooltip v-if="row.original.health?.injury" :text="row.original.health.injury">
-						<UIcon name="i-heroicons-plus-circle-20-solid" class="w-5 h-5 text-red-500" />
+						<UIcon name="i-lucide-bandage" class="w-5 h-5 text-red-500" />
 					</UTooltip>
 					<UTooltip v-if="row.original.health?.pregnancy" text="Zwanger">
-						<UIcon name="i-heroicons-sparkles-20-solid" class="w-5 h-5 text-pink-500" />
+						<UIcon name="i-lucide-baby" class="w-5 h-5 text-pink-500" />
 					</UTooltip>
 				</div>
 			</template>
@@ -268,19 +268,19 @@ const filteredRows = computed(() => {
 			<template #actions-cell="{ row }">
 				<div class="flex items-center gap-x-1">
 					<UTooltip text="Bekijk details">
-						<UButton icon="i-heroicons-eye-20-solid" variant="ghost" size="sm" class="text-emerald-100"
+						<UButton icon="i-lucide-eye" variant="ghost" size="sm" class="text-emerald-100"
 							@click="navigateTo(`/admin/users/${row.original.$id}`)" />
 					</UTooltip>
 					<UTooltip text="Voeg credits toe">
-						<UButton icon="i-heroicons-plus-20-solid" variant="ghost" size="sm" class="text-emerald-100"
+						<UButton icon="i-lucide-plus" variant="ghost" size="sm" class="text-emerald-100"
 							@click="setUser(row.original)" />
 					</UTooltip>
 					<UTooltip text="Archiveer">
-						<UButton icon="i-heroicons-archive-box-20-solid" variant="ghost" size="sm"
+						<UButton icon="i-lucide-archive" variant="ghost" size="sm"
 							class="text-emerald-100" @click="archiveUser(row.original.$id)" />
 					</UTooltip>
 					<UTooltip text="WhatsApp" v-if="row.original.phone">
-						<UButton icon="i-heroicons-chat-bubble-bottom-center-text-20-solid" variant="ghost" size="sm"
+						<UButton icon="i-lucide-message-circle" variant="ghost" size="sm"
 							class="text-emerald-100" @click="sendWhatsapp(row.original)" />
 					</UTooltip>
 				</div>

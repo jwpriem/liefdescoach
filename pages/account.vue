@@ -78,7 +78,7 @@ const tabs = computed<TabsItem[]>(() => {
 	if (!isAdmin.value) {
 		items.push({
 			label: 'Dashboard',
-			icon: 'i-heroicons-home',
+			icon: 'i-lucide-house',
 			slot: 'dashboard' as const,
 		})
 	}
@@ -86,12 +86,12 @@ const tabs = computed<TabsItem[]>(() => {
 	items.push(
 		{
 			label: 'Boekingen',
-			icon: 'i-heroicons-calendar-days',
+			icon: 'i-lucide-calendar-days',
 			slot: 'lessen' as const,
 		},
 		{
 			label: 'Credits',
-			icon: 'i-heroicons-credit-card',
+			icon: 'i-lucide-credit-card',
 			slot: 'credits' as const,
 		},
 	)
@@ -99,7 +99,7 @@ const tabs = computed<TabsItem[]>(() => {
 	if (!isAdmin.value) {
 		items.push({
 			label: 'Mijn gegevens',
-			icon: 'i-heroicons-user-circle',
+			icon: 'i-lucide-circle-user',
 			slot: 'gegevens' as const,
 		})
 	}
@@ -108,17 +108,17 @@ const tabs = computed<TabsItem[]>(() => {
 		items.push(
 			{
 				label: 'Lessen',
-				icon: 'i-heroicons-academic-cap',
+				icon: 'i-lucide-graduation-cap',
 				slot: 'admin-lessen' as const,
 			},
 			{
 				label: 'Studenten',
-				icon: 'i-heroicons-users',
+				icon: 'i-lucide-users',
 				slot: 'gebruikers' as const,
 			},
 			{
 				label: 'Omzet',
-				icon: 'i-heroicons-chart-bar',
+				icon: 'i-lucide-bar-chart-2',
 				slot: 'omzet' as const,
 			},
 		)

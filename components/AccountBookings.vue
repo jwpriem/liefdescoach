@@ -63,10 +63,10 @@ async function bookExtraSpot(lesson: any) {
         </div>
       </div>
 
-      <UButton v-if="availableCredits > 0" color="primary" variant="solid" size="lg" icon="i-heroicons-plus-20-solid" @click="openBookingModal()">
+      <UButton v-if="availableCredits > 0" color="primary" variant="solid" size="lg" icon="i-lucide-plus" @click="openBookingModal()">
         Boek een les
       </UButton>
-      <UButton v-else to="/tarieven" color="primary" variant="outline" size="lg" icon="i-heroicons-shopping-cart-20-solid">
+      <UButton v-else to="/tarieven" color="primary" variant="outline" size="lg" icon="i-lucide-shopping-cart">
         Koop credits
       </UButton>
     </div>
@@ -127,10 +127,10 @@ async function bookExtraSpot(lesson: any) {
         <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
       </svg>
       <p class="text-gray-400 mb-4">Je hebt nog geen boekingen</p>
-      <UButton v-if="availableCredits > 0" color="primary" variant="solid" icon="i-heroicons-plus-20-solid" @click="openBookingModal()">
+      <UButton v-if="availableCredits > 0" color="primary" variant="solid" icon="i-lucide-plus" @click="openBookingModal()">
         Boek je eerste les
       </UButton>
-      <UButton v-else to="/tarieven" color="primary" variant="outline" icon="i-heroicons-shopping-cart-20-solid">
+      <UButton v-else to="/tarieven" color="primary" variant="outline" icon="i-lucide-shopping-cart">
         Koop credits om te boeken
       </UButton>
     </div>

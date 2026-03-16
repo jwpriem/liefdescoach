@@ -189,7 +189,7 @@ watch([dateFrom, dateTo, selectedBucket], fetchRevenue)
     <!-- Chart -->
     <div class="rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-2xl shadow-emerald-950/20 p-4 sm:p-6" style="height: 350px; position: relative;">
       <div v-if="loading" class="absolute inset-0 flex items-center justify-center">
-        <UIcon name="i-heroicons-arrow-path-20-solid" class="w-6 h-6 text-emerald-500 animate-spin" />
+        <UIcon name="i-lucide-refresh-cw" class="w-6 h-6 text-emerald-500 animate-spin" />
       </div>
       <Line v-else-if="chartData.labels.length" :data="chartData" :options="chartOptions" />
       <div v-else class="flex items-center justify-center h-full text-gray-500">

@@ -195,10 +195,10 @@ const computedStudents = computed(() => {
                     {{ booking.students.name }}<span v-if="booking.isExtraSpot" class="text-emerald-400"> (extra plek)</span>
                   </span>
                   <UTooltip v-if="booking.students.injury" :text="booking.students.injury">
-                    <UIcon name="i-heroicons-plus-circle-20-solid" class="w-4 h-4 text-red-500 flex-shrink-0" />
+                    <UIcon name="i-lucide-bandage" class="w-4 h-4 text-red-500 flex-shrink-0" />
                   </UTooltip>
                   <UTooltip v-if="booking.students.pregnancy" text="Zwanger">
-                    <UIcon name="i-heroicons-sparkles-20-solid" class="w-4 h-4 text-pink-500 flex-shrink-0" />
+                    <UIcon name="i-lucide-baby" class="w-4 h-4 text-pink-500 flex-shrink-0" />
                   </UTooltip>
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                     stroke="currentColor"
@@ -226,14 +226,14 @@ const computedStudents = computed(() => {
 
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-1.5">Les</label>
-            <USelectMenu icon="i-heroicons-academic-cap-20-solid" size="lg" color="primary" variant="outline"
+            <USelectMenu icon="i-lucide-graduation-cap" size="lg" color="primary" variant="outline"
               v-model="state.addBookingLesson" :items="computedLessons" class="w-full" value-key="value"
               :search-input="false" />
           </div>
 
           <div v-if="state.addBookingLesson">
             <label class="block text-sm font-medium text-gray-300 mb-1.5">Gebruiker</label>
-            <USelectMenu icon="i-heroicons-user-20-solid" size="lg" color="primary" variant="outline"
+            <USelectMenu icon="i-lucide-user" size="lg" color="primary" variant="outline"
               v-model="state.addBookingUser" :items="computedStudents" class="w-full" value-key="value"
               :search-input="{ placeholder: 'Zoek gebruiker...' }" />
           </div>
@@ -258,7 +258,7 @@ const computedStudents = computed(() => {
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-1.5">Datum</label>
             <UPopover class="w-full">
-              <UButton icon="i-heroicons-calendar-days-20-solid" size="lg"
+              <UButton icon="i-lucide-calendar-days" size="lg"
                 :label="dayjs(state.createLessonDate).format('D MMM, YYYY')" color="primary" variant="outline"
                 class="w-full justify-between" />
               <template #content="{ close }">
@@ -270,23 +270,23 @@ const computedStudents = computed(() => {
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-1.5">Tijd</label>
             <div class="flex items-center gap-3">
-              <USelectMenu icon="i-heroicons-clock-20-solid" size="lg" color="primary" variant="outline"
+              <USelectMenu icon="i-lucide-clock" size="lg" color="primary" variant="outline"
                 v-model="state.createLessonHours" :items="state.hours" class="w-full" />
-              <USelectMenu icon="i-heroicons-clock-20-solid" size="lg" color="primary" variant="outline"
+              <USelectMenu icon="i-lucide-clock" size="lg" color="primary" variant="outline"
                 v-model="state.createLessonMinutes" :items="state.minutes" class="w-full" />
             </div>
           </div>
 
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-1.5">Type les</label>
-            <USelectMenu icon="i-heroicons-academic-cap-20-solid" size="lg" color="primary" variant="outline"
+            <USelectMenu icon="i-lucide-graduation-cap" size="lg" color="primary" variant="outline"
               v-model="state.createLessonType" :items="state.types" class="w-full" value-key="value"
               :search-input="false" />
           </div>
 
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-1.5">Docent</label>
-            <USelectMenu icon="i-heroicons-academic-cap-20-solid" size="lg" color="primary" variant="outline"
+            <USelectMenu icon="i-lucide-graduation-cap" size="lg" color="primary" variant="outline"
               v-model="state.createLessonTeacher" :items="state.teachers" class="w-full" value-key="value"
               :search-input="false" />
           </div>

@@ -1,6 +1,11 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
 
+/* Lucide icons: uniform stroke width to match former heroicons-solid visual weight */
+[class*="i-lucide"] {
+  stroke-width: 2.5;
+}
+
 @theme {
   --font-display: 'Montserrat', sans-serif;
   --font-body: 'Source Sans 3', sans-serif;
