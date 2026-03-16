@@ -1,13 +1,17 @@
 <script setup lang="ts">
-const title = ref('Yoga Ravennah | Account');
-const description = ref('Mijn accountdetails');
+import type { TabsItem } from '@nuxt/ui'
+
+const title = ref('Yoga Ravennah | Archief');
+const description = ref('Lessen archief');
 const ogImage = ref('https://www.ravennah.com/ravennah-social.jpg');
-const pageUrl = ref('https://www.ravennah.com/account');
+const pageUrl = ref('https://www.ravennah.com/archief');
 
 const store = useMainStore()
+const dayjs = useDayjs()
+const { $rav } = useNuxtApp()
 
 definePageMeta({
-  // layout: 'yoga'
+  layout: 'app'
 })
 
 useHead({
@@ -18,8 +22,6 @@ useHead({
     { hid: 'og:url', property: 'og:url', content: pageUrl },
     { hid: 'og:description', property: 'og:description', content: description },
     { hid: 'og:image', property: 'og:image', content: ogImage },
-
-    // twitter card
     { hid: "twitter:title", name: "twitter:title", content: title },
     { hid: "twitter:url", name: "twitter:url", content: pageUrl },
     { hid: 'twitter:description', name: 'twitter:description', content: description },
@@ -27,15 +29,44 @@ useHead({
   ]
 })
 
-const loggedInUser = computed(() => store.loggedInUser);
-const isAdmin = computed(() => store.isAdmin);
-const isLoading = computed(() => store.isLoading);
+const isAdmin = computed(() => store.isAdmin)
+const isLoading = computed(() => store.isLoading)
 
-const { data: archive } = await useFetch('/api/lessonsArchive')
+if (!isAdmin.value) {
+  navigateTo('/')
+}
 
-function sortStudents(students) {
+const dateFrom = ref(dayjs().subtract(3, 'month').format('YYYY-MM-DD'))
+const dateTo = ref(dayjs().format('YYYY-MM-DD'))
+
+const { data: archive, refresh } = await useFetch('/api/lessonsArchive', {
+  query: computed(() => ({ from: dateFrom.value, to: dateTo.value }))
+})
+
+const page = ref(1)
+const pageSize = 25
+
+watch([dateFrom, dateTo], () => {
+  page.value = 1
+})
+
+const allLessons = computed(() => archive.value?.rows ?? [])
+const totalPages = computed(() => Math.ceil(allLessons.value.length / pageSize))
+const paginatedLessons = computed(() =>
+  allLessons.value.slice((page.value - 1) * pageSize, page.value * pageSize)
+)
+
+function formatArchiveDateInDutch(date: string): string {
+  const lessonDate = dayjs(date).utc()
+  const startTime = lessonDate.format('H.mm')
+  const endTime = lessonDate.add(1, 'hour').format('H.mm')
+  const includeYear = lessonDate.year() !== dayjs().year()
+  const datePart = lessonDate.format(includeYear ? 'dddd D MMMM YYYY' : 'dddd D MMMM')
+  return `${datePart} van ${startTime} tot ${endTime} uur`
+}
+
+function sortStudents(students: any[]) {
   if (!Array.isArray(students)) return [];
-
   return [...students].sort((a, b) => {
     const nameA = a.students?.name || "";
     const nameB = b.students?.name || "";
@@ -43,85 +74,121 @@ function sortStudents(students) {
   });
 }
 
-async function removeBooking(booking, lesson) {
+async function removeBooking(booking: any, lesson: any) {
   if (confirm('Weet je zeker dat je deze boeking wilt verwijderen?')) {
     await store.cancelBooking(booking, lesson)
-    await refreshNuxtData()
+    await refresh()
   }
 }
 
-if (!isAdmin.value) {
-  navigateTo('/')
-}
+// Bottom nav: clicking any tab navigates back to account
+const activeTab = ref(0)
+const tabs: TabsItem[] = [
+  { label: 'Boekingen', icon: 'i-lucide-calendar-days', slot: 'lessen' as const },
+  { label: 'Credits', icon: 'i-lucide-credit-card', slot: 'credits' as const },
+  { label: 'Lessen', icon: 'i-lucide-graduation-cap', slot: 'admin-lessen' as const },
+  { label: 'Studenten', icon: 'i-lucide-users', slot: 'gebruikers' as const },
+  { label: 'Omzet', icon: 'i-lucide-bar-chart-2', slot: 'omzet' as const },
+]
+watch(activeTab, () => navigateTo('/account'))
 </script>
 
 <template>
-  <div>
+  <div class="min-h-screen">
     <ClientOnly>
       <IsLoading :loading="isLoading" />
     </ClientOnly>
-    <div class="container mt-8 sm:mt-12 md:mt-24 mx-auto p-8 md:px-0 md:py-24">
-      <div>
+
+    <div class="container mx-auto px-4 sm:px-8 pt-1 md:pt-32"
+      style="padding-bottom: calc(6rem + max(env(safe-area-inset-bottom), 0px))">
+      <div class="pt-3">
         <div class="md:flex justify-between items-center mb-8">
           <h2
             class="text-2xl md:text-3xl font-bold bg-gradient-to-r from-emerald-400 to-teal-500 bg-clip-text text-transparent uppercase tracking-wide">
             Lessen Archief
           </h2>
+          <UButton color="primary" icon="i-lucide-arrow-left" variant="outline" size="lg" to="/account"
+            class="mt-4 md:mt-0">
+            Terug
+          </UButton>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div v-for="lesson in archive.rows" :key="lesson.$id"
-            class="group relative overflow-hidden rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm transition-all duration-300 hover:border-emerald-500/30 hover:shadow-2xl hover:shadow-emerald-950/20 p-6">
-            <div class="space-y-4">
-              <!-- Header -->
-              <div class="flex justify-between items-start">
-                <div>
-                  <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Les</span>
-                  <span class="block text-lg font-semibold text-gray-100 mt-0.5 capitalize">{{ lesson.type ||
-                    'hatha&nbsp;yoga' }}</span>
-                </div>
-                <div class="px-3 py-1 rounded-full bg-gray-900/50 border border-gray-800">
-                  <span class="text-xs font-medium text-gray-400">{{ $rav.formatDateInDutch(lesson.date, true) }}</span>
-                </div>
+        <!-- Date range pickers -->
+        <div class="flex flex-wrap gap-4 mb-8">
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Van</label>
+            <UInput type="date" v-model="dateFrom" color="primary" variant="outline" size="lg" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Tot</label>
+            <UInput type="date" v-model="dateTo" color="primary" variant="outline" size="lg" />
+          </div>
+        </div>
+
+        <!-- Results count -->
+        <p class="text-sm text-gray-500 mb-4">
+          {{ allLessons.length }} {{ allLessons.length === 1 ? 'les' : 'lessen' }} gevonden
+        </p>
+
+        <!-- Lessons grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div v-for="lesson in paginatedLessons" :key="lesson.$id"
+            class="rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-2xl shadow-emerald-950/20 p-6">
+            <div class="space-y-3">
+              <!-- Les -->
+              <div>
+                <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Les</span>
+                <span class="block text-gray-100 mt-0.5" v-html="$rav.getLessonDescription(lesson)"></span>
               </div>
 
-              <!-- Content -->
-              <div class="pt-4 border-t border-gray-800/50">
-                <div class="flex items-center justify-between mb-3">
-                  <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Boekingen</span>
-                  <span class="text-xs font-medium px-2 py-0.5 rounded bg-gray-900 text-gray-400">{{
-                    lesson.bookings?.length || 0 }}/9</span>
-                </div>
+              <!-- Datum -->
+              <div>
+                <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Datum</span>
+                <span class="block text-gray-100 mt-0.5">{{ formatArchiveDateInDutch(lesson.date) }}</span>
+              </div>
 
-                <div class="space-y-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
-                  <div v-for="booking in sortStudents(lesson.bookings || [])" :key="booking.$id"
-                    class="flex items-center justify-between group/booking p-2 rounded hover:bg-gray-800/50 transition-colors">
-                    <span
-                      class="text-sm text-gray-300 hover:text-emerald-400 transition-colors flex items-center gap-2 cursor-pointer"
+              <!-- Boekingen -->
+              <div>
+                <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">
+                  Boekingen ({{ lesson.bookings?.length || 0 }}/9)
+                </span>
+                <div class="mt-1">
+                  <span v-for="booking in sortStudents(lesson.bookings || [])" :key="booking.$id"
+                    class="flex items-center gap-1 text-base text-gray-300 group/booking py-0.5">
+                    <span class="hover:text-emerald-400 transition-colors cursor-pointer flex-1"
                       @click="navigateTo(`/admin/users/${booking.students?.$id}`)">
-                      <div class="w-1.5 h-1.5 rounded-full bg-emerald-500/50"></div>
                       {{ booking.students?.name || 'Onbekende gebruiker' }}
                     </span>
+                    <UIcon v-if="booking.students?.injury" name="i-lucide-heart-pulse"
+                      class="w-4 h-4 text-red-500 flex-shrink-0" />
+                    <UTooltip v-if="booking.students?.pregnancy" text="Zwanger">
+                      <UIcon name="i-lucide-baby" class="w-4 h-4 text-pink-500 flex-shrink-0" />
+                    </UTooltip>
                     <button @click="removeBooking(booking, lesson)" aria-label="Verwijder boeking"
-                      class="opacity-0 group-hover/booking:opacity-100 p-1 hover:bg-red-500/10 rounded transition-all"
+                      class="opacity-0 group-hover/booking:opacity-100 p-1 hover:bg-red-500/10 rounded transition-all flex-shrink-0"
                       title="Verwijder boeking">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                        stroke="currentColor" class="w-4 h-4 text-red-400 hover:text-red-300">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                          d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                      </svg>
+                      <UIcon name="i-heroicons-trash-20-solid" class="w-4 h-4 text-red-400 hover:text-red-300" />
                     </button>
-                  </div>
-
-                  <div v-if="!lesson.bookings?.length" class="text-sm text-gray-500 italic text-center py-2">
-                    Geen boekingen gevonden
-                  </div>
+                  </span>
+                  <span v-if="!lesson.bookings?.length" class="text-sm text-gray-500">Geen boekingen</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
+
+        <!-- Empty state -->
+        <div v-if="allLessons.length === 0" class="text-center py-16 text-gray-500">
+          Geen lessen gevonden voor deze periode.
+        </div>
+
+        <!-- Pagination -->
+        <div v-if="totalPages > 1" class="flex justify-center mt-8">
+          <UPagination v-model:page="page" :total="allLessons.length" :items-per-page="pageSize" />
+        </div>
       </div>
     </div>
+
+    <AccountBottomNav :tabs="tabs" v-model="activeTab" />
   </div>
 </template>
