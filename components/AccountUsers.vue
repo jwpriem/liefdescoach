@@ -222,7 +222,7 @@ const filteredRows = computed(() => {
 				<div class="grid grid-cols-4 gap-2 border-t border-gray-800/50 pt-3 mt-3">
 					<UButton block color="primary" icon="i-heroicons-eye-20-solid" variant="soft" size="lg"
 						class="justify-center text-emerald-100 bg-emerald-500/10 hover:bg-emerald-500/20"
-						:to="`/admin/users/${row.$id}`" />
+						@click="navigateTo(`/admin/users/${row.$id}`)" />
 					<UButton block color="primary" icon="i-heroicons-plus-20-solid" variant="soft" size="lg"
 						class="justify-center text-emerald-100 bg-emerald-500/10 hover:bg-emerald-500/20"
 						@click="setUser(row)" />
@@ -243,7 +243,7 @@ const filteredRows = computed(() => {
 		<UTable v-if="filteredRows.length" :columns="columns" :data="filteredRows">
 			<template #name-cell="{ row }">
 				<div class="flex items-center gap-2">
-					<UButton variant="link" :to="`/admin/users/${row.original.$id}`" color="neutral"
+					<UButton variant="link" color="neutral" @click="navigateTo(`/admin/users/${row.original.$id}`)"
 						class="p-0 font-medium hover:text-emerald-400">
 						{{ row.original.name }}
 					</UButton>
@@ -269,7 +269,7 @@ const filteredRows = computed(() => {
 				<div class="flex items-center gap-x-1">
 					<UTooltip text="Bekijk details">
 						<UButton icon="i-heroicons-eye-20-solid" variant="ghost" size="sm" class="text-emerald-100"
-							:to="`/admin/users/${row.original.$id}`" />
+							@click="navigateTo(`/admin/users/${row.original.$id}`)" />
 					</UTooltip>
 					<UTooltip text="Voeg credits toe">
 						<UButton icon="i-heroicons-plus-20-solid" variant="ghost" size="sm" class="text-emerald-100"
