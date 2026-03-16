@@ -172,7 +172,7 @@ const filteredRows = computed(() => {
 				<div>
 					<label class="block text-sm font-medium text-gray-300 mb-1.5">Filter gebruikers</label>
 					<UInput id="naam" v-model="q" color="primary" placeholder="Zoek gebruiker" type="text"
-						variant="outline" size="lg" />
+						variant="outline" size="lg" :ui="{ base: 'text-base' }" />
 				</div>
 				<div>
 					<label class="block text-sm font-medium text-gray-300 mb-1.5">Gearchiveerd</label>
