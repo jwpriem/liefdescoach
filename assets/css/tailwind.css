@@ -6,11 +6,13 @@
   --font-body: 'Source Sans 3', sans-serif;
 }
 
-@layer base {
-    html, body {
-        background-color: #030712;
-    }
+/* Safari 26 derives toolbar tint from html/body background-color.
+   Placed outside @layer base so it can't be overridden by utility layers. */
+html, body {
+    background-color: #030712;
+}
 
+@layer base {
     body .dark {
         @apply font-body text-gray-600 antialiased;
         font-family: 'Source Sans 3', sans-serif;
