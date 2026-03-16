@@ -101,7 +101,7 @@ if (!isAdmin.value) {
                       <div class="w-1.5 h-1.5 rounded-full bg-emerald-500/50"></div>
                       {{ booking.students?.name || 'Onbekende gebruiker' }}
                     </NuxtLink>
-                    <button @click="removeBooking(booking, lesson)"
+                    <button @click="removeBooking(booking, lesson)" aria-label="Verwijder boeking"
                       class="opacity-0 group-hover/booking:opacity-100 p-1 hover:bg-red-500/10 rounded transition-all"
                       title="Verwijder boeking">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
