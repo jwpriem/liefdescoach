@@ -6,6 +6,7 @@ const { $rav } = useNuxtApp()
 const state = reactive({
   onlyFutureLessons: false,
   bookForUser: false,
+  injuryPopup: null as { name: string; injury: string } | null,
   addBookingUser: null,
   addBookingLesson: null,
   createLesson: false,
@@ -207,15 +208,15 @@ async function deleteManagedLesson(lesson: any) {
                 lesson.bookings?.length || 0 }}/9)</span>
               <div class="mt-1">
                 <span v-for="booking in getLessonBookingsWithLabels(lesson.bookings || [])" :key="booking.$id"
-                  class="flex items-center gap-1 text-sm text-gray-300">
+                  class="flex items-center gap-1 text-base text-gray-300">
                   <span
                     class="hover:text-emerald-400 transition-colors cursor-pointer"
                     @click="navigateTo(`/admin/users/${booking.students.$id}`)">
                     {{ booking.students.name }}<span v-if="booking.isExtraSpot" class="text-emerald-400"> (extra plek)</span>
                   </span>
-                  <UTooltip v-if="booking.students.injury" :text="booking.students.injury">
-                    <UIcon name="i-lucide-bandage" class="w-4 h-4 text-red-500 flex-shrink-0" />
-                  </UTooltip>
+                  <UIcon v-if="booking.students.injury" name="i-lucide-clipboard-plus"
+                    class="w-4 h-4 text-red-500 flex-shrink-0 cursor-pointer hover:text-red-400 transition-colors"
+                    @click="state.injuryPopup = { name: booking.students.name, injury: booking.students.injury }" />
                   <UTooltip v-if="booking.students.pregnancy" text="Zwanger">
                     <UIcon name="i-lucide-baby" class="w-4 h-4 text-pink-500 flex-shrink-0" />
                   </UTooltip>
@@ -225,6 +226,23 @@ async function deleteManagedLesson(lesson: any) {
             </div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Modal: Injury info -->
+    <div v-if="state.injuryPopup" class="fixed inset-0 bg-black/75 flex justify-center items-center z-50 p-4"
+      @click.self="state.injuryPopup = null">
+      <div
+        class="w-full max-w-md rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-2xl shadow-emerald-950/20 p-8">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <UIcon name="i-lucide-clipboard-plus" class="w-5 h-5 text-red-500" />
+            <h2 class="text-xl font-bold text-emerald-100 tracking-tight">Blessure info</h2>
+          </div>
+          <UButton icon="i-lucide-x" color="gray" variant="ghost" size="sm" @click="state.injuryPopup = null" />
+        </div>
+        <p class="text-sm font-medium text-gray-400 mb-1">{{ state.injuryPopup.name }}</p>
+        <p class="text-base text-gray-200">{{ state.injuryPopup.injury }}</p>
       </div>
     </div>
 
