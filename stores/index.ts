@@ -419,7 +419,10 @@ export const useMainStore = defineStore('main', {
                     }
                 })
 
-                await this.sendEmail('sendBookingConfirmation', lesson.$id)
+                const lessonIsInPast = new Date(lesson.date) < new Date()
+                if (!(this.isAdmin && lessonIsInPast)) {
+                    await this.sendEmail('sendBookingConfirmation', lesson.$id)
+                }
                 isOnBehalf ? await this.clearOnBehalf() : await this.getUser()
                 if (!isOnBehalf) await this.fetchBookings()
             });
