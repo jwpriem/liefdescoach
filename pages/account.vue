@@ -85,7 +85,7 @@ const tabs = computed<TabsItem[]>(() => {
 
 	items.push(
 		{
-			label: 'Mijn lessen',
+			label: 'Boekingen',
 			icon: 'i-heroicons-calendar-days',
 			slot: 'lessen' as const,
 		},
@@ -112,7 +112,7 @@ const tabs = computed<TabsItem[]>(() => {
 				slot: 'admin-lessen' as const,
 			},
 			{
-				label: 'Gebruikers',
+				label: 'Studenten',
 				icon: 'i-heroicons-users',
 				slot: 'gebruikers' as const,
 			},
@@ -131,12 +131,9 @@ const tabs = computed<TabsItem[]>(() => {
 <template>
 	<div class="min-h-screen">
 		<IsLoading :loading="isLoading" />
-		<div
-			class="container mx-auto px-4 sm:px-8 pt-1 md:pt-32"
+		<div class="container mx-auto px-4 sm:px-8 pt-1 md:pt-32"
 			style="padding-bottom: calc(6rem + max(env(safe-area-inset-bottom), 0px))"
-			@touchstart.passive="onSwipeStart"
-			@touchend.passive="onSwipeEnd"
-		>
+			@touchstart.passive="onSwipeStart" @touchend.passive="onSwipeEnd">
 			<div v-show="currentSlot === 'dashboard'" class="pt-3">
 				<AccountDashboard v-if="!isAdmin && loggedInUser" />
 			</div>
