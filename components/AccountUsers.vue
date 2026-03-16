@@ -147,13 +147,21 @@ const filteredRows = computed(() => {
 		return filteredUsers.value
 	}
 
+	// ⚡ Bolt: Performance optimization
+	// 1. Move the `.toLowerCase()` calculation outside the filter loop so it only happens once.
+	// 2. Instead of iterating over `Object.values(x)` which checks every property (including IDs and internal data),
+	//    we specifically check only the relevant fields: name, email, and phone.
+	// This reduces the computational overhead significantly during search.
+	const searchTerm = q.value.toLowerCase();
+
 	return filteredUsers.value.filter((x) => {
-		return Object.values(x).some((value) => {
-			return typeof value === 'string' && value.toLowerCase().includes(q.value.toLowerCase());
-		});
+		return (
+			(x.name && x.name.toLowerCase().includes(searchTerm)) ||
+			(x.email && x.email.toLowerCase().includes(searchTerm)) ||
+			(x.phone && x.phone.toLowerCase().includes(searchTerm))
+		);
 	});
-}
-)
+})
 
 </script>
 
