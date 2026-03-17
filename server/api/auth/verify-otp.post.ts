@@ -44,7 +44,9 @@ export default defineEventHandler(async (event) => {
     const storedBuffer = Buffer.from(otpDoc.code)
 
     if (codeBuffer.length !== storedBuffer.length || !crypto.timingSafeEqual(codeBuffer, storedBuffer)) {
-        throw createError({ statusCode: 401, statusMessage: 'Ongeldige code. Probeer opnieuw.' })
+        // Prevent brute force by deleting the OTP immediately after a failed attempt
+        await db.delete(otpCodes).where(eq(otpCodes.id, otpDoc.id))
+        throw createError({ statusCode: 401, statusMessage: 'Ongeldige code. Vraag een nieuwe code aan.' })
     }
 
     // 4. Delete OTP
