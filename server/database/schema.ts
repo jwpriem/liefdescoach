@@ -36,7 +36,9 @@ export const lessons = pgTable('lessons', {
   type: lessonTypeEnum('type').notNull(),
   teacher: text('teacher'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
-})
+}, (table) => [
+  index('lessons_date_idx').on(table.date),
+])
 
 export const bookings = pgTable('bookings', {
   id: text('id').primaryKey(),
