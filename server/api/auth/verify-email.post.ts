@@ -24,7 +24,10 @@ export default defineEventHandler(async (event) => {
         .update(payloadString)
         .digest('hex')
 
-    if (signature !== expectedSignature) {
+    const signatureBuffer = Buffer.from(signature)
+    const expectedSignatureBuffer = Buffer.from(expectedSignature)
+
+    if (signatureBuffer.length !== expectedSignatureBuffer.length || !crypto.timingSafeEqual(signatureBuffer, expectedSignatureBuffer)) {
         throw createError({ statusCode: 400, statusMessage: 'Ongeldige handtekening' })
     }
 
