@@ -8,7 +8,6 @@ import { students } from '../../database/schema'
  */
 export default defineEventHandler(async (event) => {
     const body = await readBody(event)
-    const db = useDB()
 
     let userId: string
     let userEmail: string

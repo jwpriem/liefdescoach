@@ -7,7 +7,6 @@ import { credits, bookings } from '../../../database/schema'
  */
 export default defineEventHandler(async (event) => {
     await requireAdmin(event)
-    const db = useDB()
     const config = useRuntimeConfig()
 
     const userId = getRouterParam(event, 'id')

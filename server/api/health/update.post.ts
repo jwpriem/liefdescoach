@@ -4,7 +4,6 @@ import { health, students } from '../../database/schema'
 
 export default defineEventHandler(async (event) => {
     const authUser = await requireAuth(event)
-    const db = useDB()
 
     const body = await readBody(event)
 

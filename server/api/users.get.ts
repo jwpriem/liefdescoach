@@ -3,7 +3,6 @@ import { students, health } from '../database/schema'
 
 export default defineEventHandler(async (event) => {
     await requireAdmin(event)
-    const db = useDB()
 
     // Fetch all students with optional health data
     const rows = await db

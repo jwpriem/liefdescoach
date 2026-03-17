@@ -131,9 +131,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   css: ['~/assets/css/tailwind.css'],
 
   routeRules: {
-    // Lesson list: cache for 5 minutes — read-heavy, rarely changes
-    '/api/lessons': { cache: { maxAge: 300 } },
-    // Static info pages: cache for 1 hour
+    // Static info pages: cache for 1 hour (bounded by lru-cache storage below)
     '/over': { cache: { maxAge: 3600 } },
     '/tarieven': { cache: { maxAge: 3600 } },
     '/priveles': { cache: { maxAge: 3600 } },
@@ -164,6 +162,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     compressPublicAssets: { gzip: true, brotli: true },
     // Minify the server bundle to reduce startup memory footprint
     minify: true,
+    // Use bounded LRU cache instead of unbounded in-memory default
+    storage: {
+      cache: {
+        driver: 'lru-cache',
+        max: 20,
+      }
+    }
   },
 
   compatibilityDate: '2025-01-01'

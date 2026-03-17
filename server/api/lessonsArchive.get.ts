@@ -3,7 +3,6 @@ import { lessons, bookings, students, health } from '../database/schema'
 
 export default defineEventHandler(async (event) => {
     await requireAdmin(event)
-    const db = useDB()
     const query = getQuery(event)
 
     const toDate = query.to ? new Date(query.to as string) : new Date()
@@ -11,11 +10,18 @@ export default defineEventHandler(async (event) => {
         ? new Date(query.from as string)
         : new Date(new Date().setMonth(new Date().getMonth() - 3))
 
+    // Clamp date range to max 12 months to prevent unbounded queries
+    const maxRange = 365 * 24 * 60 * 60 * 1000
+    if (toDate.getTime() - fromDate.getTime() > maxRange) {
+        fromDate.setTime(toDate.getTime() - maxRange)
+    }
+
     const lessonRows = await db
         .select()
         .from(lessons)
         .where(and(gte(lessons.date, fromDate), lte(lessons.date, toDate)))
         .orderBy(desc(lessons.date))
+        .limit(200)
 
     const lessonIds = lessonRows.map(l => l.id)
     let bookingRows: any[] = []

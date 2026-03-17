@@ -22,7 +22,6 @@ export default defineEventHandler(async (event) => {
 
     const email = body.email.trim().toLowerCase()
     const password = body.password
-    const db = useDB()
 
     // Look up student by email
     const rows = await db

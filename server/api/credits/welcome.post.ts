@@ -8,7 +8,6 @@ import { credits } from '../../database/schema'
  */
 export default defineEventHandler(async (event) => {
     const user = await requireAuth(event)
-    const db = useDB()
 
     const body = await readBody(event)
     const studentId = body?.studentId

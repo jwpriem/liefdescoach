@@ -12,7 +12,6 @@ import { credits } from '../../database/schema'
  */
 export default defineEventHandler(async (event) => {
     await requireAdmin(event)
-    const db = useDB()
 
     const body = await readBody(event)
 
