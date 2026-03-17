@@ -80,7 +80,6 @@ export default defineEventHandler(async (event) => {
         } catch (err: any) {
             console.error(`[BookingCancellation] ${mail.label} email failed:`, err?.message ?? err)
         }
-        await new Promise(resolve => setTimeout(resolve, 10000))
     }
 
     setResponseStatus(event, 202)
