@@ -63,6 +63,8 @@ export const credits = pgTable('credits', {
   index('credits_student_id_idx').on(table.studentId),
   index('credits_booking_id_idx').on(table.bookingId),
   index('credits_student_available_idx').on(table.studentId, table.bookingId, table.validTo),
+  // Covers credit history queries: WHERE studentId = ? ORDER BY createdAt DESC LIMIT 500
+  index('credits_student_created_idx').on(table.studentId, table.createdAt),
 ])
 
 export const health = pgTable('health', {
