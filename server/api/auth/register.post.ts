@@ -24,7 +24,6 @@ export default defineEventHandler(async (event) => {
     }
 
     const email = body.email.trim().toLowerCase()
-    const db = useDB()
 
     // Check if email already exists
     const existing = await db

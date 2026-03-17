@@ -34,7 +34,6 @@ export default defineEventHandler(async (event) => {
     }
 
     // Update email verification in Neon
-    const db = useDB()
     await db
         .update(students)
         .set({ emailVerified: true })

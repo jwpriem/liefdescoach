@@ -16,7 +16,6 @@ function hashToken(token: string): string {
  * Returns the raw session token (only needed internally).
  */
 export async function createSession(event: H3Event, userId: string): Promise<string> {
-  const db = useDB()
   const token = nanoid(48)
   const tokenHash = hashToken(token)
   const expiresAt = new Date(Date.now() + SESSION_MAX_AGE * 1000)
@@ -47,7 +46,6 @@ export async function getSessionUser(event: H3Event) {
   const token = getCookie(event, SESSION_COOKIE)
   if (!token) return null
 
-  const db = useDB()
   const tokenHash = hashToken(token)
   const now = new Date()
 
@@ -84,7 +82,6 @@ export async function getSessionUser(event: H3Event) {
 export async function destroySession(event: H3Event): Promise<void> {
   const token = getCookie(event, SESSION_COOKIE)
   if (token) {
-    const db = useDB()
     const tokenHash = hashToken(token)
     await db.delete(sessions).where(eq(sessions.tokenHash, tokenHash))
   }

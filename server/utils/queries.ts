@@ -6,7 +6,6 @@ import { lessons, bookings, credits, students, health } from '../database/schema
  * Fetch a lesson with its bookings (and optionally student data).
  */
 export async function getLessonWithBookings(lessonId: string, includeStudents = false) {
-  const db = useDB()
 
   const lesson = await db.select().from(lessons).where(eq(lessons.id, lessonId)).limit(1)
   if (lesson.length === 0) return null
@@ -39,7 +38,6 @@ export async function getLessonWithBookings(lessonId: string, includeStudents = 
  * Count bookings for a lesson.
  */
 export async function countLessonBookings(lessonId: string): Promise<number> {
-  const db = useDB()
   const result = await db
     .select({ count: countFn() })
     .from(bookings)
@@ -51,7 +49,6 @@ export async function countLessonBookings(lessonId: string): Promise<number> {
  * Find an available (unused, non-expired) credit for a student, FIFO by expiry.
  */
 export async function findAvailableCredit(studentId: string) {
-  const db = useDB()
   const now = new Date()
   const result = await db
     .select()

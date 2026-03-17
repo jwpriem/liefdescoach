@@ -6,7 +6,6 @@ import { lessons, bookings, credits } from '../database/schema'
  */
 export default defineEventHandler(async (event) => {
     await requireAdmin(event)
-    const db = useDB()
     const config = useRuntimeConfig()
 
     const query = getQuery(event)

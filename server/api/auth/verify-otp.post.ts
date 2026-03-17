@@ -19,7 +19,6 @@ export default defineEventHandler(async (event) => {
 
     const email = body.email.trim().toLowerCase()
     const code = body.code.trim()
-    const db = useDB()
 
     // 1. Look up OTP by email
     const rows = await db

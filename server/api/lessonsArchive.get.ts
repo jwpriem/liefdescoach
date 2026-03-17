@@ -3,7 +3,6 @@ import { lessons, bookings, students, health } from '../database/schema'
 
 export default defineEventHandler(async (event) => {
     await requireAdmin(event)
-    const db = useDB()
     const query = getQuery(event)
 
     const toDate = query.to ? new Date(query.to as string) : new Date()

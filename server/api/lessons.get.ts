@@ -2,7 +2,6 @@ import { gte, asc, eq } from 'drizzle-orm'
 import { lessons, bookings } from '../database/schema'
 
 export default defineEventHandler(async () => {
-    const db = useDB()
     const now = new Date()
 
     const lessonRows = await db

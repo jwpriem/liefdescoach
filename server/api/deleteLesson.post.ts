@@ -4,7 +4,6 @@ import { lessons, bookings, credits } from '../database/schema'
 export default defineEventHandler(async (event) => {
   await requireAdmin(event)
   const { lessonId } = await readBody(event)
-  const db = useDB()
 
   // Find all bookings for this lesson
   const lessonBookings = await db

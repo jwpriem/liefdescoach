@@ -10,7 +10,6 @@ dayjs.locale('nl')
 
 export default defineEventHandler(async (event) => {
     await requireAuth(event)
-    const db = useDB()
 
     const body = await readBody(event)
 

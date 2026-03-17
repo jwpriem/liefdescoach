@@ -19,7 +19,6 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 401, statusMessage: 'Ongeldige API-sleutel' })
     }
 
-    const db = useDB()
 
     // Calculate tomorrow's date range
     const nowAmsterdam = dayjs().tz('Europe/Amsterdam')
