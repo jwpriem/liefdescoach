@@ -34,8 +34,19 @@ const loggedInUser = computed(() => store.loggedInUser);
 const isLoading = computed(() => store.isLoading);
 const availableCredits = computed(() => store.availableCredits);
 
+// ⚡ Bolt: Optimize O(N) array lookup in v-for to O(1) Set lookup
+const bookedLessonIds = computed(() => {
+  const ids = new Set<string>()
+  for (const booking of store.myBookings) {
+    if (booking.lessons?.$id) {
+      ids.add(booking.lessons.$id)
+    }
+  }
+  return ids
+})
+
 function checkBooking(id: string) {
-  return store.myBookings.some(booking => booking.lessons.$id === id)
+  return bookedLessonIds.value.has(id)
 }
 
 async function book(lesson: any) {

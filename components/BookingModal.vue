@@ -9,12 +9,22 @@ const lessons = computed(() => store.lessons)
 const futureLessons = computed(() => lessons.value.filter(l => $rav.isFutureBooking(l.date)))
 const availableCredits = computed(() => store.availableCredits)
 
-function checkBooking(id: string) {
-  return store.myBookings.some(booking => {
+// ⚡ Bolt: Optimize O(N) array lookup in v-for to O(1) Set lookup
+const bookedLessonIds = computed(() => {
+  const ids = new Set<string>()
+  for (const booking of store.myBookings) {
     const l = booking.lessons
-    if (Array.isArray(l)) return l.some((li: any) => li.$id === id)
-    return l?.$id === id
-  })
+    if (Array.isArray(l)) {
+      l.forEach((li: any) => ids.add(li.$id))
+    } else if (l?.$id) {
+      ids.add(l.$id)
+    }
+  }
+  return ids
+})
+
+function checkBooking(id: string) {
+  return bookedLessonIds.value.has(id)
 }
 
 function spotsLeft(lesson: any): number {
