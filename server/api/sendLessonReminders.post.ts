@@ -101,7 +101,7 @@ export default defineEventHandler(async (event) => {
                 errors.push(msg)
             }
 
-            await new Promise(resolve => setTimeout(resolve, process.env.NODE_ENV !== 'production' ? 10000 : 1000))
+            await new Promise(resolve => setTimeout(resolve, 100))
         }
     }
 

@@ -98,7 +98,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     },
     workbox: {
       navigateFallback: '/account',
-      globPatterns: ['**/*.{js,css,html,png,svg,ico,woff2}'],
+      // Only cache app shell assets — fonts are fetched from CDN and cached separately
+      globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
     },
     devOptions: {
       enabled: false,
@@ -122,14 +123,24 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
   fonts: {
     families: [
-      { name: 'Montserrat', provider: 'google', weights: [200, 300, 400, 500, 600, 700, 800, 900] },
-      { name: 'Source Sans 3', provider: 'google', weights: [200, 300, 400, 500, 600, 700, 800, 900] }
+      { name: 'Montserrat', provider: 'google', weights: [400, 500, 600, 700] },
+      { name: 'Source Sans 3', provider: 'google', weights: [400, 500, 600, 700] }
     ]
   },
 
   css: ['~/assets/css/tailwind.css'],
 
   routeRules: {
+    // Lesson list: cache for 5 minutes — read-heavy, rarely changes
+    '/api/lessons': { cache: { maxAge: 300 } },
+    // Static info pages: cache for 1 hour
+    '/over': { cache: { maxAge: 3600 } },
+    '/tarieven': { cache: { maxAge: 3600 } },
+    '/priveles': { cache: { maxAge: 3600 } },
+    '/hatha-yoga': { cache: { maxAge: 3600 } },
+    '/voordelen': { cache: { maxAge: 3600 } },
+    '/contact': { cache: { maxAge: 3600 } },
+    // Legacy redirects
     '/liefdescoach/**': { redirect: '/', statusCode: 301 },
     '/yoga': { redirect: '/', statusCode: 301 },
     '/yoga/account': { redirect: '/account', statusCode: 301 },
@@ -146,6 +157,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
   icon: {
     mode: 'svg',
+  },
+
+  nitro: {
+    // Compress static assets with gzip + brotli — reduces bandwidth and memory transfer
+    compressPublicAssets: { gzip: true, brotli: true },
+    // Minify the server bundle to reduce startup memory footprint
+    minify: true,
   },
 
   compatibilityDate: '2025-01-01'
