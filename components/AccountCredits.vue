@@ -1,9 +1,6 @@
 <script setup lang="ts">
-const store = useMainStore();
+const { creditHistory: myCredits, availableCredits } = useCredits();
 const { $rav } = useNuxtApp();
-
-const myCredits = computed(() => store.myCredits);
-const availableCredits = computed(() => store.availableCredits);
 
 const showBuyCredits = ref(false);
 

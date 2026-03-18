@@ -4,7 +4,7 @@ const description = ref('Kies het abonnement dat bij jou past. Losse lessen, str
 const ogImage = ref('https://www.ravennah.com/ravennah-social.jpg');
 const pageUrl = ref('https://www.ravennah.com/tarieven');
 
-const store = useMainStore()
+const { user: loggedInUser } = useAuth()
 
 useHead({
 	title,
@@ -23,7 +23,6 @@ useHead({
 	]
 })
 
-const loggedInUser = computed(() => store.loggedInUser);
 
 const pricingPlans = [
 	{

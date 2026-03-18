@@ -4,7 +4,11 @@ const description = ref('Ik geef les elke zondag van 9.45u tot 10.45u bij Studio
 const ogImage = ref('https://www.ravennah.com/ravennah-social.jpg');
 const pageUrl = ref('https://www.ravennah.com/lessen');
 
-const store = useMainStore()
+const { user: loggedInUser } = useAuth()
+const { availableCredits } = useCredits()
+const { myBookings } = useBookings()
+const { handleBooking, error: bookingError, pending: isLoading } = useBookingActions()
+const { set: setOnBehalfOf } = useOnBehalfOf()
 const toast = useToast()
 const { $rav } = useNuxtApp()
 
@@ -28,16 +32,12 @@ useHead({
   ]
 })
 
-const { data: lessons } = await useFetch('/api/lessons')
-
-const loggedInUser = computed(() => store.loggedInUser);
-const isLoading = computed(() => store.isLoading);
-const availableCredits = computed(() => store.availableCredits);
+const { data: lessons } = await useFetch('lessons', () => $fetch('/api/lessons'))
 
 // ⚡ Bolt: Optimize O(N) array lookup in v-for to O(1) Set lookup
 const bookedLessonIds = computed(() => {
   const ids = new Set<string>()
-  for (const booking of store.myBookings) {
+  for (const booking of myBookings.value) {
     if (booking.lessons?.$id) {
       ids.add(booking.lessons.$id)
     }
@@ -50,11 +50,11 @@ function checkBooking(id: string) {
 }
 
 async function book(lesson: any) {
-  if (!store.loggedInUser) return
-  await store.setOnBehalfOf(store.loggedInUser)
-  await store.handleBooking(lesson)
+  if (!loggedInUser.value) return
+  setOnBehalfOf(loggedInUser.value)
+  await handleBooking(lesson)
 
-  if (!store.errorMessage) {
+  if (!bookingError.value) {
     toast.add({
       id: 'booking',
       title: 'Tot snel',
@@ -63,8 +63,6 @@ async function book(lesson: any) {
       description: 'Je les is geboekt!'
     })
   }
-
-  store.fetchLessons()
 }
 
 </script>

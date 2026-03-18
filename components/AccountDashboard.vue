@@ -1,10 +1,9 @@
 <script setup lang="ts">
-const store = useMainStore()
+const { myBookings } = useBookings()
+const { availableCredits } = useCredits()
+const { user: loggedInUser } = useAuth()
 const { $rav } = useNuxtApp()
 
-const myBookings = computed(() => store.myBookings)
-const availableCredits = computed(() => store.availableCredits)
-const loggedInUser = computed(() => store.loggedInUser)
 const openBookingModal = inject('openBookingModal') as () => void
 
 const showBuyCredits = ref(false)

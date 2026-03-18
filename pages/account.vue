@@ -6,7 +6,7 @@ const description = ref('Mijn accountdetails');
 const ogImage = ref('https://www.ravennah.com/ravennah-social.jpg');
 const pageUrl = ref('https://www.ravennah.com/account');
 
-const store = useMainStore()
+const { user: loggedInUser, isAdmin, pending: isLoading } = useAuth()
 
 definePageMeta({
 	layout: 'app'
@@ -28,15 +28,9 @@ useHead({
 		{ hid: "twitter:image", name: "twitter:image", content: ogImage },
 	]
 })
-if (!store.loggedInUser) {
+if (!loggedInUser.value) {
 	navigateTo('/login')
 }
-
-const loggedInUser = computed(() => store.loggedInUser);
-const isAdmin = computed(() => store.isAdmin);
-const students = computed(() => store.students);
-const lessons = computed(() => store.lessons);
-const isLoading = computed(() => store.isLoading);
 
 const showBookingModal = ref(false)
 provide('openBookingModal', () => showBookingModal.value = true)
@@ -155,10 +149,10 @@ const tabs = computed<TabsItem[]>(() => {
 				<AccountDetails v-if="loggedInUser" />
 			</div>
 			<div v-show="currentSlot === 'admin-lessen'" class="pt-3">
-				<AccountLessons v-if="isAdmin && lessons && students" />
+				<AccountLessons v-if="isAdmin" />
 			</div>
 			<div v-show="currentSlot === 'gebruikers'" class="pt-3">
-				<AccountUsers v-if="isAdmin && students && loggedInUser" />
+				<AccountUsers v-if="isAdmin && loggedInUser" />
 			</div>
 			<div v-show="currentSlot === 'omzet'" class="pt-3">
 				<AccountRevenue v-if="isAdmin" />

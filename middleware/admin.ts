@@ -1,15 +1,15 @@
-export default defineNuxtRouteMiddleware(async (to, from) => {
-    const store = useMainStore()
+export default defineNuxtRouteMiddleware(async () => {
+  const { user, isAdmin, refresh } = useAuth()
 
-    if (!store.loggedInUser) {
-        await store.getUser()
-    }
+  if (!user.value) {
+    await refresh()
+  }
 
-    if (!store.loggedInUser) {
-        return navigateTo('/login')
-    }
+  if (!user.value) {
+    return navigateTo('/login')
+  }
 
-    if (!store.isAdmin) {
-        return navigateTo('/account')
-    }
+  if (!isAdmin.value) {
+    return navigateTo('/account')
+  }
 })

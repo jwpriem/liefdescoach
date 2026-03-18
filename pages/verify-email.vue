@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const route = useRoute()
-const store = useMainStore()
+const { verifyEmail } = useAuth()
 const token = route.query.token as string
 const verifying = ref(true)
 const success = ref(false)
@@ -14,10 +14,7 @@ onMounted(async () => {
     }
 
     try {
-        await store.verifyEmail(token)
-        if (store.errorMessage) {
-            throw new Error(store.errorMessage)
-        }
+        await verifyEmail(token)
         success.value = true
         setTimeout(() => {
             navigateTo('/account')

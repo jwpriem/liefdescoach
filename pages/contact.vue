@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const store = useMainStore();
+const { call, pending: isLoading } = useApiCall()
 
 const title = ref('Yoga Ravennah | Contact');
 const description = ref('Wil je meer weten of een keer een proefles meedoen? Neem dan contact op via het formulier of mijn socials.');
@@ -30,26 +30,23 @@ useHead({
 })
 
 async function send(){
- await store.setLoading(true)
- await $fetch('/api/mail/send', {
-   method: 'POST',
-   body: {
-     type: 'contact',
-     data: {
-       name: name.value,
-       email: email.value,
-       message: message.value,
-     }
-   }
- })
-
-  name.value = ''
-  email.value = ''
-  message.value = ''
- await store.setLoading(false)
+  await call(async () => {
+    await $fetch('/api/mail/send', {
+      method: 'POST',
+      body: {
+        type: 'contact',
+        data: {
+          name: name.value,
+          email: email.value,
+          message: message.value,
+        }
+      }
+    })
+    name.value = ''
+    email.value = ''
+    message.value = ''
+  })
 }
-
-const isLoading = computed(() => store.isLoading);
 
 </script>
 
