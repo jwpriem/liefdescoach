@@ -19,14 +19,15 @@ const otpStep = ref<'email' | 'code'>('email')
 const otpCode = ref('')
 const otpSent = ref(false)
 
-const store = useMainStore()
+const { user, login: authLogin, sendOtp: authSendOtp, verifyOtp: authVerifyOtp, register: authRegister, refresh } = useAuth()
+const { call, error: errorMessage, pending: isLoading } = useApiCall()
 
 definePageMeta({
   // layout: 'yoga',
   ssr: false,
   middleware: () => {
-    const store = useMainStore()
-    if (store.loggedInUser) {
+    const { user } = useAuth()
+    if (user.value) {
       return navigateTo('/account')
     }
   }
@@ -50,17 +51,15 @@ useHead({
 })
 
 onMounted(async () => {
-  if (store.loggedInUser) return
-  await store.getUser() // 401 => logged out (no banner)
-  if (store.loggedInUser) {
+  if (user.value) return
+  await refresh()
+  if (user.value) {
     await navigateTo('/account', { replace: true })
   } else {
     ready.value = true
   }
 })
 
-const errorMessage = computed(() => store.errorMessage);
-const isLoading = computed(() => store.isLoading);
 const normalizedEmail = computed(() => email.value.trim().toLowerCase())
 
 const pageTitle = computed(() => {
@@ -77,54 +76,54 @@ const pageSubtitle = computed(() => {
 })
 
 async function login() {
-  await store.login(normalizedEmail.value, password.value)
+  await call(() => authLogin(normalizedEmail.value, password.value))
 
-  if (store.loggedInUser) {
+  if (user.value) {
     await navigateTo({ path: "/account" })
   }
 }
 
 async function register() {
-  await store.registerUser(
+  await call(() => authRegister(
     normalizedEmail.value,
     password.value,
     name.value,
     phone.value ? formatPhoneNumber(phone.value) : '',
     dateOfBirth.value || null,
     injury.value || null
-  )
+  ))
 
-  if (!store.errorMessage) {
+  if (!errorMessage.value) {
     await navigateTo({ path: "/account" })
   }
 }
 
 async function sendOtp() {
-  await store.sendOtp(normalizedEmail.value)
+  await call(() => authSendOtp(normalizedEmail.value))
 
-  if (!store.errorMessage) {
+  if (!errorMessage.value) {
     otpStep.value = 'code'
     otpSent.value = true
   }
 }
 
 async function verifyOtp() {
-  await store.verifyOtp(normalizedEmail.value, otpCode.value)
+  await call(() => authVerifyOtp(normalizedEmail.value, otpCode.value))
 
-  if (store.loggedInUser) {
+  if (user.value) {
     await navigateTo({ path: '/account' })
   }
 }
 
 async function resendOtp() {
   otpCode.value = ''
-  await store.sendOtp(normalizedEmail.value)
+  await call(() => authSendOtp(normalizedEmail.value))
 }
 
 function switchToRegister() {
   loginMode.value = 'password'
   registerForm.value = true
-  store.errorMessage = null
+  errorMessage.value = null
 }
 
 function switchLoginMode(mode: 'password' | 'otp') {
@@ -133,7 +132,7 @@ function switchLoginMode(mode: 'password' | 'otp') {
   otpStep.value = 'email'
   otpCode.value = ''
   otpSent.value = false
-  store.errorMessage = null
+  errorMessage.value = null
 }
 
 function formatPhoneNumber(input: string) {

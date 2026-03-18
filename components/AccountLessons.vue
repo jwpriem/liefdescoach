@@ -1,7 +1,15 @@
 <script setup lang="ts">
-const store = useMainStore()
+const { isAdmin } = useAuth()
+const { handleBooking, cancelBooking } = useBookingActions()
+const { set: setOnBehalfOf } = useOnBehalfOf()
 const dayjs = useDayjs()
 const { $rav } = useNuxtApp()
+
+const { data: adminLessonsData, refresh: refreshLessons } = await useAsyncData('admin-lessons', () => $fetch<any>('/api/lessonsWithBookings'))
+const { data: adminUsersData } = await useAsyncData('admin-users', () => $fetch<any>('/api/users'))
+
+const lessons = computed(() => adminLessonsData.value?.rows ?? [])
+const students = computed(() => adminUsersData.value?.users ?? [])
 
 const state = reactive({
   onlyFutureLessons: false,
@@ -45,10 +53,6 @@ const state = reactive({
   minutes: ['00', '15', '30', '45']
 })
 
-const lessons = computed(() => store.lessons)
-const students = computed(() => store.students)
-const isAdmin = computed(() => store.isAdmin)
-
 function cancel() {
   state.addBookingUser = null
   state.addBookingLesson = null
@@ -64,20 +68,13 @@ function cancelLesson() {
 
 async function book() {
   state.bookForUser = false
-  store.setLoading(true)
-
-  await store.setOnBehalfOf(state.addBookingUser)
-  await store.handleBooking(state.addBookingLesson, { extraSpot: true })
-  await store.fetchStudents()
-  await store.fetchLessons()
-
+  if (state.addBookingUser) setOnBehalfOf(state.addBookingUser)
+  await handleBooking(state.addBookingLesson, { extraSpot: true })
   state.addBookingUser = null
   state.addBookingLesson = null
-  store.setLoading(false)
 }
 
 async function createNewLesson() {
-  store.setLoading(true)
   state.createLessonDate.setUTCHours(parseInt(state.createLessonHours, 10), parseInt(state.createLessonMinutes, 10), 0, 0)
 
   await $fetch('/api/createLesson', {
@@ -89,16 +86,12 @@ async function createNewLesson() {
     },
   })
 
-  cancelLesson() // Resets the lesson creation form
-  await store.fetchLessons()
-  store.setLoading(false)
+  cancelLesson()
+  await refreshLessons()
 }
 
-async function removeBooking(booking, lesson) {
-  // state.addBookingUser is likely null here unless we are in the middle of booking? 
-  // Preserving logic but removing JSON.parse, assuming store handles object or null.
-  await store.setOnBehalfOf(state.addBookingUser)
-  await store.cancelBooking(booking, lesson)
+async function removeBooking(booking: any) {
+  await cancelBooking(booking)
 }
 
 const { sortStudents, getLessonBookingsWithLabels } = useLessonBookings()
@@ -146,7 +139,8 @@ function closeManage() {
 
 async function deleteManagedLesson(lesson: any) {
   closeManage()
-  await store.deleteLesson(lesson.$id)
+  await $fetch('/api/deleteLesson', { method: 'POST', body: { lessonId: lesson.$id } })
+  await refreshLessons()
 }
 </script>
 
@@ -286,7 +280,7 @@ async function deleteManagedLesson(lesson: any) {
                 </UTooltip>
               </span>
               <UButton aria-label="Deelnemer verwijderen" icon="i-heroicons-trash-20-solid" variant="ghost" size="xs"
-                class="text-red-400 hover:text-red-300" @click="removeBooking(booking, managedLesson); closeManage()" />
+                class="text-red-400 hover:text-red-300" @click="removeBooking(booking); closeManage()" />
             </div>
           </div>
           <p v-else class="text-sm text-gray-500">Geen deelnemers.</p>

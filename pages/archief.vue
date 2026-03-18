@@ -6,7 +6,8 @@ const description = ref('Lessen archief');
 const ogImage = ref('https://www.ravennah.com/ravennah-social.jpg');
 const pageUrl = ref('https://www.ravennah.com/archief');
 
-const store = useMainStore()
+const { isAdmin } = useAuth()
+const { cancelBooking, pending: isLoading } = useBookingActions()
 const dayjs = useDayjs()
 const { $rav } = useNuxtApp()
 
@@ -28,9 +29,6 @@ useHead({
     { hid: "twitter:image", name: "twitter:image", content: ogImage },
   ]
 })
-
-const isAdmin = computed(() => store.isAdmin)
-const isLoading = computed(() => store.isLoading)
 
 if (!isAdmin.value) {
   navigateTo('/')
@@ -67,9 +65,9 @@ function formatArchiveDateInDutch(date: string): string {
 
 const { getLessonBookingsWithLabels } = useLessonBookings()
 
-async function removeBooking(booking: any, lesson: any) {
+async function removeBooking(booking: any) {
   if (confirm('Weet je zeker dat je deze boeking wilt verwijderen?')) {
-    await store.cancelBooking(booking, lesson)
+    await cancelBooking(booking)
     await refresh()
   }
 }
@@ -160,7 +158,7 @@ watch(activeTab, (newVal) => {
                     <UTooltip v-if="booking.students?.pregnancy" text="Zwanger">
                       <UIcon name="i-lucide-baby" class="w-4 h-4 text-pink-500 flex-shrink-0" />
                     </UTooltip>
-                    <button @click="removeBooking(booking, lesson)" aria-label="Verwijder boeking"
+                    <button @click="removeBooking(booking)" aria-label="Verwijder boeking"
                       class="opacity-0 group-hover/booking:opacity-100 p-1 hover:bg-red-500/10 rounded transition-all flex-shrink-0"
                       title="Verwijder boeking">
                       <UIcon name="i-heroicons-trash-20-solid" class="w-4 h-4 text-red-400 hover:text-red-300" />

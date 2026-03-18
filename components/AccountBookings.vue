@@ -1,9 +1,9 @@
 <script setup lang="ts">
-const store = useMainStore()
+const { myBookings } = useBookings()
+const { availableCredits } = useCredits()
+const { cancelBooking, handleBooking } = useBookingActions()
 const { $rav } = useNuxtApp()
 
-const myBookings = computed(() => store.myBookings)
-const availableCredits = computed(() => store.availableCredits)
 const openBookingModal = inject('openBookingModal') as () => void
 
 const futureBookingGroups = computed(() => {
@@ -40,11 +40,11 @@ const futureBookingGroups = computed(() => {
 
 async function removeBooking(bookingGroup: any) {
   const bookingToCancel = bookingGroup.bookings[bookingGroup.bookings.length - 1]
-  await store.cancelBooking(bookingToCancel)
+  await cancelBooking(bookingToCancel)
 }
 
 async function bookExtraSpot(lesson: any) {
-  await store.handleBooking(lesson, { extraSpot: true })
+  await handleBooking(lesson, { extraSpot: true })
 }
 </script>
 

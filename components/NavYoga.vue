@@ -1,23 +1,22 @@
 <script lang="ts" setup>
-const store = useMainStore()
+const { user: loggedInUser, logout: authLogout, refresh } = useAuth()
 const router = useRouter()
 const navOpen = ref(false);
 
-await useAsyncData('loggedInUser', () => Promise.all([store.getUser(), store.fetchLessons()]), { server: false })
+await refresh()
+
 const toggle = () => {
 	navOpen.value = !navOpen.value;
 };
 
 const logout = async () => {
 	try {
-		await store.logoutUser();
+		await authLogout();
 		await router.push('/');
 	} catch (error) {
 		// Handle the error
 	}
 };
-
-const loggedInUser = computed(() => store.loggedInUser)
 </script>
 
 <template>

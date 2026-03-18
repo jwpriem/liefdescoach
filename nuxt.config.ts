@@ -69,7 +69,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
   modules: [
     '@nuxt/fonts',
-    '@pinia/nuxt',
     'dayjs-nuxt',
     '@nuxtjs/sitemap',
     '@nuxtjs/robots',

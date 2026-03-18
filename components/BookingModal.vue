@@ -1,18 +1,22 @@
 <script setup lang="ts">
-const store = useMainStore()
+const { user: loggedInUser } = useAuth()
+const { availableCredits } = useCredits()
+const { myBookings } = useBookings()
+const { handleBooking, error: bookingError } = useBookingActions()
+const { set: setOnBehalfOf } = useOnBehalfOf()
 const toast = useToast()
 const { $rav } = useNuxtApp()
 
 const open = defineModel<boolean>({ default: false })
 
-const lessons = computed(() => store.lessons)
-const futureLessons = computed(() => lessons.value.filter(l => $rav.isFutureBooking(l.date)))
-const availableCredits = computed(() => store.availableCredits)
+const { data: lessonsData } = await useAsyncData('lessons', () => $fetch<any>('/api/lessons'))
+const lessons = computed(() => lessonsData.value?.rows ?? [])
+const futureLessons = computed(() => lessons.value.filter((l: any) => $rav.isFutureBooking(l.date)))
 
 // ⚡ Bolt: Optimize O(N) array lookup in v-for to O(1) Set lookup
 const bookedLessonIds = computed(() => {
   const ids = new Set<string>()
-  for (const booking of store.myBookings) {
+  for (const booking of myBookings.value) {
     const l = booking.lessons
     if (Array.isArray(l)) {
       l.forEach((li: any) => ids.add(li.$id))
@@ -32,11 +36,11 @@ function spotsLeft(lesson: any): number {
 }
 
 async function book(lesson: any) {
-  if (!store.loggedInUser) return
-  await store.setOnBehalfOf(store.loggedInUser)
-  await store.handleBooking(lesson)
+  if (!loggedInUser.value) return
+  setOnBehalfOf(loggedInUser.value)
+  await handleBooking(lesson)
 
-  if (!store.errorMessage) {
+  if (!bookingError.value) {
     toast.add({
       id: 'booking',
       title: 'Tot snel',
@@ -45,15 +49,9 @@ async function book(lesson: any) {
       description: 'Je les is geboekt!'
     })
   }
-
-  store.fetchLessons()
 }
 
-onMounted(() => {
-  if (store.lessons.length === 0) {
-    store.fetchLessons()
-  }
-})
+
 </script>
 
 <template>

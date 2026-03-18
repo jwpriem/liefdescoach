@@ -1,12 +1,13 @@
 <script setup lang="ts">
-const store = useMainStore();
-const router = useRouter();
-const { $rav } = useNuxtApp();
+import type { User } from '~/composables/useAuth'
 
-import type { User } from '@/stores/index'
+const { user: loggedInUser, isAdmin, updateProfile, updatePassword: authUpdatePassword, updateHealth: authUpdateHealth, updateReminders: authUpdateReminders, requestEmailVerification } = useAuth()
+const { availableCredits: myCredits } = useCredits()
+const { $rav } = useNuxtApp()
 
 const props = defineProps<{
   user?: User | null
+  credits?: number
 }>()
 
 const state = reactive({
@@ -26,15 +27,15 @@ const state = reactive({
   passwordCheck: false,
 });
 
-const loggedInUser = computed(() => store.loggedInUser);
 const targetUser = computed(() => props.user || loggedInUser.value);
-const isAdmin = computed(() => store.isAdmin);
-const availableCredits = computed(() => props.user ? (store.studentCreditSummary[props.user.$id] || 0) : store.availableCredits);
+const availableCredits = computed(() => props.credits !== undefined ? props.credits : myCredits.value);
 
 const remindersEnabled = computed({
   get: () => targetUser.value?.reminders !== false,
   set: async (value: boolean) => {
-    await store.updateReminders(targetUser.value, value);
+    if (targetUser.value?.$id) {
+      await authUpdateReminders(targetUser.value.$id, value)
+    }
   },
 });
 
@@ -74,17 +75,12 @@ function cancel() {
 async function update() {
   if (!targetUser.value) return;
   try {
-    // Call the new update-profile API (no password required)
-    await $fetch('/api/students/update-profile', {
-      method: 'POST',
-      body: {
-        userId: targetUser.value.$id,
-        name: state.name,
-        phone: state.phone ? $rav.formatPhoneNumber(state.phone) : null,
-        dateOfBirth: state.dateOfBirth ? new Date(state.dateOfBirth).toISOString() : null
-      }
+    await updateProfile({
+      userId: targetUser.value.$id,
+      name: state.name ?? undefined,
+      phone: state.phone ? $rav.formatPhoneNumber(state.phone) : null,
+      dateOfBirth: state.dateOfBirth ? new Date(state.dateOfBirth).toISOString() : null
     });
-    await store.getUser(); // Refresh user details
     cancel();
   } catch (error) {
     console.error('Failed to update profile:', error);
@@ -106,7 +102,7 @@ async function updateHealth() {
       currentHealth.pregnancy !== newHealth.pregnancy ||
       currentHealth.dueDate !== newHealth.dueDate
     ) {
-      await store.updateHealth(targetUser.value, newHealth);
+      await authUpdateHealth(targetUser.value.$id, newHealth);
     }
     cancel();
   } catch (error) {
@@ -117,7 +113,7 @@ async function updateHealth() {
 async function updatePassword() {
   try {
     if (state.passwordCheck) {
-      await store.updatePasswordUser(state.password, state.newPassword);
+      await authUpdatePassword(state.password!, state.newPassword!);
       cancel();
     }
   } catch (error) {
@@ -146,7 +142,7 @@ const toast = useToast()
 async function requestVerification() {
   verificationSent.value = true
   try {
-    await store.requestEmailVerification()
+    await requestEmailVerification()
     toast.add({
       title: 'Verificatie verzonden',
       description: 'Check je e-mailinbox (en spam) voor de verificatielink.',

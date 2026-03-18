@@ -1,6 +1,5 @@
 <script lang="ts" setup>
-const store = useMainStore()
-const router = useRouter()
+const { isAdmin } = useAuth()
 const { $rav } = useNuxtApp()
 const toast = useToast()
 
@@ -39,10 +38,11 @@ const state = reactive({
 	showArchived: false
 });
 
-const students = computed(() => store.students);
-const loggedInUser = computed(() => store.loggedInUser);
-const isAdmin = computed(() => store.isAdmin);
-const studentCreditSummary = computed(() => store.studentCreditSummary);
+const { data: adminUsersData, refresh: refreshUsers } = await useAsyncData('admin-users', () => $fetch<any>('/api/users'))
+const { data: creditSummaryData, refresh: refreshCreditSummary } = await useAsyncData('credit-summary', () => $fetch<any>('/api/credits/summary'))
+
+const students = computed(() => adminUsersData.value?.users ?? [])
+const studentCreditSummary = computed(() => creditSummaryData.value?.summary ?? {})
 
 function getAvailableCredits(userId: string): number {
 	return studentCreditSummary.value[userId] || 0;
@@ -62,7 +62,8 @@ function cancel(): void {
 
 async function addCredits(userId: string, type: string): Promise<void> {
 	try {
-		await store.addCredits(userId, type);
+		await $fetch('/api/credits/add', { method: 'POST', body: { studentId: userId, type } })
+		await refreshCreditSummary()
 		cancel();
 	} catch (error) {
 		console.error('Failed to add credits:', error);
@@ -78,7 +79,7 @@ async function migrateCredits(): Promise<void> {
 	try {
 		const res = await $fetch('/api/credits/migrate', { method: 'POST' })
 		migrationResult.value = res
-		await store.getUser()
+		await refreshCreditSummary()
 		toast.add({
 			title: 'Migratie voltooid',
 			icon: 'i-lucide-badge-check',
@@ -108,7 +109,7 @@ async function archiveUser(userId) {
 			},
 		});
 
-		await store.getUser();
+		await refreshUsers();
 	} catch (error) {
 		console.error('Failed to update preferences:', error);
 	}
