@@ -61,7 +61,7 @@ async function logout(page: Page) {
 
 /**
  * Helper: navigate from account to /lessen using client-side navigation.
- * This preserves the Pinia store state (including loggedInUser), unlike
+ * This preserves the composable state (including loggedInUser), unlike
  * page.goto() which triggers a full SSR reload and re-authentication.
  */
 async function navigateToLessen(page: Page) {
@@ -147,17 +147,8 @@ test.describe('Booking flow', () => {
                 expect(geboektAfter).toBe(geboektBefore + 1)
             }).toPass({ timeout: 15_000 })
         } catch (e) {
-            // Debug: print store state
-            const storeState = await page.evaluate(() => {
-                // @ts-ignore
-                const store = window.$nuxt.$pinia.state.value.main
-                return {
-                    myBookings: store.myBookings,
-                    credits: store.myCreditSummary,
-                    loggedInUser: store.loggedInUser
-                }
-            })
-            console.log('DEBUG STORE STATE:', JSON.stringify(storeState, null, 2))
+            // Debug: log page state
+            console.log('DEBUG: Booking verification timed out — "Geboekt" count did not increase.')
             throw e
         }
 

@@ -174,7 +174,5 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         max: 20,
       }
     }
-  },
-
-  compatibilityDate: '2025-01-01'
+  }
 })
