@@ -151,7 +151,7 @@ const filteredRows = computed(() => {
 	const tokens = normalized.toLowerCase().split(' ')
 
 	return filteredUsers.value.filter((x) => {
-		const searchable = [x.name, x.email, x.phone].filter(Boolean).join(' ').toLowerCase()
+		const searchable = `${x.name || ''} ${x.email || ''} ${x.phone || ''}`.toLowerCase()
 		return tokens.every(token => searchable.includes(token))
 	})
 })
