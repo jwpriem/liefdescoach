@@ -121,14 +121,16 @@ export default defineNuxtPlugin(nuxtApp => {
 
         getLessonTitle(lesson: any) {
             if (lesson.type == 'guest lesson') {
-                return `Yin-Yang Yoga door gastdocent ${lesson.teacher}`
+                const safeTeacher = (lesson.teacher || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;")
+                return `Yin-Yang Yoga door gastdocent ${safeTeacher}`
             }
             return rav.checkLessonType(lesson.type)
         },
 
         getLessonDescription(lesson: any) {
             if (lesson.type == 'guest lesson') {
-                return `Yin-Yang Yoga door gastdocent <span class="text-yellow-600">${lesson.teacher}</span>`
+                const safeTeacher = (lesson.teacher || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;")
+                return `Yin-Yang Yoga door gastdocent <span class="text-yellow-600">${safeTeacher}</span>`
             }
             return rav.checkLessonType(lesson.type)
         }
