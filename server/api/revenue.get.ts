@@ -45,6 +45,7 @@ export default defineEventHandler(async (event) => {
             )
         )
         .orderBy(asc(lessons.date))
+        .limit(5000)
 
     // Group into buckets
     const lessonsSeen = new Set<string>()
