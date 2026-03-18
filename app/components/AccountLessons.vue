@@ -213,7 +213,7 @@ async function deleteManagedLesson(lesson: any) {
             <UIcon name="i-lucide-heart-pulse" class="w-5 h-5 text-red-500" />
             <h2 class="text-xl font-bold text-emerald-100 tracking-tight">Blessure info</h2>
           </div>
-          <UButton icon="i-lucide-x" color="gray" variant="ghost" size="sm" @click="state.injuryPopup = null" />
+          <UButton icon="i-lucide-x" color="neutral" variant="ghost" size="sm" @click="state.injuryPopup = null" />
         </div>
         <p class="text-sm font-medium text-gray-400 mb-1">{{ state.injuryPopup.name }}</p>
         <p class="text-base text-gray-200">{{ state.injuryPopup.injury }}</p>
