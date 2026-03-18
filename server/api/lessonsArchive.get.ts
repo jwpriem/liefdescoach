@@ -1,4 +1,4 @@
-import { lte, gte, desc, eq, and } from 'drizzle-orm'
+import { lte, gte, desc, eq, and, inArray } from 'drizzle-orm'
 import { lessons, bookings, students, health } from '../database/schema'
 
 export default defineEventHandler(async (event) => {
@@ -26,7 +26,6 @@ export default defineEventHandler(async (event) => {
     const lessonIds = lessonRows.map(l => l.id)
     let bookingRows: any[] = []
     if (lessonIds.length > 0) {
-        const { inArray } = await import('drizzle-orm')
         bookingRows = await db
             .select({
                 id: bookings.id,

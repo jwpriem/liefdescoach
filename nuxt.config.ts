@@ -138,6 +138,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     '/hatha-yoga': { cache: { maxAge: 3600 } },
     '/voordelen': { cache: { maxAge: 3600 } },
     '/contact': { cache: { maxAge: 3600 } },
+    // Authenticated/dynamic pages: disable SSR to prevent Vue instance accumulation per request
+    '/account': { ssr: false },
+    '/archief': { ssr: false },
+    '/login': { ssr: false },
+    '/verify-email': { ssr: false },
+    '/admin/**': { ssr: false },
     // Legacy redirects
     '/liefdescoach/**': { redirect: '/', statusCode: 301 },
     '/yoga': { redirect: '/', statusCode: 301 },
