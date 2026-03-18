@@ -23,17 +23,19 @@ export default defineEventHandler(async (event) => {
         'credit_20': 12.50,
     }
 
-    // Fetch all credits
+    // Fetch credits (bounded)
     const creditRows = await db
         .select()
         .from(credits)
         .where(eq(credits.studentId, userId))
+        .limit(2000)
 
-    // Fetch all bookings
+    // Fetch bookings (bounded)
     const bookingRows = await db
         .select()
         .from(bookings)
         .where(eq(bookings.studentId, userId))
+        .limit(2000)
 
     const now = new Date()
     const availableCredits = creditRows.filter(c => !c.bookingId && c.validTo && new Date(c.validTo) > now).length
