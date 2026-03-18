@@ -221,16 +221,16 @@ const filteredRows = computed(() => {
 					</div>
 				</div>
 				<div class="grid grid-cols-4 gap-2 border-t border-gray-800/50 pt-3 mt-3">
-					<UButton block color="primary" icon="i-lucide-eye" variant="soft" size="lg"
+					<UButton aria-label="Bekijk details" block color="primary" icon="i-lucide-eye" variant="soft" size="lg"
 						class="justify-center text-emerald-100 bg-emerald-500/10 hover:bg-emerald-500/20"
 						@click="navigateTo(`/admin/users/${row.$id}`)" />
-					<UButton block color="primary" icon="i-lucide-plus" variant="soft" size="lg"
+					<UButton aria-label="Voeg credits toe" block color="primary" icon="i-lucide-plus" variant="soft" size="lg"
 						class="justify-center text-emerald-100 bg-emerald-500/10 hover:bg-emerald-500/20"
 						@click="setUser(row)" />
-					<UButton block color="primary" icon="i-lucide-archive" variant="soft" size="lg"
+					<UButton aria-label="Archiveer" block color="primary" icon="i-lucide-archive" variant="soft" size="lg"
 						class="justify-center text-emerald-100 bg-emerald-500/10 hover:bg-emerald-500/20"
 						@click="archiveUser(row.$id)" />
-					<UButton :disabled="!row.phone" block color="primary" icon="i-lucide-message-circle-more"
+					<UButton aria-label="WhatsApp sturen" :disabled="!row.phone" block color="primary" icon="i-lucide-message-circle-more"
 						variant="soft" size="lg"
 						class="justify-center text-emerald-100 bg-emerald-500/10 hover:bg-emerald-500/20 disabled:opacity-30 disabled:cursor-not-allowed"
 						@click="sendWhatsapp(row)" />
@@ -270,19 +270,19 @@ const filteredRows = computed(() => {
 				<template #actions-cell="{ row }">
 					<div class="flex items-center gap-x-1">
 						<UTooltip text="Bekijk details">
-							<UButton icon="i-lucide-eye" variant="ghost" size="sm" class="text-emerald-100"
+							<UButton aria-label="Bekijk details" icon="i-lucide-eye" variant="ghost" size="sm" class="text-emerald-100"
 								@click="navigateTo(`/admin/users/${row.original.$id}`)" />
 						</UTooltip>
 						<UTooltip text="Voeg credits toe">
-							<UButton icon="i-lucide-plus" variant="ghost" size="sm" class="text-emerald-100"
+							<UButton aria-label="Voeg credits toe" icon="i-lucide-plus" variant="ghost" size="sm" class="text-emerald-100"
 								@click="setUser(row.original)" />
 						</UTooltip>
 						<UTooltip text="Archiveer">
-							<UButton icon="i-lucide-archive" variant="ghost" size="sm" class="text-emerald-100"
+							<UButton aria-label="Archiveer" icon="i-lucide-archive" variant="ghost" size="sm" class="text-emerald-100"
 								@click="archiveUser(row.original.$id)" />
 						</UTooltip>
 						<UTooltip text="WhatsApp" v-if="row.original.phone">
-							<UButton icon="i-lucide-message-circle-more" variant="ghost" size="sm"
+							<UButton aria-label="WhatsApp sturen" icon="i-lucide-message-circle-more" variant="ghost" size="sm"
 								class="text-emerald-100" @click="sendWhatsapp(row.original)" />
 						</UTooltip>
 					</div>
