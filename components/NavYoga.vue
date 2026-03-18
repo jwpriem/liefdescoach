@@ -1,9 +1,7 @@
 <script lang="ts" setup>
-const { user: loggedInUser, logout: authLogout, refresh } = useAuth()
+const { user: loggedInUser, logout: authLogout } = useAuth()
 const router = useRouter()
 const navOpen = ref(false);
-
-await refresh()
 
 const toggle = () => {
 	navOpen.value = !navOpen.value;

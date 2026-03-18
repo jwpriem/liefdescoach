@@ -19,7 +19,7 @@ const otpStep = ref<'email' | 'code'>('email')
 const otpCode = ref('')
 const otpSent = ref(false)
 
-const { user, login: authLogin, sendOtp: authSendOtp, verifyOtp: authVerifyOtp, register: authRegister, refresh } = useAuth()
+const { user, login: authLogin, sendOtp: authSendOtp, verifyOtp: authVerifyOtp, register: authRegister, pending } = useAuth()
 const { call, error: errorMessage, pending: isLoading } = useApiCall()
 
 definePageMeta({
@@ -51,8 +51,13 @@ useHead({
 })
 
 onMounted(async () => {
-  if (user.value) return
-  await refresh()
+  // useAuth's useAsyncData already started fetching immediately; wait for it
+  // without triggering a redundant second request
+  if (pending.value) {
+    await new Promise<void>(resolve => {
+      const stop = watch(pending, (v) => { if (!v) { stop(); resolve() } })
+    })
+  }
   if (user.value) {
     await navigateTo('/account', { replace: true })
   } else {
