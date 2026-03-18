@@ -176,7 +176,7 @@ async function deleteManagedLesson(lesson: any) {
                 <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Les</span>
                 <span class="block text-gray-100 mt-0.5" v-html="$rav.getLessonDescription(lesson)"></span>
               </div>
-              <UButton icon="i-lucide-settings" variant="ghost" size="md"
+              <UButton aria-label="Les beheren" icon="i-lucide-settings" variant="ghost" size="md"
                 class="text-gray-400 hover:text-white -mt-1 -mr-2" @click="openManage(lesson)" />
             </div>
             <div>
@@ -266,7 +266,7 @@ async function deleteManagedLesson(lesson: any) {
             <h2 class="text-2xl font-bold text-emerald-100 tracking-tight">Les beheren</h2>
             <p class="text-gray-400 text-sm mt-1">{{ $rav.formatDateInDutch(managedLesson.date, true) }}</p>
           </div>
-          <UButton icon="i-heroicons-x-mark-20-solid" variant="ghost" size="sm"
+          <UButton aria-label="Sluiten" icon="i-heroicons-x-mark-20-solid" variant="ghost" size="sm"
             class="text-gray-400 hover:text-white -mt-1 -mr-2" @click="closeManage()" />
         </div>
 
@@ -285,7 +285,7 @@ async function deleteManagedLesson(lesson: any) {
                   <UIcon name="i-heroicons-sparkles-20-solid" class="w-4 h-4 text-pink-500" />
                 </UTooltip>
               </span>
-              <UButton icon="i-heroicons-trash-20-solid" variant="ghost" size="xs"
+              <UButton aria-label="Deelnemer verwijderen" icon="i-heroicons-trash-20-solid" variant="ghost" size="xs"
                 class="text-red-400 hover:text-red-300" @click="removeBooking(booking, managedLesson); closeManage()" />
             </div>
           </div>
