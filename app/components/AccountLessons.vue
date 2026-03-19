@@ -91,6 +91,7 @@ async function createNewLesson() {
 }
 
 async function removeBooking(booking: any) {
+  if (!confirm('Weet je zeker dat je deze deelnemer wilt verwijderen?')) return;
   await cancelBooking(booking)
 }
 
@@ -138,6 +139,7 @@ function closeManage() {
 }
 
 async function deleteManagedLesson(lesson: any) {
+  if (!confirm('Weet je zeker dat je deze les wilt verwijderen?')) return;
   closeManage()
   await $fetch('/api/deleteLesson', { method: 'POST', body: { lessonId: lesson.$id } })
   await refreshLessons()
