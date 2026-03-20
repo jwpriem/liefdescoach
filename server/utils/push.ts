@@ -56,32 +56,44 @@ async function sendToSubscription(
 
 /**
  * Send a push notification to all subscriptions for a given student.
+ * Never throws — returns 0 on any failure so callers are not impacted.
  */
 export async function sendPushToStudent(studentId: string, payload: PushPayload): Promise<number> {
-    const subs = await db
-        .select()
-        .from(pushSubscriptions)
-        .where(eq(pushSubscriptions.studentId, studentId))
+    try {
+        const subs = await db
+            .select()
+            .from(pushSubscriptions)
+            .where(eq(pushSubscriptions.studentId, studentId))
 
-    let sent = 0
-    for (const sub of subs) {
-        if (await sendToSubscription(sub, payload)) sent++
+        let sent = 0
+        for (const sub of subs) {
+            if (await sendToSubscription(sub, payload)) sent++
+        }
+        return sent
+    } catch (err: any) {
+        console.error(`[Push] sendPushToStudent failed for ${studentId}:`, err?.message ?? err)
+        return 0
     }
-    return sent
 }
 
 /**
  * Send a push notification to all admin users who have push enabled.
+ * Never throws — returns 0 on any failure so callers are not impacted.
  */
 export async function sendPushToAdmins(payload: PushPayload): Promise<number> {
-    const adminStudents = await db
-        .select({ id: students.id })
-        .from(students)
-        .where(eq(students.isAdmin, true))
+    try {
+        const adminStudents = await db
+            .select({ id: students.id })
+            .from(students)
+            .where(eq(students.isAdmin, true))
 
-    let sent = 0
-    for (const admin of adminStudents) {
-        sent += await sendPushToStudent(admin.id, payload)
+        let sent = 0
+        for (const admin of adminStudents) {
+            sent += await sendPushToStudent(admin.id, payload)
+        }
+        return sent
+    } catch (err: any) {
+        console.error('[Push] sendPushToAdmins failed:', err?.message ?? err)
+        return 0
     }
-    return sent
 }

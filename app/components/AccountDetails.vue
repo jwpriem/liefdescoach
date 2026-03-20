@@ -43,10 +43,15 @@ const remindersEnabled = computed({
 const pushEnabled = computed({
   get: () => pushSubscribed.value,
   set: async (value: boolean) => {
-    if (value) {
-      await pushSubscribe()
-    } else {
-      await pushUnsubscribe()
+    const success = value ? await pushSubscribe() : await pushUnsubscribe()
+    if (!success) {
+      toast.add({
+        title: value ? 'Pushberichten inschakelen mislukt' : 'Pushberichten uitschakelen mislukt',
+        description: value
+          ? 'Controleer of je meldingen hebt toegestaan in je browser.'
+          : 'Probeer het later opnieuw.',
+        color: 'error',
+      })
     }
   },
 });
