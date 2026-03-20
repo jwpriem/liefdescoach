@@ -126,14 +126,22 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   css: ['~/assets/css/tailwind.css'],
 
   routeRules: {
-    // Static info pages: cache for 1 hour (bounded by lru-cache storage below)
-    '/over': { cache: { maxAge: 3600 } },
-    '/tarieven': { cache: { maxAge: 3600 } },
-    '/priveles': { cache: { maxAge: 3600 } },
-    '/hatha-yoga': { cache: { maxAge: 3600 } },
-    '/voordelen': { cache: { maxAge: 3600 } },
-    '/contact': { cache: { maxAge: 3600 } },
-    // Authenticated/dynamic pages: disable SSR to prevent Vue instance accumulation per request
+    // Static pages: ISR — render once, then serve from cache indefinitely
+    // stale-while-revalidate ensures the cached version is served while re-rendering in background
+    '/': { isr: true },
+    '/over': { isr: true },
+    '/tarieven': { isr: true },
+    '/priveles': { isr: true },
+    '/hatha-yoga': { isr: true },
+    '/voordelen': { isr: true },
+    '/contact': { isr: true },
+    '/bo-bol': { isr: true },
+    '/yoga-capelle-aan-den-ijssel': { isr: true },
+    '/yoga-zuidplas': { isr: true },
+    '/yoga-waddinxveen': { isr: true },
+    '/yoga-zevenhuizen': { isr: true },
+    // Dynamic/authenticated pages: disable SSR to prevent Vue instance accumulation
+    '/lessen': { ssr: false },
     '/account': { ssr: false },
     '/archief': { ssr: false },
     '/login': { ssr: false },
