@@ -5,6 +5,11 @@ const token = route.query.token as string
 const verifying = ref(true)
 const success = ref(false)
 const error = ref('')
+let redirectTimer: ReturnType<typeof setTimeout> | undefined
+
+onBeforeUnmount(() => {
+    if (redirectTimer) clearTimeout(redirectTimer)
+})
 
 onMounted(async () => {
     if (!token) {
@@ -16,7 +21,7 @@ onMounted(async () => {
     try {
         await verifyEmail(token)
         success.value = true
-        setTimeout(() => {
+        redirectTimer = setTimeout(() => {
             navigateTo('/account')
         }, 3000)
     } catch (e: any) {
