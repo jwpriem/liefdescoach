@@ -108,9 +108,9 @@ async function bookExtraSpot(lesson: any) {
             <div>
               <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Zet in je agenda</span>
               <div class="flex gap-3 mt-2">
-                <a :href="$rav.getCalenderLink('apple', bookingGroup.lessons.date, bookingGroup.lessons.type)" class="hover:opacity-80 transition-opacity" aria-label="Voeg toe aan Apple Agenda"><NuxtImg src="/apple.png" class="w-6" alt="" /></a>
-                <a :href="$rav.getCalenderLink('google', bookingGroup.lessons.date, bookingGroup.lessons.type)" class="hover:opacity-80 transition-opacity" aria-label="Voeg toe aan Google Agenda"><NuxtImg src="/gmail.png" class="w-6" alt="" /></a>
-                <a :href="$rav.getCalenderLink('outlook', bookingGroup.lessons.date, bookingGroup.lessons.type)" class="hover:opacity-80 transition-opacity" aria-label="Voeg toe aan Outlook Agenda"><NuxtImg src="/outlook.png" class="w-6" alt="" /></a>
+                <a :href="$rav.getCalenderLink('apple', bookingGroup.lessons.date, bookingGroup.lessons.type)" class="hover:opacity-80 transition-opacity" aria-label="Voeg toe aan Apple Agenda"><img src="/apple.png" class="w-6" alt="" /></a>
+                <a :href="$rav.getCalenderLink('google', bookingGroup.lessons.date, bookingGroup.lessons.type)" class="hover:opacity-80 transition-opacity" aria-label="Voeg toe aan Google Agenda"><img src="/gmail.png" class="w-6" alt="" /></a>
+                <a :href="$rav.getCalenderLink('outlook', bookingGroup.lessons.date, bookingGroup.lessons.type)" class="hover:opacity-80 transition-opacity" aria-label="Voeg toe aan Outlook Agenda"><img src="/outlook.png" class="w-6" alt="" /></a>
               </div>
             </div>
 

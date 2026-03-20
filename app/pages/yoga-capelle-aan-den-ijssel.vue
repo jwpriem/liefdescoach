@@ -73,7 +73,7 @@ useLocationPageSchema('Capelle aan den IJssel', 'https://www.ravennah.com/yoga-c
             <div class="container mx-auto">
                 <div class="md:flex justify-between items-center md:space-x-12 space-y-8 md:space-y-0">
                     <div class="w-full md:w-1/2">
-                        <NuxtImg class="w-full h-64 md:h-96 object-center object-cover rounded-3xl shadow-xl"
+                        <img class="w-full h-64 md:h-96 object-center object-cover rounded-3xl shadow-xl"
                             src="/ravennah_een_been.webp" />
                     </div>
                     <div class="w-full md:w-1/2 space-y-6">
@@ -120,7 +120,7 @@ useLocationPageSchema('Capelle aan den IJssel', 'https://www.ravennah.com/yoga-c
                         </ul>
                     </div>
                     <div class="w-full md:w-1/2">
-                        <NuxtImg class="w-full h-64 md:h-96 object-center object-cover rounded-3xl shadow-xl"
+                        <img class="w-full h-64 md:h-96 object-center object-cover rounded-3xl shadow-xl"
                             src="/ravennah_wind.webp" />
                     </div>
                 </div>

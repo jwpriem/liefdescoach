@@ -335,7 +335,7 @@ async function onConfirmDeleteLesson() {
                 :label="dayjs(state.createLessonDate).format('D MMM, YYYY')" color="primary" variant="outline"
                 class="w-full justify-between" />
               <template #content="{ close }">
-                <DatePicker v-model="state.createLessonDate" is-required @close="close" />
+                <LazyDatePicker v-model="state.createLessonDate" is-required @close="close" />
               </template>
             </UPopover>
           </div>

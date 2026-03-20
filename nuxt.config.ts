@@ -71,9 +71,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     '@nuxt/fonts',
     'dayjs-nuxt',
     '@nuxtjs/sitemap',
-    '@nuxtjs/robots',
     '@nuxt/ui',
-    '@nuxt/image',
     '@vite-pwa/nuxt',
   ],
 
@@ -105,10 +103,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     },
   },
 
-  image: {
-    domains: ['images.unsplash.com']
-  },
-
   dayjs: {
     locales: ['en', 'nl'],
     plugins: ['relativeTime', 'utc', 'timezone'],
@@ -117,7 +111,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   },
 
   sitemap: {
-    autoLastmod: true
+    autoLastmod: true,
+    // Cache the sitemap for 1 hour to avoid regenerating on every request
+    cacheMaxAgeSeconds: 3600,
   },
 
   fonts: {
@@ -160,6 +156,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
   icon: {
     mode: 'svg',
+  },
+
+  vite: {
+    build: {
+      sourcemap: false,
+    },
   },
 
   nitro: {
