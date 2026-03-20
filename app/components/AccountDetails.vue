@@ -3,6 +3,7 @@ import type { User } from '~/composables/useAuth'
 
 const { user: loggedInUser, isAdmin, updateProfile, updatePassword: authUpdatePassword, updateHealth: authUpdateHealth, updateReminders: authUpdateReminders, requestEmailVerification } = useAuth()
 const { availableCredits: myCredits } = useCredits()
+const { isSupported: pushSupported, isSubscribed: pushSubscribed, subscribe: pushSubscribe, unsubscribe: pushUnsubscribe } = usePushNotifications()
 const { $rav } = useNuxtApp()
 
 const props = defineProps<{
@@ -35,6 +36,17 @@ const remindersEnabled = computed({
   set: async (value: boolean) => {
     if (targetUser.value?.$id) {
       await authUpdateReminders(targetUser.value.$id, value)
+    }
+  },
+});
+
+const pushEnabled = computed({
+  get: () => pushSubscribed.value,
+  set: async (value: boolean) => {
+    if (value) {
+      await pushSubscribe()
+    } else {
+      await pushUnsubscribe()
     }
   },
 });
@@ -217,6 +229,13 @@ async function requestVerification() {
             <span class="block text-gray-400 text-xs mt-0.5">Ontvang een e-mail de avond voor je les</span>
           </div>
           <USwitch v-model="remindersEnabled" color="primary" />
+        </div>
+        <div v-if="pushSupported" class="flex items-center justify-between pt-2 border-t border-gray-800/50">
+          <div>
+            <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Pushberichten</span>
+            <span class="block text-gray-400 text-xs mt-0.5">Ontvang meldingen op je telefoon voor herinneringen en updates</span>
+          </div>
+          <USwitch v-model="pushEnabled" color="primary" />
         </div>
       </div>
       <div class="flex flex-col gap-3 mt-6">

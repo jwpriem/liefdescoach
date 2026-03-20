@@ -17,5 +17,6 @@ export default defineEventHandler(async (event) => {
         emailVerification: sessionUser.emailVerified,
         archived: sessionUser.archived,
         reminders: sessionUser.reminders,
+        pushNotifications: sessionUser.pushNotifications,
     }
 })

@@ -1,6 +1,6 @@
 import { createError } from 'h3'
-import { eq } from 'drizzle-orm'
-import { lessons, bookings, students } from '../database/schema'
+import { eq, and, isNull, gt } from 'drizzle-orm'
+import { lessons, bookings, students, credits } from '../database/schema'
 
 export default defineEventHandler(async (event) => {
     await requireAuth(event)
@@ -87,6 +87,51 @@ export default defineEventHandler(async (event) => {
         } catch (err: any) {
             console.error(`[BookingConfirmation] ${mail.label} email failed:`, err?.message ?? err)
         }
+    }
+
+    // Send push notification to admin
+    try {
+        await sendPushToAdmins({
+            title: 'Nieuwe boeking',
+            body: `${body.name} heeft ${lessontype} geboekt op ${formattedDate}`,
+            url: '/account',
+        })
+    } catch (err: any) {
+        console.error('[BookingConfirmation] Admin push failed:', err?.message ?? err)
+    }
+
+    // Check if student has zero remaining credits — alert admin
+    try {
+        const studentRows = await db
+            .select({ id: students.id })
+            .from(students)
+            .where(eq(students.email, body.email))
+            .limit(1)
+
+        if (studentRows.length > 0) {
+            const now = new Date()
+            const availableCredits = await db
+                .select()
+                .from(credits)
+                .where(
+                    and(
+                        eq(credits.studentId, studentRows[0].id),
+                        isNull(credits.bookingId),
+                        gt(credits.validTo, now)
+                    )
+                )
+                .limit(1)
+
+            if (availableCredits.length === 0) {
+                await sendPushToAdmins({
+                    title: 'Credits op',
+                    body: `${body.name} heeft geen credits meer`,
+                    url: '/account',
+                })
+            }
+        }
+    } catch (err: any) {
+        console.error('[BookingConfirmation] Credit check push failed:', err?.message ?? err)
     }
 
     setResponseStatus(event, 202)

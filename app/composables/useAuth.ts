@@ -6,6 +6,7 @@ export type User = {
   dateOfBirth?: string
   archived?: boolean
   reminders?: boolean
+  pushNotifications?: boolean
   labels?: string[]
   registration?: string
   emailVerification?: boolean
