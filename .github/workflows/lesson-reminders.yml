@@ -10,7 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Send lesson reminder emails
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
-          curl -sf -X POST "${{ secrets.APP_URL }}/api/sendLessonReminders" \
+          curl --fail-with-body -s -X POST "$APP_URL/api/sendLessonReminders" \
             -H "Content-Type: application/json" \
-            -H "x-api-key: ${{ secrets.CRON_SECRET }}"
+            -H "x-api-key: $CRON_SECRET"
