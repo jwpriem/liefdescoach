@@ -61,17 +61,36 @@ export function formatMinutes(date: Date): string {
  * Get tomorrow's start and end in a given timezone, returned as UTC Date objects.
  */
 export function getTomorrowRange(timezone: string): { start: Date; end: Date } {
-    // Get "now" in the target timezone
-    const nowInTZ = new Date(new Date().toLocaleString('en-US', { timeZone: timezone }))
-    // Tomorrow at midnight in that timezone
-    const tomorrowLocal = new Date(nowInTZ.getFullYear(), nowInTZ.getMonth(), nowInTZ.getDate() + 1, 0, 0, 0, 0)
-    const endLocal = new Date(nowInTZ.getFullYear(), nowInTZ.getMonth(), nowInTZ.getDate() + 1, 23, 59, 59, 999)
+    const now = new Date()
 
-    // Convert back to UTC by finding the offset
-    const offsetMs = tomorrowLocal.getTime() - new Date(tomorrowLocal.toLocaleString('en-US', { timeZone: 'UTC' })).getTime()
+    // Get tomorrow's date string in the target timezone using en-CA (YYYY-MM-DD format)
+    // Adding 24h is sufficient to land on "tomorrow" in any timezone
+    const tomorrowStr = new Intl.DateTimeFormat('en-CA', { timeZone: timezone })
+        .format(new Date(now.getTime() + 24 * 60 * 60 * 1000))
 
-    return {
-        start: new Date(tomorrowLocal.getTime() - offsetMs),
-        end: new Date(endLocal.getTime() - offsetMs),
-    }
+    const [year, month, day] = tomorrowStr.split('-').map(Number)
+
+    // Use noon UTC as anchor to determine the timezone offset on that day
+    // (noon avoids DST transition ambiguity which only occurs near midnight)
+    const noonUtc = new Date(Date.UTC(year, month - 1, day, 12, 0, 0))
+    const parts = new Intl.DateTimeFormat('en-US', {
+        timeZone: timezone,
+        hour: 'numeric',
+        minute: 'numeric',
+        second: 'numeric',
+        hour12: false,
+    }).formatToParts(noonUtc)
+
+    const h = parseInt(parts.find(p => p.type === 'hour')!.value) % 24
+    const m = parseInt(parts.find(p => p.type === 'minute')!.value)
+    const s = parseInt(parts.find(p => p.type === 'second')!.value)
+
+    // offsetMs = how many ms the target timezone is ahead of UTC
+    const offsetMs = ((h - 12) * 3600 + m * 60 + s) * 1000
+
+    // Midnight in target timezone = UTC midnight minus the offset
+    const start = new Date(Date.UTC(year, month - 1, day, 0, 0, 0) - offsetMs)
+    const end = new Date(start.getTime() + 24 * 60 * 60 * 1000 - 1)
+
+    return { start, end }
 }
