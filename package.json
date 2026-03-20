@@ -28,7 +28,6 @@
     "@nuxtjs/sitemap": "^7.0.0",
     "@popperjs/core": "^2.11.8",
     "@vite-pwa/nuxt": "^1.1.1",
-    "appwrite": "^21.5.0",
     "bcrypt": "^6.0.0",
     "chart.js": "^4.5.1",
     "drizzle-orm": "^0.45.1",
@@ -42,14 +41,12 @@
   "devDependencies": {
     "@iconify-json/lucide": "^1.2.27",
     "@nuxt/fonts": "^0.11.0",
-    "@nuxt/image": "^2.0.0",
     "@playwright/test": "^1.58.1",
     "@types/bcrypt": "^6.0.0",
     "dayjs-nuxt": "^2.1.9",
     "dotenv": "^17.2.3",
     "drizzle-kit": "^0.31.9",
     "h3": "2.0.1-rc.17",
-    "sharp": "^0.34.5",
     "tsx": "^4.21.0",
     "vitest": "^2.1.9"
   },

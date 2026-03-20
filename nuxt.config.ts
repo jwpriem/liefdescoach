@@ -73,7 +73,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     '@nuxtjs/sitemap',
     '@nuxtjs/robots',
     '@nuxt/ui',
-    '@nuxt/image',
     '@vite-pwa/nuxt',
   ],
 
@@ -103,10 +102,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     devOptions: {
       enabled: false,
     },
-  },
-
-  image: {
-    domains: ['images.unsplash.com']
   },
 
   dayjs: {
@@ -160,6 +155,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
   icon: {
     mode: 'svg',
+  },
+
+  vite: {
+    build: {
+      sourcemap: false,
+    },
   },
 
   nitro: {
