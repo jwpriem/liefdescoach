@@ -32,6 +32,7 @@ export default defineEventHandler(async (event) => {
     }
 
     let emailsSent = 0
+    let pushSent = 0
     const errors: string[] = []
 
     for (const lesson of lessonRows) {
@@ -42,6 +43,7 @@ export default defineEventHandler(async (event) => {
                 studentName: students.name,
                 studentEmail: students.email,
                 reminders: students.reminders,
+                pushNotifications: students.pushNotifications,
             })
             .from(bookings)
             .innerJoin(students, eq(bookings.studentId, students.id))
@@ -61,44 +63,59 @@ export default defineEventHandler(async (event) => {
         for (const student of bookingRows) {
             if (!student.studentEmail) continue
 
-            // Check reminder opt-out
-            if (student.reminders === false) {
-                console.log(`[LessonReminder] Skipped ${student.studentEmail} (reminders disabled)`)
-                continue
+            // Send email reminder (if opted in)
+            if (student.reminders !== false) {
+                const mail = lessonReminderEmail({
+                    name: student.studentName || 'Yogi',
+                    lessonType,
+                    lessonDate: formattedDate,
+                    address,
+                })
+
+                try {
+                    await smtpTransport.sendMail({
+                        from: 'Yoga Ravennah <info@ravennah.com>',
+                        to: student.studentEmail,
+                        subject: mail.subject,
+                        html: mail.html,
+                        text: mail.text,
+                    })
+                    emailsSent++
+                    console.log(`[LessonReminder] Email sent to ${student.studentEmail} for lesson ${lesson.id}`)
+                } catch (err: any) {
+                    const msg = `Failed to send email to ${student.studentEmail}: ${err?.message ?? err}`
+                    console.error(`[LessonReminder] ${msg}`)
+                    errors.push(msg)
+                }
+            } else {
+                console.log(`[LessonReminder] Skipped email for ${student.studentEmail} (reminders disabled)`)
             }
 
-            const mail = lessonReminderEmail({
-                name: student.studentName || 'Yogi',
-                lessonType,
-                lessonDate: formattedDate,
-                address,
-            })
-
-            try {
-                await smtpTransport.sendMail({
-                    from: 'Yoga Ravennah <info@ravennah.com>',
-                    to: student.studentEmail,
-                    subject: mail.subject,
-                    html: mail.html,
-                    text: mail.text,
-                })
-                emailsSent++
-                console.log(`[LessonReminder] Sent to ${student.studentEmail} for lesson ${lesson.id}`)
-            } catch (err: any) {
-                const msg = `Failed to send to ${student.studentEmail}: ${err?.message ?? err}`
-                console.error(`[LessonReminder] ${msg}`)
-                errors.push(msg)
+            // Send push reminder (if opted in)
+            if (student.pushNotifications) {
+                try {
+                    const sent = await sendPushToStudent(student.studentId, {
+                        title: 'Morgen yoga!',
+                        body: `Je hebt morgen ${lessonType} — tot dan!`,
+                        url: '/lessen',
+                    })
+                    pushSent += sent
+                    console.log(`[LessonReminder] Push sent to ${student.studentEmail} (${sent} devices)`)
+                } catch (err: any) {
+                    console.error(`[LessonReminder] Push failed for ${student.studentEmail}:`, err?.message ?? err)
+                }
             }
 
             await new Promise(resolve => setTimeout(resolve, 100))
         }
     }
 
-    console.log(`[LessonReminder] Done. Lessons: ${lessonRows.length}, Emails sent: ${emailsSent}, Errors: ${errors.length}`)
+    console.log(`[LessonReminder] Done. Lessons: ${lessonRows.length}, Emails sent: ${emailsSent}, Push sent: ${pushSent}, Errors: ${errors.length}`)
 
     return {
         lessonsFound: lessonRows.length,
         emailsSent,
+        pushSent,
         errors: errors.length > 0 ? errors : undefined,
     }
 })

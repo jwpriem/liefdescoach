@@ -14,6 +14,7 @@ export const students = pgTable('students', {
   phone: text('phone'),
   archived: boolean('archived').notNull().default(false),
   reminders: boolean('reminders').notNull().default(true),
+  pushNotifications: boolean('push_notifications').notNull().default(false),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 }, (table) => [
   uniqueIndex('students_email_idx').on(table.email),
@@ -75,6 +76,18 @@ export const health = pgTable('health', {
   dueDate: timestamp('due_date', { withTimezone: true }),
 }, (table) => [
   uniqueIndex('health_student_id_idx').on(table.studentId),
+])
+
+export const pushSubscriptions = pgTable('push_subscriptions', {
+  id: text('id').primaryKey(),
+  studentId: text('student_id').notNull().references(() => students.id, { onDelete: 'cascade' }),
+  endpoint: text('endpoint').notNull(),
+  p256dh: text('p256dh').notNull(),
+  auth: text('auth').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+}, (table) => [
+  index('push_subscriptions_student_id_idx').on(table.studentId),
+  uniqueIndex('push_subscriptions_endpoint_idx').on(table.endpoint),
 ])
 
 export const otpCodes = pgTable('otp_codes', {

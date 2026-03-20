@@ -48,9 +48,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     revenuePerBooking: '14',   // NUXT_REVENUE_PER_BOOKING
     costPerLesson: '35',       // NUXT_COST_PER_LESSON
     sessionSecret: '',         // NUXT_SESSION_SECRET (for signing session cookies)
+    vapidPrivateKey: '',       // NUXT_VAPID_PRIVATE_KEY (Web Push VAPID private key)
+    vapidEmail: '',            // NUXT_VAPID_EMAIL (e.g. mailto:info@ravennah.com)
     // Public keys that are exposed to the client
     public: {
       project: '',                // NUXT_PUBLIC_PROJECT (Appwrite project ID — needed for lazy password migration)
+      vapidPublicKey: '',         // NUXT_PUBLIC_VAPID_PUBLIC_KEY (Web Push VAPID public key)
       mailPass: '',
       mailPassDev: ''
     }
@@ -97,6 +100,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       navigateFallback: '/account',
       // Only cache app shell assets — fonts are fetched from CDN and cached separately
       globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
+      // Import custom push notification handler into the generated service worker
+      importScripts: ['/push-sw.js'],
     },
     devOptions: {
       enabled: false,

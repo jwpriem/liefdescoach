@@ -75,5 +75,16 @@ export default defineEventHandler(async (event) => {
         }
     }
 
+    // Send push notification to admin
+    try {
+        await sendPushToAdmins({
+            title: 'Annulering',
+            body: `${body.name} heeft ${lessontype} geannuleerd op ${formattedDate}`,
+            url: '/account',
+        })
+    } catch (err: any) {
+        console.error('[BookingCancellation] Admin push failed:', err?.message ?? err)
+    }
+
     setResponseStatus(event, 202)
 })
