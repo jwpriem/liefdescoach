@@ -90,11 +90,6 @@ async function createNewLesson() {
   await refreshLessons()
 }
 
-async function removeBooking(booking: any) {
-  if (!confirm('Weet je zeker dat je deze deelnemer wilt verwijderen?')) return;
-  await cancelBooking(booking)
-}
-
 const { sortStudents, getLessonBookingsWithLabels } = useLessonBookings()
 
 const futureLessons = computed(() =>
@@ -138,10 +133,30 @@ function closeManage() {
   managedLesson.value = null
 }
 
+const confirmRemoveBooking = ref(false)
+const pendingRemoveBooking = ref<any>(null)
+
+function promptRemoveBooking(booking: any) {
+  pendingRemoveBooking.value = booking
+  confirmRemoveBooking.value = true
+}
+
+async function onConfirmRemoveBooking() {
+  if (pendingRemoveBooking.value) {
+    await cancelBooking(pendingRemoveBooking.value)
+    pendingRemoveBooking.value = null
+  }
+}
+
+const confirmDeleteLesson = ref(false)
+
 async function deleteManagedLesson(lesson: any) {
-  if (!confirm('Weet je zeker dat je deze les wilt verwijderen?')) return;
+  confirmDeleteLesson.value = true
+}
+
+async function onConfirmDeleteLesson() {
   closeManage()
-  await $fetch('/api/deleteLesson', { method: 'POST', body: { lessonId: lesson.$id } })
+  await $fetch('/api/deleteLesson', { method: 'POST', body: { lessonId: managedLesson.value.$id } })
   await refreshLessons()
 }
 </script>
@@ -282,7 +297,7 @@ async function deleteManagedLesson(lesson: any) {
                 </UTooltip>
               </span>
               <UButton aria-label="Deelnemer verwijderen" icon="i-heroicons-trash-20-solid" variant="ghost" size="xs"
-                class="text-red-400 hover:text-red-300" @click="removeBooking(booking); closeManage()" />
+                class="text-red-400 hover:text-red-300" @click="promptRemoveBooking(booking); closeManage()" />
             </div>
           </div>
           <p v-else class="text-sm text-gray-500">Geen deelnemers.</p>
@@ -296,6 +311,14 @@ async function deleteManagedLesson(lesson: any) {
         </div>
       </div>
     </div>
+
+    <!-- Confirm: Remove booking -->
+    <ConfirmModal v-model="confirmRemoveBooking" message="Weet je zeker dat je deze deelnemer wilt verwijderen?"
+      @confirm="onConfirmRemoveBooking" />
+
+    <!-- Confirm: Delete lesson -->
+    <ConfirmModal v-model="confirmDeleteLesson" message="Weet je zeker dat je deze les wilt verwijderen?"
+      @confirm="onConfirmDeleteLesson" />
 
     <!-- Modal: Create lesson -->
     <div v-if="state.createLesson && isAdmin"

@@ -65,9 +65,18 @@ function formatArchiveDateInDutch(date: string): string {
 
 const { getLessonBookingsWithLabels } = useLessonBookings()
 
-async function removeBooking(booking: any) {
-  if (confirm('Weet je zeker dat je deze boeking wilt verwijderen?')) {
-    await cancelBooking(booking)
+const confirmRemoveBooking = ref(false)
+const pendingRemoveBooking = ref<any>(null)
+
+function removeBooking(booking: any) {
+  pendingRemoveBooking.value = booking
+  confirmRemoveBooking.value = true
+}
+
+async function onConfirmRemoveBooking() {
+  if (pendingRemoveBooking.value) {
+    await cancelBooking(pendingRemoveBooking.value)
+    pendingRemoveBooking.value = null
     await refresh()
   }
 }
@@ -184,5 +193,8 @@ watch(activeTab, (newVal) => {
     </div>
 
     <AccountBottomNav :tabs="tabs" v-model="activeTab" />
+
+    <ConfirmModal v-model="confirmRemoveBooking" message="Weet je zeker dat je deze boeking wilt verwijderen?"
+      @confirm="onConfirmRemoveBooking" />
   </div>
 </template>
