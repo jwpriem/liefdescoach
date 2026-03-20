@@ -1,5 +1,5 @@
 import { createError } from 'h3'
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 import { eq } from 'drizzle-orm'
 import { students } from '../../database/schema'
 

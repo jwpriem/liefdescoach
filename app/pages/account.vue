@@ -155,7 +155,7 @@ const tabs = computed<TabsItem[]>(() => {
 				<AccountUsers v-if="isAdmin && loggedInUser" />
 			</div>
 			<div v-show="currentSlot === 'omzet'" class="pt-3">
-				<AccountRevenue v-if="isAdmin" />
+				<LazyAccountRevenue v-if="isAdmin" />
 			</div>
 		</div>
 

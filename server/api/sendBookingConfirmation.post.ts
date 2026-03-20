@@ -1,12 +1,6 @@
 import { createError } from 'h3'
 import { eq } from 'drizzle-orm'
-import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc.js'
-import 'dayjs/locale/nl.js'
 import { lessons, bookings, students } from '../database/schema'
-
-dayjs.extend(utc)
-dayjs.locale('nl')
 
 export default defineEventHandler(async (event) => {
     await requireAuth(event)
@@ -40,7 +34,7 @@ export default defineEventHandler(async (event) => {
         name: b.studentName ?? 'Onbekend',
     }))
 
-    const lessonDate = dayjs(lesson.date).utc()
+    const lessonDate = new Date(lesson.date!)
     const lessontype = lesson.type === 'guest lesson'
         ? `Yin-Yang Yoga door gastdocent ${lesson.teacher}`
         : lesson.type === 'peachy bum' ? 'Peachy Bum' : 'Hatha Yoga'
@@ -50,9 +44,9 @@ export default defineEventHandler(async (event) => {
     const calendarTitle = lesson.type === 'peachy bum' ? 'Peachy Bum les' : 'Hatha Yoga les'
 
     const calendarLink = (stream: string) =>
-        `https://calndr.link/d/event/?service=${stream}&start=${lessonDate.format('YYYY-MM-DD')}%20${lessonDate.format('H')}:${lessonDate.format('mm')}&title=${calendarTitle}%20Ravennah&timezone=Europe/Amsterdam&location=${encodeURIComponent(address)}`
+        `https://calndr.link/d/event/?service=${stream}&start=${formatISODate(lessonDate)}%20${formatHour(lessonDate)}:${formatMinutes(lessonDate)}&title=${calendarTitle}%20Ravennah&timezone=Europe/Amsterdam&location=${encodeURIComponent(address)}`
 
-    const formattedDate = `${lessonDate.format('dddd D MMMM')} van ${lessonDate.format('H.mm')} tot ${lessonDate.add(1, 'hour').format('H.mm')} uur`
+    const formattedDate = formatLessonDate(lessonDate)
     const spots = MAX_LESSON_CAPACITY - bookingRows.length
 
     const studentMail = bookingStudentEmail({

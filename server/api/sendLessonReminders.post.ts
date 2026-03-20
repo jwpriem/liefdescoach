@@ -1,14 +1,6 @@
 import { createError } from 'h3'
 import { and, gte, lte, eq } from 'drizzle-orm'
-import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc.js'
-import timezone from 'dayjs/plugin/timezone.js'
-import 'dayjs/locale/nl.js'
 import { lessons, bookings, students } from '../database/schema'
-
-dayjs.extend(utc)
-dayjs.extend(timezone)
-dayjs.locale('nl')
 
 export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig()
@@ -21,9 +13,7 @@ export default defineEventHandler(async (event) => {
 
 
     // Calculate tomorrow's date range
-    const nowAmsterdam = dayjs().tz('Europe/Amsterdam')
-    const tomorrowStart = nowAmsterdam.add(1, 'day').startOf('day').utc().toDate()
-    const tomorrowEnd = nowAmsterdam.add(1, 'day').endOf('day').utc().toDate()
+    const { start: tomorrowStart, end: tomorrowEnd } = getTomorrowRange('Europe/Amsterdam')
 
     // Fetch lessons scheduled for tomorrow
     const lessonRows = await db
@@ -59,11 +49,11 @@ export default defineEventHandler(async (event) => {
 
         if (bookingRows.length === 0) continue
 
-        const lessonDate = dayjs(lesson.date).utc()
+        const lessonDate = new Date(lesson.date!)
         const lessonType = lesson.type === 'guest lesson'
             ? `Yin-Yang Yoga door gastdocent ${lesson.teacher}`
             : lesson.type === 'peachy bum' ? 'Peachy Bum' : 'Hatha Yoga'
-        const formattedDate = `${lessonDate.format('dddd D MMMM')} van ${lessonDate.format('H.mm')} tot ${lessonDate.add(1, 'hour').format('H.mm')} uur`
+        const formattedDate = formatLessonDate(lessonDate)
         const address = lesson.type === 'peachy bum'
             ? 'Kosboulevard 5, 3059 XZ Rotterdam'
             : 'Emmy van Leersumhof 24a, 3059 LT Rotterdam'

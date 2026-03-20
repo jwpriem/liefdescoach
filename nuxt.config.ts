@@ -71,7 +71,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     '@nuxt/fonts',
     'dayjs-nuxt',
     '@nuxtjs/sitemap',
-    '@nuxtjs/robots',
     '@nuxt/ui',
     '@vite-pwa/nuxt',
   ],
@@ -112,7 +111,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   },
 
   sitemap: {
-    autoLastmod: true
+    autoLastmod: true,
+    // Cache the sitemap for 1 hour to avoid regenerating on every request
+    cacheMaxAgeSeconds: 3600,
   },
 
   fonts: {
