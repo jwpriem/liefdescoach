@@ -66,28 +66,40 @@ function cancelLesson() {
   state.createLesson = false
 }
 
+const isBooking = ref(false)
 async function book() {
-  state.bookForUser = false
-  if (state.addBookingUser) setOnBehalfOf(state.addBookingUser)
-  await handleBooking(state.addBookingLesson, { extraSpot: true })
-  state.addBookingUser = null
-  state.addBookingLesson = null
+  isBooking.value = true
+  try {
+    if (state.addBookingUser) setOnBehalfOf(state.addBookingUser)
+    await handleBooking(state.addBookingLesson, { extraSpot: true })
+    state.addBookingUser = null
+    state.addBookingLesson = null
+    state.bookForUser = false
+  } finally {
+    isBooking.value = false
+  }
 }
 
+const isCreatingLesson = ref(false)
 async function createNewLesson() {
-  state.createLessonDate.setUTCHours(parseInt(state.createLessonHours, 10), parseInt(state.createLessonMinutes, 10), 0, 0)
+  isCreatingLesson.value = true
+  try {
+    state.createLessonDate.setUTCHours(parseInt(state.createLessonHours, 10), parseInt(state.createLessonMinutes, 10), 0, 0)
 
-  await $fetch('/api/createLesson', {
-    method: 'post',
-    body: {
-      date: state.createLessonDate.toISOString(),
-      type: state.createLessonType,
-      teacher: state.createLessonTeacher,
-    },
-  })
+    await $fetch('/api/createLesson', {
+      method: 'post',
+      body: {
+        date: state.createLessonDate.toISOString(),
+        type: state.createLessonType,
+        teacher: state.createLessonTeacher,
+      },
+    })
 
-  cancelLesson()
-  await refreshLessons()
+    cancelLesson()
+    await refreshLessons()
+  } finally {
+    isCreatingLesson.value = false
+  }
 }
 
 const { sortStudents, getLessonBookingsWithLabels } = useLessonBookings()
@@ -260,7 +272,7 @@ async function onConfirmDeleteLesson() {
           </div>
 
           <div class="flex gap-3 mt-2">
-            <UButton color="primary" variant="solid" size="lg" @click="book()"
+            <UButton :loading="isBooking" color="primary" variant="solid" size="lg" @click="book()"
               :disabled="!state.addBookingUser && !state.addBookingLesson">Voeg toe</UButton>
             <UButton color="primary" variant="outline" size="lg" @click="cancel()">Annuleer</UButton>
           </div>
@@ -365,7 +377,7 @@ async function onConfirmDeleteLesson() {
           </div>
 
           <div class="flex gap-3 mt-2">
-            <UButton color="primary" variant="solid" size="lg" @click="createNewLesson()">Voeg toe</UButton>
+            <UButton :loading="isCreatingLesson" color="primary" variant="solid" size="lg" @click="createNewLesson()">Voeg toe</UButton>
             <UButton color="primary" variant="outline" size="lg" @click="cancelLesson()">Annuleer</UButton>
           </div>
         </div>
