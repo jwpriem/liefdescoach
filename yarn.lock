@@ -5465,13 +5465,6 @@ gzip-size@^7.0.0:
   dependencies:
     duplexer "^0.1.2"
 
-h3@2.0.1-rc.17:
-  version "2.0.1-rc.17"
-  resolved "https://registry.yarnpkg.com/h3/-/h3-2.0.1-rc.17.tgz#86fb5a5261a38f59e0fb3384581e345285be3b61"
-  integrity sha512-9rPJs68qMj7HJH78z7uSIAw6rl3EElLdVSirTeAf6B5ogwiFVIr9AKMMS4u00Gp8DYIPnnjtw3ZWN7EkYcPBrQ==
-  dependencies:
-    rou3 "^0.8.1"
-    srvx "^0.11.12"
 
 h3@^1.12.0, h3@^1.15.3, h3@^1.15.5, h3@^1.15.6:
   version "1.15.9"
