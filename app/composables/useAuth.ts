@@ -91,6 +91,14 @@ export const useAuth = () => {
     await refresh()
   }
 
+  async function requestPasswordReset(email: string) {
+    await $fetch('/api/auth/request-password-reset', { method: 'POST', body: { email } })
+  }
+
+  async function resetPassword(token: string, password: string) {
+    await $fetch('/api/auth/reset-password', { method: 'POST', body: { token, password } })
+  }
+
   async function updateProfile(data: { name?: string; email?: string; phone?: string | null; dateOfBirth?: string | null; userId?: string }) {
     if (data.email) {
       await $fetch('/api/auth/update-profile', { method: 'POST', body: { email: data.email } })
@@ -119,6 +127,7 @@ export const useAuth = () => {
     user, isAdmin, pending, refresh,
     login, logout, sendOtp, verifyOtp, register,
     requestEmailVerification, verifyEmail,
+    requestPasswordReset, resetPassword,
     updateProfile, updatePassword, updateReminders, updateHealth
   }
 }

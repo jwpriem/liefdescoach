@@ -1,23 +1,19 @@
-import { createError } from 'h3'
-import crypto from 'node:crypto'
-
 export default defineEventHandler(async (event) => {
     const user = await requireAuth(event)
     const config = useRuntimeConfig()
 
-    // Generate a signed token (stateless)
-    const expires = Date.now() + 24 * 60 * 60 * 1000 // 24 hours
-    const payload = JSON.stringify({ userId: user.$id, email: user.email, expires })
-
-    const signature = crypto
-        .createHmac('sha256', config.sessionSecret)
-        .update(payload)
-        .digest('hex')
-
-    const token = Buffer.from(payload).toString('base64') + '.' + signature
+    // Generate a signed token (stateless, 24h expiry)
+    const token = generateSignedToken(
+        {
+            userId: user.$id,
+            email: user.email,
+            purpose: 'email-verification',
+            expires: Date.now() + 24 * 60 * 60 * 1000,
+        },
+        config.sessionSecret
+    )
 
     const verifyUrl = `${getHeader(event, 'origin')}/verify-email?token=${token}`
-
     const email = verificationEmail(verifyUrl)
 
     await smtpTransport.sendMail({
