@@ -151,6 +151,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     '/archief': { ssr: false },
     '/login': { ssr: false },
     '/verify-email': { ssr: false },
+    '/reset-wachtwoord': { ssr: false },
     '/admin/**': { ssr: false },
     // Legacy redirects
     '/liefdescoach/**': { redirect: '/', statusCode: 301 },

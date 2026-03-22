@@ -347,6 +347,25 @@ export function contactEmail(data: {
     }
 }
 
+// ─── Password reset ─────────────────────────────────────────────────────────
+
+export function passwordResetEmail(url: string): { subject: string; html: string; text: string } {
+    const content = `
+    ${heading('Wachtwoord herstellen')}
+    ${subtext('Klik op de onderstaande knop om je wachtwoord opnieuw in te stellen.')}
+    <p style="font-size:14px;color:#374151;text-align:center;margin:0 0 24px 0;">Deze link is 1 uur geldig.</p>
+    ${primaryButton('Wachtwoord herstellen', url)}
+    <p style="font-size:13px;color:#9ca3af;text-align:center;margin-top:24px;">Werkt de knop niet? Kopieer en plak dan deze link in je browser:</p>
+    <p style="font-size:12px;color:#9ca3af;text-align:center;margin-top:4px;word-break:break-all;"><a href="${url}" style="color:${BRAND_COLOR};text-decoration:none;">${url}</a></p>
+    <p style="font-size:13px;color:#9ca3af;text-align:center;margin-top:16px;">Heb je geen wachtwoord-reset aangevraagd? Dan kun je dit bericht negeren.</p>`
+
+    return {
+        subject: 'Wachtwoord herstellen voor Yoga Ravennah',
+        html: wrapInLayout('Wachtwoord herstellen', content),
+        text: `Wachtwoord herstellen\n\nKlik op deze link om je wachtwoord opnieuw in te stellen:\n${url}\n\nDeze link is 1 uur geldig.\n\nHeb je geen wachtwoord-reset aangevraagd? Dan kun je dit bericht negeren.`,
+    }
+}
+
 // ─── Verification email ──────────────────────────────────────────────────────
 
 export function verificationEmail(url: string): { subject: string; html: string; text: string } {

@@ -14,12 +14,14 @@ const passwordCheck = ref(false);
 const ready = ref(false)
 
 // OTP state
-const loginMode = ref<'password' | 'otp'>('password')
+const loginMode = ref<'password' | 'otp' | 'forgot'>('password')
 const otpStep = ref<'email' | 'code'>('email')
 const otpCode = ref('')
 const otpSent = ref(false)
 
-const { user, login: authLogin, sendOtp: authSendOtp, verifyOtp: authVerifyOtp, register: authRegister, pending } = useAuth()
+const resetSent = ref(false)
+
+const { user, login: authLogin, sendOtp: authSendOtp, verifyOtp: authVerifyOtp, register: authRegister, requestPasswordReset: authRequestPasswordReset, pending } = useAuth()
 const { call, error: errorMessage, pending: isLoading } = useApiCall()
 
 definePageMeta({
@@ -69,12 +71,14 @@ const normalizedEmail = computed(() => email.value.trim().toLowerCase())
 
 const pageTitle = computed(() => {
   if (registerForm.value) return 'Account aanmaken'
+  if (loginMode.value === 'forgot') return 'Wachtwoord vergeten'
   if (loginMode.value === 'otp') return 'Inloggen met e-mailcode'
   return 'Inloggen'
 })
 
 const pageSubtitle = computed(() => {
   if (registerForm.value) return 'Maak een account aan om lessen te boeken'
+  if (loginMode.value === 'forgot') return 'Ontvang een link om je wachtwoord te herstellen'
   if (loginMode.value === 'otp' && otpStep.value === 'code') return `We hebben een code gestuurd naar ${normalizedEmail.value}`
   if (loginMode.value === 'otp') return 'Ontvang een eenmalige code op je e-mailadres'
   return 'Welkom terug bij Yoga Ravennah'
@@ -125,18 +129,26 @@ async function resendOtp() {
   await call(() => authSendOtp(normalizedEmail.value))
 }
 
+async function requestReset() {
+  await call(() => authRequestPasswordReset(normalizedEmail.value))
+  if (!errorMessage.value) {
+    resetSent.value = true
+  }
+}
+
 function switchToRegister() {
   loginMode.value = 'password'
   registerForm.value = true
   errorMessage.value = null
 }
 
-function switchLoginMode(mode: 'password' | 'otp') {
+function switchLoginMode(mode: 'password' | 'otp' | 'forgot') {
   loginMode.value = mode
   registerForm.value = false
   otpStep.value = 'email'
   otpCode.value = ''
   otpSent.value = false
+  resetSent.value = false
   errorMessage.value = null
 }
 
@@ -193,8 +205,8 @@ const passwordStrength = computed(() => {
           <p class="mt-2 text-sm text-gray-400">{{ pageSubtitle }}</p>
         </div>
 
-        <!-- Login mode toggle (only in login, not register) -->
-        <div v-if="!registerForm" class="mb-8">
+        <!-- Login mode toggle (only in login, not register, not forgot) -->
+        <div v-if="!registerForm && loginMode !== 'forgot'" class="mb-8">
           <div class="flex rounded-xl bg-gray-800/60 p-1">
             <button class="flex-1 rounded-lg py-2.5 text-sm font-medium transition-all duration-200" :class="loginMode === 'password'
               ? 'bg-emerald-600 text-white shadow-md shadow-emerald-900/40'
@@ -321,6 +333,26 @@ const passwordStrength = computed(() => {
             </template>
           </div>
 
+          <!-- ==================== FORGOT PASSWORD ==================== -->
+          <div v-if="loginMode === 'forgot'" class="space-y-5">
+            <template v-if="!resetSent">
+              <div>
+                <label for="forgot-email" class="block text-sm font-medium text-gray-300 mb-1.5">
+                  E-mail <span class="text-red-500">*</span>
+                </label>
+                <UInput id="forgot-email" v-model="email" size="lg" color="primary" placeholder="naam@voorbeeld.nl"
+                  type="email" variant="outline" autocomplete="email" autocapitalize="none" autocorrect="off"
+                  inputmode="email" />
+              </div>
+            </template>
+            <template v-else>
+              <div class="rounded-xl bg-emerald-950/40 border border-emerald-800/50 p-4 text-center">
+                <UIcon name="i-lucide-mail-check" class="w-10 h-10 text-emerald-400 mx-auto mb-3" />
+                <p class="text-sm text-emerald-200">Als dit e-mailadres bij ons bekend is, ontvang je een e-mail om je wachtwoord te herstellen.</p>
+              </div>
+            </template>
+          </div>
+
           <!-- ==================== ACTION BUTTONS ==================== -->
           <div class="mt-8 space-y-3">
             <!-- Password login -->
@@ -328,6 +360,12 @@ const passwordStrength = computed(() => {
               <UButton :disabled="!password" color="primary" variant="solid" size="lg" block @click="login">
                 Inloggen
               </UButton>
+              <div class="text-center">
+                <button class="text-sm text-gray-400 hover:text-emerald-400 transition-colors"
+                  @click="switchLoginMode('forgot')">
+                  Wachtwoord vergeten?
+                </button>
+              </div>
               <div class="text-center">
                 <button class="text-sm text-gray-400 hover:text-emerald-400 transition-colors"
                   @click="registerForm = true">
@@ -364,6 +402,19 @@ const passwordStrength = computed(() => {
               <div class="text-center">
                 <button class="text-sm text-gray-400 hover:text-emerald-400 transition-colors" @click="resendOtp">
                   Geen code ontvangen? <span class="font-medium underline underline-offset-2">Opnieuw versturen</span>
+                </button>
+              </div>
+            </template>
+
+            <!-- Forgot password -->
+            <template v-if="loginMode === 'forgot'">
+              <UButton v-if="!resetSent" :disabled="!email" color="primary" variant="solid" size="lg" block @click="requestReset">
+                Verstuur reset-link
+              </UButton>
+              <div class="text-center">
+                <button class="text-sm text-gray-400 hover:text-emerald-400 transition-colors"
+                  @click="switchLoginMode('password')">
+                  Terug naar inloggen
                 </button>
               </div>
             </template>
