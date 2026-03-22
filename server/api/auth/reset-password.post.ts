@@ -6,7 +6,6 @@ import { students } from '../../database/schema'
 /**
  * POST /api/auth/reset-password
  * Verifies the signed token and sets a new password.
- * Works for all users, including those not yet lazy-migrated from Appwrite.
  */
 export default defineEventHandler(async (event) => {
     const body = await readBody(event)
@@ -36,7 +35,7 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 400, statusMessage: 'Gebruiker niet gevonden' })
     }
 
-    // Hash and store the new password in Neon (completes lazy migration if needed)
+    // Hash and store the new password
     const hash = await bcrypt.hash(body.password, 12)
     await db
         .update(students)

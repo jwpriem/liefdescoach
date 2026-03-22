@@ -347,6 +347,26 @@ export function contactEmail(data: {
     }
 }
 
+// ─── Password reset (migration) ─────────────────────────────────────────────
+
+export function passwordResetMigrationEmail(url: string): { subject: string; html: string; text: string } {
+    const content = `
+    ${heading('Nieuw wachtwoord instellen')}
+    ${subtext('We hebben ons systeem geüpgraded! Hierdoor moet je eenmalig een nieuw wachtwoord instellen.')}
+    <p style="font-size:14px;color:#374151;text-align:center;margin:0 0 8px 0;">Je oude wachtwoord werkt niet meer in het nieuwe systeem. Klik op de onderstaande knop om een nieuw wachtwoord te kiezen.</p>
+    <p style="font-size:14px;color:#374151;text-align:center;margin:0 0 24px 0;">Deze link is 1 uur geldig.</p>
+    ${primaryButton('Nieuw wachtwoord instellen', url)}
+    <p style="font-size:13px;color:#9ca3af;text-align:center;margin-top:24px;">Werkt de knop niet? Kopieer en plak dan deze link in je browser:</p>
+    <p style="font-size:12px;color:#9ca3af;text-align:center;margin-top:4px;word-break:break-all;"><a href="${url}" style="color:${BRAND_COLOR};text-decoration:none;">${url}</a></p>
+    <p style="font-size:13px;color:#9ca3af;text-align:center;margin-top:16px;">Heb je dit niet aangevraagd? Dan kun je dit bericht negeren.</p>`
+
+    return {
+        subject: 'Stel je nieuwe wachtwoord in voor Yoga Ravennah',
+        html: wrapInLayout('Nieuw wachtwoord instellen', content),
+        text: `Nieuw wachtwoord instellen\n\nWe hebben ons systeem geüpgraded! Hierdoor moet je eenmalig een nieuw wachtwoord instellen.\n\nJe oude wachtwoord werkt niet meer in het nieuwe systeem. Klik op deze link om een nieuw wachtwoord te kiezen:\n${url}\n\nDeze link is 1 uur geldig.\n\nHeb je dit niet aangevraagd? Dan kun je dit bericht negeren.`,
+    }
+}
+
 // ─── Password reset ─────────────────────────────────────────────────────────
 
 export function passwordResetEmail(url: string): { subject: string; html: string; text: string } {

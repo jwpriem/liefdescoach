@@ -32,38 +32,31 @@ TEST_EMAIL=user@example.com TEST_PASSWORD=secret yarn test:e2e:headed   # visibl
 BASE_URL=http://localhost:3000 yarn test:e2e                            # custom base URL
 ```
 
-Tests are in `e2e/`. The test user must exist in Appwrite Auth and have at least 1 credit for the booking test to pass.
+Tests are in `e2e/`. The test user must exist in the database and have at least 1 credit for the booking test to pass.
 
 ### Database Scripts
 
-Standalone `tsx` scripts in `scripts/` for Appwrite database management. Require env vars `NUXT_PUBLIC_PROJECT` and `NUXT_APPWRITE_KEY` (loaded from `.env` via dotenv).
+Standalone `tsx` scripts in `scripts/` for database management.
 
 ```bash
-yarn db:setup            # Create new database with lessons/bookings/students schema
 yarn db:seed-lessons     # Seed 12 weeks of Sunday 09:45 hatha yoga + 3 guest lessons
-yarn db:sync-students    # Sync Auth users into students collection
 ```
 
-`db:setup` prints the new database ID to set as `NUXT_PUBLIC_DATABASE`. `db:seed-lessons` accepts `--weeks N` to customize. All scripts share `scripts/appwrite-client.ts` for client setup.
+`db:seed-lessons` accepts `--weeks N` to customize. Legacy Appwrite migration scripts remain in `scripts/` but are no longer functional.
 
 ## Architecture
 
 This is a **Nuxt 3** application for "Yoga Ravennah" — a yoga studio booking system with a credit-based lesson reservation flow. The UI language is Dutch.
 
-### Appwrite — Dual Client Pattern
+### Database
 
-The app uses Appwrite Cloud as its database and auth provider with two separate SDKs:
-
-- **Client-side** (`appwrite` package): `composables/useAppwrite.ts` returns `account`, `databases`, `tablesDB`, and `ID`. Used in the Pinia store for auth operations (login, register, session management).
-- **Server-side** (`node-appwrite` package): `server/utils/appwrite.ts` exports `useServerAppwrite()` — a singleton that returns `tablesDB`, `users`, `Query`, and `ID` authenticated with the server API key. Auto-imported by Nitro in all `server/` files.
-
-Appwrite tables: `lessons`, `bookings`, `students`. Bookings reference both a lesson and a student.
+The app uses **Neon PostgreSQL** via Drizzle ORM. Tables: `students`, `sessions`, `lessons`, `bookings`, `credits`, `health`, `pushSubscriptions`, `otpCodes`.
 
 ### Server Auth (`server/utils/auth.ts`)
 
 Two auto-imported helpers for API route protection:
 
-- `requireAuth(event)` — verifies the Appwrite session cookie, returns the authenticated user or throws 401
+- `requireAuth(event)` — verifies the session cookie, returns the authenticated user or throws 401
 - `requireAdmin(event)` — calls `requireAuth`, then checks for the `admin` label or throws 403
 
 ### Booking Flow (Server-Side)
@@ -73,14 +66,11 @@ Booking and cancellation are handled atomically in server API routes:
 - `server/api/handleBooking.post.ts` — validates credits, checks lesson capacity (`MAX_LESSON_CAPACITY` from `server/utils/constants.ts`), prevents duplicates, creates booking, deducts credit
 - `server/api/cancelBooking.post.ts` — verifies ownership, enforces 24h cancellation window, deletes booking, refunds credit
 
-The Pinia store (`stores/index.ts`) delegates to these endpoints via `$fetch` and then triggers email sending client-side.
+The UI delegates to these endpoints via `$fetch`.
 
 ### Email
 
-Two email systems are used:
-
-- **Postmark** (production transactional emails): `server/api/sendBookingConfirmation.post.ts` and `SendBookingCancellation.post.ts` use Postmark templates
-- **nuxt-mail** (SMTP): used for simple notifications (new user registration). Dev uses Mailtrap sandbox.
+Uses **nodemailer** (SMTP) for all transactional emails. Dev uses Mailtrap sandbox, production uses PrivateEmail. Templates in `server/utils/emailTemplates.ts`.
 
 ### State Management (`stores/index.ts`)
 
@@ -102,10 +92,10 @@ Provides `$rav` globally with utility functions: Dutch date formatting, calendar
 
 ### Runtime Config
 
-**Private** (server only): `postmark`, `appwriteKey`
-**Public**: `project` (Appwrite project ID), `database` (Appwrite database ID), `mailPass`, `mailPassDev`
+**Private** (server only): `databaseUrl`, `sessionSecret`, `cronSecret`
+**Public**: `vapidPublicKey`, `mailPass`, `mailPassDev`
 
-Set via environment variables prefixed with `NUXT_` (e.g., `NUXT_APPWRITE_KEY`, `NUXT_PUBLIC_PROJECT`).
+Set via environment variables prefixed with `NUXT_` (e.g., `NUXT_DATABASE_URL`, `NUXT_SESSION_SECRET`).
 
 ### UI Framework
 
