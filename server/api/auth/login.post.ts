@@ -1,7 +1,21 @@
-import { createError } from 'h3'
+import { createError, getRequestIP } from 'h3'
 import bcrypt from 'bcryptjs'
 import { eq } from 'drizzle-orm'
 import { students } from '../../database/schema'
+
+const MAX_LOGIN_ATTEMPTS = 5;
+const LOGIN_LOCKOUT_MS = 15 * 60 * 1000; // 15 minutes
+const loginAttempts = new Map<string, { count: number; lockedUntil: number; lastAttempt: number }>();
+
+// Periodically clean up old rate limit entries to prevent memory leaks
+setInterval(() => {
+    const now = Date.now();
+    for (const [key, value] of loginAttempts.entries()) {
+        if (now - value.lastAttempt > LOGIN_LOCKOUT_MS && value.lockedUntil <= now) {
+            loginAttempts.delete(key);
+        }
+    }
+}, 5 * 60 * 1000); // Clean up every 5 minutes
 
 /**
  * POST /api/auth/login
@@ -23,6 +37,22 @@ export default defineEventHandler(async (event) => {
     const email = body.email.trim().toLowerCase()
     const password = body.password
 
+    const ip = getRequestIP(event, { xForwardedFor: true }) || 'unknown';
+    const rateLimitKey = `${ip}:${email}`;
+    const now = Date.now();
+    const attempt = loginAttempts.get(rateLimitKey);
+
+    if (attempt) {
+        if (attempt.lockedUntil > now) {
+            throw createError({ statusCode: 429, statusMessage: 'Te veel inlogpogingen. Probeer het over 15 minuten opnieuw.' })
+        }
+        // If the lockout period has passed or it's been more than 15 mins since last attempt, reset count
+        if (now - attempt.lastAttempt > LOGIN_LOCKOUT_MS) {
+            attempt.count = 0;
+            attempt.lockedUntil = 0;
+        }
+    }
+
     // Look up student by email
     const rows = await db
         .select()
@@ -40,6 +70,15 @@ export default defineEventHandler(async (event) => {
         // Password already migrated to Neon — verify directly
         const valid = await bcrypt.compare(password, student.passwordHash)
         if (!valid) {
+            if (!attempt) {
+                loginAttempts.set(rateLimitKey, { count: 1, lockedUntil: 0, lastAttempt: now });
+            } else {
+                attempt.count += 1;
+                attempt.lastAttempt = now;
+                if (attempt.count >= MAX_LOGIN_ATTEMPTS) {
+                    attempt.lockedUntil = now + LOGIN_LOCKOUT_MS;
+                }
+            }
             throw createError({ statusCode: 401, statusMessage: 'Verkeerde e-mailadres of wachtwoord. Probeer opnieuw.' })
         }
     } else {
@@ -61,6 +100,15 @@ export default defineEventHandler(async (event) => {
             await account.createEmailPasswordSession(email, password)
         } catch (e: any) {
             console.error('[login] Appwrite fallback failed for', email, e?.message ?? e)
+            if (!attempt) {
+                loginAttempts.set(rateLimitKey, { count: 1, lockedUntil: 0, lastAttempt: now });
+            } else {
+                attempt.count += 1;
+                attempt.lastAttempt = now;
+                if (attempt.count >= MAX_LOGIN_ATTEMPTS) {
+                    attempt.lockedUntil = now + LOGIN_LOCKOUT_MS;
+                }
+            }
             throw createError({ statusCode: 401, statusMessage: 'Verkeerde e-mailadres of wachtwoord. Probeer opnieuw.' })
         }
 
@@ -74,6 +122,9 @@ export default defineEventHandler(async (event) => {
         // Clean up the Appwrite session (we don't need it)
         try { await account.deleteSession('current') } catch { /* ignore */ }
     }
+
+    // Successful login: reset attempts
+    loginAttempts.delete(rateLimitKey);
 
     // Create session
     await createSession(event, student.id)
