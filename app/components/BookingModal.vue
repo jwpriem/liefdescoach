@@ -135,7 +135,8 @@ async function book(lesson: any) {
             <UButton v-else
               :disabled="availableCredits < 1"
               color="primary" variant="solid" size="sm"
-              @click="book(lesson)">
+              @click="book(lesson)"
+              :aria-label="(availableCredits < 1 ? 'Geen credits voor ' : 'Boek ') + $rav.getLessonTitle(lesson) + ' op ' + $rav.formatDateInDutch(lesson.date, true)">
               {{ availableCredits < 1 ? 'Geen credits' : 'Boek' }}
             </UButton>
           </div>
