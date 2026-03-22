@@ -37,7 +37,10 @@ export const useAuth = () => {
   const pending = computed(() => status.value === 'pending')
 
   async function login(email: string, password: string) {
-    await $fetch('/api/auth/login', { method: 'POST', body: { email, password } })
+    const res = await $fetch<{ success: boolean; reason?: string }>('/api/auth/login', { method: 'POST', body: { email, password } })
+    if (res.reason === 'migration-reset-sent') {
+      return res
+    }
     await refresh()
     return user.value
   }

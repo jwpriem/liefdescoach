@@ -42,22 +42,8 @@ export default defineEventHandler(async (event) => {
             throw createError({ statusCode: 401, statusMessage: 'Huidig wachtwoord is onjuist' })
         }
     } else {
-        // Password not migrated yet — verify against Appwrite
-        try {
-            const { Client, Account } = await import('node-appwrite')
-            const config = useRuntimeConfig()
-            const projectId = (config.public as any).project
-            if (!projectId) throw new Error('No Appwrite config')
-
-            const client = new Client()
-            client.setEndpoint('https://cloud.appwrite.io/v1').setProject(projectId)
-            const account = new Account(client)
-            await account.createEmailPasswordSession(user.email, body.password)
-            try { await account.deleteSession('current') } catch { /* ignore */ }
-        } catch (e: any) {
-            if (e?.statusCode) throw e
-            throw createError({ statusCode: 401, statusMessage: 'Huidig wachtwoord is onjuist' })
-        }
+        // Password not yet set — user must use the password reset flow first
+        throw createError({ statusCode: 400, statusMessage: 'Je wachtwoord moet eerst worden ingesteld via de wachtwoord-herstellen pagina.' })
     }
 
     // Hash and store new password

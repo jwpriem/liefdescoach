@@ -20,6 +20,7 @@ const otpCode = ref('')
 const otpSent = ref(false)
 
 const resetSent = ref(false)
+const migrationResetSent = ref(false)
 
 const { user, login: authLogin, sendOtp: authSendOtp, verifyOtp: authVerifyOtp, register: authRegister, requestPasswordReset: authRequestPasswordReset, pending } = useAuth()
 const { call, error: errorMessage, pending: isLoading } = useApiCall()
@@ -85,7 +86,12 @@ const pageSubtitle = computed(() => {
 })
 
 async function login() {
-  await call(() => authLogin(normalizedEmail.value, password.value))
+  const result = await call(() => authLogin(normalizedEmail.value, password.value))
+
+  if (result && typeof result === 'object' && 'reason' in result && result.reason === 'migration-reset-sent') {
+    migrationResetSent.value = true
+    return
+  }
 
   if (user.value) {
     await navigateTo({ path: "/account" })
@@ -232,8 +238,15 @@ const passwordStrength = computed(() => {
             </button>
           </div>
 
+          <!-- ==================== MIGRATION RESET SENT ==================== -->
+          <div v-if="migrationResetSent" class="rounded-xl bg-emerald-950/40 border border-emerald-800/50 p-4 text-center">
+            <UIcon name="i-lucide-mail-check" class="w-10 h-10 text-emerald-400 mx-auto mb-3" />
+            <p class="text-sm text-emerald-200 mb-2">We hebben ons systeem geüpgraded.</p>
+            <p class="text-sm text-emerald-200">Er is een e-mail verstuurd naar <strong>{{ normalizedEmail }}</strong> met instructies om een nieuw wachtwoord in te stellen.</p>
+          </div>
+
           <!-- ==================== PASSWORD LOGIN / REGISTER ==================== -->
-          <div v-if="loginMode === 'password' || registerForm" class="space-y-5">
+          <div v-if="!migrationResetSent && (loginMode === 'password' || registerForm)" class="space-y-5">
             <div>
               <label for="email" class="block text-sm font-medium text-gray-300 mb-1.5">
                 E-mail <span class="text-red-500">*</span>
@@ -354,7 +367,7 @@ const passwordStrength = computed(() => {
           </div>
 
           <!-- ==================== ACTION BUTTONS ==================== -->
-          <div class="mt-8 space-y-3">
+          <div v-if="!migrationResetSent" class="mt-8 space-y-3">
             <!-- Password login -->
             <template v-if="loginMode === 'password' && !registerForm">
               <UButton :disabled="!password" color="primary" variant="solid" size="lg" block @click="login">
