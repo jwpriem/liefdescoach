@@ -188,6 +188,15 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         driver: 'lru-cache',
         max: 20,
       }
-    }
+    },
+    // Restrict API access to same origin only — rejects cross-origin requests
+    routeRules: {
+      '/api/**': {
+        cors: false,
+        headers: {
+          'Access-Control-Allow-Origin': 'same-origin',
+        },
+      },
+    },
   }
 })

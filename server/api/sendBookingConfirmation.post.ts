@@ -74,20 +74,22 @@ export default defineEventHandler(async (event) => {
         { label: 'admin', to: 'info@ravennah.com', ...adminMail },
     ]
 
-    for (const mail of emails) {
-        try {
-            const result = await smtpTransport.sendMail({
-                from: 'Yoga Ravennah <info@ravennah.com>',
-                to: mail.to,
-                subject: mail.subject,
-                html: mail.html,
-                text: mail.text,
-            })
-            console.log(`[BookingConfirmation] ${mail.label} email sent:`, result?.accepted)
-        } catch (err: any) {
-            console.error(`[BookingConfirmation] ${mail.label} email failed:`, err?.message ?? err)
-        }
-    }
+    await Promise.allSettled(
+        emails.map(async (mail) => {
+            try {
+                const result = await smtpTransport.sendMail({
+                    from: 'Yoga Ravennah <info@ravennah.com>',
+                    to: mail.to,
+                    subject: mail.subject,
+                    html: mail.html,
+                    text: mail.text,
+                })
+                console.log(`[BookingConfirmation] ${mail.label} email sent:`, result?.accepted)
+            } catch (err: any) {
+                console.error(`[BookingConfirmation] ${mail.label} email failed:`, err?.message ?? err)
+            }
+        })
+    )
 
     // Send push notification to admin
     try {
