@@ -30,12 +30,14 @@ export default defineEventHandler(async (event) => {
             throw createError({ statusCode: 400, statusMessage: `Onbekend email type: ${body.type}` })
     }
 
-    await smtpTransport.sendMail({
+    smtpTransport.sendMail({
         from: 'Yoga Ravennah <info@ravennah.com>',
         to,
         subject: email.subject,
         html: email.html,
         text: email.text,
+    }).catch((err: any) => {
+        console.error(`[mail/send] Failed to send ${body.type} email:`, err?.message ?? err)
     })
 
     return { success: true }

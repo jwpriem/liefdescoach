@@ -22,6 +22,12 @@ export default defineEventHandler(async (event) => {
     if (!body?.name || typeof body.name !== 'string') {
         throw createError({ statusCode: 400, statusMessage: 'Naam is verplicht' })
     }
+    if (body.name.trim().length < 2 || body.name.trim().length > 100) {
+        throw createError({ statusCode: 400, statusMessage: 'Naam moet tussen 2 en 100 tekens zijn' })
+    }
+    if (body.phone && (typeof body.phone !== 'string' || !/^\+?[\d\s\-()]{7,20}$/.test(body.phone.trim()))) {
+        throw createError({ statusCode: 400, statusMessage: 'Ongeldig telefoonnummer' })
+    }
 
     const email = body.email.trim().toLowerCase()
 

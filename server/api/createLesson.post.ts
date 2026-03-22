@@ -21,8 +21,10 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 400, statusMessage: 'Ongeldige datum' })
     }
 
-    if (body.teacher && typeof body.teacher !== 'string') {
-        throw createError({ statusCode: 400, statusMessage: 'Ongeldige docent' })
+    if (body.teacher !== undefined && body.teacher !== null) {
+        if (typeof body.teacher !== 'string' || body.teacher.trim().length === 0 || body.teacher.trim().length > 100) {
+            throw createError({ statusCode: 400, statusMessage: 'Docent moet tussen 1 en 100 tekens zijn' })
+        }
     }
 
     const result = await db.insert(lessons).values({
