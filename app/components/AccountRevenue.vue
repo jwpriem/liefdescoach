@@ -28,6 +28,21 @@ const bucketOptions = [
 
 const selectedBucket = ref('week')
 const loading = ref(false)
+const testNotifLoading = ref(false)
+const testNotifResult = ref<string | null>(null)
+
+async function sendTestNotification() {
+  testNotifLoading.value = true
+  testNotifResult.value = null
+  try {
+    const res = await $fetch('/api/push/test', { method: 'POST' })
+    testNotifResult.value = res.sent > 0 ? `Verstuurd naar ${res.sent} apparaat(en).` : 'Geen actieve abonnementen gevonden.'
+  } catch {
+    testNotifResult.value = 'Mislukt. Controleer VAPID-configuratie.'
+  } finally {
+    testNotifLoading.value = false
+  }
+}
 
 // Default: current month
 const now = new Date()
@@ -195,6 +210,20 @@ watch([dateFrom, dateTo, selectedBucket], fetchRevenue)
       <div v-else class="flex items-center justify-center h-full text-gray-500">
         Geen data voor deze periode
       </div>
+    </div>
+
+    <!-- TEMP: Test push notification -->
+    <div class="mt-6 flex items-center gap-3">
+      <UButton
+        color="warning"
+        variant="soft"
+        icon="i-lucide-bell"
+        :loading="testNotifLoading"
+        @click="sendTestNotification"
+      >
+        Test pushmelding
+      </UButton>
+      <span v-if="testNotifResult" class="text-sm text-gray-400">{{ testNotifResult }}</span>
     </div>
 
     <!-- Settings info -->
