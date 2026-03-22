@@ -104,8 +104,11 @@ async function createNewLesson() {
 
 const { sortStudents, getLessonBookingsWithLabels } = useLessonBookings()
 
+// ⚡ Bolt: Move expensive O(N log N) sorting and allocations out of the template
 const futureLessons = computed(() =>
-  lessons.value.filter(l => dayjs(new Date(l.date)).isAfter(dayjs()))
+  lessons.value
+    .filter(l => dayjs(new Date(l.date)).isAfter(dayjs()))
+    .map(l => ({ ...l, processedBookings: getLessonBookingsWithLabels(l.bookings || []) }))
 )
 
 const computedLessons = computed(() => {
@@ -136,6 +139,11 @@ const computedStudents = computed(() => {
 })
 
 const managedLesson = ref<any>(null)
+
+// ⚡ Bolt: Memoize managed lesson bookings to prevent re-evaluation on every patch
+const processedManagedBookings = computed(() =>
+  managedLesson.value ? getLessonBookingsWithLabels(managedLesson.value.bookings || []) : []
+)
 
 function openManage(lesson: any) {
   managedLesson.value = lesson
@@ -210,7 +218,7 @@ async function onConfirmDeleteLesson() {
               <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Boekingen ({{
                 lesson.bookings?.length || 0 }}/9)</span>
               <div class="mt-1">
-                <span v-for="booking in getLessonBookingsWithLabels(lesson.bookings || [])" :key="booking.$id"
+                <span v-for="booking in lesson.processedBookings" :key="booking.$id"
                   class="flex items-center gap-1 text-base text-gray-300">
                   <span class="hover:text-emerald-400 transition-colors cursor-pointer"
                     @click="navigateTo(`/admin/users/${booking.students.$id}`)">
@@ -296,7 +304,7 @@ async function onConfirmDeleteLesson() {
         <div class="mb-6">
           <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Deelnemer verwijderen</h3>
           <div v-if="managedLesson.bookings?.length" class="flex flex-col gap-2">
-            <div v-for="booking in getLessonBookingsWithLabels(managedLesson.bookings)" :key="booking.$id"
+            <div v-for="booking in processedManagedBookings" :key="booking.$id"
               class="flex items-center justify-between rounded-xl bg-gray-900/60 border border-gray-800/50 px-4 py-2.5">
               <span class="flex items-center gap-2 text-sm text-gray-200">
                 {{ booking.students.name }}

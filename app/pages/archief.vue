@@ -51,7 +51,9 @@ watch([dateFrom, dateTo], () => {
 const allLessons = computed(() => archive.value?.rows ?? [])
 const totalPages = computed(() => Math.ceil(allLessons.value.length / pageSize))
 const paginatedLessons = computed(() =>
-  allLessons.value.slice((page.value - 1) * pageSize, page.value * pageSize)
+  allLessons.value
+    .slice((page.value - 1) * pageSize, page.value * pageSize)
+    .map((l: any) => ({ ...l, processedBookings: getLessonBookingsWithLabels(l.bookings || []) }))
 )
 
 function formatArchiveDateInDutch(date: string): string {
@@ -156,7 +158,7 @@ watch(activeTab, (newVal) => {
                   Boekingen ({{ lesson.bookings?.length || 0 }}/9)
                 </span>
                 <div class="mt-1">
-                  <span v-for="booking in getLessonBookingsWithLabels(lesson.bookings || [])" :key="booking.$id"
+                  <span v-for="booking in lesson.processedBookings" :key="booking.$id"
                     class="flex items-center gap-1 text-base text-gray-300 group/booking py-0.5">
                     <span class="hover:text-emerald-400 transition-colors cursor-pointer flex-1"
                       @click="navigateTo(`/admin/users/${booking.students?.$id}`)">
