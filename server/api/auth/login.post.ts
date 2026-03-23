@@ -1,7 +1,8 @@
 import { createError, getHeader, getRequestIP } from 'h3'
 import bcrypt from 'bcryptjs'
 import { eq } from 'drizzle-orm'
-import { students } from '../../database/schema'
+import { nanoid } from 'nanoid'
+import { students, loginHistory } from '../../database/schema'
 
 const MAX_LOGIN_ATTEMPTS = 5;
 const LOGIN_LOCKOUT_MS = 15 * 60 * 1000; // 15 minutes
@@ -123,6 +124,14 @@ export default defineEventHandler(async (event) => {
 
     // Create session
     await createSession(event, student.id)
+
+    // Record login history
+    await db.insert(loginHistory).values({
+        id: nanoid(),
+        studentId: student.id,
+        ipAddress: ip,
+        userAgent: getHeader(event, 'user-agent') || null,
+    })
 
     return {
         success: true,

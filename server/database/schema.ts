@@ -90,6 +90,16 @@ export const pushSubscriptions = pgTable('push_subscriptions', {
   uniqueIndex('push_subscriptions_endpoint_idx').on(table.endpoint),
 ])
 
+export const loginHistory = pgTable('login_history', {
+  id: text('id').primaryKey(),
+  studentId: text('student_id').notNull().references(() => students.id, { onDelete: 'cascade' }),
+  ipAddress: text('ip_address'),
+  userAgent: text('user_agent'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+}, (table) => [
+  index('login_history_student_id_idx').on(table.studentId),
+])
+
 export const otpCodes = pgTable('otp_codes', {
   id: text('id').primaryKey(),
   email: text('email').notNull(),

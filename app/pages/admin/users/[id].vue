@@ -9,6 +9,7 @@ definePageMeta({
 
 const { data: userStats } = await useFetch(`/api/users/${userId}/stats`)
 const { data: adminUsers } = await useAsyncData('admin-users', () => $fetch<any>('/api/users'))
+const { data: loginHistoryData } = await useFetch<{ logins: any[] }>(`/api/users/${userId}/login-history`)
 
 const user = computed(() => (adminUsers.value as any)?.users?.find((u: any) => u.$id === userId))
 const stats = computed(() => userStats.value)
@@ -61,6 +62,22 @@ function formatEuro(value: number) {
 
                 <!-- Personal Details (Reused) -->
                 <AccountDetails :user="user" :credits="(stats as any)?.availableCredits" />
+
+                <!-- Login History -->
+                <div>
+                    <h2 class="text-xl font-bold text-white mb-4">Inloggeschiedenis</h2>
+                    <div v-if="loginHistoryData?.logins?.length"
+                        class="bg-gray-900/50 border border-gray-800 rounded-xl divide-y divide-gray-800">
+                        <div v-for="login in loginHistoryData.logins" :key="login.id" class="p-4 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4">
+                            <span class="text-sm font-medium text-white whitespace-nowrap">
+                                {{ new Date(login.createdAt).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) }}
+                            </span>
+                            <span class="text-xs text-gray-500">{{ login.ipAddress || 'Onbekend IP' }}</span>
+                            <span class="text-xs text-gray-600 truncate max-w-xs hidden sm:inline">{{ login.userAgent?.substring(0, 80) }}</span>
+                        </div>
+                    </div>
+                    <p v-else class="text-gray-500 text-sm">Geen inloggeschiedenis beschikbaar.</p>
+                </div>
 
             </div>
         </div>
