@@ -230,10 +230,12 @@ const filteredRows = computed(() => {
 					<UButton aria-label="Archiveer" block color="primary" icon="i-lucide-archive" variant="soft" size="lg"
 						class="justify-center text-emerald-100 bg-emerald-500/10 hover:bg-emerald-500/20"
 						@click="archiveUser(row.$id)" />
-					<UButton aria-label="WhatsApp sturen" :disabled="!row.phone" block color="primary" icon="i-lucide-message-circle-more"
-						variant="soft" size="lg"
-						class="justify-center text-emerald-100 bg-emerald-500/10 hover:bg-emerald-500/20 disabled:opacity-30 disabled:cursor-not-allowed"
-						@click="sendWhatsapp(row)" />
+					<UTooltip :text="row.phone ? 'WhatsApp sturen' : 'Geen telefoonnummer'">
+						<UButton aria-label="WhatsApp sturen" :disabled="!row.phone" block color="primary" icon="i-lucide-message-circle-more"
+							variant="soft" size="lg"
+							class="justify-center text-emerald-100 bg-emerald-500/10 hover:bg-emerald-500/20 disabled:opacity-30 disabled:cursor-not-allowed"
+							@click="sendWhatsapp(row)" />
+					</UTooltip>
 				</div>
 			</div>
 		</div>
@@ -281,9 +283,9 @@ const filteredRows = computed(() => {
 							<UButton aria-label="Archiveer" icon="i-lucide-archive" variant="ghost" size="sm" class="text-emerald-100"
 								@click="archiveUser(row.original.$id)" />
 						</UTooltip>
-						<UTooltip text="WhatsApp" v-if="row.original.phone">
-							<UButton aria-label="WhatsApp sturen" icon="i-lucide-message-circle-more" variant="ghost" size="sm"
-								class="text-emerald-100" @click="sendWhatsapp(row.original)" />
+						<UTooltip :text="row.original.phone ? 'WhatsApp' : 'Geen telefoonnummer'">
+							<UButton aria-label="WhatsApp sturen" :disabled="!row.original.phone" icon="i-lucide-message-circle-more" variant="ghost" size="sm"
+								class="text-emerald-100 disabled:opacity-30 disabled:cursor-not-allowed" @click="sendWhatsapp(row.original)" />
 						</UTooltip>
 					</div>
 				</template>
