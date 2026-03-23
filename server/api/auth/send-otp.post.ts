@@ -1,7 +1,30 @@
-import { createError } from 'h3'
+import { createError, getRequestIP } from 'h3'
 import crypto from 'crypto'
 import { eq } from 'drizzle-orm'
 import { students, otpCodes } from '../../database/schema'
+
+const OTP_COOLDOWN_MS = 60 * 1000; // 1 minute
+const MAX_IP_REQUESTS = 20;
+
+const otpRequestsByEmail = new Map<string, number>();
+const otpRequestsByIP = new Map<string, { count: number; firstRequest: number }>();
+
+function lazyCleanup(now: number) {
+    if (otpRequestsByEmail.size > 1000) {
+        for (const [key, timestamp] of otpRequestsByEmail.entries()) {
+            if (now - timestamp > OTP_COOLDOWN_MS) {
+                otpRequestsByEmail.delete(key);
+            }
+        }
+    }
+    if (otpRequestsByIP.size > 1000) {
+        for (const [key, data] of otpRequestsByIP.entries()) {
+            if (now - data.firstRequest > OTP_COOLDOWN_MS) {
+                otpRequestsByIP.delete(key);
+            }
+        }
+    }
+}
 
 /**
  * Custom OTP flow: checks if user exists, generates a 6-digit code,
@@ -15,6 +38,31 @@ export default defineEventHandler(async (event) => {
     }
 
     const email = body.email.trim().toLowerCase()
+
+    const ip = getRequestIP(event) || 'unknown';
+    const now = Date.now();
+
+    lazyCleanup(now);
+
+    const lastRequestByEmail = otpRequestsByEmail.get(email);
+    const ipData = otpRequestsByIP.get(ip);
+
+    if (lastRequestByEmail && now - lastRequestByEmail < OTP_COOLDOWN_MS) {
+        throw createError({ statusCode: 429, statusMessage: 'Je kunt maximaal één keer per minuut een code aanvragen.' })
+    }
+
+    if (ipData) {
+        if (now - ipData.firstRequest > OTP_COOLDOWN_MS) {
+            // Reset window
+            otpRequestsByIP.set(ip, { count: 1, firstRequest: now });
+        } else if (ipData.count >= MAX_IP_REQUESTS) {
+            throw createError({ statusCode: 429, statusMessage: 'Te veel aanvragen vanaf dit IP. Probeer het later opnieuw.' })
+        } else {
+            ipData.count++;
+        }
+    } else {
+        otpRequestsByIP.set(ip, { count: 1, firstRequest: now });
+    }
 
     // 1. Check if user exists
     const userRows = await db
@@ -59,6 +107,9 @@ export default defineEventHandler(async (event) => {
         html: emailContent.html,
         text: emailContent.text,
     })
+
+    // Update rate limit for email after successful send
+    otpRequestsByEmail.set(email, now);
 
     return { success: true }
 })

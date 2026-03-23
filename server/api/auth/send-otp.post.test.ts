@@ -1,6 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import handler from './send-otp.post'
 
+vi.mock('h3', () => ({
+  createError: (opts: any) => {
+    const err = new Error(opts.statusMessage) as any
+    err.statusCode = opts.statusCode
+    err.statusMessage = opts.statusMessage
+    return err
+  },
+  getRequestIP: vi.fn().mockReturnValue('127.0.0.1'),
+}))
+
 const mockDb = {
   select: vi.fn().mockReturnThis(),
   from: vi.fn().mockReturnThis(),
@@ -42,14 +52,17 @@ describe('POST /api/auth/send-otp', () => {
     vi.mocked(readBody).mockResolvedValue({ email: 'noone@test.com' })
     mockDb.limit.mockResolvedValue([])
 
-    await expect(handle({} as any)).rejects.toMatchObject({ statusCode: 404 })
+    await expect(handle({ node: { req: { headers: {} } } } as any)).rejects.toMatchObject({ statusCode: 404 })
   })
 
   it('generates OTP and sends email when user exists', async () => {
-    vi.mocked(readBody).mockResolvedValue({ email: 'user@test.com' })
+    vi.mocked(readBody).mockResolvedValue({ email: `user-${Date.now()}@test.com` }) // bypass email rate limit in tests
     mockDb.limit.mockResolvedValue([{ id: 'u1' }])
 
-    const result = await handle({} as any)
+    const { getRequestIP } = await import('h3');
+    vi.mocked(getRequestIP).mockReturnValue(`127.0.0.1-${Date.now()}`); // bypass IP rate limit in tests
+
+    const result = await handle({ node: { req: { headers: {} } } } as any)
 
     expect(result).toEqual({ success: true })
     expect(mockDb.delete).toHaveBeenCalled() // deletes old codes
