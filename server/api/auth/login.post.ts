@@ -44,7 +44,7 @@ export default defineEventHandler(async (event) => {
     const email = body.email.trim().toLowerCase()
     const password = body.password
 
-    const ip = getRequestIP(event, { xForwardedFor: true }) || 'unknown';
+    const ip = getRequestIP(event) || 'unknown';
     const rateLimitKey = `${ip}:${email}`;
     const now = Date.now();
     const attempt = loginAttempts.get(rateLimitKey);

@@ -22,6 +22,7 @@ const mockDb = {
   from: vi.fn().mockReturnThis(),
   where: vi.fn().mockReturnThis(),
   limit: vi.fn().mockResolvedValue([]),
+  insert: vi.fn().mockReturnValue({ values: vi.fn().mockResolvedValue([]) }),
 }
 
 beforeEach(() => {
@@ -39,6 +40,7 @@ beforeEach(() => {
   mockDb.from.mockReturnThis()
   mockDb.where.mockReturnThis()
   mockDb.limit.mockResolvedValue([])
+  mockDb.insert.mockReturnValue({ values: vi.fn().mockResolvedValue([]) })
 })
 
 const handle = handler as any
