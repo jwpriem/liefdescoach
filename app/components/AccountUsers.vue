@@ -133,11 +133,19 @@ async function sendWhatsapp(user) {
 
 const q = ref('')
 
+// ⚡ Bolt: Pre-compute search strings outside the filter loop to prevent O(N) string allocations and lowercasing on every keystroke
+const searchableStudents = computed(() => {
+	return students.value.map(student => ({
+		...student,
+		_searchable: `${student.name || ''} ${student.email || ''} ${student.phone || ''}`.toLowerCase()
+	}))
+})
+
 const filteredUsers = computed(() => {
 	if (state.showArchived) {
-		return students.value
+		return searchableStudents.value
 	} else {
-		return students.value.filter((student) => {
+		return searchableStudents.value.filter((student) => {
 			return !student.archived;
 		})
 	}
@@ -152,8 +160,7 @@ const filteredRows = computed(() => {
 	const tokens = normalized.toLowerCase().split(' ')
 
 	return filteredUsers.value.filter((x) => {
-		const searchable = `${x.name || ''} ${x.email || ''} ${x.phone || ''}`.toLowerCase()
-		return tokens.every(token => searchable.includes(token))
+		return tokens.every(token => x._searchable.includes(token))
 	})
 })
 

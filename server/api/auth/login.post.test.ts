@@ -18,6 +18,8 @@ import handler from './login.post'
 // ─── Stubs for Nitro auto-imports ──────────────────────────────────────────
 
 const mockDb = {
+  insert: vi.fn().mockReturnThis(),
+  values: vi.fn().mockReturnThis(),
   select: vi.fn().mockReturnThis(),
   from: vi.fn().mockReturnThis(),
   where: vi.fn().mockReturnThis(),
@@ -38,6 +40,8 @@ beforeEach(() => {
   mockDb.select.mockReturnThis()
   mockDb.from.mockReturnThis()
   mockDb.where.mockReturnThis()
+  mockDb.insert.mockReturnThis()
+  mockDb.values.mockReturnThis()
   mockDb.limit.mockResolvedValue([])
 })
 
@@ -57,6 +61,8 @@ describe('POST /api/auth/login', () => {
 
   it('throws 401 when user is not found', async () => {
     vi.mocked(readBody).mockResolvedValue({ email: 'noone@test.com', password: 'test1234' })
+  mockDb.insert.mockReturnThis()
+  mockDb.values.mockReturnThis()
     mockDb.limit.mockResolvedValue([])
     await expect(handle(fakeEvent())).rejects.toMatchObject({ statusCode: 401 })
   })
