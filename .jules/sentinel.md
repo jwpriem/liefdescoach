@@ -6,3 +6,8 @@
 **Vulnerability:** The `getLessonTitle` and `getLessonDescription` helpers in `app/plugins/rav.ts` interpolated the `lesson.teacher` property without escaping it. Since these helpers are used with the `v-html` directive in components like `BookingModal.vue`, a malicious admin could inject scripts via the teacher name.
 **Learning:** Even when data comes from an "internal" source (like the database, entered by admins), if it's rendered using `v-html`, it must be explicitly sanitized or escaped. Vue's default text interpolation (`{{ }}`) provides auto-escaping, but `v-html` bypasses this completely.
 **Prevention:** Always sanitize or HTML-escape dynamic content before returning it from helpers that might be used with `v-html`. Prefer Vue's standard text interpolation (`{{ }}`) where HTML rendering is not strictly necessary.
+
+## 2024-05-18 - [Fix IP Spoofing & Memory Leaks in Login Rate Limiting]
+**Vulnerability:** The login endpoint rate limiter (`server/api/auth/login.post.ts`) used `getRequestIP(event, { xForwardedFor: true })` to extract user IP address and set `setInterval` for garbage collection.
+**Learning:** Using `xForwardedFor: true` makes IP rate-limiting bypassable trivially if reverse proxy hasn't been strictly validated because attackers can forge the `X-Forwarded-For` header. Additionally, `setInterval` caused a memory leak on HMR and potential crashes in edge environments.
+**Prevention:** Do not use `xForwardedFor: true` for IP-based rate limiting when using `getRequestIP()`. Use lazy cleanup (verifying entries size threshold before doing cleanup dynamically) to handle rate-limiting eviction without relying on background loops like `setInterval()`.
