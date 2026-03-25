@@ -41,7 +41,14 @@ const state = reactive({
 const { data: adminUsersData, refresh: refreshUsers } = await useAsyncData('admin-users', () => $fetch<any>('/api/users'))
 const { data: creditSummaryData, refresh: refreshCreditSummary } = await useAsyncData('credit-summary', () => $fetch<any>('/api/credits/summary'))
 
-const students = computed(() => adminUsersData.value?.users ?? [])
+// ⚡ Bolt: Pre-compute search string outside the render/filter loop to avoid O(N) allocations on every keystroke
+const students = computed(() => {
+	const users = adminUsersData.value?.users ?? []
+	return users.map((u: any) => ({
+		...u,
+		_searchable: `${u.name || ''} ${u.email || ''} ${u.phone || ''}`.toLowerCase()
+	}))
+})
 const studentCreditSummary = computed(() => creditSummaryData.value?.summary ?? {})
 
 function getAvailableCredits(userId: string): number {
@@ -151,9 +158,8 @@ const filteredRows = computed(() => {
 
 	const tokens = normalized.toLowerCase().split(' ')
 
-	return filteredUsers.value.filter((x) => {
-		const searchable = `${x.name || ''} ${x.email || ''} ${x.phone || ''}`.toLowerCase()
-		return tokens.every(token => searchable.includes(token))
+	return filteredUsers.value.filter((x: any) => {
+		return tokens.every(token => x._searchable.includes(token))
 	})
 })
 
