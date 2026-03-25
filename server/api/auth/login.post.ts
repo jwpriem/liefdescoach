@@ -9,20 +9,23 @@ const LOGIN_LOCKOUT_MS = 15 * 60 * 1000; // 15 minutes
 const loginAttempts = new Map<string, { count: number; lockedUntil: number; lastAttempt: number }>();
 const migrationResetSent = new Map<string, number>(); // email -> timestamp of last reset email
 
-// Periodically clean up old rate limit entries to prevent memory leaks
-setInterval(() => {
-    const now = Date.now();
-    for (const [key, value] of loginAttempts.entries()) {
-        if (now - value.lastAttempt > LOGIN_LOCKOUT_MS && value.lockedUntil <= now) {
-            loginAttempts.delete(key);
+function lazyCleanup(now: number) {
+    if (loginAttempts.size > 1000) {
+        for (const [key, value] of loginAttempts.entries()) {
+            if (now - value.lastAttempt > LOGIN_LOCKOUT_MS && value.lockedUntil <= now) {
+                loginAttempts.delete(key);
+            }
         }
     }
-    for (const [key, ts] of migrationResetSent.entries()) {
-        if (now - ts > LOGIN_LOCKOUT_MS) {
-            migrationResetSent.delete(key);
+    if (migrationResetSent.size > 1000) {
+        for (const [key, ts] of migrationResetSent.entries()) {
+            if (now - ts > LOGIN_LOCKOUT_MS) {
+                migrationResetSent.delete(key);
+            }
         }
     }
-}, 5 * 60 * 1000); // Clean up every 5 minutes
+}
+
 
 /**
  * POST /api/auth/login
@@ -44,9 +47,12 @@ export default defineEventHandler(async (event) => {
     const email = body.email.trim().toLowerCase()
     const password = body.password
 
-    const ip = getRequestIP(event, { xForwardedFor: true }) || 'unknown';
+    const ip = getRequestIP(event) || 'unknown';
     const rateLimitKey = `${ip}:${email}`;
     const now = Date.now();
+
+    lazyCleanup(now);
+
     const attempt = loginAttempts.get(rateLimitKey);
 
     if (attempt) {
