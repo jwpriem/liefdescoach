@@ -128,10 +128,11 @@ function askQuestion() {
     <!-- Quick actions -->
     <div class="grid grid-cols-2 gap-4">
       <button
+        aria-label="Stuur een bericht via Whatsapp"
         class="rounded-2xl border border-gray-800/80 bg-gray-950/50 backdrop-blur-sm p-4 flex items-center gap-3 text-left transition-colors hover:border-emerald-700/50 hover:bg-emerald-950/20"
         @click="askQuestion"
       >
-        <div class="flex items-center justify-center w-9 h-9 rounded-xl bg-emerald-500/15 shrink-0">
+        <div class="flex items-center justify-center w-9 h-9 rounded-xl bg-emerald-500/15 shrink-0" aria-hidden="true">
           <UIcon name="i-lucide-message-circle-more" class="size-5 text-emerald-400" />
         </div>
         <div class="min-w-0">
@@ -141,10 +142,11 @@ function askQuestion() {
       </button>
 
       <button
+        aria-label="Koop nieuwe credits"
         class="rounded-2xl border border-gray-800/80 bg-gray-950/50 backdrop-blur-sm p-4 flex items-center gap-3 text-left transition-colors hover:border-emerald-700/50 hover:bg-emerald-950/20"
         @click="showBuyCredits = true"
       >
-        <div class="flex items-center justify-center w-9 h-9 rounded-xl bg-emerald-500/15 shrink-0">
+        <div class="flex items-center justify-center w-9 h-9 rounded-xl bg-emerald-500/15 shrink-0" aria-hidden="true">
           <UIcon name="i-lucide-shopping-cart" class="size-5 text-emerald-400" />
         </div>
         <div class="min-w-0">
