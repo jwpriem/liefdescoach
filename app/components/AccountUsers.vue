@@ -133,6 +133,17 @@ async function sendWhatsapp(user) {
 
 const q = ref('')
 
+// ⚡ Bolt: Cache searchable strings in a Map keyed by student ID.
+// This prevents O(N * M) string allocations and case conversions during high-frequency typing in the search box,
+// while preserving the original reactive object references to avoid breaking Vue reactivity.
+const searchableCache = computed(() => {
+	const cache = new Map<string, string>()
+	for (const student of students.value) {
+		cache.set(student.$id, `${student.name || ''} ${student.email || ''} ${student.phone || ''}`.toLowerCase())
+	}
+	return cache
+})
+
 const filteredUsers = computed(() => {
 	if (state.showArchived) {
 		return students.value
@@ -152,7 +163,7 @@ const filteredRows = computed(() => {
 	const tokens = normalized.toLowerCase().split(' ')
 
 	return filteredUsers.value.filter((x) => {
-		const searchable = `${x.name || ''} ${x.email || ''} ${x.phone || ''}`.toLowerCase()
+		const searchable = searchableCache.value.get(x.$id) || ''
 		return tokens.every(token => searchable.includes(token))
 	})
 })
