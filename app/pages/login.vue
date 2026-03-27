@@ -158,6 +158,15 @@ function switchLoginMode(mode: 'password' | 'otp' | 'forgot') {
   errorMessage.value = null
 }
 
+function handleSubmit() {
+  if (migrationResetSent.value) return
+  if (registerForm.value) return register()
+  if (loginMode.value === 'password') return login()
+  if (loginMode.value === 'otp' && otpStep.value === 'email') return sendOtp()
+  if (loginMode.value === 'otp' && otpStep.value === 'code') return verifyOtp()
+  if (loginMode.value === 'forgot' && !resetSent.value) return requestReset()
+}
+
 function formatPhoneNumber(input: string) {
   let digits = input.replace(/\D/g, '');
   if (digits.startsWith('06')) {
@@ -227,7 +236,7 @@ const passwordStrength = computed(() => {
           </div>
         </div>
 
-        <form @submit.prevent>
+        <form @submit.prevent="handleSubmit">
           <!-- Error message -->
           <div v-if="errorMessage" class="mb-6 rounded-xl bg-red-950/40 border border-red-800/50 p-4">
             <p class="text-sm text-red-300">{{ errorMessage }}</p>
