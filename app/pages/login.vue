@@ -232,6 +232,7 @@ const passwordStrength = computed(() => {
           <div v-if="errorMessage" class="mb-6 rounded-xl bg-red-950/40 border border-red-800/50 p-4">
             <p class="text-sm text-red-300">{{ errorMessage }}</p>
             <button v-if="errorMessage?.includes('Maak eerst een account aan')"
+              type="button"
               class="mt-2 text-sm font-medium text-red-200 underline underline-offset-2 hover:text-red-100 transition-colors"
               @click.prevent="switchToRegister">
               Registreren
@@ -261,7 +262,7 @@ const passwordStrength = computed(() => {
                 <span v-if="registerForm" class="font-normal text-gray-500">(min. 8 tekens)</span>
               </label>
               <UInput id="password" v-model="password" size="lg" color="primary" placeholder="Je wachtwoord"
-                type="password" variant="outline" />
+                type="password" variant="outline" autocomplete="current-password" />
             </div>
 
             <!-- Password strength indicator (register only) -->
@@ -374,13 +375,13 @@ const passwordStrength = computed(() => {
                 Inloggen
               </UButton>
               <div class="text-center">
-                <button class="text-sm text-gray-400 hover:text-emerald-400 transition-colors"
+                <button type="button" tabindex="-1" class="text-sm text-gray-400 hover:text-emerald-400 transition-colors"
                   @click="switchLoginMode('forgot')">
                   Wachtwoord vergeten?
                 </button>
               </div>
               <div class="text-center">
-                <button class="text-sm text-gray-400 hover:text-emerald-400 transition-colors"
+                <button type="button" tabindex="-1" class="text-sm text-gray-400 hover:text-emerald-400 transition-colors"
                   @click="registerForm = true">
                   Nog geen account? <span class="font-medium underline underline-offset-2">Registreren</span>
                 </button>
@@ -393,7 +394,7 @@ const passwordStrength = computed(() => {
                 Account aanmaken
               </UButton>
               <div class="text-center">
-                <button class="text-sm text-gray-400 hover:text-emerald-400 transition-colors"
+                <button type="button" class="text-sm text-gray-400 hover:text-emerald-400 transition-colors"
                   @click="registerForm = false">
                   Al een account? <span class="font-medium underline underline-offset-2">Inloggen</span>
                 </button>
@@ -413,7 +414,7 @@ const passwordStrength = computed(() => {
                 Verifieer en inloggen
               </UButton>
               <div class="text-center">
-                <button class="text-sm text-gray-400 hover:text-emerald-400 transition-colors" @click="resendOtp">
+                <button type="button" class="text-sm text-gray-400 hover:text-emerald-400 transition-colors" @click="resendOtp">
                   Geen code ontvangen? <span class="font-medium underline underline-offset-2">Opnieuw versturen</span>
                 </button>
               </div>
@@ -425,7 +426,7 @@ const passwordStrength = computed(() => {
                 Verstuur reset-link
               </UButton>
               <div class="text-center">
-                <button class="text-sm text-gray-400 hover:text-emerald-400 transition-colors"
+                <button type="button" class="text-sm text-gray-400 hover:text-emerald-400 transition-colors"
                   @click="switchLoginMode('password')">
                   Terug naar inloggen
                 </button>
