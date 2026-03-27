@@ -8,12 +8,19 @@ export default defineEventHandler(async (event) => {
     let dateOfBirth = null
     let phone = null
 
-    // Fetch health data
-    const healthRows = await db
-        .select()
-        .from(health)
-        .where(eq(health.studentId, authUser.$id))
-        .limit(1)
+    // Fetch health and student profile data concurrently
+    const [healthRows, studentRows] = await Promise.all([
+        db
+            .select()
+            .from(health)
+            .where(eq(health.studentId, authUser.$id))
+            .limit(1),
+        db
+            .select({ dateOfBirth: students.dateOfBirth, phone: students.phone })
+            .from(students)
+            .where(eq(students.id, authUser.$id))
+            .limit(1)
+    ])
 
     if (healthRows.length > 0) {
         const h = healthRows[0]
@@ -24,13 +31,6 @@ export default defineEventHandler(async (event) => {
             dueDate: h.dueDate?.toISOString() ?? null,
         }
     }
-
-    // Fetch student profile data
-    const studentRows = await db
-        .select({ dateOfBirth: students.dateOfBirth, phone: students.phone })
-        .from(students)
-        .where(eq(students.id, authUser.$id))
-        .limit(1)
 
     if (studentRows.length > 0) {
         dateOfBirth = studentRows[0].dateOfBirth?.toISOString() ?? null
