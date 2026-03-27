@@ -85,26 +85,18 @@ const tabs = computed<TabsItem[]>(() => {
 		})
 	}
 
-	items.push(
-		{
-			label: 'Boekingen',
-			icon: 'i-lucide-calendar-days',
-			slot: 'lessen' as const,
-		},
-		{
-			label: 'Credits',
-			icon: 'i-lucide-credit-card',
-			slot: 'credits' as const,
-		},
-	)
+	items.push({
+		label: 'Boekingen',
+		icon: 'i-lucide-calendar-days',
+		slot: 'lessen' as const,
+	})
 
-	if (!isAdmin.value) {
-		items.push({
-			label: 'Mijn gegevens',
-			icon: 'i-lucide-circle-user',
-			slot: 'gegevens' as const,
-		})
-	}
+	items.push({
+		label: 'Credits',
+		icon: 'i-lucide-credit-card',
+		slot: 'credits' as const,
+		...(isAdmin.value ? { hidden: true } : {}),
+	} as TabsItem & { hidden?: boolean })
 
 	if (isAdmin.value) {
 		items.push(
@@ -126,6 +118,12 @@ const tabs = computed<TabsItem[]>(() => {
 		)
 	}
 
+	items.push({
+		label: 'Instellingen',
+		icon: 'i-lucide-settings',
+		slot: 'gegevens' as const,
+	})
+
 	return items
 })
 </script>
@@ -146,6 +144,10 @@ const tabs = computed<TabsItem[]>(() => {
 				<AccountCredits />
 			</div>
 			<div v-show="currentSlot === 'gegevens'" class="pt-3">
+				<div v-if="isAdmin" class="mb-4">
+					<UButton icon="i-lucide-credit-card" label="Credits" variant="outline"
+						@click="activeTab = tabs.findIndex((t: any) => t.slot === 'credits')" />
+				</div>
 				<AccountDetails v-if="loggedInUser" />
 			</div>
 			<div v-show="currentSlot === 'admin-lessen'" class="pt-3">
