@@ -8,3 +8,6 @@
 ## 2024-03-27 - Disabled Button Clarity
 **Learning:** Users often encounter disabled buttons in account management without clear explanations (e.g. canceling lessons or booking extra spots when out of credits).
 **Action:** Always wrap disabled action buttons with a UTooltip to provide context on why the action is unavailable, reducing user frustration.
+## 2024-05-19 - Adding ARIA labels to structural container buttons
+**Learning:** Container-level structural buttons (e.g. quick action tiles acting as buttons with nested spans and decorative icons) in this project lacked distinct accessible names for screen readers. The text within internal spans may not be correctly identified or may be announced out-of-order.
+**Action:** When a `<button>` wraps a complex internal structure (like decorative SVGs and multiple text spans), explicitly set an `aria-label` on the `<button>` and mark decorative children with `aria-hidden="true"`.
