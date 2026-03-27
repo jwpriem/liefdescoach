@@ -133,11 +133,21 @@ async function sendWhatsapp(user) {
 
 const q = ref('')
 
+// ⚡ Bolt: Pre-compute searchable string outside of the keystroke filter loop to prevent unnecessary allocations
+const processedUsers = computed(() => {
+	return students.value.map((student) => {
+		return {
+			...student,
+			_searchable: `${student.name || ''} ${student.email || ''} ${student.phone || ''}`.toLowerCase(),
+		}
+	})
+})
+
 const filteredUsers = computed(() => {
 	if (state.showArchived) {
-		return students.value
+		return processedUsers.value
 	} else {
-		return students.value.filter((student) => {
+		return processedUsers.value.filter((student) => {
 			return !student.archived;
 		})
 	}
@@ -152,8 +162,7 @@ const filteredRows = computed(() => {
 	const tokens = normalized.toLowerCase().split(' ')
 
 	return filteredUsers.value.filter((x) => {
-		const searchable = `${x.name || ''} ${x.email || ''} ${x.phone || ''}`.toLowerCase()
-		return tokens.every(token => searchable.includes(token))
+		return tokens.every(token => x._searchable.includes(token))
 	})
 })
 

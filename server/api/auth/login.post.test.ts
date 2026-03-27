@@ -40,7 +40,7 @@ beforeEach(() => {
   mockDb.from.mockReturnThis()
   mockDb.where.mockReturnThis()
   mockDb.limit.mockResolvedValue([])
-  mockDb.insert.mockReturnValue({ values: vi.fn().mockResolvedValue([]) })
+  mockDb.insert = vi.fn().mockReturnValue({ values: vi.fn().mockResolvedValue([]) })
 })
 
 const handle = handler as any
@@ -60,6 +60,7 @@ describe('POST /api/auth/login', () => {
   it('throws 401 when user is not found', async () => {
     vi.mocked(readBody).mockResolvedValue({ email: 'noone@test.com', password: 'test1234' })
     mockDb.limit.mockResolvedValue([])
+  mockDb.insert = vi.fn().mockReturnValue({ values: vi.fn().mockResolvedValue([]) })
     await expect(handle(fakeEvent())).rejects.toMatchObject({ statusCode: 401 })
   })
 

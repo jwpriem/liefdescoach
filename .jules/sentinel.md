@@ -6,7 +6,8 @@
 **Vulnerability:** The `getLessonTitle` and `getLessonDescription` helpers in `app/plugins/rav.ts` interpolated the `lesson.teacher` property without escaping it. Since these helpers are used with the `v-html` directive in components like `BookingModal.vue`, a malicious admin could inject scripts via the teacher name.
 **Learning:** Even when data comes from an "internal" source (like the database, entered by admins), if it's rendered using `v-html`, it must be explicitly sanitized or escaped. Vue's default text interpolation (`{{ }}`) provides auto-escaping, but `v-html` bypasses this completely.
 **Prevention:** Always sanitize or HTML-escape dynamic content before returning it from helpers that might be used with `v-html`. Prefer Vue's standard text interpolation (`{{ }}`) where HTML rendering is not strictly necessary.
-## 2024-05-20 - [Fix IP spoofing bypass in rate limiter]
-**Vulnerability:** The login rate limiter in `server/api/auth/login.post.ts` used `getRequestIP(event, { xForwardedFor: true })`. This allows an attacker to easily bypass IP-based rate limiting by spoofing the `X-Forwarded-For` HTTP header, leading to unlimited brute-force attempts.
-**Learning:** Never trust the `X-Forwarded-For` header for security or rate limiting purposes unless the application is deployed behind a trusted reverse proxy that explicitly sanitizes or overwrites this header, preventing client spoofing.
-**Prevention:** Remove `{ xForwardedFor: true }` from `getRequestIP` calls by default. Always rely on the raw socket connection IP for rate limiting unless reverse proxy configurations are explicitly verified.
+
+## 2024-05-18 - [Fix IP Spoofing & Memory Leaks in Login Rate Limiting]
+**Vulnerability:** The login endpoint rate limiter (`server/api/auth/login.post.ts`) used `getRequestIP(event, { xForwardedFor: true })` to extract user IP address and set `setInterval` for garbage collection.
+**Learning:** Using `xForwardedFor: true` makes IP rate-limiting bypassable trivially if reverse proxy hasn't been strictly validated because attackers can forge the `X-Forwarded-For` header. Additionally, `setInterval` caused a memory leak on HMR and potential crashes in edge environments.
+**Prevention:** Do not use `xForwardedFor: true` for IP-based rate limiting when using `getRequestIP()`. Use lazy cleanup (verifying entries size threshold before doing cleanup dynamically) to handle rate-limiting eviction without relying on background loops like `setInterval()`.
