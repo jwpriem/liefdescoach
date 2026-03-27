@@ -1,7 +1,22 @@
-import { createError } from 'h3'
+import { createError, getRequestIP } from 'h3'
 import bcrypt from 'bcryptjs'
 import { eq } from 'drizzle-orm'
 import { students } from '../../database/schema'
+
+const MAX_REGISTRATIONS_PER_IP = 5;
+const REGISTRATION_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+
+const registrationsByIP = new Map<string, { count: number; firstRequest: number }>();
+
+function lazyCleanup(now: number) {
+    if (registrationsByIP.size > 1000) {
+        for (const [key, data] of registrationsByIP.entries()) {
+            if (now - data.firstRequest > REGISTRATION_WINDOW_MS) {
+                registrationsByIP.delete(key);
+            }
+        }
+    }
+}
 
 /**
  * POST /api/auth/register
@@ -30,6 +45,26 @@ export default defineEventHandler(async (event) => {
     }
 
     const email = body.email.trim().toLowerCase()
+
+    const ip = getRequestIP(event) || 'unknown';
+    const now = Date.now();
+
+    lazyCleanup(now);
+
+    const ipData = registrationsByIP.get(ip);
+
+    if (ipData) {
+        if (now - ipData.firstRequest > REGISTRATION_WINDOW_MS) {
+            // Reset window
+            registrationsByIP.set(ip, { count: 1, firstRequest: now });
+        } else if (ipData.count >= MAX_REGISTRATIONS_PER_IP) {
+            throw createError({ statusCode: 429, statusMessage: 'Te veel registraties vanaf dit IP. Probeer het later opnieuw.' })
+        } else {
+            ipData.count++;
+        }
+    } else {
+        registrationsByIP.set(ip, { count: 1, firstRequest: now });
+    }
 
     // Check if email already exists
     const existing = await db
