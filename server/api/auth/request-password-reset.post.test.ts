@@ -1,6 +1,19 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import handler from './request-password-reset.post'
 
+vi.mock('h3', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('h3')>()
+  return {
+    ...actual,
+    createError: (opts: any) => {
+      const err = new Error(opts.statusMessage)
+      Object.assign(err, opts)
+      return err
+    },
+    getRequestIP: vi.fn().mockReturnValue('127.0.0.1'),
+  }
+})
+
 const mockDb = {
   select: vi.fn().mockReturnThis(),
   from: vi.fn().mockReturnThis(),
@@ -29,6 +42,11 @@ const handle = typeof handler === 'function'
   : (handler as any).handler ?? handler
 
 describe('POST /api/auth/request-password-reset', () => {
+  beforeEach(async () => {
+    const { getRequestIP } = await import('h3')
+    vi.mocked(getRequestIP).mockReturnValue(`127.0.0.1-${Date.now()}`)
+  })
+
   it('throws 400 when email is missing', async () => {
     vi.mocked(readBody).mockResolvedValue({})
     await expect(handle({} as any)).rejects.toMatchObject({ statusCode: 400 })
