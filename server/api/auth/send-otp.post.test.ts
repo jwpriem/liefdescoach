@@ -48,11 +48,14 @@ describe('POST /api/auth/send-otp', () => {
     await expect(handle({} as any)).rejects.toMatchObject({ statusCode: 400 })
   })
 
-  it('throws 404 when user does not exist', async () => {
+  it('returns success even when user does not exist (prevents enumeration)', async () => {
     vi.mocked(readBody).mockResolvedValue({ email: 'noone@test.com' })
     mockDb.limit.mockResolvedValue([])
 
-    await expect(handle({ node: { req: { headers: {} } } } as any)).rejects.toMatchObject({ statusCode: 404 })
+    const result = await handle({ node: { req: { headers: {} } } } as any)
+
+    expect(result).toEqual({ success: true })
+    expect(smtpTransport.sendMail).not.toHaveBeenCalled()
   })
 
   it('generates OTP and sends email when user exists', async () => {

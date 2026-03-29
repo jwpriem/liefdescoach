@@ -11,3 +11,8 @@
 **Vulnerability:** The login endpoint rate limiter (`server/api/auth/login.post.ts`) used `getRequestIP(event, { xForwardedFor: true })` to extract user IP address and set `setInterval` for garbage collection.
 **Learning:** Using `xForwardedFor: true` makes IP rate-limiting bypassable trivially if reverse proxy hasn't been strictly validated because attackers can forge the `X-Forwarded-For` header. Additionally, `setInterval` caused a memory leak on HMR and potential crashes in edge environments.
 **Prevention:** Do not use `xForwardedFor: true` for IP-based rate limiting when using `getRequestIP()`. Use lazy cleanup (verifying entries size threshold before doing cleanup dynamically) to handle rate-limiting eviction without relying on background loops like `setInterval()`.
+
+## 2024-05-18 - [Fix Email Enumeration in OTP Request]
+**Vulnerability:** The `/api/auth/send-otp` endpoint threw a 404 error when a requested email address was not found in the database. This allowed an unauthenticated attacker to enumerate whether a specific email address is registered.
+**Learning:** Any endpoint that accepts a user identifier (email, username, etc.) and performs an action (like sending a password reset link or OTP) must return a consistent, generic response regardless of whether the identifier exists. Otherwise, the differing responses leak the existence of the user.
+**Prevention:** Always return a generic success response (e.g., `{ success: true }`) from authentication-related request endpoints, and handle the actual sending logic silently if the user exists.
