@@ -16,7 +16,8 @@ const futureBookings = computed(() => {
       return { ...booking, lessons: lesson }
     })
     .filter((booking: any) => booking.lessons && $rav.isFutureBooking(booking.lessons.date))
-    .sort((a: any, b: any) => new Date(a.lessons.date).getTime() - new Date(b.lessons.date).getTime())
+    // ⚡ Bolt: Prevent expensive Date instantiations inside the sort loop by directly comparing ISO strings
+    .sort((a: any, b: any) => a.lessons.date < b.lessons.date ? -1 : a.lessons.date > b.lessons.date ? 1 : 0)
 })
 
 const nextBooking = computed(() => futureBookings.value[0] ?? null)

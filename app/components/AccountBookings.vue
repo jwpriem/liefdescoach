@@ -35,7 +35,8 @@ const futureBookingGroups = computed(() => {
       current.spots += 1
     })
 
-  return [...grouped.values()].sort((a, b) => new Date(a.lessons.date).getTime() - new Date(b.lessons.date).getTime())
+  // ⚡ Bolt: Prevent expensive Date instantiations inside the sort loop by directly comparing ISO strings
+  return [...grouped.values()].sort((a: any, b: any) => a.lessons.date < b.lessons.date ? -1 : a.lessons.date > b.lessons.date ? 1 : 0)
 })
 
 async function removeBooking(bookingGroup: any) {

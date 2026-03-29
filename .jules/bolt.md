@@ -13,3 +13,7 @@
 ## 2024-05-18 - Vue Template Render Loop Anti-Pattern
 **Learning:** Avoid calling functions that sort arrays or allocate new objects (like `getLessonBookingsWithLabels(lesson.bookings)`) directly inside Vue `v-for` directives in templates. This forces Vue to re-execute expensive operations and create new references on every single patch/render cycle, destroying performance.
 **Action:** Move expensive data transformations out of the template and into `computed` properties (e.g., mapping an array to include processed properties).
+
+## 2024-05-24 - Array Sorting Performance with ISO Date Strings
+**Learning:** Calling `new Date(string).getTime()` or using `String.prototype.localeCompare()` inside array `.sort()` comparator functions is extremely slow because it requires O(N log N) costly instantiations and local culture formatting logic on every swap. ISO 8601 strings are inherently lexicographically sortable.
+**Action:** Use simple `<` and `>` operators inside `.sort()` callbacks when comparing ISO date strings (e.g. `a.date < b.date ? -1 : a.date > b.date ? 1 : 0`).
