@@ -1,6 +1,21 @@
-import { createError } from 'h3'
+import { createError, getRequestIP } from 'h3'
 import { eq } from 'drizzle-orm'
 import { students } from '../../database/schema'
+
+const MAX_IP_REQUESTS = 5;
+const REQUEST_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+
+const resetRequestsByIP = new Map<string, { count: number; firstRequest: number }>();
+
+function lazyCleanup(now: number) {
+    if (resetRequestsByIP.size > 1000) {
+        for (const [key, data] of resetRequestsByIP.entries()) {
+            if (now - data.firstRequest > REQUEST_WINDOW_MS) {
+                resetRequestsByIP.delete(key);
+            }
+        }
+    }
+}
 
 /**
  * POST /api/auth/request-password-reset
@@ -16,6 +31,26 @@ export default defineEventHandler(async (event) => {
 
     const email = body.email.trim().toLowerCase()
     const config = useRuntimeConfig()
+
+    const ip = getRequestIP(event) || 'unknown';
+    const now = Date.now();
+
+    lazyCleanup(now);
+
+    const ipData = resetRequestsByIP.get(ip);
+
+    if (ipData) {
+        if (now - ipData.firstRequest > REQUEST_WINDOW_MS) {
+            // Reset window
+            resetRequestsByIP.set(ip, { count: 1, firstRequest: now });
+        } else if (ipData.count >= MAX_IP_REQUESTS) {
+            throw createError({ statusCode: 429, statusMessage: 'Te veel aanvragen vanaf dit IP. Probeer het later opnieuw.' })
+        } else {
+            ipData.count++;
+        }
+    } else {
+        resetRequestsByIP.set(ip, { count: 1, firstRequest: now });
+    }
 
     // Look up student — if not found, return success anyway (no email enumeration)
     const rows = await db
