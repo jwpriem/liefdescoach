@@ -11,3 +11,7 @@
 ## 2024-05-19 - Adding ARIA labels to structural container buttons
 **Learning:** Container-level structural buttons (e.g. quick action tiles acting as buttons with nested spans and decorative icons) in this project lacked distinct accessible names for screen readers. The text within internal spans may not be correctly identified or may be announced out-of-order.
 **Action:** When a `<button>` wraps a complex internal structure (like decorative SVGs and multiple text spans), explicitly set an `aria-label` on the `<button>` and mark decorative children with `aria-hidden="true"`.
+
+## 2024-06-12 - Ensure tooltips display on disabled Nuxt UI buttons
+**Learning:** In Nuxt UI (and common component libraries), disabled `<UButton>` elements block pointer events, preventing wrapper components like `<UTooltip>` from registering hover states. This leads to hidden context about *why* the button is disabled.
+**Action:** When an action is unavailable, always show the disabled button and explicitly wrap it in a structural `<div>` so the surrounding `<UTooltip>` can properly catch pointer events and explain the disabled state to the user.
