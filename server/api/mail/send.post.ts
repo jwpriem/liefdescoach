@@ -1,4 +1,18 @@
-import { createError } from 'h3'
+import { createError, getRequestIP } from 'h3'
+
+const MAX_IP_REQUESTS = 5;
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+const requestsByIP = new Map<string, { count: number; firstRequest: number }>();
+
+function lazyCleanup(now: number) {
+    if (requestsByIP.size > 1000) {
+        for (const [key, data] of requestsByIP.entries()) {
+            if (now - data.firstRequest > RATE_LIMIT_WINDOW_MS) {
+                requestsByIP.delete(key);
+            }
+        }
+    }
+}
 
 /**
  * Server-side email API for simple notification emails.
@@ -14,6 +28,25 @@ export default defineEventHandler(async (event) => {
 
     if (!body?.type || typeof body.type !== 'string') {
         throw createError({ statusCode: 400, statusMessage: 'Email type is verplicht' })
+    }
+
+    const ip = getRequestIP(event) || 'unknown';
+    const now = Date.now();
+
+    lazyCleanup(now);
+
+    const ipData = requestsByIP.get(ip);
+
+    if (ipData) {
+        if (now - ipData.firstRequest > RATE_LIMIT_WINDOW_MS) {
+            requestsByIP.set(ip, { count: 1, firstRequest: now });
+        } else if (ipData.count >= MAX_IP_REQUESTS) {
+            throw createError({ statusCode: 429, statusMessage: 'Te veel aanvragen vanaf dit IP. Probeer het later opnieuw.' });
+        } else {
+            ipData.count++;
+        }
+    } else {
+        requestsByIP.set(ip, { count: 1, firstRequest: now });
     }
 
     let email: { subject: string; html: string; text: string }
