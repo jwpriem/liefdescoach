@@ -105,11 +105,13 @@ async function createNewLesson() {
 const { sortStudents, getLessonBookingsWithLabels } = useLessonBookings()
 
 // ⚡ Bolt: Move expensive O(N log N) sorting and allocations out of the template
-const futureLessons = computed(() =>
-  lessons.value
-    .filter(l => dayjs(new Date(l.date)).isAfter(dayjs()))
+// ⚡ Bolt: Avoid allocating heavy dayjs objects inside filter loops by using native Date time comparison
+const futureLessons = computed(() => {
+  const nowTime = Date.now()
+  return lessons.value
+    .filter(l => new Date(l.date).getTime() > nowTime)
     .map(l => ({ ...l, processedBookings: getLessonBookingsWithLabels(l.bookings || []) }))
-)
+})
 
 const computedLessons = computed(() => {
   return lessons.value.map(lesson => {
