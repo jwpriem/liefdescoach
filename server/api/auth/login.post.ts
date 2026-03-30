@@ -73,28 +73,27 @@ export default defineEventHandler(async (event) => {
         .where(eq(students.email, email))
         .limit(1)
 
-    if (rows.length === 0) {
-        throw createError({ statusCode: 401, statusMessage: 'Verkeerde e-mailadres of wachtwoord. Probeer opnieuw.' })
+    // To prevent user enumeration via timing attack, always perform a bcrypt comparison
+    const dummyHash = '$2b$12$7eegZyIWby/HGfvrXBRXVOPX9dfeV6clTEloooQdG7YtvJAaQRmRu';
+    const student = rows.length > 0 ? rows[0] : null;
+    const hashToCompare = student?.passwordHash || dummyHash;
+
+    const valid = await bcrypt.compare(password, hashToCompare);
+
+    if (!student || (student.passwordHash && !valid)) {
+        if (!attempt) {
+            loginAttempts.set(rateLimitKey, { count: 1, lockedUntil: 0, lastAttempt: now });
+        } else {
+            attempt.count += 1;
+            attempt.lastAttempt = now;
+            if (attempt.count >= MAX_LOGIN_ATTEMPTS) {
+                attempt.lockedUntil = now + LOGIN_LOCKOUT_MS;
+            }
+        }
+        throw createError({ statusCode: 401, statusMessage: 'Verkeerde e-mailadres of wachtwoord. Probeer opnieuw.' });
     }
 
-    const student = rows[0]
-
-    if (student.passwordHash) {
-        // Verify password
-        const valid = await bcrypt.compare(password, student.passwordHash)
-        if (!valid) {
-            if (!attempt) {
-                loginAttempts.set(rateLimitKey, { count: 1, lockedUntil: 0, lastAttempt: now });
-            } else {
-                attempt.count += 1;
-                attempt.lastAttempt = now;
-                if (attempt.count >= MAX_LOGIN_ATTEMPTS) {
-                    attempt.lockedUntil = now + LOGIN_LOCKOUT_MS;
-                }
-            }
-            throw createError({ statusCode: 401, statusMessage: 'Verkeerde e-mailadres of wachtwoord. Probeer opnieuw.' })
-        }
-    } else {
+    if (!student.passwordHash) {
         // Password not yet migrated — send a password reset email instead
         const lastSent = migrationResetSent.get(email)
         if (!lastSent || now - lastSent > LOGIN_LOCKOUT_MS) {
