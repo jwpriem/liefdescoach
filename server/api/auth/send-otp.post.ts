@@ -72,10 +72,8 @@ export default defineEventHandler(async (event) => {
         .limit(1)
 
     if (userRows.length === 0) {
-        throw createError({
-            statusCode: 404,
-            statusMessage: 'Er is geen account gevonden met dit e-mailadres. Maak eerst een account aan.'
-        })
+        // Prevent email enumeration by returning success even if the user does not exist
+        return { success: true }
     }
 
     const userId = userRows[0].id
