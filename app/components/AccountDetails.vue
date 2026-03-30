@@ -31,6 +31,10 @@ const state = reactive({
 const targetUser = computed(() => props.user || loggedInUser.value);
 const availableCredits = computed(() => props.credits !== undefined ? props.credits : myCredits.value);
 
+const isUpdating = ref(false);
+const isUpdatingHealth = ref(false);
+const isUpdatingPassword = ref(false);
+
 const remindersEnabled = computed({
   get: () => targetUser.value?.reminders !== false,
   set: async (value: boolean) => {
@@ -91,6 +95,7 @@ function cancel() {
 
 async function update() {
   if (!targetUser.value) return;
+  isUpdating.value = true;
   try {
     await updateProfile({
       userId: targetUser.value.$id,
@@ -101,11 +106,14 @@ async function update() {
     cancel();
   } catch (error) {
     console.error('Failed to update profile:', error);
+  } finally {
+    isUpdating.value = false;
   }
 }
 
 async function updateHealth() {
   if (!targetUser.value) return;
+  isUpdatingHealth.value = true;
   try {
     const currentHealth = targetUser.value.health || {};
     const newHealth = {
@@ -124,17 +132,23 @@ async function updateHealth() {
     cancel();
   } catch (error) {
     // Handle errors
+  } finally {
+    isUpdatingHealth.value = false;
   }
 }
 
 async function updatePassword() {
+  isUpdatingPassword.value = true;
   try {
     if (state.passwordCheck) {
       await authUpdatePassword(state.password!, state.newPassword!);
       cancel();
+      state.editPassword = false;
     }
   } catch (error) {
     // Handle your errors here
+  } finally {
+    isUpdatingPassword.value = false;
   }
 }
 
@@ -307,7 +321,7 @@ async function requestVerification() {
 
 
         <div class="flex gap-3 mt-4">
-          <UButton color="primary" variant="solid" size="lg" @click="update()">Opslaan</UButton>
+          <UButton color="primary" variant="solid" size="lg" :loading="isUpdating" @click="update()">Opslaan</UButton>
           <UButton color="primary" variant="outline" size="lg" @click="cancel()">Annuleer</UButton>
         </div>
       </div>
@@ -350,7 +364,7 @@ async function requestVerification() {
           </div>
         </div>
         <div class="flex gap-3 mt-2">
-          <UButton color="primary" variant="solid" size="lg" @click="updatePassword(), state.editPassword = false"
+          <UButton color="primary" variant="solid" size="lg" :loading="isUpdatingPassword" @click="updatePassword()"
             :disabled="!state.passwordCheck">Opslaan</UButton>
           <UButton color="primary" variant="outline" size="lg" @click="cancel()">Annuleer</UButton>
         </div>
@@ -383,7 +397,7 @@ async function requestVerification() {
         </div>
 
         <div class="flex gap-3 mt-4">
-          <UButton color="primary" variant="solid" size="lg" @click="updateHealth()">Opslaan</UButton>
+          <UButton color="primary" variant="solid" size="lg" :loading="isUpdatingHealth" @click="updateHealth()">Opslaan</UButton>
           <UButton color="primary" variant="outline" size="lg" @click="cancel()">Annuleer</UButton>
         </div>
       </div>
