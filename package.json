@@ -26,6 +26,7 @@
     "@nuxt/ui": "^4.0.0",
     "@nuxtjs/sitemap": "^7.0.0",
     "@popperjs/core": "^2.11.8",
+    "@tailwindcss/vite": "^4.0.0",
     "@vite-pwa/nuxt": "^1.1.1",
     "bcryptjs": "^3.0.3",
     "chart.js": "^4.5.1",
@@ -33,6 +34,7 @@
     "nanoid": "^5.1.6",
     "nodemailer": "^6.9.0",
     "nuxt": "^4.4.2",
+    "tailwindcss": "^4.0.0",
     "v-calendar": "^3.1.2",
     "vue-chartjs": "^5.3.3",
     "web-push": "^3.6.7"
