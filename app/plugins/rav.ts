@@ -70,7 +70,8 @@ export default defineNuxtPlugin(nuxtApp => {
         },
 
         isFutureBooking(lessonDate: string) {
-            return dayjs().isBefore(dayjs(new Date(lessonDate)))
+            // ⚡ Bolt: Avoid allocating heavy dayjs objects inside filter loops by using native Date time comparison
+            return new Date(lessonDate).getTime() > Date.now()
         },
         checkCancelPeriod(lesson: any) {
             return dayjs().utc().isBefore(dayjs(new Date(lesson.date)).utc().subtract(1, 'day'))
@@ -104,11 +105,9 @@ export default defineNuxtPlugin(nuxtApp => {
         },
 
         upcomingLessons(lessons: any) {
+            const nowTime = Date.now()
             return lessons
-                .filter((lesson: any) => {
-                    const lessonDate = dayjs(new Date(lesson.date))
-                    return dayjs().isBefore(lessonDate)
-                })
+                .filter((lesson: any) => new Date(lesson.date).getTime() > nowTime)
         },
 
         checkAvailability(lesson: any, student: any) {
