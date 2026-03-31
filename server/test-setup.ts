@@ -22,6 +22,16 @@ vi.stubGlobal('getCookie', vi.fn())
 vi.stubGlobal('deleteCookie', vi.fn())
 vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({ sessionSecret: 'test-secret', public: {} }))
 
+vi.mock('h3', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('h3')>()
+  return {
+    ...actual,
+    getRequestIP: vi.fn().mockReturnValue('127.0.0.1'),
+    readBody: vi.fn(),
+    createError: actual.createError,
+  }
+})
+
 // Server utils auto-imports
 vi.stubGlobal('db', {})
 vi.stubGlobal('createSession', vi.fn())
