@@ -38,8 +38,10 @@ const state = reactive({
 	showArchived: false
 });
 
-const { data: adminUsersData, refresh: refreshUsers } = await useAsyncData('admin-users', () => $fetch<any>('/api/users'))
-const { data: creditSummaryData, refresh: refreshCreditSummary } = await useAsyncData('credit-summary', () => $fetch<any>('/api/credits/summary'))
+const [{ data: adminUsersData, refresh: refreshUsers }, { data: creditSummaryData, refresh: refreshCreditSummary }] = await Promise.all([
+	useAsyncData('admin-users', () => $fetch<any>('/api/users')),
+	useAsyncData('credit-summary', () => $fetch<any>('/api/credits/summary'))
+])
 
 const students = computed(() => adminUsersData.value?.users ?? [])
 const studentCreditSummary = computed(() => creditSummaryData.value?.summary ?? {})

@@ -7,9 +7,11 @@ definePageMeta({
     middleware: ['auth', 'admin']
 })
 
-const { data: userStats } = await useFetch(`/api/users/${userId}/stats`)
-const { data: adminUsers } = await useAsyncData('admin-users', () => $fetch<any>('/api/users'))
-const { data: loginHistoryData } = await useFetch<{ logins: any[] }>(`/api/users/${userId}/login-history`)
+const [{ data: userStats }, { data: adminUsers }, { data: loginHistoryData }] = await Promise.all([
+    useFetch(`/api/users/${userId}/stats`),
+    useAsyncData('admin-users', () => $fetch<any>('/api/users')),
+    useFetch<{ logins: any[] }>(`/api/users/${userId}/login-history`)
+])
 
 const user = computed(() => (adminUsers.value as any)?.users?.find((u: any) => u.$id === userId))
 const stats = computed(() => userStats.value)
