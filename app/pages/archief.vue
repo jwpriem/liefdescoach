@@ -121,12 +121,12 @@ watch(activeTab, (newVal) => {
         <!-- Date range pickers -->
         <div class="flex flex-wrap gap-4 mb-8">
           <div class="flex flex-col gap-1">
-            <label class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Van</label>
-            <UInput type="date" v-model="dateFrom" color="primary" variant="outline" size="lg" />
+            <label for="dateFrom" class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Van</label>
+            <UInput id="dateFrom" type="date" v-model="dateFrom" color="primary" variant="outline" size="lg" />
           </div>
           <div class="flex flex-col gap-1">
-            <label class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Tot</label>
-            <UInput type="date" v-model="dateTo" color="primary" variant="outline" size="lg" />
+            <label for="dateTo" class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Tot</label>
+            <UInput id="dateTo" type="date" v-model="dateTo" color="primary" variant="outline" size="lg" />
           </div>
         </div>
 

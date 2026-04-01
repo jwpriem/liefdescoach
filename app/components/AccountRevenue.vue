@@ -163,16 +163,16 @@ watch([dateFrom, dateTo, selectedBucket], fetchRevenue)
     <div class="rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-lg shadow-emerald-950/10 p-4 sm:p-6 mb-6">
       <div class="flex items-start justify-start gap-x-6 flex-wrap gap-y-4">
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-1.5">Van</label>
-          <UInput v-model="dateFrom" type="date" color="primary" variant="outline" size="lg" />
+          <label for="dateFrom" class="block text-sm font-medium text-gray-300 mb-1.5">Van</label>
+          <UInput id="dateFrom" v-model="dateFrom" type="date" color="primary" variant="outline" size="lg" />
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-1.5">Tot</label>
-          <UInput v-model="dateTo" type="date" color="primary" variant="outline" size="lg" />
+          <label for="dateTo" class="block text-sm font-medium text-gray-300 mb-1.5">Tot</label>
+          <UInput id="dateTo" v-model="dateTo" type="date" color="primary" variant="outline" size="lg" />
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-1.5">Periode</label>
-          <USelect v-model="selectedBucket" :items="bucketOptions" value-key="value" color="primary" variant="outline" size="lg" />
+          <label for="period" class="block text-sm font-medium text-gray-300 mb-1.5">Periode</label>
+          <USelect id="period" v-model="selectedBucket" :items="bucketOptions" value-key="value" color="primary" variant="outline" size="lg" />
         </div>
       </div>
     </div>

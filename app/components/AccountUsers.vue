@@ -180,13 +180,13 @@ const filteredRows = computed(() => {
 			class="rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-lg shadow-emerald-950/10 p-4 sm:p-6 mb-6">
 			<div class="flex items-start justify-start gap-x-6 flex-wrap gap-y-4">
 				<div>
-					<label class="block text-sm font-medium text-gray-300 mb-1.5">Filter gebruikers</label>
+					<label for="naam" class="block text-sm font-medium text-gray-300 mb-1.5">Filter gebruikers</label>
 					<UInput id="naam" v-model="q" color="primary" placeholder="Zoek gebruiker" type="text"
 						variant="outline" size="lg" />
 				</div>
 				<div>
-					<label class="block text-sm font-medium text-gray-300 mb-1.5">Gearchiveerd</label>
-					<USwitch v-model="state.showArchived" unchecked-icon="i-lucide-x" checked-icon="i-lucide-check" />
+					<label for="showArchived" class="block text-sm font-medium text-gray-300 mb-1.5">Gearchiveerd</label>
+					<USwitch id="showArchived" v-model="state.showArchived" unchecked-icon="i-lucide-x" checked-icon="i-lucide-check" />
 				</div>
 			</div>
 		</div>

@@ -268,15 +268,15 @@ async function onConfirmDeleteLesson() {
           <h2 class="text-2xl font-bold text-emerald-100 tracking-tight">Voeg boeking toe</h2>
 
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-1.5">Les</label>
-            <USelectMenu icon="i-lucide-graduation-cap" size="lg" color="primary" variant="outline"
+            <label for="addBookingLesson" class="block text-sm font-medium text-gray-300 mb-1.5">Les</label>
+            <USelectMenu input-id="addBookingLesson" icon="i-lucide-graduation-cap" size="lg" color="primary" variant="outline"
               v-model="state.addBookingLesson" :items="computedLessons" class="w-full" value-key="value"
               :search-input="false" />
           </div>
 
           <div v-if="state.addBookingLesson">
-            <label class="block text-sm font-medium text-gray-300 mb-1.5">Gebruiker</label>
-            <USelectMenu icon="i-lucide-user" size="lg" color="primary" variant="outline" v-model="state.addBookingUser"
+            <label for="addBookingUser" class="block text-sm font-medium text-gray-300 mb-1.5">Gebruiker</label>
+            <USelectMenu input-id="addBookingUser" icon="i-lucide-user" size="lg" color="primary" variant="outline" v-model="state.addBookingUser"
               :items="computedStudents" class="w-full" value-key="value"
               :search-input="{ placeholder: 'Zoek gebruiker...' }" />
           </div>
@@ -351,9 +351,9 @@ async function onConfirmDeleteLesson() {
           <h2 class="text-2xl font-bold text-emerald-100 tracking-tight">Voeg les toe</h2>
 
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-1.5">Datum</label>
+            <label for="createLessonDate" class="block text-sm font-medium text-gray-300 mb-1.5">Datum</label>
             <UPopover class="w-full">
-              <UButton icon="i-lucide-calendar-days" size="lg"
+              <UButton id="createLessonDate" icon="i-lucide-calendar-days" size="lg"
                 :label="dayjs(state.createLessonDate).format('D MMM, YYYY')" color="primary" variant="outline"
                 class="w-full justify-between" />
               <template #content="{ close }">
@@ -363,25 +363,25 @@ async function onConfirmDeleteLesson() {
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-1.5">Tijd</label>
+            <label for="createLessonHours" class="block text-sm font-medium text-gray-300 mb-1.5">Tijd</label>
             <div class="flex items-center gap-3">
-              <USelectMenu icon="i-lucide-clock" size="lg" color="primary" variant="outline"
+              <USelectMenu input-id="createLessonHours" icon="i-lucide-clock" size="lg" color="primary" variant="outline"
                 v-model="state.createLessonHours" :items="state.hours" class="w-full" />
-              <USelectMenu icon="i-lucide-clock" size="lg" color="primary" variant="outline"
+              <USelectMenu input-id="createLessonMinutes" aria-label="Minuten" icon="i-lucide-clock" size="lg" color="primary" variant="outline"
                 v-model="state.createLessonMinutes" :items="state.minutes" class="w-full" />
             </div>
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-1.5">Type les</label>
-            <USelectMenu icon="i-lucide-graduation-cap" size="lg" color="primary" variant="outline"
+            <label for="createLessonType" class="block text-sm font-medium text-gray-300 mb-1.5">Type les</label>
+            <USelectMenu input-id="createLessonType" icon="i-lucide-graduation-cap" size="lg" color="primary" variant="outline"
               v-model="state.createLessonType" :items="state.types" class="w-full" value-key="value"
               :search-input="false" />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-1.5">Docent</label>
-            <USelectMenu icon="i-lucide-graduation-cap" size="lg" color="primary" variant="outline"
+            <label for="createLessonTeacher" class="block text-sm font-medium text-gray-300 mb-1.5">Docent</label>
+            <USelectMenu input-id="createLessonTeacher" icon="i-lucide-graduation-cap" size="lg" color="primary" variant="outline"
               v-model="state.createLessonTeacher" :items="state.teachers" class="w-full" value-key="value"
               :search-input="false" />
           </div>
