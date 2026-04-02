@@ -54,8 +54,10 @@ export default defineEventHandler(async (event) => {
     }))
 
     const now = new Date()
+    // ⚡ Bolt: Pre-calculate static timestamp outside the loop and use native getTime() for comparison
+    const nowTime = now.getTime()
     const available = rows.filter(
-        (c) => !c.bookingId && c.validTo && new Date(c.validTo) > now
+        (c) => !c.bookingId && c.validTo && new Date(c.validTo).getTime() > nowTime
     ).length
 
     return {

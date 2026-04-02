@@ -38,7 +38,9 @@ export default defineEventHandler(async (event) => {
         .limit(2000)
 
     const now = new Date()
-    const availableCredits = creditRows.filter(c => !c.bookingId && c.validTo && new Date(c.validTo) > now).length
+    // ⚡ Bolt: Pre-calculate static timestamp outside the loop and use native getTime() for comparison
+    const nowTime = now.getTime()
+    const availableCredits = creditRows.filter(c => !c.bookingId && c.validTo && new Date(c.validTo).getTime() > nowTime).length
     const usedCredits = creditRows.filter(c => !!c.bookingId).length
 
     // Map booking IDs to credits
