@@ -35,19 +35,26 @@ function spotsLeft(lesson: any): number {
   return 9 - (lesson.bookings?.length || 0)
 }
 
+const isBookingId = ref<string | null>(null)
+
 async function book(lesson: any) {
   if (!loggedInUser.value) return
-  setOnBehalfOf(loggedInUser.value)
-  await handleBooking(lesson)
+  isBookingId.value = lesson.$id
+  try {
+    setOnBehalfOf(loggedInUser.value)
+    await handleBooking(lesson)
 
-  if (!bookingError.value) {
-    toast.add({
-      id: 'booking',
-      title: 'Tot snel',
-      icon: 'i-lucide-badge-check',
-      color: 'primary',
-      description: 'Je les is geboekt!'
-    })
+    if (!bookingError.value) {
+      toast.add({
+        id: 'booking',
+        title: 'Tot snel',
+        icon: 'i-lucide-badge-check',
+        color: 'primary',
+        description: 'Je les is geboekt!'
+      })
+    }
+  } finally {
+    isBookingId.value = null
   }
 }
 
@@ -134,6 +141,7 @@ async function book(lesson: any) {
             <!-- Book button -->
             <UButton v-else
               :disabled="availableCredits < 1"
+              :loading="isBookingId === lesson.$id"
               color="primary" variant="solid" size="sm"
               @click="book(lesson)"
               :aria-label="(availableCredits < 1 ? 'Geen credits voor ' : 'Boek ') + $rav.getLessonTitle(lesson) + ' op ' + $rav.formatDateInDutch(lesson.date, true)">

@@ -39,13 +39,26 @@ const futureBookingGroups = computed(() => {
   return [...grouped.values()].sort((a: any, b: any) => a.lessons.date < b.lessons.date ? -1 : a.lessons.date > b.lessons.date ? 1 : 0)
 })
 
+const isCancelingId = ref<string | null>(null)
+const isBookingExtraId = ref<string | null>(null)
+
 async function removeBooking(bookingGroup: any) {
-  const bookingToCancel = bookingGroup.bookings[bookingGroup.bookings.length - 1]
-  await cancelBooking(bookingToCancel)
+  isCancelingId.value = bookingGroup.lessonId
+  try {
+    const bookingToCancel = bookingGroup.bookings[bookingGroup.bookings.length - 1]
+    await cancelBooking(bookingToCancel)
+  } finally {
+    isCancelingId.value = null
+  }
 }
 
 async function bookExtraSpot(lesson: any) {
-  await handleBooking(lesson, { extraSpot: true })
+  isBookingExtraId.value = lesson.$id
+  try {
+    await handleBooking(lesson, { extraSpot: true })
+  } finally {
+    isBookingExtraId.value = null
+  }
 }
 </script>
 
@@ -118,12 +131,12 @@ async function bookExtraSpot(lesson: any) {
             <div class="flex flex-col gap-2">
               <UTooltip :text="availableCredits < 1 ? 'Onvoldoende credits' : 'Boek een extra plek'" class="w-full" :ui="{ width: 'w-full' }">
                 <div class="w-full">
-                  <UButton color="primary" variant="outline" size="lg" block :disabled="availableCredits < 1" @click="bookExtraSpot(bookingGroup.lessons)">Boek extra plek</UButton>
+                  <UButton :loading="isBookingExtraId === bookingGroup.lessonId" color="primary" variant="outline" size="lg" block :disabled="availableCredits < 1" @click="bookExtraSpot(bookingGroup.lessons)">Boek extra plek</UButton>
                 </div>
               </UTooltip>
               <UTooltip :text="!$rav.checkCancelPeriod(bookingGroup.lessons) ? 'Annuleren kan tot 24 uur voor de les' : 'Annuleer deze boeking'" class="w-full" :ui="{ width: 'w-full' }">
                 <div class="w-full">
-                  <UButton color="primary" variant="solid" size="lg" block @click="removeBooking(bookingGroup)" :disabled="!$rav.checkCancelPeriod(bookingGroup.lessons)">Annuleer 1 plek</UButton>
+                  <UButton :loading="isCancelingId === bookingGroup.lessonId" color="primary" variant="solid" size="lg" block @click="removeBooking(bookingGroup)" :disabled="!$rav.checkCancelPeriod(bookingGroup.lessons)">Annuleer 1 plek</UButton>
                 </div>
               </UTooltip>
             </div>
