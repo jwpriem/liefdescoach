@@ -133,21 +133,21 @@ async function sendWhatsapp(user) {
 
 const q = ref('')
 
-// ⚡ Bolt: Pre-compute searchable string outside of the keystroke filter loop to prevent unnecessary allocations
-const processedUsers = computed(() => {
-	return students.value.map((student) => {
-		return {
-			...student,
-			_searchable: `${student.name || ''} ${student.email || ''} ${student.phone || ''}`.toLowerCase(),
-		}
-	})
+// ⚡ Bolt: Pre-compute searchable string outside of the keystroke filter loop to prevent unnecessary allocations.
+// ⚡ Bolt: Use a Map to cache pre-computed values instead of mapping the array and spreading objects, which strips Vue's reactive proxies.
+const searchableCache = computed(() => {
+	const cache = new Map<string, string>()
+	for (const student of students.value) {
+		cache.set(student.$id, `${student.name || ''} ${student.email || ''} ${student.phone || ''}`.toLowerCase())
+	}
+	return cache
 })
 
 const filteredUsers = computed(() => {
 	if (state.showArchived) {
-		return processedUsers.value
+		return students.value
 	} else {
-		return processedUsers.value.filter((student) => {
+		return students.value.filter((student) => {
 			return !student.archived;
 		})
 	}
@@ -162,7 +162,8 @@ const filteredRows = computed(() => {
 	const tokens = normalized.toLowerCase().split(' ')
 
 	return filteredUsers.value.filter((x) => {
-		return tokens.every(token => x._searchable.includes(token))
+		const searchable = searchableCache.value.get(x.$id) || ''
+		return tokens.every(token => searchable.includes(token))
 	})
 })
 
