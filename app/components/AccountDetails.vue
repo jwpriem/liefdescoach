@@ -364,8 +364,12 @@ async function requestVerification() {
           </div>
         </div>
         <div class="flex gap-3 mt-2">
-          <UButton color="primary" variant="solid" size="lg" :loading="isUpdatingPassword" @click="updatePassword()"
-            :disabled="!state.passwordCheck">Opslaan</UButton>
+          <UTooltip :text="!state.passwordCheck ? 'Voer een geldig nieuw wachtwoord in' : 'Wachtwoord opslaan'">
+            <div>
+              <UButton color="primary" variant="solid" size="lg" :loading="isUpdatingPassword" @click="updatePassword()"
+                :disabled="!state.passwordCheck">Opslaan</UButton>
+            </div>
+          </UTooltip>
           <UButton color="primary" variant="outline" size="lg" @click="cancel()">Annuleer</UButton>
         </div>
       </div>
