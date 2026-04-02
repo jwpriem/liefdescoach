@@ -5,8 +5,10 @@ const { set: setOnBehalfOf } = useOnBehalfOf()
 const dayjs = useDayjs()
 const { $rav } = useNuxtApp()
 
-const { data: adminLessonsData, refresh: refreshLessons } = await useAsyncData('admin-lessons', () => $fetch<any>('/api/lessonsWithBookings'))
-const { data: adminUsersData } = await useAsyncData('admin-users', () => $fetch<any>('/api/users'))
+const [{ data: adminLessonsData, refresh: refreshLessons }, { data: adminUsersData }] = await Promise.all([
+  useAsyncData('admin-lessons', () => $fetch<any>('/api/lessonsWithBookings')),
+  useAsyncData('admin-users', () => $fetch<any>('/api/users'))
+])
 
 const lessons = computed(() => adminLessonsData.value?.rows ?? [])
 const students = computed(() => adminUsersData.value?.users ?? [])
