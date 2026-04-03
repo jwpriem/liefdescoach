@@ -30,7 +30,7 @@ useLocationPageSchema('Zevenhuizen', 'https://www.ravennah.com/yoga-zevenhuizen'
 
 <template>
     <div>
-        <Header image="/ravennah-zwart.jpg" alignment="object-top">
+        <Header image="/ravennah-zwart.jpg" alignment="object-top" alt="Yoga docent Ravennah in zwartwit portret">
             <h1 class="text-3xl md:text-6xl uppercase font-black">
                 <span class="emerald-underline">Yoga Zevenhuizen</span><span class="text-emerald-700">.</span>
             </h1>
@@ -73,7 +73,7 @@ useLocationPageSchema('Zevenhuizen', 'https://www.ravennah.com/yoga-zevenhuizen'
                 <div class="md:flex justify-between items-center md:space-x-12 space-y-8 md:space-y-0">
                     <div class="w-full md:w-1/2">
                         <img class="w-full h-64 md:h-96 object-center object-cover rounded-3xl shadow-xl"
-                            src="/ravennah_side_plank.webp" />
+                            src="/ravennah_side_plank.webp" alt="Yoga docent Ravennah in een zijwaartse plank yoga houding" />
                     </div>
                     <div class="w-full md:w-1/2 space-y-6">
                         <h2 class="text-2xl md:text-4xl uppercase font-black">
@@ -119,7 +119,7 @@ useLocationPageSchema('Zevenhuizen', 'https://www.ravennah.com/yoga-zevenhuizen'
                     </div>
                     <div class="w-full md:w-1/2">
                         <img class="w-full h-64 md:h-96 object-center object-cover rounded-3xl shadow-xl"
-                            src="/ravennah-pose.jpg" />
+                            src="/ravennah-pose.jpg" alt="Yoga docent Ravennah in yoga pose" />
                     </div>
                 </div>
             </div>
