@@ -284,8 +284,12 @@ async function onConfirmDeleteLesson() {
           </div>
 
           <div class="flex gap-3 mt-2">
-            <UButton :loading="isBooking" color="primary" variant="solid" size="lg" @click="book()"
-              :disabled="!state.addBookingUser && !state.addBookingLesson">Voeg toe</UButton>
+            <UTooltip :text="(!state.addBookingUser && !state.addBookingLesson) ? 'Selecteer eerst een les en gebruiker' : 'Voeg boeking toe'">
+              <div>
+                <UButton :loading="isBooking" color="primary" variant="solid" size="lg" @click="book()"
+                  :disabled="!state.addBookingUser && !state.addBookingLesson">Voeg toe</UButton>
+              </div>
+            </UTooltip>
             <UButton color="primary" variant="outline" size="lg" @click="cancel()">Annuleer</UButton>
           </div>
         </div>
