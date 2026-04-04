@@ -1,4 +1,5 @@
 import { createError } from 'h3'
+import crypto from 'node:crypto'
 import { and, gte, lte, eq } from 'drizzle-orm'
 import { lessons, bookings, students } from '../database/schema'
 
@@ -7,7 +8,14 @@ export default defineEventHandler(async (event) => {
 
     // Auth: verify cron secret
     const apiKey = getHeader(event, 'x-api-key')
-    if (!config.cronSecret || apiKey !== config.cronSecret) {
+    if (!config.cronSecret || !apiKey) {
+        throw createError({ statusCode: 401, statusMessage: 'Ongeldige API-sleutel' })
+    }
+
+    const keyBuffer = Buffer.from(apiKey)
+    const secretBuffer = Buffer.from(config.cronSecret)
+
+    if (keyBuffer.length !== secretBuffer.length || !crypto.timingSafeEqual(keyBuffer, secretBuffer)) {
         throw createError({ statusCode: 401, statusMessage: 'Ongeldige API-sleutel' })
     }
 
