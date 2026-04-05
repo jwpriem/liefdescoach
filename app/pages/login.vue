@@ -384,13 +384,13 @@ const passwordStrength = computed(() => {
                 Inloggen
               </UButton>
               <div class="text-center">
-                <button type="button" tabindex="-1" class="text-sm text-gray-400 hover:text-emerald-400 transition-colors"
+                <button type="button" class="text-sm text-gray-400 hover:text-emerald-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded px-2 py-0.5"
                   @click="switchLoginMode('forgot')">
                   Wachtwoord vergeten?
                 </button>
               </div>
               <div class="text-center">
-                <button type="button" tabindex="-1" class="text-sm text-gray-400 hover:text-emerald-400 transition-colors"
+                <button type="button" class="text-sm text-gray-400 hover:text-emerald-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded px-2 py-0.5"
                   @click="registerForm = true">
                   Nog geen account? <span class="font-medium underline underline-offset-2">Registreren</span>
                 </button>
@@ -403,7 +403,7 @@ const passwordStrength = computed(() => {
                 Account aanmaken
               </UButton>
               <div class="text-center">
-                <button type="button" class="text-sm text-gray-400 hover:text-emerald-400 transition-colors"
+                <button type="button" class="text-sm text-gray-400 hover:text-emerald-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded px-2 py-0.5"
                   @click="registerForm = false">
                   Al een account? <span class="font-medium underline underline-offset-2">Inloggen</span>
                 </button>
@@ -423,7 +423,7 @@ const passwordStrength = computed(() => {
                 Verifieer en inloggen
               </UButton>
               <div class="text-center">
-                <button type="button" class="text-sm text-gray-400 hover:text-emerald-400 transition-colors" @click="resendOtp">
+                <button type="button" class="text-sm text-gray-400 hover:text-emerald-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded px-2 py-0.5" @click="resendOtp">
                   Geen code ontvangen? <span class="font-medium underline underline-offset-2">Opnieuw versturen</span>
                 </button>
               </div>
@@ -435,7 +435,7 @@ const passwordStrength = computed(() => {
                 Verstuur reset-link
               </UButton>
               <div class="text-center">
-                <button type="button" class="text-sm text-gray-400 hover:text-emerald-400 transition-colors"
+                <button type="button" class="text-sm text-gray-400 hover:text-emerald-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded px-2 py-0.5"
                   @click="switchLoginMode('password')">
                   Terug naar inloggen
                 </button>
