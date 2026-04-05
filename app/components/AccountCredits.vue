@@ -10,17 +10,33 @@ const creditTypeLabels: Record<string, string> = {
   credit_10: 'Grote kaart (10)',
 };
 
-function getCreditStatus(credit: any) {
-  if (credit.bookingId) return 'Gebruikt';
-  if (new Date(credit.validTo) <= new Date()) return 'Verlopen';
-  return 'Beschikbaar';
-}
+// ⚡ Bolt: Move expensive data transformations out of the template render loop
+const processedCredits = computed(() => {
+  const now = Date.now();
+  return myCredits.value.map((credit: any) => {
+    let status = 'Beschikbaar';
+    let badgeColor = 'success';
 
-function getCreditBadgeColor(credit: any): string {
-  if (credit.bookingId) return 'error';
-  if (new Date(credit.validTo) <= new Date()) return 'warning';
-  return 'success';
-}
+    if (credit.bookingId) {
+      status = 'Gebruikt';
+      badgeColor = 'error';
+    } else if (new Date(credit.validTo).getTime() <= now) {
+      status = 'Verlopen';
+      badgeColor = 'warning';
+    }
+
+    return {
+      ...credit,
+      _typeLabel: creditTypeLabels[credit.type] || credit.type,
+      _status: status,
+      _badgeColor: badgeColor,
+      _lessonTitle: credit.lesson?.type ? $rav.getLessonTitle(credit.lesson) : '-',
+      _lessonTeacher: credit.lesson?.teacher || '-',
+      _lessonDate: credit.lesson ? $rav.formatDateInDutch(credit.lesson.date) : '-',
+      _validTo: $rav.formatDateInDutch(credit.validTo)
+    };
+  });
+});
 </script>
 
 <template>
@@ -48,28 +64,27 @@ function getCreditBadgeColor(credit: any): string {
       <span class="emerald-underline text-emerald-900">Credit historie</span><span class="text-emerald-700">.</span>
     </h2>
 
-    <div v-if="myCredits.length">
+    <div v-if="processedCredits.length">
       <!-- Mobile: card layout -->
       <div class="flex flex-col gap-y-3 md:hidden">
-        <div v-for="credit in myCredits" :key="credit.$id"
+        <div v-for="credit in processedCredits" :key="credit.$id"
           class="rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-lg shadow-emerald-950/10 p-4">
           <div class="flex items-center justify-between mb-3">
-            <span class="text-sm font-medium text-gray-200">{{ creditTypeLabels[credit.type] || credit.type }}</span>
-            <UBadge :color="getCreditBadgeColor(credit)" variant="subtle" size="xs">{{ getCreditStatus(credit) }}
+            <span class="text-sm font-medium text-gray-200">{{ credit._typeLabel }}</span>
+            <UBadge :color="credit._badgeColor" variant="subtle" size="xs">{{ credit._status }}
             </UBadge>
           </div>
           <div class="grid grid-cols-2 gap-y-2 text-sm">
             <template v-if="credit.lesson">
               <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Les</span>
-              <span class="text-gray-300">{{ credit.lesson?.type ?
-                $rav.getLessonTitle(credit.lesson) : '-' }}</span>
+              <span class="text-gray-300">{{ credit._lessonTitle }}</span>
               <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Docent</span>
-              <span class="text-gray-300">{{ credit.lesson.teacher }}</span>
+              <span class="text-gray-300">{{ credit._lessonTeacher }}</span>
               <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Lesdatum</span>
-              <span class="text-gray-300">{{ $rav.formatDateInDutch(credit.lesson.date) }}</span>
+              <span class="text-gray-300">{{ credit._lessonDate }}</span>
             </template>
             <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Geldig tot</span>
-            <span class="text-gray-300">{{ $rav.formatDateInDutch(credit.validTo) }}</span>
+            <span class="text-gray-300">{{ credit._validTo }}</span>
           </div>
         </div>
       </div>
@@ -89,19 +104,16 @@ function getCreditBadgeColor(credit: any): string {
             </tr>
           </thead>
           <tbody>
-            <tr v-for="credit in myCredits" :key="credit.$id" class="border-b border-gray-800/50 last:border-b-0">
-              <td class="py-3 px-4 text-sm text-gray-200">{{ creditTypeLabels[credit.type] || credit.type }}</td>
+            <tr v-for="credit in processedCredits" :key="credit.$id" class="border-b border-gray-800/50 last:border-b-0">
+              <td class="py-3 px-4 text-sm text-gray-200">{{ credit._typeLabel }}</td>
               <td class="py-3 px-4 text-sm">
-                <UBadge :color="getCreditBadgeColor(credit)" variant="subtle" size="xs">{{ getCreditStatus(credit) }}
+                <UBadge :color="credit._badgeColor" variant="subtle" size="xs">{{ credit._status }}
                 </UBadge>
               </td>
-              <td class="py-3 px-4 text-sm text-gray-300">{{ credit.lesson?.type ?
-                $rav.getLessonTitle(credit.lesson) : '-' }}</td>
-              <td class="py-3 px-4 text-sm text-gray-300">{{ credit.lesson?.teacher || '-' }}</td>
-              <td class="py-3 px-4 text-sm text-gray-300">{{ credit.lesson ? $rav.formatDateInDutch(credit.lesson.date)
-                : '-'
-              }}</td>
-              <td class="py-3 px-4 text-sm text-gray-300">{{ $rav.formatDateInDutch(credit.validTo) }}</td>
+              <td class="py-3 px-4 text-sm text-gray-300">{{ credit._lessonTitle }}</td>
+              <td class="py-3 px-4 text-sm text-gray-300">{{ credit._lessonTeacher }}</td>
+              <td class="py-3 px-4 text-sm text-gray-300">{{ credit._lessonDate }}</td>
+              <td class="py-3 px-4 text-sm text-gray-300">{{ credit._validTo }}</td>
             </tr>
           </tbody>
         </table>
