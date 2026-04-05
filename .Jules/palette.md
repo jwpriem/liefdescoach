@@ -19,3 +19,6 @@
 ## 2024-04-04 - Fixed tabindex="-1" on interactive buttons
 **Learning:** Adding `tabindex="-1"` to buttons that are essential for auxiliary form workflows (like "Forgot password" or "Register") completely breaks keyboard navigation, preventing users from reaching these interactions without a mouse.
 **Action:** Never use `tabindex="-1"` on interactive elements unless they are explicitly meant to be unreachable via keyboard (e.g., hidden or part of a managed focus group). Always rely on the native focusability of `<button>` and test tab order and visible focus states.
+## 2024-05-18 - Missing Alt Attributes on Images
+**Learning:** Found that many `<img>` tags across the site (like hero images and landing page photos) were missing `alt` attributes. Nuxt components wrapping images (like `<Header>`) also lacked a way to pass `alt` down. This meant screen readers had no context for these images.
+**Action:** Added `alt` props to wrapping components and applied meaningful `alt` text to informative images across the site. For decorative images, an empty `alt=""` is used to skip them in screen readers.
