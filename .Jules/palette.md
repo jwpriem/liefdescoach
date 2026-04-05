@@ -22,3 +22,6 @@
 ## 2024-05-18 - Missing Alt Attributes on Images
 **Learning:** Found that many `<img>` tags across the site (like hero images and landing page photos) were missing `alt` attributes. Nuxt components wrapping images (like `<Header>`) also lacked a way to pass `alt` down. This meant screen readers had no context for these images.
 **Action:** Added `alt` props to wrapping components and applied meaningful `alt` text to informative images across the site. For decorative images, an empty `alt=""` is used to skip them in screen readers.
+## 2024-05-18 - Replacing interactive spans and icons with buttons
+**Learning:** Found `<span @click="...">` and `<UIcon @click="...">` elements in `AccountLessons.vue`. Non-interactive elements with click handlers are completely inaccessible to keyboard users (cannot be tabbed to or activated with Enter/Space) and are not announced correctly by screen readers.
+**Action:** Always use `<button>` or `<a>` (or `NuxtLink`) for interactive elements. Ensure they have appropriate `aria-label`s if they are icon-only, and include `focus-visible` utility classes for clear keyboard focus states.

@@ -224,14 +224,16 @@ async function onConfirmDeleteLesson() {
               <div class="mt-1">
                 <span v-for="booking in lesson.processedBookings" :key="booking.$id"
                   class="flex items-center gap-1 text-base text-gray-300">
-                  <span class="hover:text-emerald-400 transition-colors cursor-pointer"
+                  <button class="text-left hover:text-emerald-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded px-1 -ml-1"
                     @click="navigateTo(`/admin/users/${booking.students.$id}`)">
                     {{ booking.students.name }}<span v-if="booking.isExtraSpot" class="text-emerald-400"> (extra
                       plek)</span>
-                  </span>
-                  <UIcon v-if="booking.students.injury" name="i-lucide-heart-pulse"
-                    class="w-4 h-4 text-red-500 flex-shrink-0 cursor-pointer hover:text-red-400 transition-colors"
-                    @click="state.injuryPopup = { name: booking.students.name, injury: booking.students.injury }" />
+                  </button>
+                  <button v-if="booking.students.injury" aria-label="Bekijk blessure details"
+                    class="flex items-center justify-center flex-shrink-0 hover:text-red-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 rounded p-0.5"
+                    @click="state.injuryPopup = { name: booking.students.name, injury: booking.students.injury }">
+                    <UIcon name="i-lucide-heart-pulse" class="w-4 h-4 text-red-500 block" />
+                  </button>
                   <UTooltip v-if="booking.students.pregnancy" text="Zwanger">
                     <UIcon name="i-lucide-baby" class="w-4 h-4 text-pink-500 flex-shrink-0" />
                   </UTooltip>
