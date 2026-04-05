@@ -70,7 +70,7 @@ async function book(lesson: any) {
 <template>
   <div>
     <IsLoading :loading="isLoading" />
-    <Header image="/yoga-sfeer2.jpg" alignment="object-bottom">
+    <Header image="/yoga-sfeer2.jpg" alignment="object-bottom" alt="Mensen in een yoga klas in de studio">
       <h1 class="text-3xl md:text-6xl uppercase font-black">
         <span class="emerald-underline">Les schema</span><span class="text-emerald-600">.</span>
       </h1>
@@ -177,7 +177,7 @@ async function book(lesson: any) {
         <div class="md:flex justify-between items-center md:space-x-12 space-y-8 md:space-y-0">
           <div class="w-full md:w-1/2">
             <img class="w-full h-64 md:h-96 object-center object-cover rounded-3xl shadow-xl"
-              src="/flexibiliteit.jpg" />
+              src="/flexibiliteit.jpg" alt="Yoga docent Ravennah toont flexibiliteit in een vooroverbuiging" />
           </div>
           <div id="address" class="w-full md:w-1/2 space-y-6">
             <h2 class="text-2xl md:text-4xl uppercase font-black">

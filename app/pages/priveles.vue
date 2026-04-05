@@ -29,7 +29,7 @@ useHead({
 
 <template>
 	<div>
-		<Header alignment="object-center" image="/priveles.jpeg">
+		<Header alignment="object-center" image="/priveles.jpeg" alt="Yoga docent Ravennah geeft privéles">
 			<h1 class="text-3xl md:text-6xl uppercase font-black">
         <span class="emerald-underline">Privé Yogalessen</span
         ><span class="text-emerald-600">.</span>
@@ -89,6 +89,7 @@ useHead({
 						<img
 								class="w-full h-64 md:h-96 object-center object-cover rounded-3xl shadow-xl"
 								src="/priveles-2.jpeg"
+                                alt="Yoga docent Ravennah in meditatiehouding"
 						/>
 					</div>
 					<div id="onlineDating" class="w-full md:w-1/2 space-y-6">
@@ -123,30 +124,35 @@ useHead({
 						<img
 								class="w-full h-64 md:h-96 object-center object-cover rounded-3xl shadow-xl"
 								src="/priveles-7.jpeg"
+                                alt="Sfeerimpressie priveles - stretch"
 						/>
 					</div>
 					<div class="w-full md:w-1/5">
 						<img
 								class="w-full h-64 md:h-96 object-center object-cover rounded-3xl shadow-xl"
 								src="/priveles-4.jpeg"
+                                alt="Sfeerimpressie priveles - zittende houding"
 						/>
 					</div>
 					<div class="w-full md:w-1/5">
 						<img
 								class="w-full h-64 md:h-96 object-center object-cover rounded-3xl shadow-xl"
 								src="/priveles-5.jpeg"
+                                alt="Sfeerimpressie priveles - meditatie"
 						/>
 					</div>
 					<div class="w-full md:w-1/5">
 						<img
 								class="w-full h-64 md:h-96 object-center object-cover rounded-3xl shadow-xl"
 								src="/priveles-6.jpeg"
+                                alt="Sfeerimpressie priveles - asana"
 						/>
 					</div>
 					<div class="w-full md:w-1/5">
 						<img
 								class="w-full h-64 md:h-96 object-center object-cover rounded-3xl shadow-xl"
 								src="/priveles-8.jpeg"
+                                alt="Sfeerimpressie priveles - ontspanning"
 						/>
 					</div>
 				</div>

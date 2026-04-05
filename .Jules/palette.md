@@ -15,3 +15,6 @@
 ## 2024-06-12 - Ensure tooltips display on disabled Nuxt UI buttons
 **Learning:** In Nuxt UI (and common component libraries), disabled `<UButton>` elements block pointer events, preventing wrapper components like `<UTooltip>` from registering hover states. This leads to hidden context about *why* the button is disabled.
 **Action:** When an action is unavailable, always show the disabled button and explicitly wrap it in a structural `<div>` so the surrounding `<UTooltip>` can properly catch pointer events and explain the disabled state to the user.
+## 2024-05-18 - Missing Alt Attributes on Images
+**Learning:** Found that many `<img>` tags across the site (like hero images and landing page photos) were missing `alt` attributes. Nuxt components wrapping images (like `<Header>`) also lacked a way to pass `alt` down. This meant screen readers had no context for these images.
+**Action:** Added `alt` props to wrapping components and applied meaningful `alt` text to informative images across the site. For decorative images, an empty `alt=""` is used to skip them in screen readers.

@@ -30,7 +30,7 @@ useLocationPageSchema('Capelle aan den IJssel', 'https://www.ravennah.com/yoga-c
 
 <template>
     <div>
-        <Header image="/ravennah-rug.jpg" alignment="object-center">
+        <Header image="/ravennah-rug.jpg" alignment="object-center" alt="Yoga docent Ravennah op de rug gezien">
             <h1 class="text-3xl md:text-6xl uppercase font-black">
                 <span class="emerald-underline">Yoga Capelle</span><span class="text-emerald-700">.</span>
             </h1>
@@ -74,7 +74,7 @@ useLocationPageSchema('Capelle aan den IJssel', 'https://www.ravennah.com/yoga-c
                 <div class="md:flex justify-between items-center md:space-x-12 space-y-8 md:space-y-0">
                     <div class="w-full md:w-1/2">
                         <img class="w-full h-64 md:h-96 object-center object-cover rounded-3xl shadow-xl"
-                            src="/ravennah_een_been.webp" />
+                            src="/ravennah_een_been.webp" alt="Yoga docent Ravennah in een staande yoga balans houding" />
                     </div>
                     <div class="w-full md:w-1/2 space-y-6">
                         <h2 class="text-2xl md:text-4xl uppercase font-black">
@@ -121,7 +121,7 @@ useLocationPageSchema('Capelle aan den IJssel', 'https://www.ravennah.com/yoga-c
                     </div>
                     <div class="w-full md:w-1/2">
                         <img class="w-full h-64 md:h-96 object-center object-cover rounded-3xl shadow-xl"
-                            src="/ravennah_wind.webp" />
+                            src="/ravennah_wind.webp" alt="Yoga docent Ravennah buiten in de wind" />
                     </div>
                 </div>
             </div>

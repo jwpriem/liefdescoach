@@ -30,7 +30,7 @@ useLocationPageSchema('Zuidplas', 'https://www.ravennah.com/yoga-zuidplas', desc
 
 <template>
     <div>
-        <Header image="/yoga-sfeer.jpg" alignment="object-middle">
+        <Header image="/yoga-sfeer.jpg" alignment="object-middle" alt="Mensen in een yoga klas in de studio">
             <h1 class="text-3xl md:text-6xl uppercase font-black">
                 <span class="emerald-underline">Yoga Zuidplas</span><span class="text-emerald-700">.</span>
             </h1>
@@ -74,7 +74,7 @@ useLocationPageSchema('Zuidplas', 'https://www.ravennah.com/yoga-zuidplas', desc
                 <div class="md:flex justify-between items-center md:space-x-12 space-y-8 md:space-y-0">
                     <div class="w-full md:w-1/2">
                         <img class="w-full h-64 md:h-96 object-center object-cover rounded-3xl shadow-xl"
-                            src="/ravennah_staan.webp" />
+                            src="/ravennah_staan.webp" alt="Yoga docent Ravennah staand op een mat in een yoga houding" />
                     </div>
                     <div class="w-full md:w-1/2 space-y-6">
                         <h2 class="text-2xl md:text-4xl uppercase font-black">
@@ -120,7 +120,7 @@ useLocationPageSchema('Zuidplas', 'https://www.ravennah.com/yoga-zuidplas', desc
                     </div>
                     <div class="w-full md:w-1/2">
                         <img class="w-full h-64 md:h-96 object-center object-cover rounded-3xl shadow-xl"
-                            src="/les-buiten.jpg" />
+                            src="/les-buiten.jpg" alt="Yoga les buiten in de natuur" />
                     </div>
                 </div>
             </div>
