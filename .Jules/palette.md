@@ -25,3 +25,6 @@
 ## 2024-05-18 - Replacing interactive spans and icons with buttons
 **Learning:** Found `<span @click="...">` and `<UIcon @click="...">` elements in `AccountLessons.vue`. Non-interactive elements with click handlers are completely inaccessible to keyboard users (cannot be tabbed to or activated with Enter/Space) and are not announced correctly by screen readers.
 **Action:** Always use `<button>` or `<a>` (or `NuxtLink`) for interactive elements. Ensure they have appropriate `aria-label`s if they are icon-only, and include `focus-visible` utility classes for clear keyboard focus states.
+## 2024-05-18 - Replacing interactive divs with buttons for mobile toggles
+**Learning:** Found mobile navigation toggles implemented as `<div @click="...">` elements without `role="button"` or `tabindex="0"`. These are completely inaccessible to keyboard users and are not announced by screen readers as interactive. Even if spans are documented, main navigation structural `div`s need explicit attention.
+**Action:** When inspecting navigation structures, ensure that interactive elements intended to act as toggles are strictly `<button>` elements (or `<a>`/`<NuxtLink>`) with appropriate `aria-label` attributes and clear `focus-visible` styling.
