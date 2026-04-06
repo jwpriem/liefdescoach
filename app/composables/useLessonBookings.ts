@@ -1,10 +1,13 @@
 export function useLessonBookings() {
+  const collator = new Intl.Collator()
+
   function sortStudents(students: any[]) {
     if (!Array.isArray(students)) return []
     return [...students].sort((a, b) => {
       const nameA = a?.students?.name || a?.name || ''
       const nameB = b?.students?.name || b?.name || ''
-      return nameA.localeCompare(nameB)
+      // ⚡ Bolt: Optimize sorting performance by reusing an Intl.Collator instance
+      return collator.compare(nameA, nameB)
     })
   }
 
