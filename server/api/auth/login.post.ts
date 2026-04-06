@@ -8,9 +8,13 @@ const MAX_LOGIN_ATTEMPTS = 5;
 const LOGIN_LOCKOUT_MS = 15 * 60 * 1000; // 15 minutes
 const loginAttempts = new Map<string, { count: number; lockedUntil: number; lastAttempt: number }>();
 const migrationResetSent = new Map<string, number>(); // email -> timestamp of last reset email
+let lastCleanup = 0;
 
 function lazyCleanup(now: number) {
+    if (now - lastCleanup < 60000) return;
+
     if (loginAttempts.size > 1000) {
+        lastCleanup = now;
         for (const [key, value] of loginAttempts.entries()) {
             if (now - value.lastAttempt > LOGIN_LOCKOUT_MS && value.lockedUntil <= now) {
                 loginAttempts.delete(key);
@@ -18,6 +22,7 @@ function lazyCleanup(now: number) {
         }
     }
     if (migrationResetSent.size > 1000) {
+        lastCleanup = now;
         for (const [key, ts] of migrationResetSent.entries()) {
             if (now - ts > LOGIN_LOCKOUT_MS) {
                 migrationResetSent.delete(key);

@@ -7,9 +7,11 @@ const MAX_REGISTRATIONS_PER_IP = 5;
 const REGISTRATION_WINDOW_MS = 60 * 60 * 1000; // 1 hour
 
 const registrationsByIP = new Map<string, { count: number; firstRequest: number }>();
+let lastCleanup = 0;
 
 function lazyCleanup(now: number) {
-    if (registrationsByIP.size > 1000) {
+    if (registrationsByIP.size > 1000 && now - lastCleanup > 60000) {
+        lastCleanup = now;
         for (const [key, data] of registrationsByIP.entries()) {
             if (now - data.firstRequest > REGISTRATION_WINDOW_MS) {
                 registrationsByIP.delete(key);
