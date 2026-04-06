@@ -139,13 +139,24 @@ const chartOptions = computed(() => ({
 const totals = computed(() => {
   if (!revenueData.value?.data?.length) return null
   const items = revenueData.value.data
-  return {
-    revenue: items.reduce((s: number, d: any) => s + d.revenue, 0),
-    cost: items.reduce((s: number, d: any) => s + d.cost, 0),
-    profit: items.reduce((s: number, d: any) => s + d.profit, 0),
-    bookings: items.reduce((s: number, d: any) => s + d.bookings, 0),
-    lessons: items.reduce((s: number, d: any) => s + d.lessons, 0),
+
+  // ⚡ Bolt: Consolidated 5 separate Array.reduce() calls into a single loop
+  // Expected impact: Transforms O(5N) array iterations into O(N), reducing CPU overhead and allocation during dashboard re-renders.
+  let revenue = 0
+  let cost = 0
+  let profit = 0
+  let bookings = 0
+  let lessons = 0
+
+  for (const item of items) {
+    revenue += item.revenue
+    cost += item.cost
+    profit += item.profit
+    bookings += item.bookings
+    lessons += item.lessons
   }
+
+  return { revenue, cost, profit, bookings, lessons }
 })
 
 // Fetch on mount and when params change
