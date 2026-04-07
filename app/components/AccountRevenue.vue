@@ -139,12 +139,28 @@ const chartOptions = computed(() => ({
 const totals = computed(() => {
   if (!revenueData.value?.data?.length) return null
   const items = revenueData.value.data
+
+  // ⚡ Bolt: Consolidate multiple .reduce() loops into a single O(N) pass to reduce iteration overhead
+  let revenue = 0
+  let cost = 0
+  let profit = 0
+  let bookings = 0
+  let lessons = 0
+
+  for (const item of items) {
+    revenue += item.revenue
+    cost += item.cost
+    profit += item.profit
+    bookings += item.bookings
+    lessons += item.lessons
+  }
+
   return {
-    revenue: items.reduce((s: number, d: any) => s + d.revenue, 0),
-    cost: items.reduce((s: number, d: any) => s + d.cost, 0),
-    profit: items.reduce((s: number, d: any) => s + d.profit, 0),
-    bookings: items.reduce((s: number, d: any) => s + d.bookings, 0),
-    lessons: items.reduce((s: number, d: any) => s + d.lessons, 0),
+    revenue,
+    cost,
+    profit,
+    bookings,
+    lessons,
   }
 })
 
