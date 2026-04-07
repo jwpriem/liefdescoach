@@ -65,7 +65,18 @@ describe('POST /api/auth/send-otp', () => {
     const { getRequestIP } = await import('h3');
     vi.mocked(getRequestIP).mockReturnValue(`127.0.0.1-${Date.now()}`); // bypass IP rate limit in tests
 
-    const result = await handle({ node: { req: { headers: {} } } } as any)
+    let waitUntilPromise: Promise<void> | null = null;
+    const mockEvent = {
+      node: { req: { headers: {} } },
+      waitUntil: vi.fn((p) => { waitUntilPromise = p }),
+    } as any;
+
+    const result = await handle(mockEvent)
+
+    // Wait for the background task to complete if it was scheduled
+    if (waitUntilPromise) {
+      await waitUntilPromise;
+    }
 
     expect(result).toEqual({ success: true })
     expect(mockDb.delete).toHaveBeenCalled() // deletes old codes
