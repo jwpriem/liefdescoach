@@ -2908,7 +2908,7 @@
     postcss "^8.5.6"
     tailwindcss "4.2.2"
 
-"@tailwindcss/vite@^4.2.1":
+"@tailwindcss/vite@^4.0.0", "@tailwindcss/vite@^4.2.1":
   version "4.2.2"
   resolved "https://registry.yarnpkg.com/@tailwindcss/vite/-/vite-4.2.2.tgz#49240a41691c34b78ed4a80d07a39301f1a5129f"
   integrity sha512-mEiF5HO1QqCLXoNEfXVA1Tzo+cYsrqV7w9Juj2wdUFyW07JRenqMG225MvPwr3ZD9N1bFQj46X7r33iHxLUW0w==
@@ -8330,7 +8330,7 @@ tailwind-variants@^3.2.2:
   resolved "https://registry.yarnpkg.com/tailwind-variants/-/tailwind-variants-3.2.2.tgz#3ac8ccc735cae8b6f416330070f5f7437a77a0f3"
   integrity sha512-Mi4kHeMTLvKlM98XPnK+7HoBPmf4gygdFmqQPaDivc3DpYS6aIY6KiG/PgThrGvii5YZJqRsPz0aPyhoFzmZgg==
 
-tailwindcss@4.2.2, tailwindcss@^4.2.1:
+tailwindcss@4.2.2, tailwindcss@^4.0.0, tailwindcss@^4.2.1:
   version "4.2.2"
   resolved "https://registry.yarnpkg.com/tailwindcss/-/tailwindcss-4.2.2.tgz#688fb0751c8ca9044e890546510a2ee817308e87"
   integrity sha512-KWBIxs1Xb6NoLdMVqhbhgwZf2PGBpPEiwOqgI4pFIYbNTfBXiKYyWoTsXgBQ9WFg/OlhnvHaY+AEpW7wSmFo2Q==

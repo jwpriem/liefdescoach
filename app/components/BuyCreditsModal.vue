@@ -47,7 +47,7 @@ function close() {
           <button
             v-for="plan in pricingPlans"
             :key="plan.name"
-            class="w-full text-left rounded-xl p-4 border transition-all"
+            class="w-full text-left rounded-xl p-4 border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
             :class="[
               plan.gold
                 ? 'bg-yellow-950/40 border-yellow-700/50 hover:border-yellow-500/80'
