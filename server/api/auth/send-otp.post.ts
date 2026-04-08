@@ -78,36 +78,42 @@ export default defineEventHandler(async (event) => {
 
     const userId = userRows[0].id
 
-    // 2. Delete any existing OTP codes for this email
-    await db.delete(otpCodes).where(eq(otpCodes.email, email))
-
-    // 3. Generate a 6-digit code
-    const code = crypto.randomInt(100000, 999999).toString()
-
-    // 4. Store with 10-minute expiry
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000)
-
-    await db.insert(otpCodes).values({
-        id: generateId(),
-        email,
-        code,
-        userId,
-        expiresAt,
-    })
-
-    // 5. Send via SMTP
-    const emailContent = otpEmail(code)
-
-    await smtpTransport.sendMail({
-        from: 'Yoga Ravennah <info@ravennah.com>',
-        to: email,
-        subject: emailContent.subject,
-        html: emailContent.html,
-        text: emailContent.text,
-    })
-
-    // Update rate limit for email after successful send
+    // Update rate limit for email before returning
     otpRequestsByEmail.set(email, now);
+
+    event.waitUntil(Promise.resolve().then(async () => {
+        try {
+            // 2. Delete any existing OTP codes for this email
+            await db.delete(otpCodes).where(eq(otpCodes.email, email))
+
+            // 3. Generate a 6-digit code
+            const code = crypto.randomInt(100000, 999999).toString()
+
+            // 4. Store with 10-minute expiry
+            const expiresAt = new Date(Date.now() + 10 * 60 * 1000)
+
+            await db.insert(otpCodes).values({
+                id: generateId(),
+                email,
+                code,
+                userId,
+                expiresAt,
+            })
+
+            // 5. Send via SMTP
+            const emailContent = otpEmail(code)
+
+            await smtpTransport.sendMail({
+                from: 'Yoga Ravennah <info@ravennah.com>',
+                to: email,
+                subject: emailContent.subject,
+                html: emailContent.html,
+                text: emailContent.text,
+            })
+        } catch (error) {
+            console.error('Error sending OTP:', error)
+        }
+    }))
 
     return { success: true }
 })
