@@ -24,8 +24,8 @@ const logout = async () => {
 			<nuxt-link class="z-50" to="/">
 				<Yoga color="#d1fae5" />
 			</nuxt-link>
-			<div class="bg-emerald-700 text-emerald-100 rounded-full h-12 w-12 flex justify-center items-center z-50 shadow-xl fixed right-0 m-6"
-				style="top: max(env(safe-area-inset-top), 0px)" @click="toggle">
+			<button class="bg-emerald-700 text-emerald-100 rounded-full h-12 w-12 flex justify-center items-center z-50 shadow-xl fixed right-0 m-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
+				style="top: max(env(safe-area-inset-top), 0px)" @click="toggle" :aria-label="navOpen ? 'Sluit menu' : 'Open menu'">
 				<svg v-if="!navOpen" class="w-6 h-6 inline-block stroke-current text-white" fill="none"
 					stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
 					<path d="M4 6h16M4 12h16m-7 6h7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
@@ -34,7 +34,7 @@ const logout = async () => {
 					stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
 					<path d="M6 18L18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
 				</svg>
-			</div>
+			</button>
 			<div :class="navOpen ? 'translate-x-0' : 'translate-x-full'"
 				class="transition-transform duration-300 ease-in-out fixed top-0 left-0 bg-gray-950 min-h-screen flex justify-start items-center text-center z-40 w-screen">
 				<ul class="w-full space-y-8">
@@ -89,9 +89,9 @@ const logout = async () => {
 						</nuxt-link>
 					</li>
 					<li v-if="loggedInUser" @click="toggle">
-						<span class="mobile-nav-item cursor-pointer" @click="logout()">
+						<button class="mobile-nav-item cursor-pointer w-full text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded" @click="logout()">
 							Logout
-						</span>
+						</button>
 					</li>
 				</ul>
 			</div>
@@ -154,9 +154,9 @@ const logout = async () => {
 					</nuxt-link>
 				</li>
 				<li v-if="loggedInUser">
-					<span class="nav-item cursor-pointer" @click="logout()">
+					<button class="nav-item cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded px-2" @click="logout()">
 						Logout
-					</span>
+					</button>
 				</li>
 			</ul>
 			<!--<a href="https://www.instagram.com/yogaravennah" target="_blank" class="fixed bottom-0 right-0 m-4 rounded-xl font-bold text-lg px-4 py-2 bg-emerald-700 text-white hover:bg-emerald-500 cursor-pointer inline-block transition-all duration-300 ease-in-out antialiased" >-->
