@@ -28,3 +28,6 @@
 ## 2024-05-18 - Replacing interactive divs with buttons for mobile toggles
 **Learning:** Found mobile navigation toggles implemented as `<div @click="...">` elements without `role="button"` or `tabindex="0"`. These are completely inaccessible to keyboard users and are not announced by screen readers as interactive. Even if spans are documented, main navigation structural `div`s need explicit attention.
 **Action:** When inspecting navigation structures, ensure that interactive elements intended to act as toggles are strictly `<button>` elements (or `<a>`/`<NuxtLink>`) with appropriate `aria-label` attributes and clear `focus-visible` styling.
+## 2024-05-18 - Replacing interactive list items with semantic elements
+**Learning:** Found `<li @click="...">` elements used for navigation and actions in `NavYoga.vue` and `NavLiefdescoach.vue`. Placing click handlers on non-interactive `<li>` elements prevents keyboard users from focusing and activating them, creating an accessibility barrier.
+**Action:** Always move `@click` handlers from `<li>` elements down to their natively focusable and interactive children (such as `<a>`, `<nuxt-link>`, or `<button>`).

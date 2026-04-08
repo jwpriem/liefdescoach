@@ -54,23 +54,23 @@
 						Contact
 					</h6>
 					<ul>
-						<li @click="track('phone')">
+						<li>
 							<svg class="w-5 h-5 inline-block text-emerald-900 mr-2" fill="none" stroke="currentColor"
 								viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
 								<path
 									d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
 									stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
 							</svg>
-							<a href="tel:0647699709">06 47 69 97 09</a>
+							<a href="tel:0647699709" @click="track('phone')">06 47 69 97 09</a>
 						</li>
-						<li @click="track('email')">
+						<li>
 							<svg class="w-5 h-5 inline-block text-emerald-900 mr-2" fill="none" stroke="currentColor"
 								viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
 								<path
 									d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
 									stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
 							</svg>
-							<nuxt-link to="/contact">
+							<nuxt-link to="/contact" @click="track('email')">
 								info
 								<svg class="h-4 -mx-1 inline-block stroke-current" fill="none" stroke="currentColor"
 									viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -81,7 +81,7 @@
 								ravennah.com
 							</nuxt-link>
 						</li>
-						<li @click="track('instagram')">
+						<li>
 							<svg id="Layer_1" class="w-5 h-5 inline-block text-emerald-900 mr-2" data-name="Layer 1"
 								fill="currentColor" stroke="currentColor" viewBox="0 0 128 128"
 								xmlns="http://www.w3.org/2000/svg">
@@ -92,7 +92,7 @@
 								<path class="cls-1"
 									d="M64.27,46.47A17.68,17.68,0,1,1,46.6,64.14,17.7,17.7,0,0,1,64.27,46.47m0-8A25.68,25.68,0,1,0,90,64.14,25.68,25.68,0,0,0,64.27,38.47Z" />
 							</svg>
-							<a href="https://www.instagram.com/yogaravennah" target="_blank">@yogaravennah</a>
+							<a href="https://www.instagram.com/yogaravennah" target="_blank" @click="track('instagram')">@yogaravennah</a>
 						</li>
 					</ul>
 				</div>
