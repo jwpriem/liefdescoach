@@ -65,27 +65,33 @@ export default defineEventHandler(async (event) => {
 
     const student = rows[0]
 
-    // Generate signed token (1 hour expiry)
-    const token = generateSignedToken(
-        {
-            userId: student.id,
-            email: student.email,
-            purpose: 'password-reset',
-            expires: Date.now() + 60 * 60 * 1000,
-        },
-        config.sessionSecret
-    )
+    event.waitUntil(Promise.resolve().then(async () => {
+        try {
+            // Generate signed token (1 hour expiry)
+            const token = generateSignedToken(
+                {
+                    userId: student.id,
+                    email: student.email,
+                    purpose: 'password-reset',
+                    expires: Date.now() + 60 * 60 * 1000,
+                },
+                config.sessionSecret
+            )
 
-    const resetUrl = `${getHeader(event, 'origin')}/reset-wachtwoord?token=${token}`
-    const emailContent = passwordResetEmail(resetUrl)
+            const resetUrl = `${getHeader(event, 'origin')}/reset-wachtwoord?token=${token}`
+            const emailContent = passwordResetEmail(resetUrl)
 
-    await smtpTransport.sendMail({
-        from: 'Yoga Ravennah <info@ravennah.com>',
-        to: student.email,
-        subject: emailContent.subject,
-        html: emailContent.html,
-        text: emailContent.text,
-    })
+            await smtpTransport.sendMail({
+                from: 'Yoga Ravennah <info@ravennah.com>',
+                to: student.email,
+                subject: emailContent.subject,
+                html: emailContent.html,
+                text: emailContent.text,
+            })
+        } catch (error) {
+            console.error('Error sending password reset email:', error)
+        }
+    }))
 
     return { success: true }
 })

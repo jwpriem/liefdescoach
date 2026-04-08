@@ -66,7 +66,18 @@ describe('POST /api/auth/request-password-reset', () => {
     vi.mocked(readBody).mockResolvedValue({ email: 'user@test.com' })
     mockDb.limit.mockResolvedValue([{ id: 'u1', email: 'user@test.com' }])
 
-    const result = await handle({} as any)
+    let waitUntilPromise: Promise<void> | null = null;
+    const mockEvent = {
+      node: { req: { headers: {} } },
+      waitUntil: vi.fn((p) => { waitUntilPromise = p }),
+    } as any;
+
+    const result = await handle(mockEvent)
+
+    // Wait for the background task to complete if it was scheduled
+    if (waitUntilPromise) {
+      await waitUntilPromise;
+    }
 
     expect(result).toEqual({ success: true })
     expect(smtpTransport.sendMail).toHaveBeenCalledOnce()
