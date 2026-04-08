@@ -25,6 +25,9 @@ beforeEach(() => {
   mockDb.limit.mockResolvedValue([])
   mockDb.update.mockReturnThis()
   mockDb.set.mockReturnThis()
+
+  // Change user ID to prevent rate limiting cross-talk between tests
+  mockUser.$id = `u-${Date.now()}-${Math.random()}`
 })
 
 const handle = typeof handler === 'function'
