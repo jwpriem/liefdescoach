@@ -10,14 +10,21 @@ const showBuyCredits = ref(false)
 
 const futureBookings = computed(() => {
   if (!myBookings.value) return []
-  return myBookings.value
-    .map((booking: any) => {
-      const lesson = Array.isArray(booking.lessons) ? booking.lessons[0] : booking.lessons
-      return { ...booking, lessons: lesson }
-    })
-    .filter((booking: any) => booking.lessons && $rav.isFutureBooking(booking.lessons.date))
-    // ⚡ Bolt: Prevent expensive Date instantiations inside the sort loop by directly comparing ISO strings
-    .sort((a: any, b: any) => a.lessons.date < b.lessons.date ? -1 : a.lessons.date > b.lessons.date ? 1 : 0)
+
+  const validBookings = []
+
+  // ⚡ Bolt: Consolidate map and filter into a single loop to avoid multiple array traversals
+  // and prevent allocating throwaway objects for past bookings.
+  for (const rawBooking of myBookings.value) {
+    const lesson = Array.isArray(rawBooking.lessons) ? rawBooking.lessons[0] : rawBooking.lessons
+
+    if (lesson && $rav.isFutureBooking(lesson.date)) {
+      validBookings.push({ ...rawBooking, lessons: lesson })
+    }
+  }
+
+  // ⚡ Bolt: Prevent expensive Date instantiations inside the sort loop by directly comparing ISO strings
+  return validBookings.sort((a: any, b: any) => a.lessons.date < b.lessons.date ? -1 : a.lessons.date > b.lessons.date ? 1 : 0)
 })
 
 const nextBooking = computed(() => futureBookings.value[0] ?? null)
