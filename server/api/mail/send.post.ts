@@ -3,9 +3,11 @@ import { createError, getRequestIP } from 'h3'
 const MAX_IP_REQUESTS = 5;
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
 const requestsByIP = new Map<string, { count: number; firstRequest: number }>();
+let lastCleanup = 0;
 
 function lazyCleanup(now: number) {
-    if (requestsByIP.size > 1000) {
+    if (requestsByIP.size > 1000 && now - lastCleanup > 60000) {
+        lastCleanup = now;
         for (const [key, data] of requestsByIP.entries()) {
             if (now - data.firstRequest > RATE_LIMIT_WINDOW_MS) {
                 requestsByIP.delete(key);

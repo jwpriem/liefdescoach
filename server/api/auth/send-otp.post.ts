@@ -8,9 +8,13 @@ const MAX_IP_REQUESTS = 20;
 
 const otpRequestsByEmail = new Map<string, number>();
 const otpRequestsByIP = new Map<string, { count: number; firstRequest: number }>();
+let lastCleanup = 0;
 
 function lazyCleanup(now: number) {
+    if (now - lastCleanup < 60000) return;
+
     if (otpRequestsByEmail.size > 1000) {
+        lastCleanup = now;
         for (const [key, timestamp] of otpRequestsByEmail.entries()) {
             if (now - timestamp > OTP_COOLDOWN_MS) {
                 otpRequestsByEmail.delete(key);
@@ -18,6 +22,7 @@ function lazyCleanup(now: number) {
         }
     }
     if (otpRequestsByIP.size > 1000) {
+        lastCleanup = now;
         for (const [key, data] of otpRequestsByIP.entries()) {
             if (now - data.firstRequest > OTP_COOLDOWN_MS) {
                 otpRequestsByIP.delete(key);
