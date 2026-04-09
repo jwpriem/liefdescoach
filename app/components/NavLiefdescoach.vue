@@ -32,33 +32,33 @@ const toggle = () => {
           </button>
           <div :class="navOpen ? 'left-0 ml-0' : 'ml-100vw'" class="transition-all duration-300 ease-in-out fixed top-0 bg-white min-h-screen flex justify-start items-center text-center z-40 w-screen">
               <ul class="w-full space-y-8">
-                  <li @click="toggle">
-                      <nuxt-link class="mobile-nav-item" to="/liefdescoach/">
+                  <li>
+                      <nuxt-link class="mobile-nav-item" to="/liefdescoach/" @click="toggle">
               Home
                       </nuxt-link>
                   </li>
-                  <li @click="toggle">
-                      <nuxt-link class="mobile-nav-item" to="/liefdescoach/over">
+                  <li>
+                      <nuxt-link class="mobile-nav-item" to="/liefdescoach/over" @click="toggle">
               Over mij
                       </nuxt-link>
                   </li>
-                  <li @click="toggle">
-                      <nuxt-link class="mobile-nav-item" to="/liefdescoach/kosten">
+                  <li>
+                      <nuxt-link class="mobile-nav-item" to="/liefdescoach/kosten" @click="toggle">
               Kosten
                       </nuxt-link>
                   </li>
-                  <li @click="toggle">
-                      <nuxt-link class="mobile-nav-item" to="/liefdescoach/oplichters">
+                  <li>
+                      <nuxt-link class="mobile-nav-item" to="/liefdescoach/oplichters" @click="toggle">
               Oplichters
                       </nuxt-link>
                   </li>
-                  <li @click="toggle">
-                      <nuxt-link class="mobile-nav-item" to="/liefdescoach/contact">
+                  <li>
+                      <nuxt-link class="mobile-nav-item" to="/liefdescoach/contact" @click="toggle">
               Contact
                       </nuxt-link>
                   </li>
-                  <li @click="toggle">
-                      <nuxt-link class="button rose" to="/liefdescoach/intake">
+                  <li>
+                      <nuxt-link class="button rose" to="/liefdescoach/intake" @click="toggle">
               Intake
                       </nuxt-link>
                   </li>

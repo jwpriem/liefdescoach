@@ -38,58 +38,58 @@ const logout = async () => {
 			<div :class="navOpen ? 'translate-x-0' : 'translate-x-full'"
 				class="transition-transform duration-300 ease-in-out fixed top-0 left-0 bg-gray-950 min-h-screen flex justify-start items-center text-center z-40 w-screen">
 				<ul class="w-full space-y-8">
-					<li @click="toggle">
-						<nuxt-link class="mobile-nav-item" to="/">
+					<li>
+						<nuxt-link class="mobile-nav-item" to="/" @click="toggle">
 							Home
 						</nuxt-link>
 					</li>
-					<li @click="toggle">
-						<nuxt-link class="mobile-nav-item" to="/over">
+					<li>
+						<nuxt-link class="mobile-nav-item" to="/over" @click="toggle">
 							Over mij
 						</nuxt-link>
 					</li>
-					<li @click="toggle">
-						<nuxt-link class="mobile-nav-item" to="/voordelen">
+					<li>
+						<nuxt-link class="mobile-nav-item" to="/voordelen" @click="toggle">
 							Voordelen
 						</nuxt-link>
 					</li>
-					<li @click="toggle">
-						<nuxt-link class="mobile-nav-item" to="/lessen">
+					<li>
+						<nuxt-link class="mobile-nav-item" to="/lessen" @click="toggle">
 							Les schema
 						</nuxt-link>
 					</li>
-					<li @click="toggle">
-						<nuxt-link class="mobile-nav-item" to="/priveles">
+					<li>
+						<nuxt-link class="mobile-nav-item" to="/priveles" @click="toggle">
 							Priveles
 						</nuxt-link>
 					</li>
-					<li @click="toggle">
-						<nuxt-link class="mobile-nav-item" to="/hatha-yoga">
+					<li>
+						<nuxt-link class="mobile-nav-item" to="/hatha-yoga" @click="toggle">
 							Hatha Yoga
 						</nuxt-link>
 					</li>
-					<li @click="toggle">
-						<nuxt-link class="mobile-nav-item" to="/tarieven">
+					<li>
+						<nuxt-link class="mobile-nav-item" to="/tarieven" @click="toggle">
 							Tarieven
 						</nuxt-link>
 					</li>
-					<li @click="toggle">
-						<nuxt-link class="mobile-nav-item" to="/contact">
+					<li>
+						<nuxt-link class="mobile-nav-item" to="/contact" @click="toggle">
 							Contact
 						</nuxt-link>
 					</li>
-					<li v-if="loggedInUser" @click="toggle">
-						<nuxt-link class="mobile-nav-item" to="/account">
+					<li v-if="loggedInUser">
+						<nuxt-link class="mobile-nav-item" to="/account" @click="toggle">
 							{{ loggedInUser.name }}
 						</nuxt-link>
 					</li>
-					<li v-else @click="toggle">
-						<nuxt-link class="mobile-nav-item" to="/login">
+					<li v-else>
+						<nuxt-link class="mobile-nav-item" to="/login" @click="toggle">
 							Login
 						</nuxt-link>
 					</li>
-					<li v-if="loggedInUser" @click="toggle">
-						<button class="mobile-nav-item cursor-pointer w-full text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded" @click="logout()">
+					<li v-if="loggedInUser">
+						<button class="mobile-nav-item cursor-pointer w-full text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded" @click="logout(); toggle()">
 							Logout
 						</button>
 					</li>
