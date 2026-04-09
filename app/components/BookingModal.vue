@@ -139,14 +139,18 @@ async function book(lesson: any) {
               Vol
             </span>
             <!-- Book button -->
-            <UButton v-else
-              :disabled="availableCredits < 1"
-              :loading="isBookingId === lesson.$id"
-              color="primary" variant="solid" size="sm"
-              @click="book(lesson)"
-              :aria-label="(availableCredits < 1 ? 'Geen credits voor ' : 'Boek ') + $rav.getLessonTitle(lesson) + ' op ' + $rav.formatDateInDutch(lesson.date, true)">
-              {{ availableCredits < 1 ? 'Geen credits' : 'Boek' }}
-            </UButton>
+            <UTooltip v-else :text="availableCredits < 1 ? 'Onvoldoende credits' : 'Boek deze les'">
+              <div>
+                <UButton
+                  :disabled="availableCredits < 1"
+                  :loading="isBookingId === lesson.$id"
+                  color="primary" variant="solid" size="sm"
+                  @click="book(lesson)"
+                  :aria-label="(availableCredits < 1 ? 'Geen credits voor ' : 'Boek ') + $rav.getLessonTitle(lesson) + ' op ' + $rav.formatDateInDutch(lesson.date, true)">
+                  {{ availableCredits < 1 ? 'Geen credits' : 'Boek' }}
+                </UButton>
+              </div>
+            </UTooltip>
           </div>
         </div>
       </div>
