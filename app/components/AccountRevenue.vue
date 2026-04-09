@@ -75,12 +75,28 @@ const chartData = computed(() => {
   }
 
   const items = revenueData.value.data
+
+  // ⚡ Bolt: Consolidated 4 separate Array.map() calls into a single loop
+  // Expected impact: Transforms O(4N) array iterations into O(N), reducing CPU overhead and allocation during dashboard re-renders.
+  const labels = []
+  const revenueDataArr = []
+  const costDataArr = []
+  const profitDataArr = []
+
+  for (let i = 0; i < items.length; i++) {
+    const d = items[i]
+    labels.push(d.label)
+    revenueDataArr.push(d.revenue)
+    costDataArr.push(d.cost)
+    profitDataArr.push(d.profit)
+  }
+
   return {
-    labels: items.map((d: any) => d.label),
+    labels,
     datasets: [
       {
         label: 'Omzet',
-        data: items.map((d: any) => d.revenue),
+        data: revenueDataArr,
         borderColor: '#10b981',
         backgroundColor: 'rgba(16, 185, 129, 0.1)',
         fill: true,
@@ -88,7 +104,7 @@ const chartData = computed(() => {
       },
       {
         label: 'Kosten',
-        data: items.map((d: any) => d.cost),
+        data: costDataArr,
         borderColor: '#ef4444',
         backgroundColor: 'rgba(239, 68, 68, 0.1)',
         fill: true,
@@ -96,7 +112,7 @@ const chartData = computed(() => {
       },
       {
         label: 'Winst',
-        data: items.map((d: any) => d.profit),
+        data: profitDataArr,
         borderColor: '#6366f1',
         backgroundColor: 'rgba(99, 102, 241, 0.1)',
         fill: true,
