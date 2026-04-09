@@ -11,29 +11,31 @@ const futureBookingGroups = computed(() => {
 
   const grouped = new Map<string, any>()
 
-  myBookings.value
-    .map((booking: any) => {
-      const lesson = Array.isArray(booking.lessons) ? booking.lessons[0] : booking.lessons
-      return { ...booking, lessons: lesson }
-    })
-    .filter((booking: any) => booking.lessons && $rav.isFutureBooking(booking.lessons.date))
-    .forEach((booking: any) => {
-      const lessonId = booking.lessons.$id
-      const current = grouped.get(lessonId)
+  // ⚡ Bolt: Consolidate map, filter, and forEach into a single loop to avoid multiple array traversals
+  // and prevent allocating throwaway objects for past bookings.
+  for (const rawBooking of myBookings.value) {
+    const lesson = Array.isArray(rawBooking.lessons) ? rawBooking.lessons[0] : rawBooking.lessons
 
-      if (!current) {
-        grouped.set(lessonId, {
-          lessonId,
-          lessons: booking.lessons,
-          bookings: [booking],
-          spots: 1,
-        })
-        return
-      }
+    if (!lesson || !$rav.isFutureBooking(lesson.date)) {
+      continue
+    }
 
+    const booking = { ...rawBooking, lessons: lesson }
+    const lessonId = booking.lessons.$id
+    const current = grouped.get(lessonId)
+
+    if (!current) {
+      grouped.set(lessonId, {
+        lessonId,
+        lessons: booking.lessons,
+        bookings: [booking],
+        spots: 1,
+      })
+    } else {
       current.bookings.push(booking)
       current.spots += 1
-    })
+    }
+  }
 
   // ⚡ Bolt: Prevent expensive Date instantiations inside the sort loop by directly comparing ISO strings
   return [...grouped.values()].sort((a: any, b: any) => a.lessons.date < b.lessons.date ? -1 : a.lessons.date > b.lessons.date ? 1 : 0)

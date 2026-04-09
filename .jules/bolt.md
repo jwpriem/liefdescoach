@@ -17,3 +17,6 @@
 ## 2024-05-24 - Array Sorting Performance with ISO Date Strings
 **Learning:** Calling `new Date(string).getTime()` or using `String.prototype.localeCompare()` inside array `.sort()` comparator functions is extremely slow because it requires O(N log N) costly instantiations and local culture formatting logic on every swap. ISO 8601 strings are inherently lexicographically sortable.
 **Action:** Use simple `<` and `>` operators inside `.sort()` callbacks when comparing ISO date strings (e.g. `a.date < b.date ? -1 : a.date > b.date ? 1 : 0`).
+## 2026-04-08 - Vue Computed Array Consolidations
+**Learning:** Chained array methods like `.map().filter().forEach()` inside computed properties can be highly inefficient in Vue. Doing `.map(item => ({ ...item, ... }))` creates intermediate arrays and allocates new throwaway objects for every single item, even for those that are immediately discarded by the subsequent `.filter()`. This causes unnecessary memory usage, garbage collection, and breaks Vue's reactive proxies.
+**Action:** Consolidate multiple array operations (`.map`, `.filter`, `.forEach`) into a single `for...of` or `.reduce()` loop. Only allocate new objects or spread properties for items that *pass* the conditional checks, thereby turning O(k*N) time and memory operations into O(N).
