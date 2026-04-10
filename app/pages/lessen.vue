@@ -104,11 +104,14 @@ async function book(lesson: any) {
                 'plek' : 'plekken' }} )</p>
           </div>
           <div>
-            <UButton :disabled="checkBooking(lesson.$id) || availableCredits < 1" color="primary" variant="solid"
-              @click="book(lesson)"
-              v-if="loggedInUser && !checkBooking(lesson.$id) && (lesson.bookings?.length || 0) != 9">{{
-                availableCredits < 1 ? 'Geen credits' : 'Boek' }}</UButton>
-                <span v-if="checkBooking(lesson.$id)" class="flex content-center"><svg
+            <UTooltip :text="availableCredits < 1 ? 'Onvoldoende credits' : 'Boek deze les'" v-if="loggedInUser && !checkBooking(lesson.$id) && (lesson.bookings?.length || 0) != 9">
+              <div>
+                <UButton :disabled="checkBooking(lesson.$id) || availableCredits < 1" color="primary" variant="solid"
+                  @click="book(lesson)">{{
+                    availableCredits < 1 ? 'Geen credits' : 'Boek' }}</UButton>
+              </div>
+            </UTooltip>
+            <span v-if="checkBooking(lesson.$id)" class="flex content-center"><svg
                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                     stroke="currentColor" class="w-6 h-6 inline-block mx-1">
                     <path stroke-linecap="round" stroke-linejoin="round"

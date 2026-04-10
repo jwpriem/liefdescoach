@@ -31,3 +31,7 @@
 ## 2024-05-18 - Replacing interactive list items with semantic elements
 **Learning:** Found `<li @click="...">` elements used for navigation and actions in `NavYoga.vue` and `NavLiefdescoach.vue`. Placing click handlers on non-interactive `<li>` elements prevents keyboard users from focusing and activating them, creating an accessibility barrier.
 **Action:** Always move `@click` handlers from `<li>` elements down to their natively focusable and interactive children (such as `<a>`, `<nuxt-link>`, or `<button>`).
+
+## 2024-05-19 - Ensure tooltips display on disabled Nuxt UI buttons
+**Learning:** In Nuxt UI (and common component libraries), disabled `<UButton>` elements block pointer events, preventing wrapper components like `<UTooltip>` from registering hover states. This leads to hidden context about *why* the button is disabled.
+**Action:** When an action is unavailable, always show the disabled button and explicitly wrap it in a structural `<div>` so the surrounding `<UTooltip>` can properly catch pointer events and explain the disabled state to the user.
