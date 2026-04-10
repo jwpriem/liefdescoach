@@ -115,13 +115,19 @@ export default defineEventHandler(async (event) => {
             const resetUrl = `${getHeader(event, 'origin')}/reset-wachtwoord?token=${token}`
             const emailContent = passwordResetMigrationEmail(resetUrl)
 
-            await smtpTransport.sendMail({
-                from: 'Yoga Ravennah <info@ravennah.com>',
-                to: student.email,
-                subject: emailContent.subject,
-                html: emailContent.html,
-                text: emailContent.text,
-            })
+            event.waitUntil(Promise.resolve().then(async () => {
+                try {
+                    await smtpTransport.sendMail({
+                        from: 'Yoga Ravennah <info@ravennah.com>',
+                        to: student.email,
+                        subject: emailContent.subject,
+                        html: emailContent.html,
+                        text: emailContent.text,
+                    })
+                } catch (error) {
+                    console.error('Error sending migration reset email:', error)
+                }
+            }))
 
             migrationResetSent.set(email, now)
         }

@@ -36,6 +36,11 @@
 **Learning:** Authenticated actions should be rate-limited by the User ID, not their IP, to avoid friendly-fire on shared networks. For custom in-memory rate limiters, memory cleanup loops (`lazyCleanup`) must include a timestamp check (e.g. `now - lastCleanup > 60000`) to throttle the execution of the cleanup iteration itself.
 **Prevention:** Always scope limits by `user.$id` for authenticated routes. Ensure any `size > X` map cleanup logic enforces a minimum time interval between executions.
 
+## 2025-05-18 - [Fix timing-based user enumeration in Login Endpoint]
+**Vulnerability:** The login endpoint (`server/api/auth/login.post.ts`) executed the password migration email sending synchronously when a user had no password hash set. This caused the API response time for migrated users to be fast, but extremely slow for non-migrated users. The `return { success: false, reason: 'migration-reset-sent' }` was only evaluated after blocking SMTP operations completed.
+**Learning:** Preventing user enumeration by merely returning a generic response early is insufficient if the server still performs long-running, non-constant-time synchronous operations (like SMTP `sendMail`) before the HTTP response is sent back. Attackers can simply measure the response timing instead of looking at error codes to perform namespace enumeration.
+**Prevention:** Always defer conditionally executed long-running operations like email dispatches to the background using `event.waitUntil()` so that both paths return a response to the client in roughly the same constant time.
+
 ## 2025-05-18 - Fix timing-based user enumeration on OTP endpoint
 **Vulnerability:** The `server/api/auth/send-otp.post.ts` endpoint returned early if a user didn't exist to prevent email enumeration, but performed blocking database operations and SMTP email sending if the user *did* exist. This created a significant response time difference, allowing an attacker to determine if an email is registered by timing the request.
 **Learning:** Returning immediately to prevent email enumeration is not enough if the success path performs conditionally long-running synchronous or blocking asynchronous operations. This difference in execution time leaks the same information via timing analysis.

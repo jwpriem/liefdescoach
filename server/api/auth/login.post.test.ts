@@ -44,7 +44,9 @@ beforeEach(() => {
 })
 
 const handle = handler as any
-const fakeEvent = () => ({} as any)
+const fakeEvent = () => ({
+  waitUntil: vi.fn(),
+} as any)
 
 describe('POST /api/auth/login', () => {
   it('throws 400 when email is missing', async () => {
@@ -97,9 +99,20 @@ describe('POST /api/auth/login', () => {
     vi.mocked(readBody).mockResolvedValue({ email: 'migrate@test.com', password: 'anything' })
     mockDb.limit.mockResolvedValue([{ id: 'u2', email: 'migrate@test.com', name: 'Old User', passwordHash: null, isAdmin: false }])
 
-    const result = await handle(fakeEvent())
+    let waitUntilPromise: Promise<void> | null = null;
+    const event = {
+      ...fakeEvent(),
+      waitUntil: vi.fn((p) => { waitUntilPromise = p }),
+    } as any
+
+    const result = await handle(event)
 
     expect(result).toEqual({ success: false, reason: 'migration-reset-sent' })
+
+    if (waitUntilPromise) {
+      await waitUntilPromise;
+    }
+
     expect(smtpTransport.sendMail).toHaveBeenCalledOnce()
     expect(createSession).not.toHaveBeenCalled()
   })
@@ -109,14 +122,36 @@ describe('POST /api/auth/login', () => {
     vi.mocked(readBody).mockResolvedValue({ email: uniqueEmail, password: 'anything' })
     mockDb.limit.mockResolvedValue([{ id: 'u3', email: uniqueEmail, name: 'Rate Limit User', passwordHash: null, isAdmin: false }])
 
+    let waitUntilPromise: Promise<void> | null = null;
+    const event = {
+      ...fakeEvent(),
+      waitUntil: vi.fn((p) => { waitUntilPromise = p }),
+    } as any
+
     // First attempt sends an email
-    await handle(fakeEvent())
+    await handle(event)
+
+    if (waitUntilPromise) {
+      await waitUntilPromise;
+    }
+
     expect(smtpTransport.sendMail).toHaveBeenCalledOnce()
+
+    waitUntilPromise = null;
+    const event2 = {
+      ...fakeEvent(),
+      waitUntil: vi.fn((p) => { waitUntilPromise = p }),
+    } as any
 
     // Second attempt within rate limit window should NOT send another email
     const secondSendMail = vi.fn().mockResolvedValue({})
     vi.stubGlobal('smtpTransport', { sendMail: secondSendMail })
-    await handle(fakeEvent())
+    await handle(event2)
+
+    if (waitUntilPromise) {
+      await waitUntilPromise;
+    }
+
     expect(secondSendMail).not.toHaveBeenCalled()
   })
 
