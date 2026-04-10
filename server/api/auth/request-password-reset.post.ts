@@ -6,9 +6,11 @@ const MAX_IP_REQUESTS = 5;
 const REQUEST_WINDOW_MS = 60 * 60 * 1000; // 1 hour
 
 const resetRequestsByIP = new Map<string, { count: number; firstRequest: number }>();
+let lastCleanup = 0;
 
 function lazyCleanup(now: number) {
-    if (resetRequestsByIP.size > 1000) {
+    if (resetRequestsByIP.size > 1000 && now - lastCleanup > 60000) {
+        lastCleanup = now;
         for (const [key, data] of resetRequestsByIP.entries()) {
             if (now - data.firstRequest > REQUEST_WINDOW_MS) {
                 resetRequestsByIP.delete(key);
