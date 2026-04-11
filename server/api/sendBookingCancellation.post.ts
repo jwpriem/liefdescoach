@@ -3,12 +3,17 @@ import { eq } from 'drizzle-orm'
 import { lessons, bookings, students } from '../database/schema'
 
 export default defineEventHandler(async (event) => {
-    await requireAuth(event)
+    const user = await requireAuth(event)
 
     const body = await readBody(event)
 
     if (!body?.email || typeof body.email !== 'string') {
         throw createError({ statusCode: 400, statusMessage: 'E-mail is verplicht' })
+    }
+
+    const isAdmin = user.labels.includes('admin')
+    if (body.email.trim().toLowerCase() !== user.email.toLowerCase() && !isAdmin) {
+        throw createError({ statusCode: 403, statusMessage: 'Geen toegang' })
     }
     if (!body?.lessonId || typeof body.lessonId !== 'string') {
         throw createError({ statusCode: 400, statusMessage: 'lessonId is verplicht' })
