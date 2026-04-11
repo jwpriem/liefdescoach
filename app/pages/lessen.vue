@@ -32,7 +32,7 @@ useHead({
   ]
 })
 
-const { data: lessons } = await useFetch('lessons', () => $fetch('/api/lessons'))
+const { data: lessons } = await useAsyncData('lessons', () => $fetch('/api/lessons'))
 
 // ⚡ Bolt: Optimize O(N) array lookup in v-for to O(1) Set lookup
 const bookedLessonIds = computed(() => {
