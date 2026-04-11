@@ -46,7 +46,7 @@ yarn db:seed-lessons     # Seed 12 weeks of Sunday 09:45 hatha yoga + 3 guest le
 
 ## Architecture
 
-This is a **Nuxt 3** application for "Yoga Ravennah" — a yoga studio booking system with a credit-based lesson reservation flow. The UI language is Dutch.
+This is a **Nuxt 4** application for "Yoga Ravennah" — a yoga studio booking system with a credit-based lesson reservation flow. The UI language is Dutch.
 
 ### Database
 
@@ -99,4 +99,4 @@ Set via environment variables prefixed with `NUXT_` (e.g., `NUXT_DATABASE_URL`, 
 
 ### UI Framework
 
-Uses `@nuxt/ui` v2 (based on Tailwind CSS + Headless UI) with `ui: { global: true }`. Primary color is `emerald`. Notifications positioned at top.
+Uses `@nuxt/ui` v4 (based on Tailwind CSS + Reka UI). Primary color is `emerald`. Notifications positioned at top.
