@@ -49,6 +49,22 @@ function checkBooking(id: string) {
   return bookedLessonIds.value.has(id)
 }
 
+function spotsLeft(lesson: any) {
+  return 9 - (lesson.bookings?.length || 0)
+}
+
+function spotsLabel(lesson: any) {
+  const n = spotsLeft(lesson)
+  return n === 1 ? '1 plek' : `${n} plekken`
+}
+
+function spotsBadgeClass(lesson: any) {
+  const n = spotsLeft(lesson)
+  if (n === 0) return 'bg-red-900/50 text-red-300'
+  if (n <= 3) return 'bg-orange-900/50 text-orange-300'
+  return 'bg-emerald-900/50 text-emerald-400'
+}
+
 async function book(lesson: any) {
   if (!loggedInUser.value) return
   setOnBehalfOf(loggedInUser.value)
@@ -74,64 +90,87 @@ async function book(lesson: any) {
       <h1 class="text-3xl md:text-6xl uppercase font-black">
         <span class="emerald-underline">Les schema</span><span class="text-emerald-600">.</span>
       </h1>
-      <div class="intro">
-        <div v-if="lessons && lessons.rows" v-for="lesson in lessons.rows" :key="lesson.$id"
-          class="flex justify-between items-center gap-y-3 border-b py-3">
-          <div>
-            <div class="flex align-start items-center gap-x-3">
-              <svg v-if="lesson.type == 'guest lesson'" xmlns="http://www.w3.org/2000/svg" fill="none"
-                viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                class="w-6 shrink-0 h-6 mr-1 inline-block stroke-current text-emerald-700">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5" />
-              </svg>
-              <svg svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                stroke="currentColor" class="w-6 shrink-0 h-6 mr-1 inline-block stroke-current text-emerald-700">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M12 3v17.25m0 0c-1.472 0-2.882.265-4.185.75M12 20.25c1.472 0 2.882.265 4.185.75M18.75 4.97A48.416 48.416 0 0 0 12 4.5c-2.291 0-4.545.16-6.75.47m13.5 0c1.01.143 2.01.317 3 .52m-3-.52 2.62 10.726c.122.499-.106 1.028-.589 1.202a5.988 5.988 0 0 1-2.031.352 5.988 5.988 0 0 1-2.031-.352c-.483-.174-.711-.703-.59-1.202L18.75 4.971Zm-16.5.52c.99-.203 1.99-.377 3-.52m0 0 2.62 10.726c.122.499-.106 1.028-.589 1.202a5.989 5.989 0 0 1-2.031.352 5.989 5.989 0 0 1-2.031-.352c-.483-.174-.711-.703-.59-1.202L5.25 4.971Z" />
-              </svg>
-              <span v-if="lesson.type == 'hatha yoga'">
-                <nuxt-link to="/hatha-yoga">Hatha Yoga</nuxt-link>
-              </span>
-              <span v-else-if="lesson.type == 'guest lesson'">
-                <nuxt-link to="/bo-bol"><span v-html="$rav.getLessonDescription(lesson)"></span></nuxt-link>
-              </span>
-              <span v-else v-html="$rav.getLessonDescription(lesson)"></span>
-            </div>
-            <p>{{ $rav.formatDateInDutch(lesson.date, true) }} ({{ 9 - (lesson.bookings?.length ||
-              0) }}
-              {{ (lesson.bookings?.length || 0) == 8 ?
-                'plek' : 'plekken' }} )</p>
-          </div>
-          <div>
-            <UTooltip :text="availableCredits < 1 ? 'Onvoldoende credits' : 'Boek deze les'" v-if="loggedInUser && !checkBooking(lesson.$id) && (lesson.bookings?.length || 0) != 9">
-              <div>
-                <UButton :disabled="checkBooking(lesson.$id) || availableCredits < 1" color="primary" variant="solid"
-                  @click="book(lesson)">{{
-                    availableCredits < 1 ? 'Geen credits' : 'Boek' }}</UButton>
+      <!-- Lesson cards -->
+      <div v-if="lessons && lessons.rows" class="space-y-3">
+        <div v-for="lesson in lessons.rows" :key="lesson.$id"
+          class="rounded-2xl border border-white/10 bg-white/5 overflow-hidden">
+
+          <!-- Card body -->
+          <div class="p-4 space-y-3">
+            <!-- Top row: icon + title + spots badge -->
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex items-start gap-3 min-w-0">
+                <!-- Guest lesson icon -->
+                <svg v-if="lesson.type == 'guest lesson'" xmlns="http://www.w3.org/2000/svg" fill="none"
+                  viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                  class="w-5 h-5 shrink-0 mt-0.5 text-emerald-500">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5" />
+                </svg>
+                <!-- Regular lesson icon -->
+                <svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                  stroke="currentColor" class="w-5 h-5 shrink-0 mt-0.5 text-emerald-500">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M12 3v17.25m0 0c-1.472 0-2.882.265-4.185.75M12 20.25c1.472 0 2.882.265 4.185.75M18.75 4.97A48.416 48.416 0 0 0 12 4.5c-2.291 0-4.545.16-6.75.47m13.5 0c1.01.143 2.01.317 3 .52m-3-.52 2.62 10.726c.122.499-.106 1.028-.589 1.202a5.988 5.988 0 0 1-2.031.352 5.988 5.988 0 0 1-2.031-.352c-.483-.174-.711-.703-.59-1.202L18.75 4.971Zm-16.5.52c.99-.203 1.99-.377 3-.52m0 0 2.62 10.726c.122.499-.106 1.028-.589 1.202a5.989 5.989 0 0 1-2.031.352 5.989 5.989 0 0 1-2.031-.352c-.483-.174-.711-.703-.59-1.202L5.25 4.971Z" />
+                </svg>
+                <!-- Title -->
+                <div class="min-w-0">
+                  <p class="font-semibold leading-snug">
+                    <nuxt-link v-if="lesson.type == 'hatha yoga'" to="/hatha-yoga">Hatha Yoga</nuxt-link>
+                    <nuxt-link v-else-if="lesson.type == 'guest lesson'" to="/bo-bol">
+                      <span v-html="$rav.getLessonDescription(lesson)" />
+                    </nuxt-link>
+                    <span v-else v-html="$rav.getLessonDescription(lesson)" />
+                  </p>
+                  <p class="text-sm text-white/50 mt-0.5">{{ $rav.formatDateInDutch(lesson.date, true) }}</p>
+                </div>
               </div>
-            </UTooltip>
-            <span v-if="checkBooking(lesson.$id)" class="flex content-center"><svg
-                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                    stroke="currentColor" class="w-6 h-6 inline-block mx-1">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                      d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                  </svg>
-                  Geboekt
-                </span>
-                <span v-if="loggedInUser && !checkBooking(lesson.$id) && (lesson.bookings?.length || 0) == 9"
-                  class="flex content-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                    stroke="currentColor" class="w-6 h-6 inline-block mx-1">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                      d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
-                  </svg>
-                  Helaas les is vol
-                </span>
-                <UButton color="primary" variant="solid" to="/login" v-if="!loggedInUser">Login om te boeken</UButton>
+              <!-- Spots badge -->
+              <span :class="spotsBadgeClass(lesson)"
+                class="text-xs font-semibold px-2.5 py-1 rounded-full shrink-0 whitespace-nowrap">
+                {{ spotsLabel(lesson) }}
+              </span>
+            </div>
+
+            <!-- Action row -->
+            <div>
+              <!-- Logged in, not booked, spots available -->
+              <UTooltip v-if="loggedInUser && !checkBooking(lesson.$id) && spotsLeft(lesson) > 0"
+                :text="availableCredits < 1 ? 'Onvoldoende credits' : 'Boek deze les'" class="block w-full">
+                <UButton block :disabled="availableCredits < 1" color="primary" variant="solid"
+                  @click="book(lesson)">
+                  {{ availableCredits < 1 ? 'Geen credits' : 'Boek les' }}
+                </UButton>
+              </UTooltip>
+              <!-- Already booked -->
+              <div v-else-if="checkBooking(lesson.$id)"
+                class="flex items-center justify-center gap-2 py-2 rounded-xl bg-emerald-900/30 text-emerald-400 font-medium text-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                  stroke="currentColor" class="w-5 h-5 shrink-0">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                </svg>
+                Geboekt
+              </div>
+              <!-- Logged in, not booked, lesson full -->
+              <div v-else-if="loggedInUser && spotsLeft(lesson) === 0"
+                class="flex items-center justify-center gap-2 py-2 rounded-xl bg-white/5 text-white/40 font-medium text-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                  stroke="currentColor" class="w-5 h-5 shrink-0">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+                </svg>
+                Les is vol
+              </div>
+              <!-- Not logged in -->
+              <UButton v-else-if="!loggedInUser" block color="primary" variant="solid" to="/login">
+                Login om te boeken
+              </UButton>
+            </div>
           </div>
         </div>
       </div>
+
       <p class="intro">
         <span v-if="!loggedInUser">Boeken kan door
           <nuxt-link to="/login"><u>in te loggen</u></nuxt-link>. Heb je nog geen account dan kun je een account
