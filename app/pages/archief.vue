@@ -162,7 +162,7 @@ watch(activeTab, (newVal) => {
                     class="flex items-center gap-1 text-base text-gray-300 group/booking py-0.5">
                     <span class="hover:text-emerald-400 transition-colors cursor-pointer flex-1"
                       @click="navigateTo(`/admin/users/${booking.students?.$id}`)">
-                      {{ booking.students?.name || 'Onbekende gebruiker' }}<span v-if="booking.isExtraSpot" class="text-emerald-400"> (extra plek)</span>
+                      {{ booking.students?.name || 'Onbekende gebruiker' }}<span v-if="booking.isFirstTime" class="text-amber-400"> (eerste keer)</span><span v-if="booking.isExtraSpot" class="text-emerald-400"> (extra plek)</span>
                     </span>
                     <UIcon v-if="booking.students?.injury" name="i-lucide-heart-pulse"
                       class="w-4 h-4 text-red-500 flex-shrink-0" />
