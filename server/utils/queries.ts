@@ -1,4 +1,4 @@
-import { eq, and, isNull, gt, gte, lte, asc, desc, sql, count as countFn } from 'drizzle-orm'
+import { eq, and, isNull, gt, gte, lte, asc, desc, sql, count as countFn, min, inArray } from 'drizzle-orm'
 import { nanoid } from 'nanoid'
 import { lessons, bookings, credits, students, health } from '../database/schema'
 
@@ -66,6 +66,30 @@ export async function findAvailableCredit(studentId: string) {
 }
 
 /**
+ * Get the earliest lesson date for each student across all their bookings.
+ * Used to determine if a student is attending a lesson for the first time.
+ */
+export async function getFirstLessonDatesForStudents(studentIds: string[]): Promise<Map<string, Date>> {
+  if (studentIds.length === 0) return new Map()
+
+  const rows = await db
+    .select({
+      studentId: bookings.studentId,
+      firstLessonDate: min(lessons.date),
+    })
+    .from(bookings)
+    .innerJoin(lessons, eq(bookings.lessonId, lessons.id))
+    .where(inArray(bookings.studentId, studentIds))
+    .groupBy(bookings.studentId)
+
+  return new Map(
+    rows
+      .filter(r => r.firstLessonDate != null)
+      .map(r => [r.studentId, r.firstLessonDate as Date])
+  )
+}
+
+/**
  * Generate a nanoid for new records.
  */
 export function generateId(): string {
@@ -91,6 +115,7 @@ export function nestLessonsWithBookings(
     const booking: any = {
       $id: b.id,
       lessons: b.lessonId,
+      isFirstTime: b.isFirstTime ?? false,
       students: includeStudents && b.studentName
         ? { $id: b.studentId, name: b.studentName, email: b.studentEmail, injury: b.studentInjury ?? null, pregnancy: b.studentPregnancy ?? false }
         : b.studentId,

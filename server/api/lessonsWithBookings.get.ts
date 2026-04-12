@@ -42,5 +42,18 @@ export default defineEventHandler(async (event) => {
             .where(inArray(bookings.lessonId, lessonIds))
     }
 
-    return nestLessonsWithBookings(lessonRows, bookingRows, true)
+    const studentIds = [...new Set(bookingRows.map((b: any) => b.studentId))]
+    const firstLessonDates = await getFirstLessonDatesForStudents(studentIds)
+    const lessonDateMap = new Map(lessonRows.map(l => [l.id, l.date]))
+
+    const enrichedBookingRows = bookingRows.map((b: any) => {
+        const firstDate = firstLessonDates.get(b.studentId)
+        const lessonDate = lessonDateMap.get(b.lessonId)
+        return {
+            ...b,
+            isFirstTime: firstDate != null && lessonDate != null && firstDate.getTime() === lessonDate.getTime(),
+        }
+    })
+
+    return nestLessonsWithBookings(lessonRows, enrichedBookingRows, true)
 })

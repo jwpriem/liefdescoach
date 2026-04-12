@@ -226,7 +226,7 @@ async function onConfirmDeleteLesson() {
                   class="flex items-center gap-1 text-base text-gray-300">
                   <button class="text-left hover:text-emerald-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded px-1 -ml-1"
                     @click="navigateTo(`/admin/users/${booking.students.$id}`)">
-                    {{ booking.students.name }}<span v-if="booking.isExtraSpot" class="text-emerald-400"> (extra
+                    {{ booking.students.name }}<span v-if="booking.isFirstTime" class="text-amber-400"> (eerste keer)</span><span v-if="booking.isExtraSpot" class="text-emerald-400"> (extra
                       plek)</span>
                   </button>
                   <button v-if="booking.students.injury" aria-label="Bekijk blessure details"
@@ -318,6 +318,7 @@ async function onConfirmDeleteLesson() {
               class="flex items-center justify-between rounded-xl bg-gray-900/60 border border-gray-800/50 px-4 py-2.5">
               <span class="flex items-center gap-2 text-sm text-gray-200">
                 {{ booking.students.name }}
+                <span v-if="booking.isFirstTime" class="text-amber-400 text-xs">(eerste keer)</span>
                 <span v-if="booking.isExtraSpot" class="text-emerald-400 text-xs">(extra plek)</span>
                 <UTooltip v-if="booking.students.injury" :text="booking.students.injury">
                   <UIcon name="i-heroicons-plus-circle-20-solid" class="w-4 h-4 text-red-500" />
