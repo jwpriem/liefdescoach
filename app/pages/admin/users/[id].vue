@@ -4,7 +4,8 @@ const userId = route.params.id as string
 
 // Protect route
 definePageMeta({
-    middleware: ['auth', 'admin']
+    middleware: ['auth', 'admin'],
+    layout: 'app',
 })
 
 const [{ data: userStats }, { data: adminUsers }, { data: loginHistoryData }] = await Promise.all([
@@ -23,7 +24,7 @@ function formatEuro(value: number) {
 </script>
 
 <template>
-    <div>
+    <div class="min-h-screen">
         <div v-if="user" class="container mx-auto px-4 sm:px-8 pt-28 pb-12 sm:pt-32 sm:pb-20">
 
             <!-- Back button -->
