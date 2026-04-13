@@ -15,6 +15,13 @@
       "when": 1774260859741,
       "tag": "0001_square_rage",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1776073593352,
+      "tag": "0002_lush_timeslip",
+      "breakpoints": true
     }
   ]
 }

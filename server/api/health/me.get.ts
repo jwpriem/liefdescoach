@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
             .where(eq(health.studentId, authUser.$id))
             .limit(1),
         db
-            .select({ dateOfBirth: students.dateOfBirth, phone: students.phone })
+            .select({ dateOfBirth: students.dateOfBirth, phone: students.phone, phoneRequested: students.phoneRequested })
             .from(students)
             .where(eq(students.id, authUser.$id))
             .limit(1)
@@ -32,10 +32,13 @@ export default defineEventHandler(async (event) => {
         }
     }
 
+    let phoneRequested = false
+
     if (studentRows.length > 0) {
         dateOfBirth = studentRows[0].dateOfBirth?.toISOString() ?? null
         phone = studentRows[0].phone ?? null
+        phoneRequested = studentRows[0].phoneRequested ?? false
     }
 
-    return { health: healthData, dateOfBirth, phone }
+    return { health: healthData, dateOfBirth, phone, phoneRequested }
 })

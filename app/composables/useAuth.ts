@@ -7,6 +7,7 @@ export type User = {
   archived?: boolean
   reminders?: boolean
   pushNotifications?: boolean
+  phoneRequested?: boolean
   labels?: string[]
   registration?: string
   emailVerification?: boolean
@@ -23,8 +24,8 @@ export const useAuth = () => {
     try {
       const me = await $fetch<User>('/api/auth/me')
       try {
-        const { health, dateOfBirth, phone } = await $fetch<any>('/api/health/me')
-        return { ...me, health, dateOfBirth, phone }
+        const { health, dateOfBirth, phone, phoneRequested } = await $fetch<any>('/api/health/me')
+        return { ...me, health, dateOfBirth, phone, phoneRequested }
       } catch {
         return me
       }
@@ -126,11 +127,22 @@ export const useAuth = () => {
     await refresh()
   }
 
+  async function submitPhone(phone: string) {
+    await $fetch('/api/students/submit-phone', { method: 'POST', body: { phone } })
+    await refresh()
+  }
+
+  async function skipPhoneRequest() {
+    await $fetch('/api/students/skip-phone', { method: 'POST' })
+    await refresh()
+  }
+
   return {
     user, isAdmin, pending, refresh,
     login, logout, sendOtp, verifyOtp, register,
     requestEmailVerification, verifyEmail,
     requestPasswordReset, resetPassword,
-    updateProfile, updatePassword, updateReminders, updateHealth
+    updateProfile, updatePassword, updateReminders, updateHealth,
+    submitPhone, skipPhoneRequest
   }
 }

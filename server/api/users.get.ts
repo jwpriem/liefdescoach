@@ -17,6 +17,7 @@ export default defineEventHandler(async (event) => {
             createdAt: students.createdAt,
             archived: students.archived,
             reminders: students.reminders,
+            phoneRequested: students.phoneRequested,
             healthId: health.id,
             injury: health.injury,
             pregnancy: health.pregnancy,
@@ -38,6 +39,7 @@ export default defineEventHandler(async (event) => {
         registration: r.createdAt?.toISOString() ?? null,
         archived: r.archived,
         reminders: r.reminders,
+        phoneRequested: r.phoneRequested,
         health: r.healthId ? {
             $id: r.healthId,
             injury: r.injury,

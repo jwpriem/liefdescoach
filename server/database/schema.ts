@@ -15,6 +15,7 @@ export const students = pgTable('students', {
   archived: boolean('archived').notNull().default(false),
   reminders: boolean('reminders').notNull().default(true),
   pushNotifications: boolean('push_notifications').notNull().default(false),
+  phoneRequested: boolean('phone_requested').notNull().default(false),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 }, (table) => [
   uniqueIndex('students_email_idx').on(table.email),
