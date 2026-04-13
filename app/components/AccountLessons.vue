@@ -108,11 +108,15 @@ const { sortStudents, getLessonBookingsWithLabels } = useLessonBookings()
 
 // ⚡ Bolt: Move expensive O(N log N) sorting and allocations out of the template
 // ⚡ Bolt: Avoid allocating heavy dayjs objects inside filter loops by using native Date time comparison
+// ⚡ Bolt: Consolidate multiple array operations (.filter, .map) into a single .reduce() loop to turn O(k*N) into O(N) and minimize intermediate array allocations.
 const futureLessons = computed(() => {
   const nowTime = Date.now()
-  return lessons.value
-    .filter(l => new Date(l.date).getTime() > nowTime)
-    .map(l => ({ ...l, processedBookings: getLessonBookingsWithLabels(l.bookings || []) }))
+  return lessons.value.reduce((acc: any[], l) => {
+    if (new Date(l.date).getTime() > nowTime) {
+      acc.push({ ...l, processedBookings: getLessonBookingsWithLabels(l.bookings || []) })
+    }
+    return acc
+  }, [])
 })
 
 const computedLessons = computed(() => {
