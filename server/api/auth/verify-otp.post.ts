@@ -1,7 +1,7 @@
 import { createError } from 'h3'
 import crypto from 'crypto'
 import { eq } from 'drizzle-orm'
-import { otpCodes } from '../../database/schema'
+import { otpCodes, students } from '../../database/schema'
 
 /**
  * Verifies an OTP code, deletes it from the database,
@@ -51,7 +51,10 @@ export default defineEventHandler(async (event) => {
     // 4. Delete OTP
     await db.delete(otpCodes).where(eq(otpCodes.id, otpDoc.id))
 
-    // 5. Create a session for the user
+    // 5. Mark email as verified (OTP proves ownership of the email address)
+    await db.update(students).set({ emailVerified: true }).where(eq(students.id, otpDoc.userId))
+
+    // 6. Create a session for the user
     await createSession(event, otpDoc.userId)
 
     return { success: true, userId: otpDoc.userId }
