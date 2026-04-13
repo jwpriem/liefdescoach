@@ -21,6 +21,18 @@ function formatEuro(value: number) {
     return new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(value)
 }
 
+const requestingPhone = ref(false)
+
+async function requestPhone() {
+    requestingPhone.value = true
+    try {
+        await $fetch('/api/admin/request-phone', { method: 'POST', body: { userId } })
+        await refreshNuxtData('admin-users')
+    } finally {
+        requestingPhone.value = false
+    }
+}
+
 </script>
 
 <template>
@@ -37,8 +49,20 @@ function formatEuro(value: number) {
 
                 <!-- Header & Stats -->
                 <div>
-                    <h1 class="text-3xl md:text-5xl font-black uppercase tracking-tight text-white mb-2">{{ user.name }}
-                    </h1>
+                    <div class="flex flex-wrap items-start justify-between gap-4 mb-2">
+                        <h1 class="text-3xl md:text-5xl font-black uppercase tracking-tight text-white">{{ user.name }}</h1>
+                        <UButton
+                            @click="requestPhone"
+                            :loading="requestingPhone"
+                            :disabled="requestingPhone"
+                            :icon="user.phoneRequested ? 'i-lucide-clock' : 'i-lucide-smartphone'"
+                            :color="user.phoneRequested ? 'neutral' : 'primary'"
+                            :variant="user.phoneRequested ? 'outline' : 'solid'"
+                            size="sm"
+                        >
+                            {{ user.phoneRequested ? 'Opvragen actief' : 'Telefoonnummer opvragen' }}
+                        </UButton>
+                    </div>
                     <p class="text-emerald-400 font-medium mb-8">Klantdetails & statistieken</p>
 
                     <div v-if="stats" class="grid grid-cols-2 md:grid-cols-4 gap-4">
