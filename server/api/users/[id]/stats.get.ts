@@ -40,16 +40,22 @@ export default defineEventHandler(async (event) => {
     const now = new Date()
     // ⚡ Bolt: Pre-calculate static timestamp outside the loop and use native getTime() for comparison
     const nowTime = now.getTime()
-    const availableCredits = creditRows.filter(c => !c.bookingId && c.validTo && new Date(c.validTo).getTime() > nowTime).length
-    const usedCredits = creditRows.filter(c => !!c.bookingId).length
 
-    // Map booking IDs to credits
+    let availableCredits = 0
+    let usedCredits = 0
     const bookingCreditMap = new Map<string, any>()
-    creditRows.forEach(c => {
+
+    // ⚡ Bolt: Consolidated multiple array filters and iterations into a single O(N) loop
+    // Expected impact: Transforms O(3N) array iterations into O(N) and prevents intermediate array allocations.
+    for (let i = 0; i < creditRows.length; i++) {
+        const c = creditRows[i]
         if (c.bookingId) {
+            usedCredits++
             bookingCreditMap.set(c.bookingId, c)
+        } else if (c.validTo && new Date(c.validTo).getTime() > nowTime) {
+            availableCredits++
         }
-    })
+    }
 
     let totalRevenue = 0
     bookingRows.forEach(booking => {
