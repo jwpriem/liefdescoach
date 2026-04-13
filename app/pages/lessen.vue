@@ -137,10 +137,12 @@ async function book(lesson: any) {
               <!-- Logged in, not booked, spots available -->
               <UTooltip v-if="loggedInUser && !checkBooking(lesson.$id) && spotsLeft(lesson) > 0"
                 :text="availableCredits < 1 ? 'Onvoldoende credits' : 'Boek deze les'" class="block w-full">
-                <UButton block :disabled="availableCredits < 1" color="primary" variant="solid"
-                  @click="book(lesson)">
-                  {{ availableCredits < 1 ? 'Geen credits' : 'Boek les' }}
-                </UButton>
+                <div class="w-full">
+                  <UButton block :disabled="availableCredits < 1" color="primary" variant="solid"
+                    @click="book(lesson)">
+                    {{ availableCredits < 1 ? 'Geen credits' : 'Boek les' }}
+                  </UButton>
+                </div>
               </UTooltip>
               <!-- Already booked -->
               <div v-else-if="checkBooking(lesson.$id)"
