@@ -120,7 +120,7 @@ export default defineNuxtPlugin(nuxtApp => {
 
         getLessonTitle(lesson: any) {
             if (lesson.type == 'guest lesson') {
-                const safeTeacher = (lesson.teacher || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;")
+                const safeTeacher = lesson.teacher || ""
                 return `Yin-Yang Yoga door gastdocent ${safeTeacher}`
             }
             return rav.checkLessonType(lesson.type)
