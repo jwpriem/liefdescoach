@@ -169,6 +169,17 @@ const passwordStrength = computed(() => {
 
 const verificationSent = ref(false)
 const toast = useToast()
+const requestingPhone = ref(false)
+
+async function requestPhone() {
+  requestingPhone.value = true
+  try {
+    await $fetch('/api/admin/request-phone', { method: 'POST', body: { userId: targetUser.value.$id } })
+    await refreshNuxtData('admin-users')
+  } finally {
+    requestingPhone.value = false
+  }
+}
 
 async function requestVerification() {
   verificationSent.value = true
@@ -223,7 +234,14 @@ async function requestVerification() {
           <span class="block text-gray-100 mt-0.5">{{ targetUser.email }}</span>
         </div>
         <div>
-          <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Telefoon</span>
+          <div class="flex items-center gap-x-2">
+            <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Telefoon</span>
+            <button v-if="isAdmin && props.user && !targetUser.phone"
+              @click="requestPhone" :disabled="requestingPhone || targetUser.phoneRequested"
+              class="text-xs text-emerald-400 hover:text-emerald-300 underline underline-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+              {{ targetUser.phoneRequested ? 'Opvragen actief' : 'Telefoonnummer opvragen' }}
+            </button>
+          </div>
           <span class="block text-gray-100 mt-0.5" v-if="targetUser.phone">{{ targetUser.phone }}</span>
           <span class="block text-gray-400 mt-0.5" v-else>Geen telefoonnummer</span>
         </div>
