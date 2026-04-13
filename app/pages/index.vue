@@ -10,6 +10,9 @@ definePageMeta({
 
 useHead({
 	title,
+	link: [
+		{ rel: 'canonical', href: pageUrl },
+	],
 	meta: [
 		{ hid: 'description', name: 'description', content: description },
 		{ hid: 'og:title', property: 'og:title', content: title },
