@@ -6,6 +6,8 @@ const mockDb = {
   from: vi.fn().mockReturnThis(),
   where: vi.fn().mockResolvedValue([]),
   delete: vi.fn().mockReturnThis(),
+  update: vi.fn().mockReturnThis(),
+  set: vi.fn().mockReturnThis(),
 }
 
 beforeEach(() => {
@@ -18,6 +20,8 @@ beforeEach(() => {
   mockDb.from.mockReturnThis()
   mockDb.where.mockResolvedValue([])
   mockDb.delete.mockReturnThis()
+  mockDb.update.mockReturnThis()
+  mockDb.set.mockReturnThis()
 })
 
 const handle = typeof handler === 'function'
@@ -79,6 +83,8 @@ describe('POST /api/auth/verify-otp', () => {
     const result = await handle(event)
 
     expect(result).toMatchObject({ success: true, userId: 'u1' })
+    expect(mockDb.update).toHaveBeenCalled()
+    expect(mockDb.set).toHaveBeenCalledWith({ emailVerified: true })
     expect(createSession).toHaveBeenCalledWith(event, 'u1')
   })
 })
