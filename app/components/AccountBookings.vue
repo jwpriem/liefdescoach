@@ -1,8 +1,9 @@
 <script setup lang="ts">
 const { myBookings } = useBookings()
 const { availableCredits } = useCredits()
-const { cancelBooking, handleBooking } = useBookingActions()
+const { cancelBooking, handleBooking, error: bookingError } = useBookingActions()
 const { $rav } = useNuxtApp()
+const toast = useToast()
 
 const openBookingModal = inject('openBookingModal') as () => void
 
@@ -49,6 +50,22 @@ async function removeBooking(bookingGroup: any) {
   try {
     const bookingToCancel = bookingGroup.bookings[bookingGroup.bookings.length - 1]
     await cancelBooking(bookingToCancel)
+    if (!bookingError.value) {
+      toast.add({
+        id: 'cancellation',
+        title: 'Boeking geannuleerd',
+        icon: 'i-lucide-x-circle',
+        color: 'primary',
+        description: 'Je boeking is succesvol geannuleerd.'
+      })
+    } else {
+      toast.add({
+        id: 'cancellation-error',
+        title: 'Annuleren mislukt',
+        icon: 'i-lucide-alert-circle',
+        description: bookingError.value ?? 'Er is iets misgegaan.'
+      })
+    }
   } finally {
     isCancelingId.value = null
   }
