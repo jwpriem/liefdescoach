@@ -7,7 +7,7 @@ const pageUrl = ref('https://www.ravennah.com/lessen');
 const { user: loggedInUser } = useAuth()
 const { availableCredits } = useCredits()
 const { myBookings } = useBookings()
-const { handleBooking, error: bookingError, pending: isLoading } = useBookingActions()
+const { handleBooking, cancelBooking, error: bookingError, pending: isLoading } = useBookingActions()
 const { set: setOnBehalfOf } = useOnBehalfOf()
 const toast = useToast()
 const { $rav } = useNuxtApp()
@@ -35,18 +35,42 @@ useHead({
 const { data: lessons } = await useAsyncData('lessons', () => $fetch('/api/lessons'))
 
 // ⚡ Bolt: Optimize O(N) array lookup in v-for to O(1) Set lookup
-const bookedLessonIds = computed(() => {
-  const ids = new Set<string>()
+const bookingByLessonId = computed(() => {
+  const map = new Map<string, any>()
   for (const booking of myBookings.value) {
-    if (booking.lessons?.$id) {
-      ids.add(booking.lessons.$id)
+    if (booking.lessons?.$id && !map.has(booking.lessons.$id)) {
+      map.set(booking.lessons.$id, booking)
     }
   }
-  return ids
+  return map
 })
 
 function checkBooking(id: string) {
-  return bookedLessonIds.value.has(id)
+  return bookingByLessonId.value.has(id)
+}
+
+const isCancelingId = ref<string | null>(null)
+
+async function cancel(lesson: any) {
+  if (!loggedInUser.value) return
+  const booking = bookingByLessonId.value.get(lesson.$id)
+  if (!booking) return
+
+  isCancelingId.value = lesson.$id
+  try {
+    await cancelBooking(booking)
+    if (!bookingError.value) {
+      toast.add({
+        id: 'cancellation',
+        title: 'Boeking geannuleerd',
+        icon: 'i-lucide-x-circle',
+        color: 'primary',
+        description: 'Je boeking is succesvol geannuleerd.'
+      })
+    }
+  } finally {
+    isCancelingId.value = null
+  }
 }
 
 function spotsLeft(lesson: any) {
@@ -145,14 +169,22 @@ async function book(lesson: any) {
                 </div>
               </UTooltip>
               <!-- Already booked -->
-              <div v-else-if="checkBooking(lesson.$id)"
-                class="flex items-center justify-center gap-2 py-2 rounded-xl bg-emerald-900/30 text-emerald-400 font-medium text-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                  stroke="currentColor" class="w-5 h-5 shrink-0">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                </svg>
-                Geboekt
+              <div v-else-if="checkBooking(lesson.$id)" class="space-y-2">
+                <div class="flex items-center justify-center gap-2 py-2 rounded-xl bg-emerald-900/30 text-emerald-400 font-medium text-sm">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor" class="w-5 h-5 shrink-0">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                  </svg>
+                  Geboekt
+                </div>
+                <UTooltip :text="!$rav.checkCancelPeriod(lesson) ? 'Annuleren kan tot 24 uur voor de les' : 'Annuleer deze boeking'" class="block w-full">
+                  <div class="w-full">
+                    <UButton block :loading="isCancelingId === lesson.$id" :disabled="!$rav.checkCancelPeriod(lesson)" color="neutral" variant="ghost" size="sm" @click="cancel(lesson)">
+                      Annuleer
+                    </UButton>
+                  </div>
+                </UTooltip>
               </div>
               <!-- Logged in, not booked, lesson full -->
               <div v-else-if="loggedInUser && spotsLeft(lesson) === 0"
