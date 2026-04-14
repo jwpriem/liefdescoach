@@ -150,12 +150,12 @@ async function bookExtraSpot(lesson: any) {
             <div class="flex flex-col gap-2">
               <UTooltip :text="availableCredits < 1 ? 'Onvoldoende credits' : 'Boek een extra plek'" class="w-full" :ui="{ width: 'w-full' }">
                 <div class="w-full">
-                  <UButton :loading="isBookingExtraId === bookingGroup.lessonId" color="primary" variant="outline" size="lg" block :disabled="availableCredits < 1" @click="bookExtraSpot(bookingGroup.lessons)">Boek extra plek</UButton>
+                  <UButton :loading="isBookingExtraId === bookingGroup.lessonId" color="primary" variant="solid" size="lg" block :disabled="availableCredits < 1" @click="bookExtraSpot(bookingGroup.lessons)">Boek extra plek</UButton>
                 </div>
               </UTooltip>
               <UTooltip :text="!$rav.checkCancelPeriod(bookingGroup.lessons) ? 'Annuleren kan tot 24 uur voor de les' : 'Annuleer deze boeking'" class="w-full" :ui="{ width: 'w-full' }">
                 <div class="w-full">
-                  <UButton :loading="isCancelingId === bookingGroup.lessonId" color="primary" variant="solid" size="lg" block @click="removeBooking(bookingGroup)" :disabled="!$rav.checkCancelPeriod(bookingGroup.lessons)">Annuleer 1 plek</UButton>
+                  <UButton :loading="isCancelingId === bookingGroup.lessonId" color="error" variant="soft" size="lg" block @click="removeBooking(bookingGroup)" :disabled="!$rav.checkCancelPeriod(bookingGroup.lessons)">Annuleer 1 plek</UButton>
                 </div>
               </UTooltip>
             </div>

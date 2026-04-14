@@ -211,7 +211,7 @@ async function onConfirmDeleteLesson() {
                 <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Les</span>
                 <span class="block text-gray-100 mt-0.5" v-html="$rav.getLessonDescription(lesson)"></span>
               </div>
-              <UButton aria-label="Les beheren" icon="i-lucide-settings" variant="ghost" size="md"
+              <UButton aria-label="Les beheren" icon="i-lucide-pencil" variant="ghost" size="md"
                 class="text-gray-400 hover:text-white -mt-1 -mr-2" @click="openManage(lesson)" />
             </div>
             <div>

@@ -180,7 +180,7 @@ async function book(lesson: any) {
                 </div>
                 <UTooltip :text="!$rav.checkCancelPeriod(lesson) ? 'Annuleren kan tot 24 uur voor de les' : 'Annuleer deze boeking'" class="block w-full">
                   <div class="w-full">
-                    <UButton block :loading="isCancelingId === lesson.$id" :disabled="!$rav.checkCancelPeriod(lesson)" color="neutral" variant="ghost" size="sm" @click="cancel(lesson)">
+                    <UButton block :loading="isCancelingId === lesson.$id" :disabled="!$rav.checkCancelPeriod(lesson)" color="error" variant="soft" size="sm" @click="cancel(lesson)">
                       Annuleer
                     </UButton>
                   </div>
