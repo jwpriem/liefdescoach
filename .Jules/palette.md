@@ -38,3 +38,7 @@
 ## 2025-04-12 - Wrap disabled UButton in div for tooltips
 **Learning:** In Nuxt UI (and common component libraries), disabled `<UButton>` elements block pointer events, preventing wrapper components like `<UTooltip>` from registering hover states. This leads to hidden context about *why* the button is disabled.
 **Action:** When an action is unavailable, always show the disabled button and explicitly wrap it in a structural `<div>` so the surrounding `<UTooltip>` can properly catch pointer events and explain the disabled state to the user.
+
+## 2025-04-12 - Wrapping disabled buttons with tooltips
+**Learning:** I noticed that several disabled buttons in the login and password reset pages did not have any tooltips explaining why they were disabled (e.g., waiting for input). This leaves users confused about what is required to proceed.
+**Action:** Wrapped these disabled buttons with `<UTooltip>` elements and explicitly wrapped the `<UButton>` in a structural `<div>` so the surrounding `<UTooltip>` can catch pointer events and display the context for the disabled state to the user.

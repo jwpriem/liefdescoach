@@ -93,9 +93,13 @@ async function submit() {
                         <p v-if="confirmError" class="mt-1 text-xs text-red-400">{{ confirmError }}</p>
                     </div>
 
-                    <UButton :disabled="!canSubmit" color="primary" variant="solid" size="lg" block type="submit">
-                        Wachtwoord opslaan
-                    </UButton>
+                    <UTooltip :text="!canSubmit ? 'Vul een geldig wachtwoord in om op te slaan' : 'Wachtwoord opslaan'" class="block w-full">
+                        <div class="w-full">
+                            <UButton :disabled="!canSubmit" color="primary" variant="solid" size="lg" block type="submit">
+                                Wachtwoord opslaan
+                            </UButton>
+                        </div>
+                    </UTooltip>
                 </form>
             </div>
 
