@@ -36,29 +36,34 @@ export default defineEventHandler(async (event) => {
         .orderBy(desc(credits.createdAt))
         .limit(500)
 
-    const enrichedCredits = rows.map((r) => ({
-        $id: r.id,
-        studentId: r.studentId,
-        bookingId: r.bookingId,
-        type: r.type,
-        validFrom: r.validFrom?.toISOString(),
-        validTo: r.validTo?.toISOString(),
-        createdAt: r.createdAt?.toISOString(),
-        usedAt: r.usedAt?.toISOString() ?? null,
-        lesson: r.lessonId ? {
-            $id: r.lessonId,
-            date: r.lessonDate?.toISOString(),
-            type: r.lessonType,
-            teacher: r.lessonTeacher,
-        } : null,
-    }))
-
     const now = new Date()
     // ⚡ Bolt: Pre-calculate static timestamp outside the loop and use native getTime() for comparison
     const nowTime = now.getTime()
-    const available = rows.filter(
-        (c) => !c.bookingId && c.validTo && new Date(c.validTo).getTime() > nowTime
-    ).length
+
+    // ⚡ Bolt: Consolidate multiple array operations into a single loop to turn O(k*N) into O(N)
+    const enrichedCredits: any[] = []
+    let available = 0
+    for (const r of rows) {
+        enrichedCredits.push({
+            $id: r.id,
+            studentId: r.studentId,
+            bookingId: r.bookingId,
+            type: r.type,
+            validFrom: r.validFrom?.toISOString(),
+            validTo: r.validTo?.toISOString(),
+            createdAt: r.createdAt?.toISOString(),
+            usedAt: r.usedAt?.toISOString() ?? null,
+            lesson: r.lessonId ? {
+                $id: r.lessonId,
+                date: r.lessonDate?.toISOString(),
+                type: r.lessonType,
+                teacher: r.lessonTeacher,
+            } : null,
+        })
+        if (!r.bookingId && r.validTo && new Date(r.validTo).getTime() > nowTime) {
+            available++
+        }
+    }
 
     return {
         credits: enrichedCredits,

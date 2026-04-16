@@ -82,11 +82,13 @@ export async function getFirstLessonDatesForStudents(studentIds: string[]): Prom
     .where(inArray(bookings.studentId, studentIds))
     .groupBy(bookings.studentId)
 
-  return new Map(
-    rows
-      .filter(r => r.firstLessonDate != null)
-      .map(r => [r.studentId, r.firstLessonDate as Date])
-  )
+  const map = new Map<string, Date>()
+  for (const r of rows) {
+    if (r.firstLessonDate != null) {
+      map.set(r.studentId, r.firstLessonDate as Date)
+    }
+  }
+  return map
 }
 
 /**
