@@ -20,3 +20,7 @@
 ## 2026-04-08 - Vue Computed Array Consolidations
 **Learning:** Chained array methods like `.map().filter().forEach()` inside computed properties can be highly inefficient in Vue. Doing `.map(item => ({ ...item, ... }))` creates intermediate arrays and allocates new throwaway objects for every single item, even for those that are immediately discarded by the subsequent `.filter()`. This causes unnecessary memory usage, garbage collection, and breaks Vue's reactive proxies.
 **Action:** Consolidate multiple array operations (`.map`, `.filter`, `.forEach`) into a single `for...of` or `.reduce()` loop. Only allocate new objects or spread properties for items that *pass* the conditional checks, thereby turning O(k*N) time and memory operations into O(N).
+
+## 2025-02-28 - Map Construction from Arrays
+**Learning:** Passing a chained `.filter().map()` expression directly into the `new Map()` constructor (e.g. `new Map(arr.filter(c).map(t))`) iterates the array multiple times and creates unnecessary intermediate array allocations before the Map is even built.
+**Action:** Instantiate an empty Map and populate it using a single `for...of` loop to prevent intermediate allocations and turn O(k*N) operations into O(N).
