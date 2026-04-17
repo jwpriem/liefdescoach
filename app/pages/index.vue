@@ -78,6 +78,7 @@ useLocalBusinessSchema()
 			<div class="flex flex-wrap gap-3">
 				<nuxt-link class="emerald button" to="/lessen">Bekijk het rooster</nuxt-link>
 				<nuxt-link class="emerald-outlined button" to="/tarieven">Tarieven</nuxt-link>
+				<nuxt-link class="emerald-outlined button" to="/eerste-les">Nog nooit yoga gedaan?</nuxt-link>
 			</div>
 		</Header>
 

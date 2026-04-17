@@ -144,6 +144,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     '/yoga-zuidplas': { isr: true },
     '/yoga-waddinxveen': { isr: true },
     '/yoga-zevenhuizen': { isr: true },
+    '/eerste-les': { isr: true },
     // Dynamic/authenticated pages: disable SSR to prevent Vue instance accumulation
     '/lessen': { ssr: false },
     '/account': { ssr: false },
