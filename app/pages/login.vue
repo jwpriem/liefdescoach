@@ -380,9 +380,13 @@ const passwordStrength = computed(() => {
           <div v-if="!migrationResetSent" class="mt-8 space-y-3">
             <!-- Password login -->
             <template v-if="loginMode === 'password' && !registerForm">
-              <UButton :disabled="!password" color="primary" variant="solid" size="lg" block @click="login">
-                Inloggen
-              </UButton>
+              <UTooltip :text="!password ? 'Vul je wachtwoord in om in te loggen' : 'Inloggen'" class="block w-full">
+                <div class="w-full">
+                  <UButton :disabled="!password" color="primary" variant="solid" size="lg" block @click="login">
+                    Inloggen
+                  </UButton>
+                </div>
+              </UTooltip>
               <div class="text-center">
                 <button type="button" class="text-sm text-gray-400 hover:text-emerald-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded px-2 py-0.5"
                   @click="switchLoginMode('forgot')">
@@ -399,9 +403,13 @@ const passwordStrength = computed(() => {
 
             <!-- Register -->
             <template v-if="registerForm">
-              <UButton :disabled="!password || !name" color="primary" variant="solid" size="lg" block @click="register">
-                Account aanmaken
-              </UButton>
+              <UTooltip :text="(!password || !name) ? 'Vul je naam en wachtwoord in om een account aan te maken' : 'Account aanmaken'" class="block w-full">
+                <div class="w-full">
+                  <UButton :disabled="!password || !name" color="primary" variant="solid" size="lg" block @click="register">
+                    Account aanmaken
+                  </UButton>
+                </div>
+              </UTooltip>
               <div class="text-center">
                 <button type="button" class="text-sm text-gray-400 hover:text-emerald-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded px-2 py-0.5"
                   @click="registerForm = false">
@@ -412,16 +420,24 @@ const passwordStrength = computed(() => {
 
             <!-- OTP: send code -->
             <template v-if="loginMode === 'otp' && !registerForm && otpStep === 'email'">
-              <UButton :disabled="!email" color="primary" variant="solid" size="lg" block @click="sendOtp">
-                Verstuur code
-              </UButton>
+              <UTooltip :text="!email ? 'Vul je e-mailadres in om een code te ontvangen' : 'Verstuur code'" class="block w-full">
+                <div class="w-full">
+                  <UButton :disabled="!email" color="primary" variant="solid" size="lg" block @click="sendOtp">
+                    Verstuur code
+                  </UButton>
+                </div>
+              </UTooltip>
             </template>
 
             <!-- OTP: verify code -->
             <template v-if="loginMode === 'otp' && !registerForm && otpStep === 'code'">
-              <UButton :disabled="!otpCode" color="primary" variant="solid" size="lg" block @click="verifyOtp">
-                Verifieer en inloggen
-              </UButton>
+              <UTooltip :text="!otpCode ? 'Vul de code in om in te loggen' : 'Verifieer en inloggen'" class="block w-full">
+                <div class="w-full">
+                  <UButton :disabled="!otpCode" color="primary" variant="solid" size="lg" block @click="verifyOtp">
+                    Verifieer en inloggen
+                  </UButton>
+                </div>
+              </UTooltip>
               <div class="text-center">
                 <button type="button" class="text-sm text-gray-400 hover:text-emerald-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded px-2 py-0.5" @click="resendOtp">
                   Geen code ontvangen? <span class="font-medium underline underline-offset-2">Opnieuw versturen</span>
@@ -431,9 +447,13 @@ const passwordStrength = computed(() => {
 
             <!-- Forgot password -->
             <template v-if="loginMode === 'forgot'">
-              <UButton v-if="!resetSent" :disabled="!email" color="primary" variant="solid" size="lg" block @click="requestReset">
-                Verstuur reset-link
-              </UButton>
+              <UTooltip v-if="!resetSent" :text="!email ? 'Vul je e-mailadres in om een reset-link te ontvangen' : 'Verstuur reset-link'" class="block w-full">
+                <div class="w-full">
+                  <UButton :disabled="!email" color="primary" variant="solid" size="lg" block @click="requestReset">
+                    Verstuur reset-link
+                  </UButton>
+                </div>
+              </UTooltip>
               <div class="text-center">
                 <button type="button" class="text-sm text-gray-400 hover:text-emerald-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded px-2 py-0.5"
                   @click="switchLoginMode('password')">
