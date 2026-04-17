@@ -69,6 +69,9 @@ export default defineEventHandler(async (event) => {
         otpRequestsByIP.set(ip, { count: 1, firstRequest: now });
     }
 
+    // Update rate limit for email before returning
+    otpRequestsByEmail.set(email, now);
+
     // 1. Check if user exists
     const userRows = await db
         .select({ id: students.id })
@@ -82,9 +85,6 @@ export default defineEventHandler(async (event) => {
     }
 
     const userId = userRows[0].id
-
-    // Update rate limit for email before returning
-    otpRequestsByEmail.set(email, now);
 
     event.waitUntil(Promise.resolve().then(async () => {
         try {
