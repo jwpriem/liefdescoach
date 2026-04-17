@@ -208,9 +208,6 @@ useLocalBusinessSchema()
                   <span class="text-emerald-500">→</span><span>Comfortabele sportkleding</span>
                 </li>
                 <li class="flex items-center space-x-2">
-                  <span class="text-emerald-500">→</span><span>Eventueel je eigen yogamat (of leen er een)</span>
-                </li>
-                <li class="flex items-center space-x-2">
                   <span class="text-emerald-500">→</span><span>Een flesje water</span>
                 </li>
                 <li class="flex items-center space-x-2">
