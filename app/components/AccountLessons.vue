@@ -733,17 +733,24 @@ async function onConfirmDeleteLesson() {
                             @update:model-value="onClasspassStudentSelect"
                         />
                         <div class="flex gap-3">
-                            <UButton
-                                :loading="isBookingClasspass"
-                                :disabled="!classpassBookingUser"
-                                color="info"
-                                variant="solid"
-                                size="md"
-                                icon="i-lucide-plus"
-                                @click="addClasspassBooking"
+                            <UTooltip
+                                :text="!classpassBookingUser ? 'Selecteer eerst een deelnemer' : 'Voeg classpass boeking toe'"
+                                class="block w-full"
                             >
-                                Classpass boeking toevoegen
-                            </UButton>
+                                <div class="w-full">
+                                    <UButton
+                                        :loading="isBookingClasspass"
+                                        :disabled="!classpassBookingUser"
+                                        color="info"
+                                        variant="solid"
+                                        size="md"
+                                        icon="i-lucide-plus"
+                                        @click="addClasspassBooking"
+                                    >
+                                        Classpass boeking toevoegen
+                                    </UButton>
+                                </div>
+                            </UTooltip>
                         </div>
                     </div>
                     <NewStudentForm
