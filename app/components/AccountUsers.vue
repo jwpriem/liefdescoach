@@ -35,7 +35,8 @@ const state = reactive({
 	editMode: false,
 	selectedCreditType: 'credit_1' as string,
 	user: null as any | null,
-	showArchived: false
+	showArchived: false,
+	addUser: false,
 });
 
 const [{ data: adminUsersData, refresh: refreshUsers }, { data: creditSummaryData, refresh: refreshCreditSummary }] = await Promise.all([
@@ -99,6 +100,17 @@ async function migrateCredits(): Promise<void> {
 	} finally {
 		migrating.value = false
 	}
+}
+
+async function onStudentCreated(student: any) {
+	state.addUser = false
+	await refreshUsers()
+	toast.add({
+		title: 'Gebruiker aangemaakt',
+		icon: 'i-lucide-badge-check',
+		color: 'primary',
+		description: `${student.name} is toegevoegd.`
+	})
 }
 
 async function archiveUser(userId) {
@@ -181,15 +193,22 @@ const filteredRows = computed(() => {
 		<!-- Controls bar -->
 		<div
 			class="rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-lg shadow-emerald-950/10 p-4 sm:p-6 mb-6">
-			<div class="flex items-start justify-start gap-x-6 flex-wrap gap-y-4">
-				<div>
-					<label class="block text-sm font-medium text-gray-300 mb-1.5">Filter gebruikers</label>
-					<UInput id="naam" v-model="q" color="primary" placeholder="Zoek gebruiker" type="text"
-						variant="outline" size="lg" />
+			<div class="flex items-start justify-between gap-x-6 flex-wrap gap-y-4">
+				<div class="flex items-start gap-x-6 flex-wrap gap-y-4">
+					<div>
+						<label class="block text-sm font-medium text-gray-300 mb-1.5">Filter gebruikers</label>
+						<UInput id="naam" v-model="q" color="primary" placeholder="Zoek gebruiker" type="text"
+							variant="outline" size="lg" />
+					</div>
+					<div>
+						<label class="block text-sm font-medium text-gray-300 mb-1.5">Gearchiveerd</label>
+						<USwitch v-model="state.showArchived" unchecked-icon="i-lucide-x" checked-icon="i-lucide-check" />
+					</div>
 				</div>
-				<div>
-					<label class="block text-sm font-medium text-gray-300 mb-1.5">Gearchiveerd</label>
-					<USwitch v-model="state.showArchived" unchecked-icon="i-lucide-x" checked-icon="i-lucide-check" />
+				<div class="flex items-end">
+					<UButton color="primary" icon="i-lucide-user-plus" variant="solid" size="lg" @click="state.addUser = true">
+						Nieuwe gebruiker
+					</UButton>
 				</div>
 			</div>
 		</div>
@@ -306,6 +325,17 @@ const filteredRows = computed(() => {
 					</div>
 				</template>
 			</UTable>
+		</div>
+	</div>
+
+	<!-- Modal: Add user -->
+	<div v-if="state.addUser" class="fixed inset-0 bg-black/75 flex justify-center items-center z-50 p-4"
+		@click.self="state.addUser = false">
+		<div
+			class="w-full max-w-lg max-h-[75vh] overflow-y-auto rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-2xl shadow-emerald-950/20 p-8 sm:p-10">
+			<h2 class="text-2xl font-bold text-emerald-100 tracking-tight mb-5">Nieuwe gebruiker</h2>
+			<p class="text-sm text-gray-400 mb-5">Alleen naam is verplicht. Zonder e-mailadres kan de gebruiker niet zelf inloggen; gebruik dit bijvoorbeeld voor Classpass deelnemers.</p>
+			<NewStudentForm submit-label="Gebruiker aanmaken" @created="onStudentCreated" @cancel="state.addUser = false" />
 		</div>
 	</div>
 

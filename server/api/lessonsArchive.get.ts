@@ -31,6 +31,7 @@ export default defineEventHandler(async (event) => {
                 id: bookings.id,
                 lessonId: bookings.lessonId,
                 studentId: bookings.studentId,
+                source: bookings.source,
                 studentName: students.name,
                 studentEmail: students.email,
                 studentInjury: health.injury,

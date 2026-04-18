@@ -17,6 +17,7 @@ export default defineEventHandler(async (event) => {
             id: bookings.id,
             lessonId: bookings.lessonId,
             studentId: bookings.studentId,
+            source: bookings.source,
             lessonDate: lessons.date,
             lessonType: lessons.type,
         })
@@ -46,17 +47,19 @@ export default defineEventHandler(async (event) => {
         })
     }
 
-    // Release the credit
-    const creditRows = await db
-        .select()
-        .from(credits)
-        .where(eq(credits.bookingId, body.bookingId))
-        .limit(1)
+    // Release the credit — classpass bookings never consumed one, so nothing to release.
+    if (booking.source !== 'classpass') {
+        const creditRows = await db
+            .select()
+            .from(credits)
+            .where(eq(credits.bookingId, body.bookingId))
+            .limit(1)
 
-    if (creditRows.length > 0) {
-        await db.update(credits)
-            .set({ bookingId: null, usedAt: null })
-            .where(eq(credits.id, creditRows[0].id))
+        if (creditRows.length > 0) {
+            await db.update(credits)
+                .set({ bookingId: null, usedAt: null })
+                .where(eq(credits.id, creditRows[0].id))
+        }
     }
 
     // Delete booking
