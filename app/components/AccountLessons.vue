@@ -317,7 +317,7 @@ async function onConfirmDeleteLesson() {
                         variant="solid"
                         size="lg"
                         @click="state.createLesson = !state.createLesson"
-                        >Nieuwe les</UButton
+                        >Nieuw</UButton
                     >
                     <UButton
                         color="primary"
@@ -325,7 +325,7 @@ async function onConfirmDeleteLesson() {
                         variant="solid"
                         size="lg"
                         @click="state.bookForUser = !state.bookForUser"
-                        >Maak boeking</UButton
+                        >Boeking</UButton
                     >
                     <UButton
                         color="primary"
@@ -415,30 +415,28 @@ async function onConfirmDeleteLesson() {
                                         "
                                     >
                                         {{ booking.students.name }}
-                                        <UBadge
-                                            v-if="booking.isFirstTime"
-                                            color="warning"
-                                            variant="subtle"
-                                            size="xs"
-                                            >Eerste keer</UBadge
-                                        >
-                                        <UBadge
-                                            v-if="booking.isExtraSpot"
-                                            color="success"
-                                            variant="subtle"
-                                            size="xs"
-                                            >Extra plek</UBadge
-                                        >
-                                        <UBadge
-                                            v-if="
-                                                booking.source === 'classpass'
-                                            "
-                                            color="info"
-                                            variant="subtle"
-                                            size="xs"
-                                            >Classpass</UBadge
-                                        >
                                     </button>
+                                    <UBadge
+                                        v-if="booking.isFirstTime"
+                                        color="warning"
+                                        variant="subtle"
+                                        size="xs"
+                                        >Eerste keer</UBadge
+                                    >
+                                    <UBadge
+                                        v-if="booking.isExtraSpot"
+                                        color="success"
+                                        variant="subtle"
+                                        size="xs"
+                                        >Extra plek</UBadge
+                                    >
+                                    <UBadge
+                                        v-if="booking.source === 'classpass'"
+                                        color="info"
+                                        variant="subtle"
+                                        size="xs"
+                                        >Classpass</UBadge
+                                    >
                                     <button
                                         v-if="booking.students.injury"
                                         aria-label="Bekijk blessure details"
