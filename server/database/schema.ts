@@ -2,11 +2,12 @@ import { pgTable, text, timestamp, boolean, pgEnum, index, uniqueIndex } from 'd
 
 export const creditTypeEnum = pgEnum('credit_type', ['credit_1', 'credit_5', 'credit_10', 'credit_20'])
 export const lessonTypeEnum = pgEnum('lesson_type', ['hatha yoga', 'guest lesson', 'peachy bum'])
+export const bookingSourceEnum = pgEnum('booking_source', ['regular', 'classpass'])
 
 export const students = pgTable('students', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
-  email: text('email').notNull(),
+  email: text('email'),
   passwordHash: text('password_hash'),
   isAdmin: boolean('is_admin').notNull().default(false),
   emailVerified: boolean('email_verified').notNull().default(false),
@@ -46,6 +47,7 @@ export const bookings = pgTable('bookings', {
   id: text('id').primaryKey(),
   lessonId: text('lesson_id').notNull().references(() => lessons.id, { onDelete: 'cascade' }),
   studentId: text('student_id').references(() => students.id, { onDelete: 'set null' }),
+  source: bookingSourceEnum('source').notNull().default('regular'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 }, (table) => [
   index('bookings_lesson_id_idx').on(table.lessonId),
