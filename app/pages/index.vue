@@ -3,7 +3,7 @@ const title = ref(
     "Yoga Ravennah | Ongedwongen yogales in Rotterdam Nesselande",
 );
 const description = ref(
-    "Hatha yogalessen in kleine groepen in Rotterdam Nesselande. Persoonlijke aandacht, laagdrempelig en voor iedereen — ook zonder ervaring. Elke zondag om 08:45.",
+    "Hatha yogalessen in kleine groepen in Rotterdam Nesselande. Persoonlijke aandacht, laagdrempelig en voor iedereen — ook zonder ervaring. Elke zondag om 09:45.",
 );
 const ogImage = ref("https://www.ravennah.com/ravennah-social.jpg");
 const pageUrl = ref("https://www.ravennah.com/");
@@ -153,7 +153,7 @@ useLocalBusinessSchema();
                             {
                                 icon: 'M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5',
                                 label: 'Elke zondag',
-                                sub: '08:45 – 09:45, gratis parkeren',
+                                sub: '09:45 – 10:45, gratis parkeren',
                             },
                         ]"
                         :key="feat.label"
@@ -413,7 +413,7 @@ useLocalBusinessSchema();
                             ><span class="text-emerald-600">.</span>
                         </h2>
                         <p class="intro">
-                            Elke zondag om 08:45 geef ik les aan de Emmy van
+                            Elke zondag om 09:45 geef ik les aan de Emmy van
                             Leersumhof 24a in Rotterdam Nesselande. Begin je
                             week met rust, energie en ruimte voor jezelf.
                         </p>

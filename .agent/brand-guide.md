@@ -11,7 +11,7 @@
 | **Naam** | Yoga Ravennah |
 | **Adres** | Emmy van Leersumhof 24a, 3059 LT Rotterdam |
 | **Telefoon** | +31 6 47699709 |
-| **Openingstijden** | Zondag 08:45 - 09:45 |
+| **Openingstijden** | Zondag 09:45 - 10:45 |
 | **Coördinaten** | 51.9683092, 4.5884189 |
 
 ---
