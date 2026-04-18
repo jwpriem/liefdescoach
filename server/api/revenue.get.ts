@@ -26,6 +26,7 @@ export default defineEventHandler(async (event) => {
         'credit_10': 13.50,
         'credit_20': 12.50,
     }
+    const CLASSPASS_PRICE = 7.10
 
     // Fetch all lessons, bookings, and credits in the date range using joins
     const rows = await db
@@ -33,6 +34,7 @@ export default defineEventHandler(async (event) => {
             lessonId: lessons.id,
             lessonDate: lessons.date,
             bookingId: bookings.id,
+            bookingSource: bookings.source,
             creditType: credits.type,
         })
         .from(lessons)
@@ -69,7 +71,14 @@ export default defineEventHandler(async (event) => {
         // Count booking if present (left join may produce null)
         if (row.bookingId) {
             buckets[key].bookings += 1
-            const price = row.creditType ? (PRICE_MAP[row.creditType] || revenuePerBooking) : revenuePerBooking
+            let price: number
+            if (row.bookingSource === 'classpass') {
+                price = CLASSPASS_PRICE
+            } else if (row.creditType) {
+                price = PRICE_MAP[row.creditType] || revenuePerBooking
+            } else {
+                price = revenuePerBooking
+            }
             buckets[key].revenue += price
         }
     }

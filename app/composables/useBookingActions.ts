@@ -4,9 +4,10 @@ export const useBookingActions = () => {
   const { refresh: refreshCredits } = useCredits()
   const { call, error, pending } = useApiCall()
 
-  async function handleBooking(lesson: any, options: { extraSpot?: boolean } = {}) {
+  async function handleBooking(lesson: any, options: { extraSpot?: boolean; source?: 'regular' | 'classpass' } = {}) {
     await call(async () => {
       const isOnBehalf = onBehalfOf.value && onBehalfOf.value.$id !== user.value?.$id
+      const isClasspass = options.source === 'classpass'
 
       await $fetch('/api/handleBooking', {
         method: 'POST',
@@ -14,11 +15,14 @@ export const useBookingActions = () => {
           lessonId: lesson.$id,
           onBehalfOfUserId: isOnBehalf ? onBehalfOf.value!.$id : null,
           extraSpot: options.extraSpot === true,
+          source: isClasspass ? 'classpass' : 'regular',
         }
       })
 
       const lessonIsInPast = new Date(lesson.date) < new Date()
-      if (!(isAdmin.value && lessonIsInPast)) {
+      const target = onBehalfOf.value ?? user.value
+      // Classpass bookings skip confirmation mail — the participant often has no email on file.
+      if (!isClasspass && !(isAdmin.value && lessonIsInPast) && target?.email) {
         await sendEmail('sendBookingConfirmation', lesson.$id)
       }
 
@@ -45,7 +49,11 @@ export const useBookingActions = () => {
         }
       })
 
-      await sendEmail('sendBookingCancellation', result.lessonId)
+      // Skip cancellation mail for classpass bookings (no login, often no email).
+      const target = onBehalfOf.value ?? user.value
+      if (booking.source !== 'classpass' && target?.email) {
+        await sendEmail('sendBookingCancellation', result.lessonId)
+      }
 
       await refreshNuxtData(['lessons', 'admin-lessons', 'my-bookings'])
       if (isOnBehalf) {

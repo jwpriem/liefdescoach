@@ -1,5 +1,5 @@
 import { createError } from 'h3'
-import { eq, and, isNull, gt, asc, count as countFn } from 'drizzle-orm'
+import { eq, and } from 'drizzle-orm'
 import { lessons, bookings, credits } from '../database/schema'
 
 export default defineEventHandler(async (event) => {
@@ -11,12 +11,23 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 400, statusMessage: 'lessonId is verplicht' })
     }
 
+    const isAdmin = user.labels.includes('admin')
+    const source: 'regular' | 'classpass' = body.source === 'classpass' ? 'classpass' : 'regular'
+
+    if (source === 'classpass' && !isAdmin) {
+        throw createError({ statusCode: 403, statusMessage: 'Alleen admins kunnen Classpass boekingen toevoegen' })
+    }
+
     let targetUserId = user.$id
     if (body.onBehalfOfUserId && typeof body.onBehalfOfUserId === 'string') {
-        if (!user.labels.includes('admin')) {
+        if (!isAdmin) {
             throw createError({ statusCode: 403, statusMessage: 'Geen toegang om voor anderen te boeken' })
         }
         targetUserId = body.onBehalfOfUserId
+    }
+
+    if (source === 'classpass' && targetUserId === user.$id) {
+        throw createError({ statusCode: 400, statusMessage: 'Selecteer een deelnemer voor de Classpass boeking' })
     }
 
     // Fetch lesson
@@ -26,7 +37,6 @@ export default defineEventHandler(async (event) => {
     }
     const lesson = lessonRows[0]
 
-    const isAdmin = user.labels.includes('admin')
     const isAdminBookingForStudent = isAdmin && Boolean(body.onBehalfOfUserId)
 
     if (!isAdminBookingForStudent && new Date(lesson.date) <= new Date()) {
@@ -35,43 +45,50 @@ export default defineEventHandler(async (event) => {
 
     const allowDuplicateBooking = body.extraSpot === true
 
-    // Check capacity and duplicates
     const existingBookings = await db
         .select()
         .from(bookings)
         .where(eq(bookings.lessonId, body.lessonId))
 
-    if (existingBookings.length >= MAX_LESSON_CAPACITY) {
-        throw createError({ statusCode: 409, statusMessage: 'Les is vol' })
+    // Only regular bookings count toward capacity. Classpass bookings ignore capacity.
+    if (source === 'regular') {
+        const regularCount = existingBookings.filter(b => b.source === 'regular').length
+        if (regularCount >= MAX_LESSON_CAPACITY) {
+            throw createError({ statusCode: 409, statusMessage: 'Les is vol' })
+        }
     }
 
     if (!allowDuplicateBooking && existingBookings.some(b => b.studentId === targetUserId)) {
         throw createError({ statusCode: 409, statusMessage: 'Gebruiker is al geboekt voor deze les' })
     }
 
-    // Find available credit (FIFO by expiry)
-    const credit = await findAvailableCredit(targetUserId)
-    if (!credit) {
-        throw createError({ statusCode: 402, statusMessage: 'Onvoldoende credits' })
+    // Classpass bookings do not consume credits; regular bookings do.
+    let creditId: string | null = null
+    if (source === 'regular') {
+        const credit = await findAvailableCredit(targetUserId)
+        if (!credit) {
+            throw createError({ statusCode: 402, statusMessage: 'Onvoldoende credits' })
+        }
+        creditId = credit.id
     }
 
     const now = new Date()
     const bookingId = generateId()
 
-    // Create booking
     await db.insert(bookings).values({
         id: bookingId,
         lessonId: body.lessonId,
         studentId: targetUserId,
+        source,
     })
 
-    // Claim credit
-    await db.update(credits)
-        .set({ bookingId, usedAt: now })
-        .where(eq(credits.id, credit.id))
+    if (creditId) {
+        await db.update(credits)
+            .set({ bookingId, usedAt: now })
+            .where(eq(credits.id, creditId))
+    }
 
-    // Count updated bookings
-    const updatedCount = await countLessonBookings(body.lessonId)
+    const regularCountAfter = await countRegularLessonBookings(body.lessonId)
 
     return {
         success: true,
@@ -81,6 +98,7 @@ export default defineEventHandler(async (event) => {
             type: lesson.type,
             teacher: lesson.teacher,
         },
-        spots: MAX_LESSON_CAPACITY - updatedCount,
+        source,
+        spots: MAX_LESSON_CAPACITY - regularCountAfter,
     }
 })

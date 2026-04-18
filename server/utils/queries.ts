@@ -46,6 +46,18 @@ export async function countLessonBookings(lessonId: string): Promise<number> {
 }
 
 /**
+ * Count only 'regular' bookings for a lesson — used for capacity checks.
+ * Classpass bookings do not count toward MAX_LESSON_CAPACITY.
+ */
+export async function countRegularLessonBookings(lessonId: string): Promise<number> {
+  const result = await db
+    .select({ count: countFn() })
+    .from(bookings)
+    .where(and(eq(bookings.lessonId, lessonId), eq(bookings.source, 'regular')))
+  return result[0]?.count ?? 0
+}
+
+/**
  * Find an available (unused, non-expired) credit for a student, FIFO by expiry.
  */
 export async function findAvailableCredit(studentId: string) {
@@ -117,6 +129,7 @@ export function nestLessonsWithBookings(
     const booking: any = {
       $id: b.id,
       lessons: b.lessonId,
+      source: b.source ?? 'regular',
       isFirstTime: b.isFirstTime ?? false,
       students: includeStudents && b.studentName
         ? { $id: b.studentId, name: b.studentName, email: b.studentEmail, injury: b.studentInjury ?? null, pregnancy: b.studentPregnancy ?? false }

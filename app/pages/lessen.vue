@@ -74,7 +74,8 @@ async function cancel(lesson: any) {
 }
 
 function spotsLeft(lesson: any) {
-  return 9 - (lesson.bookings?.length || 0)
+  const regular = (lesson.bookings || []).filter((b: any) => b.source !== 'classpass').length
+  return 9 - regular
 }
 
 function spotsLabel(lesson: any) {
