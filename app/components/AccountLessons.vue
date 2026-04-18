@@ -676,7 +676,7 @@ async function onConfirmDeleteLesson() {
                                     :text="booking.students.injury"
                                 >
                                     <UIcon
-                                        name="i-heroicons-plus-circle-20-solid"
+                                        name="i-lucide-heart-pulse"
                                         class="w-4 h-4 text-red-500"
                                     />
                                 </UTooltip>
@@ -685,7 +685,7 @@ async function onConfirmDeleteLesson() {
                                     text="Zwanger"
                                 >
                                     <UIcon
-                                        name="i-heroicons-sparkles-20-solid"
+                                        name="i-lucide-baby"
                                         class="w-4 h-4 text-pink-500"
                                     />
                                 </UTooltip>
