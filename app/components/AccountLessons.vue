@@ -144,6 +144,18 @@ async function createNewLesson() {
 
 const { sortStudents, getLessonBookingsWithLabels } = useLessonBookings();
 
+// ⚡ Bolt: Cache lesson booking counts to prevent repetitive filtering in the template and computed arrays
+const lessonCounts = computed(() => {
+    const counts = new Map();
+    for (const l of lessons.value) {
+        const bookings = l.bookings || [];
+        const classpassCount = bookings.filter((b: any) => b.source === "classpass").length;
+        const regularCount = bookings.length - classpassCount;
+        counts.set(l.$id, { regularCount, classpassCount });
+    }
+    return counts;
+});
+
 // ⚡ Bolt: Move expensive O(N log N) sorting and allocations out of the template
 // ⚡ Bolt: Avoid allocating heavy dayjs objects inside filter loops by using native Date time comparison
 // ⚡ Bolt: Consolidate multiple array operations (.filter, .map) into a single .reduce() loop to turn O(k*N) into O(N) and minimize intermediate array allocations.
@@ -164,9 +176,7 @@ const futureLessons = computed(() => {
 
 const computedLessons = computed(() => {
     return lessons.value.map((lesson) => {
-        const regularCount = (lesson.bookings || []).filter(
-            (b: any) => b.source !== "classpass",
-        ).length;
+        const regularCount = lessonCounts.value.get(lesson.$id)?.regularCount || 0;
         const spots = 9 - regularCount;
         const isFull = regularCount >= 9;
         const spotsContext = spots === 1 ? "plek" : "plekken";
@@ -377,26 +387,12 @@ async function onConfirmDeleteLesson() {
                         <div>
                             <span
                                 class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide"
-                                >Boekingen ({{
-                                    (lesson.bookings || []).filter(
-                                        (b: any) => b.source !== "classpass",
-                                    ).length
-                                }}/9<span
-                                    v-if="
-                                        (lesson.bookings || []).some(
-                                            (b: any) =>
-                                                b.source === 'classpass',
-                                        )
-                                    "
+                                >Boekingen ({{ lessonCounts.get(lesson.$id)?.regularCount || 0 }}/9<span
+                                    v-if="(lessonCounts.get(lesson.$id)?.classpassCount || 0) > 0"
                                     class="text-sky-300"
                                 >
                                     +
-                                    {{
-                                        (lesson.bookings || []).filter(
-                                            (b: any) =>
-                                                b.source === "classpass",
-                                        ).length
-                                    }}
+                                    {{ lessonCounts.get(lesson.$id)?.classpassCount }}
                                     Classpass</span
                                 >)</span
                             >
