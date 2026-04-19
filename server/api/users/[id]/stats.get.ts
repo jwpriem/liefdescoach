@@ -15,6 +15,7 @@ export default defineEventHandler(async (event) => {
     }
 
     const revenuePerBooking = parseFloat(config.revenuePerBooking) || 14
+    const CLASSPASS_PRICE = 7.10
 
     const creditPrices: Record<string, number> = {
         'credit_1': 16.00,
@@ -59,6 +60,10 @@ export default defineEventHandler(async (event) => {
 
     let totalRevenue = 0
     bookingRows.forEach(booking => {
+        if (booking.source === 'classpass') {
+            totalRevenue += CLASSPASS_PRICE
+            return
+        }
         const usedCredit = bookingCreditMap.get(booking.id)
         if (usedCredit) {
             totalRevenue += creditPrices[usedCredit.type] || 0
