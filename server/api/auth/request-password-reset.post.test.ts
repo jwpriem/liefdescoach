@@ -83,4 +83,35 @@ describe('POST /api/auth/request-password-reset', () => {
     expect(smtpTransport.sendMail).toHaveBeenCalledOnce()
     expect(generateSignedToken).toHaveBeenCalled()
   })
+
+  it('rate limits by email to prevent spam without throwing error', async () => {
+    vi.mocked(readBody).mockResolvedValue({ email: 'spam@test.com' })
+    mockDb.limit.mockResolvedValue([{ id: 'u2', email: 'spam@test.com' }])
+
+    let waitUntilPromise: Promise<void> | null = null;
+    const mockEvent1 = {
+      node: { req: { headers: {} } },
+      waitUntil: vi.fn((p) => { waitUntilPromise = p }),
+    } as any;
+
+    const mockEvent2 = {
+      node: { req: { headers: {} } },
+      waitUntil: vi.fn(),
+    } as any;
+
+    // First request should trigger email
+    await handle(mockEvent1)
+    if (waitUntilPromise) {
+      await waitUntilPromise;
+    }
+
+    expect(smtpTransport.sendMail).toHaveBeenCalledOnce()
+
+    // Second request within a minute should NOT trigger email, but still return success
+    const result2 = await handle(mockEvent2)
+    expect(result2).toEqual({ success: true })
+
+    // sendMail should still have been called only once
+    expect(smtpTransport.sendMail).toHaveBeenCalledOnce()
+  })
 })
