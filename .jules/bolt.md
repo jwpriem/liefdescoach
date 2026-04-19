@@ -24,3 +24,6 @@
 ## 2025-02-28 - Map Construction from Arrays
 **Learning:** Passing a chained `.filter().map()` expression directly into the `new Map()` constructor (e.g. `new Map(arr.filter(c).map(t))`) iterates the array multiple times and creates unnecessary intermediate array allocations before the Map is even built.
 **Action:** Instantiate an empty Map and populate it using a single `for...of` loop to prevent intermediate allocations and turn O(k*N) operations into O(N).
+## 2026-04-19 - Vue Template Render Loop Anti-Pattern
+**Learning:** Avoid calling functions that sort arrays or allocate new objects (like `getLessonBookingsWithLabels(lesson.bookings)` or filtering arrays) directly inside Vue `v-for` directives in templates. This forces Vue to re-execute expensive operations and create new references on every single patch/render cycle, destroying performance.
+**Action:** Move expensive data transformations out of the template and into `computed` properties (e.g., caching metrics inside a Map to maintain reference stability and prevent redundant recalculations).

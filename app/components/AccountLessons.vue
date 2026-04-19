@@ -139,26 +139,44 @@ async function createNewLesson() {
 
 const { sortStudents, getLessonBookingsWithLabels } = useLessonBookings();
 
+// ⚡ Bolt: Prevent array recreation to preserve reactivity, move expensive transforms to a metric map.
 const futureLessons = computed(() => {
     const nowTime = Date.now();
-    return lessons.value.reduce((acc: any[], l) => {
-        if (new Date(l.date).getTime() > nowTime) {
-            acc.push({
-                ...l,
-                processedBookings: getLessonBookingsWithLabels(
-                    l.bookings || [],
-                ),
-            });
+    return lessons.value.filter((l: any) => new Date(l.date).getTime() > nowTime);
+});
+
+// ⚡ Bolt: Cache derived metrics to avoid O(N) array filtering in the template on every render
+const lessonMetrics = computed(() => {
+    const map = new Map();
+    for (const lesson of lessons.value) {
+        let regularCount = 0;
+        let classpassCount = 0;
+        let hasClasspass = false;
+
+        const bookings = lesson.bookings || [];
+        for (const b of bookings) {
+            if (b.source === 'classpass') {
+                classpassCount++;
+                hasClasspass = true;
+            } else {
+                regularCount++;
+            }
         }
-        return acc;
-    }, []);
+
+        map.set(lesson.$id, {
+            regularCount,
+            classpassCount,
+            hasClasspass,
+            processedBookings: getLessonBookingsWithLabels(bookings)
+        });
+    }
+    return map;
 });
 
 const computedLessons = computed(() => {
     return lessons.value.map((lesson) => {
-        const regularCount = (lesson.bookings || []).filter(
-            (b: any) => b.source !== "classpass",
-        ).length;
+        const metrics = lessonMetrics.value.get(lesson.$id);
+        const regularCount = metrics ? metrics.regularCount : 0;
         const spots = 9 - regularCount;
         const isFull = regularCount >= 9;
         const spotsContext = spots === 1 ? "plek" : "plekken";
@@ -318,31 +336,21 @@ async function onConfirmDeleteLesson() {
                             <span
                                 class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide"
                                 >Boekingen ({{
-                                    (lesson.bookings || []).filter(
-                                        (b: any) => b.source !== "classpass",
-                                    ).length
+                                    lessonMetrics.get(lesson.$id)?.regularCount || 0
                                 }}/9<span
-                                    v-if="
-                                        (lesson.bookings || []).some(
-                                            (b: any) =>
-                                                b.source === 'classpass',
-                                        )
-                                    "
+                                    v-if="lessonMetrics.get(lesson.$id)?.hasClasspass"
                                     class="text-sky-300"
                                 >
                                     +
                                     {{
-                                        (lesson.bookings || []).filter(
-                                            (b: any) =>
-                                                b.source === "classpass",
-                                        ).length
+                                        lessonMetrics.get(lesson.$id)?.classpassCount || 0
                                     }}
                                     Classpass</span
                                 >)</span
                             >
                             <div class="mt-1">
                                 <span
-                                    v-for="booking in lesson.processedBookings"
+                                    v-for="booking in (lessonMetrics.get(lesson.$id)?.processedBookings || [])"
                                     :key="booking.$id"
                                     class="flex items-center gap-1 text-base text-gray-300"
                                 >
