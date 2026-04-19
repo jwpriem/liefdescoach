@@ -19,8 +19,10 @@ const state = reactive({
   onlyFutureLessons: false,
   bookForUser: false,
   injuryPopup: null as { name: string; injury: string } | null,
-  addBookingUser: null,
-  addBookingLesson: null,
+  addBookingUser: null as any,
+  addBookingLesson: null as any,
+  addBookingType: 'regular' as 'regular' | 'classpass',
+  showNewStudentForm: false,
   createLesson: false,
   createLessonDate: new Date(),
   createLessonHours: '09',
@@ -60,6 +62,8 @@ const state = reactive({
 function cancel() {
   state.addBookingUser = null
   state.addBookingLesson = null
+  state.addBookingType = 'regular'
+  state.showNewStudentForm = false
   state.bookForUser = false
 }
 
@@ -72,17 +76,42 @@ function cancelLesson() {
 
 const isBooking = ref(false)
 async function book() {
+  if (!state.addBookingLesson || !state.addBookingUser) return
   isBooking.value = true
   try {
-    if (state.addBookingUser) setOnBehalfOf(state.addBookingUser)
-    await handleBooking(state.addBookingLesson, { extraSpot: true })
-    state.addBookingUser = null
-    state.addBookingLesson = null
-    state.bookForUser = false
+    setOnBehalfOf(state.addBookingUser)
+    await handleBooking(state.addBookingLesson, {
+      extraSpot: true,
+      source: state.addBookingType,
+    })
+    cancel()
   } finally {
     isBooking.value = false
   }
 }
+
+async function onNewStudentCreated(student: any) {
+  state.showNewStudentForm = false
+  await refreshUsers()
+  state.addBookingUser = student
+}
+
+const NEW_STUDENT_SENTINEL = { $id: '__new__', name: '+ Nieuwe deelnemer toevoegen' }
+
+function onUserSelect(option: any) {
+  if (option?.$id === '__new__') {
+    state.showNewStudentForm = true
+    state.addBookingUser = null
+  } else {
+    state.showNewStudentForm = false
+    state.addBookingUser = option
+  }
+}
+
+const bookingTypeOptions = [
+  { label: 'Regulier', value: 'regular' },
+  { label: 'Classpass', value: 'classpass' },
+]
 
 const isCreatingLesson = ref(false)
 async function createNewLesson() {
@@ -129,23 +158,27 @@ const computedLessons = computed(() => {
     const spotsContext = spots === 1 ? 'plek' : 'plekken'
     const spotsText = isFull ? ' (Vol)' : ` (Nog ${spots} ${spotsContext})`
 
+    // Classpass bookings ignore capacity, so full lessons stay selectable for them.
+    const disabled = state.addBookingType === 'regular' && isFull
+
     return {
       label: $rav.formatDateInDutch(lesson.date) + spotsText,
       value: lesson,
-      disabled: isFull,
+      disabled,
     }
   })
 })
 
 const computedStudents = computed(() => {
-  return students.value.map(student => {
-    const isDisabled = false
-    return {
-      label: student.name,
-      value: student,
-      disabled: isDisabled,
-    }
-  })
+  const base = students.value.map(student => ({
+    label: student.name,
+    value: student,
+    disabled: false,
+  }))
+  if (state.addBookingType === 'classpass') {
+    return [{ label: NEW_STUDENT_SENTINEL.name, value: NEW_STUDENT_SENTINEL, disabled: false }, ...base]
+  }
+  return base
 })
 
 const managedLesson = ref<any>(null)
@@ -155,60 +188,12 @@ const processedManagedBookings = computed(() =>
   managedLesson.value ? getLessonBookingsWithLabels(managedLesson.value.bookings || []) : []
 )
 
-const classpassBookingUser = ref<any>(null)
-const showNewStudentForm = ref(false)
-const isBookingClasspass = ref(false)
-const NEW_STUDENT_SENTINEL = { $id: '__new__', name: '+ Nieuwe deelnemer toevoegen' }
-
-const classpassStudentOptions = computed(() => {
-  const existing = students.value.map((s: any) => ({ label: s.name, value: s }))
-  return [{ label: NEW_STUDENT_SENTINEL.name, value: NEW_STUDENT_SENTINEL }, ...existing]
-})
-
-function onClasspassStudentSelect(option: any) {
-  if (option?.$id === '__new__') {
-    showNewStudentForm.value = true
-    classpassBookingUser.value = null
-  } else {
-    showNewStudentForm.value = false
-    classpassBookingUser.value = option
-  }
-}
-
-async function onNewStudentCreated(student: any) {
-  showNewStudentForm.value = false
-  await refreshUsers()
-  classpassBookingUser.value = student
-}
-
-function resetClasspassState() {
-  classpassBookingUser.value = null
-  showNewStudentForm.value = false
-}
-
-async function addClasspassBooking() {
-  if (!managedLesson.value || !classpassBookingUser.value) return
-  isBookingClasspass.value = true
-  try {
-    setOnBehalfOf(classpassBookingUser.value)
-    await handleBooking(managedLesson.value, { source: 'classpass', extraSpot: true })
-    resetClasspassState()
-    await refreshLessons()
-    const updated = lessons.value.find((l: any) => l.$id === managedLesson.value.$id)
-    if (updated) managedLesson.value = updated
-  } finally {
-    isBookingClasspass.value = false
-  }
-}
-
 function openManage(lesson: any) {
   managedLesson.value = lesson
-  resetClasspassState()
 }
 
 function closeManage() {
   managedLesson.value = null
-  resetClasspassState()
 }
 
 const confirmRemoveBooking = ref(false)
@@ -328,6 +313,25 @@ async function onConfirmDeleteLesson() {
           <h2 class="text-2xl font-bold text-emerald-100 tracking-tight">Voeg boeking toe</h2>
 
           <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">Type boeking</label>
+            <div class="flex flex-col sm:flex-row gap-2">
+              <label v-for="opt in bookingTypeOptions" :key="opt.value"
+                class="flex-1 flex items-center gap-x-2 rounded-xl border px-4 py-2.5 cursor-pointer transition-colors"
+                :class="state.addBookingType === opt.value
+                  ? 'border-emerald-500/60 bg-emerald-500/10 text-emerald-100'
+                  : 'border-gray-800/60 bg-gray-900/40 text-gray-300 hover:border-gray-700'">
+                <input type="radio" :value="opt.value" v-model="state.addBookingType"
+                  class="accent-emerald-500"
+                  @change="state.addBookingUser = null; state.showNewStudentForm = false" />
+                <span class="text-sm font-medium">{{ opt.label }}</span>
+              </label>
+            </div>
+            <p v-if="state.addBookingType === 'classpass'" class="text-xs text-gray-500 mt-2">
+              Classpass boekingen verbruiken geen credits en tellen niet mee voor de maximale capaciteit.
+            </p>
+          </div>
+
+          <div>
             <label class="block text-sm font-medium text-gray-300 mb-1.5">Les</label>
             <USelectMenu icon="i-lucide-graduation-cap" size="lg" color="primary" variant="outline"
               v-model="state.addBookingLesson" :items="computedLessons" class="w-full" value-key="value"
@@ -336,16 +340,18 @@ async function onConfirmDeleteLesson() {
 
           <div v-if="state.addBookingLesson">
             <label class="block text-sm font-medium text-gray-300 mb-1.5">Gebruiker</label>
-            <USelectMenu icon="i-lucide-user" size="lg" color="primary" variant="outline" v-model="state.addBookingUser"
-              :items="computedStudents" class="w-full" value-key="value"
-              :search-input="{ placeholder: 'Zoek gebruiker...' }" />
+            <USelectMenu v-if="!state.showNewStudentForm" :model-value="state.addBookingUser" icon="i-lucide-user"
+              size="lg" color="primary" variant="outline" :items="computedStudents" class="w-full" value-key="value"
+              :search-input="{ placeholder: 'Zoek gebruiker...' }" @update:model-value="onUserSelect" />
+            <NewStudentForm v-else submit-label="Deelnemer aanmaken" @created="onNewStudentCreated"
+              @cancel="state.showNewStudentForm = false" />
           </div>
 
-          <div class="flex gap-3 mt-2">
-            <UTooltip :text="(!state.addBookingUser && !state.addBookingLesson) ? 'Selecteer eerst een les en gebruiker' : 'Voeg boeking toe'">
+          <div v-if="!state.showNewStudentForm" class="flex gap-3 mt-2">
+            <UTooltip :text="(!state.addBookingUser || !state.addBookingLesson) ? 'Selecteer eerst een les en gebruiker' : 'Voeg boeking toe'">
               <div>
                 <UButton :loading="isBooking" color="primary" variant="solid" size="lg" @click="book()"
-                  :disabled="!state.addBookingUser && !state.addBookingLesson">Voeg toe</UButton>
+                  :disabled="!state.addBookingUser || !state.addBookingLesson">Voeg toe</UButton>
               </div>
             </UTooltip>
             <UButton color="primary" variant="outline" size="lg" @click="cancel()">Annuleer</UButton>
@@ -389,25 +395,6 @@ async function onConfirmDeleteLesson() {
             </div>
           </div>
           <p v-else class="text-sm text-gray-500">Geen deelnemers.</p>
-        </div>
-
-        <div class="border-t border-gray-800/50 pt-6 mb-6">
-          <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Classpass deelnemer toevoegen</h3>
-          <p class="text-xs text-gray-500 mb-3">Classpass deelnemers tellen niet mee voor de maximale capaciteit.</p>
-          <div v-if="!showNewStudentForm" class="flex flex-col gap-y-3">
-            <USelectMenu :model-value="classpassBookingUser" icon="i-lucide-user" size="lg" color="primary"
-              variant="outline" :items="classpassStudentOptions" class="w-full" value-key="value"
-              :search-input="{ placeholder: 'Zoek deelnemer...' }"
-              @update:model-value="onClasspassStudentSelect" />
-            <div class="flex gap-3">
-              <UButton :loading="isBookingClasspass" :disabled="!classpassBookingUser" color="info" variant="solid"
-                size="md" icon="i-lucide-plus" @click="addClasspassBooking">
-                Classpass boeking toevoegen
-              </UButton>
-            </div>
-          </div>
-          <NewStudentForm v-else submit-label="Deelnemer aanmaken" @created="onNewStudentCreated"
-            @cancel="showNewStudentForm = false" />
         </div>
 
         <div class="border-t border-gray-800/50 pt-6">
