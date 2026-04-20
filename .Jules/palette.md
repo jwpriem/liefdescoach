@@ -42,3 +42,6 @@
 ## 2025-04-12 - Wrapping disabled buttons with tooltips
 **Learning:** I noticed that several disabled buttons in the login and password reset pages did not have any tooltips explaining why they were disabled (e.g., waiting for input). This leaves users confused about what is required to proceed.
 **Action:** Wrapped these disabled buttons with `<UTooltip>` elements and explicitly wrapped the `<UButton>` in a structural `<div>` so the surrounding `<UTooltip>` can catch pointer events and display the context for the disabled state to the user.
+## 2026-04-20 - Adding Tooltips to disabled Nuxt UI buttons
+**Learning:** Found disabled `<UButton>` in `NewStudentForm.vue` that blocked form submission without explaining what fields were missing. By wrapping disabled buttons in a structural `<div>`, we can allow wrapper components like `<UTooltip>` to catch hover states and provide context to users on why an action is blocked.
+**Action:** When a button action is blocked due to missing input, always provide clear context using a `<UTooltip>` explaining what action needs to be completed, and remember to wrap disabled `<UButton>`s in a structural `<div>` since disabled elements don't trigger pointer events.
