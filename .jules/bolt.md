@@ -27,3 +27,6 @@
 ## 2026-04-19 - Vue Template Render Loop Anti-Pattern
 **Learning:** Avoid calling functions that sort arrays or allocate new objects (like `getLessonBookingsWithLabels(lesson.bookings)` or filtering arrays) directly inside Vue `v-for` directives in templates. This forces Vue to re-execute expensive operations and create new references on every single patch/render cycle, destroying performance.
 **Action:** Move expensive data transformations out of the template and into `computed` properties (e.g., caching metrics inside a Map to maintain reference stability and prevent redundant recalculations).
+## 2024-05-19 - Vue Template Render Loop Anti-Pattern
+**Learning:** Avoid executing O(N) array filtering (e.g. `.filter()`) and computing strings within method calls (like `spotsLeft(lesson)`) that are invoked multiple times inside a Vue template `v-for` loop. This forces Vue to re-execute expensive iterations and allocations on every patch/render cycle for every item in the list, destroying frontend performance.
+**Action:** Extract these calculations out of the template and into a memoized `computed` property (e.g., `lessonMetrics`), utilizing an O(1) `Map` keyed by the item ID to efficiently cache and look up the derived metrics directly in the template.

@@ -49,6 +49,33 @@ function checkBooking(id: string) {
   return bookingByLessonId.value.has(id)
 }
 
+// ⚡ Bolt: Cache derived metrics to avoid O(N) array filtering in the template on every render
+const lessonMetrics = computed(() => {
+  const map = new Map<string, { left: number, label: string, badgeClass: string }>()
+  if (!lessons.value?.rows) return map
+
+  for (const lesson of lessons.value.rows) {
+    let regularCount = 0
+    if (lesson.bookings) {
+      for (const b of lesson.bookings) {
+        if (b.source !== 'classpass') {
+          regularCount++
+        }
+      }
+    }
+    const left = 9 - regularCount
+    const label = left === 1 ? '1 plek' : `${left} plekken`
+
+    let badgeClass = ''
+    if (left === 0) badgeClass = 'bg-red-900/50 text-red-300'
+    else if (left <= 3) badgeClass = 'bg-orange-900/50 text-orange-300'
+    else badgeClass = 'bg-emerald-900/50 text-emerald-400'
+
+    map.set(lesson.$id, { left, label, badgeClass })
+  }
+  return map
+})
+
 const isCancelingId = ref<string | null>(null)
 
 async function cancel(lesson: any) {
@@ -73,22 +100,7 @@ async function cancel(lesson: any) {
   }
 }
 
-function spotsLeft(lesson: any) {
-  const regular = (lesson.bookings || []).filter((b: any) => b.source !== 'classpass').length
-  return 9 - regular
-}
 
-function spotsLabel(lesson: any) {
-  const n = spotsLeft(lesson)
-  return n === 1 ? '1 plek' : `${n} plekken`
-}
-
-function spotsBadgeClass(lesson: any) {
-  const n = spotsLeft(lesson)
-  if (n === 0) return 'bg-red-900/50 text-red-300'
-  if (n <= 3) return 'bg-orange-900/50 text-orange-300'
-  return 'bg-emerald-900/50 text-emerald-400'
-}
 
 async function book(lesson: any) {
   if (!loggedInUser.value) return
@@ -151,16 +163,16 @@ async function book(lesson: any) {
                 </div>
               </div>
               <!-- Spots badge -->
-              <span :class="spotsBadgeClass(lesson)"
+              <span :class="lessonMetrics.get(lesson.$id)?.badgeClass"
                 class="text-xs font-semibold px-2.5 py-1 rounded-full shrink-0 whitespace-nowrap">
-                {{ spotsLabel(lesson) }}
+                {{ lessonMetrics.get(lesson.$id)?.label }}
               </span>
             </div>
 
             <!-- Action row -->
             <div>
               <!-- Logged in, not booked, spots available -->
-              <UTooltip v-if="loggedInUser && !checkBooking(lesson.$id) && spotsLeft(lesson) > 0"
+              <UTooltip v-if="loggedInUser && !checkBooking(lesson.$id) && (lessonMetrics.get(lesson.$id)?.left ?? 0) > 0"
                 :text="availableCredits < 1 ? 'Onvoldoende credits' : 'Boek deze les'" class="block w-full">
                 <div class="w-full">
                   <UButton block :disabled="availableCredits < 1" color="primary" variant="solid"
@@ -188,7 +200,7 @@ async function book(lesson: any) {
                 </UTooltip>
               </div>
               <!-- Logged in, not booked, lesson full -->
-              <div v-else-if="loggedInUser && spotsLeft(lesson) === 0"
+              <div v-else-if="loggedInUser && (lessonMetrics.get(lesson.$id)?.left ?? 0) === 0"
                 class="flex items-center justify-center gap-2 py-2 rounded-xl bg-white/5 text-white/40 font-medium text-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                   stroke="currentColor" class="w-5 h-5 shrink-0">
