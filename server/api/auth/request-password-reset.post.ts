@@ -4,16 +4,28 @@ import { students } from '../../database/schema'
 
 const MAX_IP_REQUESTS = 5;
 const REQUEST_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+const EMAIL_COOLDOWN_MS = 60 * 1000; // 1 minute
 
 const resetRequestsByIP = new Map<string, { count: number; firstRequest: number }>();
+const resetRequestsByEmail = new Map<string, number>();
 let lastCleanup = 0;
 
 function lazyCleanup(now: number) {
-    if (resetRequestsByIP.size > 1000 && now - lastCleanup > 60000) {
+    if (now - lastCleanup < 60000) return;
+
+    if (resetRequestsByIP.size > 1000) {
         lastCleanup = now;
         for (const [key, data] of resetRequestsByIP.entries()) {
             if (now - data.firstRequest > REQUEST_WINDOW_MS) {
                 resetRequestsByIP.delete(key);
+            }
+        }
+    }
+    if (resetRequestsByEmail.size > 1000) {
+        lastCleanup = now;
+        for (const [key, timestamp] of resetRequestsByEmail.entries()) {
+            if (now - timestamp > EMAIL_COOLDOWN_MS) {
+                resetRequestsByEmail.delete(key);
             }
         }
     }
@@ -53,6 +65,13 @@ export default defineEventHandler(async (event) => {
     } else {
         resetRequestsByIP.set(ip, { count: 1, firstRequest: now });
     }
+
+    const lastEmailRequest = resetRequestsByEmail.get(email);
+    if (lastEmailRequest && now - lastEmailRequest < EMAIL_COOLDOWN_MS) {
+        // Silently return success to prevent email enumeration and spam
+        return { success: true };
+    }
+    resetRequestsByEmail.set(email, now);
 
     // Look up student — if not found, return success anyway (no email enumeration)
     const rows = await db
