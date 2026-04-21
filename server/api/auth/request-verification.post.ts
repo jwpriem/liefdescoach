@@ -53,13 +53,19 @@ export default defineEventHandler(async (event) => {
     const verifyUrl = `${getHeader(event, 'origin')}/verify-email?token=${token}`
     const email = verificationEmail(verifyUrl)
 
-    await smtpTransport.sendMail({
-        from: 'Yoga Ravennah <info@ravennah.com>',
-        to: user.email,
-        subject: email.subject,
-        html: email.html,
-        text: email.text
-    })
+    event.waitUntil(Promise.resolve().then(async () => {
+        try {
+            await smtpTransport.sendMail({
+                from: 'Yoga Ravennah <info@ravennah.com>',
+                to: user.email,
+                subject: email.subject,
+                html: email.html,
+                text: email.text
+            })
+        } catch (error) {
+            console.error('Error sending verification email:', error)
+        }
+    }))
 
     return { success: true }
 })
