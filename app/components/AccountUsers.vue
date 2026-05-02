@@ -33,6 +33,7 @@ const creditTypes = [
 // Using a reactive object to group related states
 const state = reactive({
 	editMode: false,
+	deleteMode: false,
 	selectedCreditType: 'credit_1' as string,
 	user: null as any | null,
 	showArchived: false,
@@ -61,6 +62,33 @@ function cancel(): void {
 	state.user = null;
 	state.selectedCreditType = 'credit_1';
 	state.editMode = false;
+	state.deleteMode = false;
+}
+
+function confirmDeleteCredit(selectedUser: any): void {
+	state.user = selectedUser;
+	state.deleteMode = true;
+}
+
+async function deleteCredit(userId: string): Promise<void> {
+	try {
+		await $fetch('/api/credits/delete', { method: 'POST', body: { studentId: userId } })
+		await refreshCreditSummary()
+		toast.add({
+			title: 'Credit verwijderd',
+			icon: 'i-lucide-badge-check',
+			color: 'success',
+			description: `1 credit verwijderd van ${state.user?.name}.`
+		})
+		cancel()
+	} catch (error: any) {
+		toast.add({
+			title: 'Verwijderen mislukt',
+			icon: 'i-lucide-x-circle',
+			color: 'error',
+			description: error?.data?.statusMessage ?? 'Er ging iets mis bij het verwijderen van het credit.'
+		})
+	}
 }
 
 async function addCredits(userId: string, type: string): Promise<void> {
@@ -251,13 +279,21 @@ const filteredRows = computed(() => {
 						<div>{{ $rav.formatDateInDutch(row.registration) }}</div>
 					</div>
 				</div>
-				<div class="grid grid-cols-4 gap-2 border-t border-gray-800/50 pt-3 mt-3">
+				<div class="grid grid-cols-5 gap-2 border-t border-gray-800/50 pt-3 mt-3">
 					<UButton aria-label="Bekijk details" block color="primary" icon="i-lucide-eye" variant="soft" size="lg"
 						class="justify-center text-emerald-100 bg-emerald-500/10 hover:bg-emerald-500/20"
 						@click="navigateTo(`/admin/users/${row.$id}`)" />
 					<UButton aria-label="Voeg credits toe" block color="primary" icon="i-lucide-plus" variant="soft" size="lg"
 						class="justify-center text-emerald-100 bg-emerald-500/10 hover:bg-emerald-500/20"
 						@click="setUser(row)" />
+					<UTooltip :text="getAvailableCredits(row.$id) > 0 ? 'Verwijder 1 credit' : 'Geen credits beschikbaar'">
+						<div class="w-full">
+							<UButton aria-label="Verwijder 1 credit" block color="error" icon="i-lucide-minus" variant="soft" size="lg"
+								:disabled="getAvailableCredits(row.$id) === 0"
+								class="justify-center text-red-300 bg-red-500/10 hover:bg-red-500/20 disabled:opacity-30 disabled:cursor-not-allowed w-full"
+								@click="confirmDeleteCredit(row)" />
+						</div>
+					</UTooltip>
 					<UButton aria-label="Archiveer" block color="primary" icon="i-lucide-archive" variant="soft" size="lg"
 						class="justify-center text-emerald-100 bg-emerald-500/10 hover:bg-emerald-500/20"
 						@click="archiveUser(row.$id)" />
@@ -312,6 +348,14 @@ const filteredRows = computed(() => {
 							<UButton aria-label="Voeg credits toe" icon="i-lucide-plus" variant="ghost" size="sm" class="text-emerald-100"
 								@click="setUser(row.original)" />
 						</UTooltip>
+						<UTooltip :text="getAvailableCredits(row.original.$id) > 0 ? 'Verwijder 1 credit' : 'Geen credits beschikbaar'">
+							<div>
+								<UButton aria-label="Verwijder 1 credit" icon="i-lucide-minus" variant="ghost" size="sm"
+									:disabled="getAvailableCredits(row.original.$id) === 0"
+									class="text-red-400 hover:text-red-300 disabled:opacity-30 disabled:cursor-not-allowed"
+									@click="confirmDeleteCredit(row.original)" />
+							</div>
+						</UTooltip>
 						<UTooltip text="Archiveer">
 							<UButton aria-label="Archiveer" icon="i-lucide-archive" variant="ghost" size="sm" class="text-emerald-100"
 								@click="archiveUser(row.original.$id)" />
@@ -336,6 +380,25 @@ const filteredRows = computed(() => {
 			<h2 class="text-2xl font-bold text-emerald-100 tracking-tight mb-5">Nieuwe gebruiker</h2>
 			<p class="text-sm text-gray-400 mb-5">Alleen naam is verplicht. Zonder e-mailadres kan de gebruiker niet zelf inloggen; gebruik dit bijvoorbeeld voor Classpass deelnemers.</p>
 			<NewStudentForm submit-label="Gebruiker aanmaken" @created="onStudentCreated" @cancel="state.addUser = false" />
+		</div>
+	</div>
+
+	<!-- Modal: Delete credit -->
+	<div v-if="state.deleteMode" class="fixed inset-0 bg-black/75 flex justify-center items-center z-50 p-4"
+		@click.self="cancel()">
+		<div
+			class="w-full max-w-md rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-2xl shadow-emerald-950/20 p-8 sm:p-10">
+			<div class="w-full flex flex-col gap-y-5">
+				<h2 class="text-2xl font-bold text-red-300 tracking-tight">Verwijder credit</h2>
+				<p class="text-gray-300">Weet je zeker dat je <strong class="text-gray-100">1 credit</strong> wilt verwijderen van <strong class="text-gray-100">{{ state.user?.name }}</strong>? <span class="text-gray-400">(huidig saldo: {{ getAvailableCredits(state.user?.$id) }})</span></p>
+				<p class="text-sm text-gray-500">Alleen een ongebruikt credit wordt verwijderd.</p>
+				<div class="flex gap-3 mt-2">
+					<UButton color="error" variant="solid" size="lg" @click="deleteCredit(state.user.$id)">
+						Verwijder credit
+					</UButton>
+					<UButton color="primary" variant="outline" size="lg" @click="cancel()">Annuleer</UButton>
+				</div>
+			</div>
 		</div>
 	</div>
 
