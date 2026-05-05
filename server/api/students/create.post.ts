@@ -9,26 +9,10 @@ import { students } from '../../database/schema'
 export default defineEventHandler(async (event) => {
     const body = await readBody(event)
 
-    let userId: string
-    let userEmail: string
-    let userName: string
-
-    // Try to get user from session (normal flow)
-    try {
-        const authUser = await requireAuth(event)
-        userId = authUser.$id
-        userEmail = authUser.email
-        userName = authUser.name
-    } catch {
-        // For registration flow, trust the client-provided data
-        if (body?.userId && body?.email && body?.name) {
-            userId = body.userId
-            userEmail = body.email
-            userName = body.name
-        } else {
-            throw createError({ statusCode: 401, statusMessage: 'Niet ingelogd' })
-        }
-    }
+    const authUser = await requireAuth(event)
+    const userId = authUser.$id
+    const userEmail = authUser.email
+    const userName = authUser.name
 
     // Check if student already exists
     const existing = await db

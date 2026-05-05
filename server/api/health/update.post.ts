@@ -25,6 +25,11 @@ export default defineEventHandler(async (event) => {
         .limit(1)
 
     if (studentRows.length === 0) {
+        // Self-healing: only create the record if the user is updating their own profile
+        if (body.userId !== authUser.$id) {
+            throw createError({ statusCode: 404, statusMessage: 'Gebruiker niet gevonden' })
+        }
+
         await db.insert(students).values({
             id: body.userId,
             email: authUser.email,
