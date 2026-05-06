@@ -33,3 +33,7 @@
 ## 2025-05-14 - Redundant Date Allocations and Year-based Caching
 **Learning:** Drizzle ORM returns timestamp columns as native JavaScript Date objects. Re-wrapping them in `new Date()` inside large loops (e.g., revenue processing) causes unnecessary heap allocations. Additionally, calculating week numbers from scratch for thousands of rows using `new Date(year, 0, 1)` can be optimized by caching start-of-year metadata.
 **Action:** Always check column types in the schema before converting dates and use a low-cardinality cache (like an object keyed by year) for static date metadata in processing loops.
+
+## 2024-05-19 - Paginated List Processing
+**Learning:** When optimizing list rendering in Vue, avoid mapping over the entire collection ($O(N)$) if the UI is paginated. Processing the entire archive can cause performance regressions as the data grows.
+**Action:** Slice the collection first, then map over the current page's slice ($O(M)$ where $M$ is page size) to pre-calculate formatted strings and transformations, ensuring constant time performance regardless of total collection size.

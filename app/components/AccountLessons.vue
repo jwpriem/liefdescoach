@@ -385,22 +385,26 @@ async function onConfirmDeleteLesson() {
                                         size="xs"
                                         >Classpass</UBadge
                                     >
-                                    <button
+                                    <UTooltip
                                         v-if="booking.students.injury"
-                                        aria-label="Bekijk blessure details"
-                                        class="flex items-center justify-center flex-shrink-0 hover:text-red-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 rounded p-0.5"
-                                        @click="
-                                            state.injuryPopup = {
-                                                name: booking.students.name,
-                                                injury: booking.students.injury,
-                                            }
-                                        "
+                                        text="Bekijk blessure details"
                                     >
-                                        <UIcon
-                                            name="i-lucide-heart-pulse"
-                                            class="w-4 h-4 text-red-500 block"
-                                        />
-                                    </button>
+                                        <button
+                                            aria-label="Bekijk blessure details"
+                                            class="flex items-center justify-center flex-shrink-0 hover:text-red-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 rounded p-0.5"
+                                            @click="
+                                                state.injuryPopup = {
+                                                    name: booking.students.name,
+                                                    injury: booking.students.injury,
+                                                }
+                                            "
+                                        >
+                                            <UIcon
+                                                name="i-lucide-heart-pulse"
+                                                class="w-4 h-4 text-red-500 block"
+                                            />
+                                        </button>
+                                    </UTooltip>
                                     <UTooltip
                                         v-if="booking.students.pregnancy"
                                         text="Zwanger"

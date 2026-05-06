@@ -141,9 +141,15 @@ async function bookExtraSpot(lesson: any) {
             <div>
               <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Zet in je agenda</span>
               <div class="flex gap-3 mt-2">
-                <a :href="$rav.getCalenderLink('apple', bookingGroup.lessons.date, bookingGroup.lessons.type)" class="hover:opacity-80 transition-opacity" aria-label="Voeg toe aan Apple Agenda"><img src="/apple.png" class="w-6" alt="" /></a>
-                <a :href="$rav.getCalenderLink('google', bookingGroup.lessons.date, bookingGroup.lessons.type)" class="hover:opacity-80 transition-opacity" aria-label="Voeg toe aan Google Agenda"><img src="/gmail.png" class="w-6" alt="" /></a>
-                <a :href="$rav.getCalenderLink('outlook', bookingGroup.lessons.date, bookingGroup.lessons.type)" class="hover:opacity-80 transition-opacity" aria-label="Voeg toe aan Outlook Agenda"><img src="/outlook.png" class="w-6" alt="" /></a>
+                <UTooltip text="Apple Agenda">
+                  <a :href="$rav.getCalenderLink('apple', bookingGroup.lessons.date, bookingGroup.lessons.type)" class="hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-lg p-0.5" aria-label="Voeg toe aan Apple Agenda"><img src="/apple.png" class="w-6" alt="" aria-hidden="true" /></a>
+                </UTooltip>
+                <UTooltip text="Google Agenda">
+                  <a :href="$rav.getCalenderLink('google', bookingGroup.lessons.date, bookingGroup.lessons.type)" class="hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-lg p-0.5" aria-label="Voeg toe aan Google Agenda"><img src="/gmail.png" class="w-6" alt="" aria-hidden="true" /></a>
+                </UTooltip>
+                <UTooltip text="Outlook Agenda">
+                  <a :href="$rav.getCalenderLink('outlook', bookingGroup.lessons.date, bookingGroup.lessons.type)" class="hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-lg p-0.5" aria-label="Voeg toe aan Outlook Agenda"><img src="/outlook.png" class="w-6" alt="" aria-hidden="true" /></a>
+                </UTooltip>
               </div>
             </div>
 
