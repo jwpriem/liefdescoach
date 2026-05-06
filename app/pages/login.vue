@@ -10,6 +10,7 @@ const phone = ref('');
 const dateOfBirth = ref('');
 const injury = ref('');
 const registerForm = ref(false);
+const showPassword = ref(false);
 const passwordCheck = ref(false);
 const ready = ref(false)
 
@@ -262,7 +263,8 @@ const passwordStrength = computed(() => {
                 E-mail <span class="text-red-500">*</span>
               </label>
               <UInput id="email" v-model="email" size="lg" color="primary" placeholder="naam@voorbeeld.nl" type="email"
-                variant="outline" autocomplete="email" autocapitalize="none" autocorrect="off" inputmode="email" />
+                variant="outline" autocomplete="email" autocapitalize="none" autocorrect="off" inputmode="email"
+                icon="i-lucide-mail" />
             </div>
 
             <div>
@@ -271,7 +273,19 @@ const passwordStrength = computed(() => {
                 <span v-if="registerForm" class="font-normal text-gray-500">(min. 8 tekens)</span>
               </label>
               <UInput id="password" v-model="password" size="lg" color="primary" placeholder="Je wachtwoord"
-                type="password" variant="outline" autocomplete="current-password" />
+                :type="showPassword ? 'text' : 'password'" variant="outline" autocomplete="current-password"
+                icon="i-lucide-lock">
+                <template #trailing>
+                  <UButton
+                    color="neutral"
+                    variant="ghost"
+                    size="sm"
+                    :icon="showPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+                    :aria-label="showPassword ? 'Wachtwoord verbergen' : 'Wachtwoord tonen'"
+                    @click="showPassword = !showPassword"
+                  />
+                </template>
+              </UInput>
             </div>
 
             <!-- Password strength indicator (register only) -->
@@ -299,7 +313,7 @@ const passwordStrength = computed(() => {
                 Naam <span class="text-red-500">*</span>
               </label>
               <UInput id="name" v-model="name" size="lg" color="primary" placeholder="Je volledige naam"
-                variant="outline" />
+                variant="outline" icon="i-lucide-user" />
             </div>
 
             <!-- Phone field (register only) -->
@@ -308,7 +322,7 @@ const passwordStrength = computed(() => {
                 Telefoonnummer <span class="text-gray-600 font-normal">(optioneel)</span>
               </label>
               <UInput id="phone" v-model="phone" size="lg" color="primary" placeholder="06 12345678"
-                variant="outline" />
+                variant="outline" icon="i-lucide-phone" />
             </div>
 
             <!-- Date of birth field (register only) -->
@@ -316,7 +330,8 @@ const passwordStrength = computed(() => {
               <label for="dateOfBirth" class="block text-sm font-medium text-gray-300 mb-1.5">
                 Geboortedatum <span class="text-gray-600 font-normal">(optioneel)</span>
               </label>
-              <UInput id="dateOfBirth" v-model="dateOfBirth" type="date" size="lg" color="primary" variant="outline" />
+              <UInput id="dateOfBirth" v-model="dateOfBirth" type="date" size="lg" color="primary" variant="outline"
+                icon="i-lucide-calendar" />
             </div>
 
             <!-- Injury/good to know field (register only) -->
@@ -339,7 +354,7 @@ const passwordStrength = computed(() => {
                 </label>
                 <UInput id="otp-email" v-model="email" size="lg" color="primary" placeholder="naam@voorbeeld.nl"
                   type="email" variant="outline" autocomplete="email" autocapitalize="none" autocorrect="off"
-                  inputmode="email" />
+                  inputmode="email" icon="i-lucide-mail" />
               </div>
             </template>
 
@@ -351,7 +366,7 @@ const passwordStrength = computed(() => {
                 </label>
                 <UInput id="otp-code" v-model="otpCode" size="lg" color="primary" placeholder="000000" variant="outline"
                   autocomplete="one-time-code" inputmode="numeric"
-                  class="text-center tracking-[0.3em] text-lg font-semibold" />
+                  class="text-center tracking-[0.3em] text-lg font-semibold" icon="i-lucide-key-round" />
               </div>
             </template>
           </div>
@@ -365,7 +380,7 @@ const passwordStrength = computed(() => {
                 </label>
                 <UInput id="forgot-email" v-model="email" size="lg" color="primary" placeholder="naam@voorbeeld.nl"
                   type="email" variant="outline" autocomplete="email" autocapitalize="none" autocorrect="off"
-                  inputmode="email" />
+                  inputmode="email" icon="i-lucide-mail" />
               </div>
             </template>
             <template v-else>

@@ -65,15 +65,19 @@ export default defineEventHandler(async (event) => {
             throw createError({ statusCode: 400, statusMessage: `Onbekend email type: ${body.type}` })
     }
 
-    smtpTransport.sendMail({
-        from: 'Yoga Ravennah <info@ravennah.com>',
-        to,
-        subject: email.subject,
-        html: email.html,
-        text: email.text,
-    }).catch((err: any) => {
-        console.error(`[mail/send] Failed to send ${body.type} email:`, err?.message ?? err)
-    })
+    event.waitUntil(Promise.resolve().then(async () => {
+        try {
+            await smtpTransport.sendMail({
+                from: 'Yoga Ravennah <info@ravennah.com>',
+                to,
+                subject: email.subject,
+                html: email.html,
+                text: email.text,
+            })
+        } catch (err: any) {
+            console.error(`[mail/send] Failed to send ${body.type} email:`, err?.message ?? err)
+        }
+    }))
 
     return { success: true }
 })

@@ -45,7 +45,11 @@ export default defineEventHandler(async (event) => {
             .returning()
         result = updated[0]
     } else {
-        // Create the student record
+        // Self-healing: only create the record if the user is updating their own profile
+        if (userId !== authUser.$id) {
+            throw createError({ statusCode: 404, statusMessage: 'Gebruiker niet gevonden' })
+        }
+
         const inserted = await db
             .insert(students)
             .values({

@@ -69,9 +69,13 @@ function cancel() {
     </div>
     <p v-if="errorMsg" class="text-sm text-red-400">{{ errorMsg }}</p>
     <div class="flex gap-3 mt-1">
-      <UButton :loading="isSubmitting" :disabled="!canSubmit" color="primary" variant="solid" size="lg" @click="submit">
-        {{ submitLabel }}
-      </UButton>
+      <UTooltip :text="!canSubmit ? 'Vul alle verplichte velden in' : submitLabel">
+        <div>
+          <UButton :loading="isSubmitting" :disabled="!canSubmit" color="primary" variant="solid" size="lg" @click="submit">
+            {{ submitLabel }}
+          </UButton>
+        </div>
+      </UTooltip>
       <UButton color="primary" variant="outline" size="lg" @click="cancel">Annuleer</UButton>
     </div>
   </div>
