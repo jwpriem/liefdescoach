@@ -7,9 +7,9 @@ import { students } from '../../database/schema'
  * Called during registration to create the student record.
  */
 export default defineEventHandler(async (event) => {
+    const authUser = await requireAuth(event)
     const body = await readBody(event)
 
-    const authUser = await requireAuth(event)
     const userId = authUser.$id
     const userEmail = authUser.email
     const userName = authUser.name

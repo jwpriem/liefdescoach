@@ -39,52 +39,52 @@ const logout = async () => {
 				class="transition-transform duration-300 ease-in-out fixed top-0 left-0 bg-gray-950 min-h-screen flex justify-start items-center text-center z-40 w-screen">
 				<ul class="w-full space-y-8">
 					<li>
-						<nuxt-link class="mobile-nav-item" to="/" @click="toggle">
+						<nuxt-link class="mobile-nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded-md px-2" to="/" @click="toggle">
 							Home
 						</nuxt-link>
 					</li>
 					<li>
-						<nuxt-link class="mobile-nav-item" to="/over" @click="toggle">
+						<nuxt-link class="mobile-nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded-md px-2" to="/over" @click="toggle">
 							Over mij
 						</nuxt-link>
 					</li>
 					<li>
-						<nuxt-link class="mobile-nav-item" to="/voordelen" @click="toggle">
+						<nuxt-link class="mobile-nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded-md px-2" to="/voordelen" @click="toggle">
 							Voordelen
 						</nuxt-link>
 					</li>
 					<li>
-						<nuxt-link class="mobile-nav-item" to="/lessen" @click="toggle">
+						<nuxt-link class="mobile-nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded-md px-2" to="/lessen" @click="toggle">
 							Les schema
 						</nuxt-link>
 					</li>
 					<li>
-						<nuxt-link class="mobile-nav-item" to="/priveles" @click="toggle">
+						<nuxt-link class="mobile-nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded-md px-2" to="/priveles" @click="toggle">
 							Priveles
 						</nuxt-link>
 					</li>
 					<li>
-						<nuxt-link class="mobile-nav-item" to="/hatha-yoga" @click="toggle">
+						<nuxt-link class="mobile-nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded-md px-2" to="/hatha-yoga" @click="toggle">
 							Hatha Yoga
 						</nuxt-link>
 					</li>
 					<li>
-						<nuxt-link class="mobile-nav-item" to="/tarieven" @click="toggle">
+						<nuxt-link class="mobile-nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded-md px-2" to="/tarieven" @click="toggle">
 							Tarieven
 						</nuxt-link>
 					</li>
 					<li>
-						<nuxt-link class="mobile-nav-item" to="/contact" @click="toggle">
+						<nuxt-link class="mobile-nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded-md px-2" to="/contact" @click="toggle">
 							Contact
 						</nuxt-link>
 					</li>
 					<li v-if="loggedInUser">
-						<nuxt-link class="mobile-nav-item" to="/account" @click="toggle">
+						<nuxt-link class="mobile-nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded-md px-2" to="/account" @click="toggle">
 							{{ loggedInUser.name }}
 						</nuxt-link>
 					</li>
 					<li v-else>
-						<nuxt-link class="mobile-nav-item" to="/login" @click="toggle">
+						<nuxt-link class="mobile-nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded-md px-2" to="/login" @click="toggle">
 							Login
 						</nuxt-link>
 					</li>
@@ -99,57 +99,57 @@ const logout = async () => {
 		<nav class="hidden md:block w-full p-6 fixed z-50 top-0 left-0 bg-gray-950">
 			<ul class="flex justify-center items-center space-x-10 text-lg text-emerald-100 uppercase font-light">
 				<li>
-					<nuxt-link to="/">
+					<nuxt-link to="/" class="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-md p-1 block">
 						<Yoga color="#d1fae5" />
 					</nuxt-link>
 				</li>
 				<li>
-					<nuxt-link class="nav-item" to="/">
+					<nuxt-link class="nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-md px-1" to="/">
 						Home
 					</nuxt-link>
 				</li>
 				<li>
-					<nuxt-link class="nav-item" to="/over">
+					<nuxt-link class="nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-md px-1" to="/over">
 						Over mij
 					</nuxt-link>
 				</li>
 				<li>
-					<nuxt-link class="nav-item" to="/lessen">
+					<nuxt-link class="nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-md px-1" to="/lessen">
 						Les schema
 					</nuxt-link>
 				</li>
 				<li>
-					<nuxt-link class="nav-item" to="/priveles">
+					<nuxt-link class="nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-md px-1" to="/priveles">
 						Priveles
 					</nuxt-link>
 				</li>
 				<li>
-					<nuxt-link class="nav-item" to="/hatha-yoga">
+					<nuxt-link class="nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-md px-1" to="/hatha-yoga">
 						Hatha Yoga
 					</nuxt-link>
 				</li>
 				<li>
-					<nuxt-link class="nav-item" to="/tarieven">
+					<nuxt-link class="nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-md px-1" to="/tarieven">
 						Tarieven
 					</nuxt-link>
 				</li>
 				<li>
-					<nuxt-link class="nav-item" to="/voordelen">
+					<nuxt-link class="nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-md px-1" to="/voordelen">
 						Voordelen
 					</nuxt-link>
 				</li>
 				<li>
-					<nuxt-link class="nav-item" to="/contact">
+					<nuxt-link class="nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-md px-1" to="/contact">
 						Contact
 					</nuxt-link>
 				</li>
 				<li v-if="loggedInUser">
-					<nuxt-link class="nav-item" to="/account">
+					<nuxt-link class="nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-md px-1" to="/account">
 						{{ loggedInUser.name }}
 					</nuxt-link>
 				</li>
 				<li v-else>
-					<nuxt-link class="nav-item" to="/login">
+					<nuxt-link class="nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-md px-1" to="/login">
 						Login
 					</nuxt-link>
 				</li>
