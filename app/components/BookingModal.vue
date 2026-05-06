@@ -70,7 +70,7 @@ async function book(lesson: any) {
       <div class="flex items-center justify-between mb-6">
         <h2 class="text-2xl font-bold text-emerald-100 tracking-tight">Boek een les</h2>
         <button @click="open = false" aria-label="Sluiten"
-          class="text-gray-400 hover:text-gray-200 transition-colors">
+          class="text-gray-400 hover:text-gray-200 transition-colors rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
             stroke="currentColor" class="w-6 h-6">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />

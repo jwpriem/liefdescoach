@@ -42,6 +42,9 @@
 ## 2025-04-12 - Wrapping disabled buttons with tooltips
 **Learning:** I noticed that several disabled buttons in the login and password reset pages did not have any tooltips explaining why they were disabled (e.g., waiting for input). This leaves users confused about what is required to proceed.
 **Action:** Wrapped these disabled buttons with `<UTooltip>` elements and explicitly wrapped the `<UButton>` in a structural `<div>` so the surrounding `<UTooltip>` can catch pointer events and display the context for the disabled state to the user.
+## 2026-04-21 - Add keyboard focus rings to interactive modal close buttons
+**Learning:** Native `<button>` elements used as icon-only close actions inside modals often rely on default browser focus rings which can be stripped or overridden. This creates a severe accessibility issue where keyboard users cannot visually identify when the close button is focused.
+**Action:** Always verify that every interactive element, particularly unstyled structural buttons or icon-only actions, has an explicitly defined `focus-visible` class configuration (e.g. `focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-lg`) to guarantee visibility for keyboard navigation.
 ## 2026-04-20 - Adding Tooltips to disabled Nuxt UI buttons
 **Learning:** Found disabled `<UButton>` in `NewStudentForm.vue` that blocked form submission without explaining what fields were missing. By wrapping disabled buttons in a structural `<div>`, we can allow wrapper components like `<UTooltip>` to catch hover states and provide context to users on why an action is blocked.
 **Action:** When a button action is blocked due to missing input, always provide clear context using a `<UTooltip>` explaining what action needs to be completed, and remember to wrap disabled `<UButton>`s in a structural `<div>` since disabled elements don't trigger pointer events.
