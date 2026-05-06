@@ -49,3 +49,6 @@
 ## 2026-05-05 - Enhanced Authentication Form UX
 **Learning:** Adding descriptive leading icons (like `i-lucide-mail`, `i-lucide-lock`) to input fields provides immediate visual context, while a password visibility toggle reduces user frustration and input errors during login and registration. These small touches significantly improve the "feel" and usability of core workflows.
 **Action:** When building or reviewing forms, always ensure consistent iconography for common fields and include a visibility toggle for password inputs using the `#trailing` slot of `UInput`.
+## 2025-05-22 - Explicit focus indicators and tooltips for icon actions
+**Learning:** In Tailwind 4 environments, default browser focus rings can be nearly invisible on specific backgrounds (like dark navigation bars or list items). Additionally, icon-only actions (like calendar exports) lack immediate semantic clarity without persistent or hover-based micro-copy.
+**Action:** Always apply explicit `focus-visible:ring-2` (and `focus:outline-none`) to interactive elements to ensure accessibility for keyboard users. Use `ring-inset` for navigation links to prevent focus indicators from being clipped by container overflow (`overflow-hidden`). Enhance icon-only buttons with `UTooltip` and `aria-label` to provide both visual and screen-reader context.

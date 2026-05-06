@@ -49,23 +49,32 @@ watch([dateFrom, dateTo], () => {
 })
 
 const allLessons = computed(() => archive.value?.rows ?? [])
-const totalPages = computed(() => Math.ceil(allLessons.value.length / pageSize))
-const paginatedLessons = computed(() =>
-  allLessons.value
-    .slice((page.value - 1) * pageSize, page.value * pageSize)
-    .map((l: any) => ({ ...l, processedBookings: getLessonBookingsWithLabels(l.bookings || []) }))
-)
-
-function formatArchiveDateInDutch(date: string): string {
-  const lessonDate = dayjs(date).utc()
-  const startTime = lessonDate.format('H.mm')
-  const endTime = lessonDate.add(1, 'hour').format('H.mm')
-  const includeYear = lessonDate.year() !== dayjs().year()
-  const datePart = lessonDate.format(includeYear ? 'dddd D MMMM YYYY' : 'dddd D MMMM')
-  return `${datePart} van ${startTime} tot ${endTime} uur`
-}
-
 const { getLessonBookingsWithLabels } = useLessonBookings()
+
+const totalPages = computed(() => Math.ceil(allLessons.value.length / pageSize))
+
+// ⚡ Bolt: Slice first, then map to maintain O(M) complexity where M is pageSize.
+// ⚡ Bolt: Move expensive data transformations and formatted strings out of the template render loop.
+// Expected impact: Prevents redundant O(N) calculations and preserves performance for large archives.
+const paginatedLessons = computed(() => {
+  const currentYear = dayjs().year()
+  return allLessons.value
+    .slice((page.value - 1) * pageSize, page.value * pageSize)
+    .map((l: any) => {
+      const lessonDate = dayjs(l.date).utc()
+      const startTime = lessonDate.format('H.mm')
+      const endTime = lessonDate.add(1, 'hour').format('H.mm')
+      const includeYear = lessonDate.year() !== currentYear
+      const datePart = lessonDate.format(includeYear ? 'dddd D MMMM YYYY' : 'dddd D MMMM')
+
+      return {
+        ...l,
+        _formattedDate: `${datePart} van ${startTime} tot ${endTime} uur`,
+        _description: $rav.getLessonDescription(l),
+        _processedBookings: getLessonBookingsWithLabels(l.bookings || [])
+      }
+    })
+})
 
 const confirmRemoveBooking = ref(false)
 const pendingRemoveBooking = ref<any>(null)
@@ -143,13 +152,13 @@ watch(activeTab, (newVal) => {
               <!-- Les -->
               <div>
                 <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Les</span>
-                <span class="block text-gray-100 mt-0.5" v-html="$rav.getLessonDescription(lesson)"></span>
+                <span class="block text-gray-100 mt-0.5" v-html="lesson._description"></span>
               </div>
 
               <!-- Datum -->
               <div>
                 <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Datum</span>
-                <span class="block text-gray-100 mt-0.5">{{ formatArchiveDateInDutch(lesson.date) }}</span>
+                <span class="block text-gray-100 mt-0.5">{{ lesson._formattedDate }}</span>
               </div>
 
               <!-- Boekingen -->
@@ -158,7 +167,7 @@ watch(activeTab, (newVal) => {
                   Boekingen ({{ lesson.bookings?.length || 0 }}/9)
                 </span>
                 <div class="mt-1">
-                  <span v-for="booking in lesson.processedBookings" :key="booking.$id"
+                  <span v-for="booking in lesson._processedBookings" :key="booking.$id"
                     class="flex items-center gap-1 text-base text-gray-300 group/booking py-0.5">
                     <span class="hover:text-emerald-400 transition-colors cursor-pointer flex-1"
                       @click="navigateTo(`/admin/users/${booking.students?.$id}`)">
