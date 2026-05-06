@@ -1,6 +1,15 @@
 import { and, gte, lte, eq, asc } from 'drizzle-orm'
 import { lessons, bookings, credits } from '../database/schema'
 
+const PRICE_MAP: Record<string, number> = {
+    'credit_1': 16.00,
+    'credit_5': 14.50,
+    'credit_10': 13.50,
+    'credit_20': 12.50,
+}
+const CLASSPASS_PRICE = 7.10
+const MONTHS = ['jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec']
+
 /**
  * Admin-only endpoint to calculate revenue data for charting.
  */
@@ -19,14 +28,6 @@ export default defineEventHandler(async (event) => {
 
     const revenuePerBooking = parseFloat(config.revenuePerBooking) || 14
     const costPerLesson = parseFloat(config.costPerLesson) || 50
-
-    const PRICE_MAP: Record<string, number> = {
-        'credit_1': 16.00,
-        'credit_5': 14.50,
-        'credit_10': 13.50,
-        'credit_20': 12.50,
-    }
-    const CLASSPASS_PRICE = 7.10
 
     // Fetch all lessons, bookings, and credits in the date range using joins
     const rows = await db
@@ -54,7 +55,8 @@ export default defineEventHandler(async (event) => {
     const buckets: Record<string, { revenue: number; cost: number; bookings: number; lessons: number }> = {}
 
     for (const row of rows) {
-        const date = new Date(row.lessonDate)
+        // ⚡ Bolt: row.lessonDate is already a Date object, avoid redundant allocation.
+        const date = row.lessonDate
         const key = getBucketKey(date, bucket)
 
         if (!buckets[key]) {
@@ -98,25 +100,32 @@ export default defineEventHandler(async (event) => {
     return { data, revenuePerBooking, costPerLesson }
 })
 
+// ⚡ Bolt: Cache Jan 1st metadata to avoid redundant Date allocations and lookups in getBucketKey.
+const jan1Cache: Record<number, { time: number; day: number }> = {}
+
 function getBucketKey(date: Date, bucket: string): string {
     const year = date.getFullYear()
-    const month = String(date.getMonth() + 1).padStart(2, '0')
 
     if (bucket === 'year') return `${year}`
-    if (bucket === 'month') return `${year}-${month}`
+    if (bucket === 'month') return `${year}-${String(date.getMonth() + 1).padStart(2, '0')}`
 
-    const jan1 = new Date(year, 0, 1)
-    const dayOfYear = Math.ceil((date.getTime() - jan1.getTime()) / 86400000) + 1
-    const weekNum = Math.ceil((dayOfYear + jan1.getDay()) / 7)
+    if (!jan1Cache[year]) {
+        const jan1 = new Date(year, 0, 1)
+        jan1Cache[year] = { time: jan1.getTime(), day: jan1.getDay() }
+    }
+    const { time, day } = jan1Cache[year]
+
+    const dayOfYear = Math.ceil((date.getTime() - time) / 86400000) + 1
+    const weekNum = Math.ceil((dayOfYear + day) / 7)
     return `${year}-W${String(weekNum).padStart(2, '0')}`
 }
 
 function formatBucketLabel(key: string, bucket: string): string {
     if (bucket === 'year') return key
     if (bucket === 'month') {
-        const months = ['jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec']
         const [y, m] = key.split('-')
-        return `${months[parseInt(m) - 1]} ${y}`
+        // ⚡ Bolt: Use pre-allocated MONTHS array.
+        return `${MONTHS[parseInt(m, 10) - 1]} ${y}`
     }
     return key.replace('-W', ' wk ')
 }
