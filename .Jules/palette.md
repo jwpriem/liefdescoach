@@ -45,3 +45,7 @@
 ## 2026-04-20 - Adding Tooltips to disabled Nuxt UI buttons
 **Learning:** Found disabled `<UButton>` in `NewStudentForm.vue` that blocked form submission without explaining what fields were missing. By wrapping disabled buttons in a structural `<div>`, we can allow wrapper components like `<UTooltip>` to catch hover states and provide context to users on why an action is blocked.
 **Action:** When a button action is blocked due to missing input, always provide clear context using a `<UTooltip>` explaining what action needs to be completed, and remember to wrap disabled `<UButton>`s in a structural `<div>` since disabled elements don't trigger pointer events.
+
+## 2025-05-22 - Explicit focus indicators and tooltips for icon actions
+**Learning:** In Tailwind 4 environments, default browser focus rings can be nearly invisible on specific backgrounds (like dark navigation bars or list items). Additionally, icon-only actions (like calendar exports) lack immediate semantic clarity without persistent or hover-based micro-copy.
+**Action:** Always apply explicit `focus-visible:ring-2` (and `focus:outline-none`) to interactive elements to ensure accessibility for keyboard users. Use `ring-inset` for navigation links to prevent focus indicators from being clipped by container overflow (`overflow-hidden`). Enhance icon-only buttons with `UTooltip` and `aria-label` to provide both visual and screen-reader context.
