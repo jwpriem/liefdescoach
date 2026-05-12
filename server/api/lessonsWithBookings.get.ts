@@ -43,16 +43,26 @@ export default defineEventHandler(async (event) => {
             .where(inArray(bookings.lessonId, lessonIds))
     }
 
-    const studentIds = [...new Set(bookingRows.map((b: any) => b.studentId))]
+    // ⚡ Bolt: Use a single loop to collect unique student IDs and avoid multiple array traversals.
+    const studentIdSet = new Set<string>()
+    for (const b of bookingRows) {
+        if (b.studentId) studentIdSet.add(b.studentId)
+    }
+    const studentIds = [...studentIdSet]
     const firstLessonDates = await getFirstLessonDatesForStudents(studentIds)
-    const lessonDateMap = new Map(lessonRows.map(l => [l.id, l.date]))
+
+    // ⚡ Bolt: Cache lesson timestamps to avoid redundant .getTime() calls in the enrichedBookingRows loop.
+    const lessonTimeMap = new Map<string, number>()
+    for (const l of lessonRows) {
+        if (l.date) lessonTimeMap.set(l.id, l.date.getTime())
+    }
 
     const enrichedBookingRows = bookingRows.map((b: any) => {
         const firstDate = firstLessonDates.get(b.studentId)
-        const lessonDate = lessonDateMap.get(b.lessonId)
+        const lessonTime = lessonTimeMap.get(b.lessonId)
         return {
             ...b,
-            isFirstTime: firstDate != null && lessonDate != null && firstDate.getTime() === lessonDate.getTime(),
+            isFirstTime: firstDate != null && lessonTime != null && firstDate.getTime() === lessonTime,
         }
     })
 

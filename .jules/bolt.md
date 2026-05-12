@@ -37,3 +37,7 @@
 ## 2024-05-19 - Paginated List Processing
 **Learning:** When optimizing list rendering in Vue, avoid mapping over the entire collection ($O(N)$) if the UI is paginated. Processing the entire archive can cause performance regressions as the data grows.
 **Action:** Slice the collection first, then map over the current page's slice ($O(M)$ where $M$ is page size) to pre-calculate formatted strings and transformations, ensuring constant time performance regardless of total collection size.
+
+## 2025-05-15 - Redundant Unique ID Extraction and Date Comparisons
+**Learning:** The common pattern `[...new Set(rows.map(r => r.id))]` for unique ID extraction causes multiple array traversals and unnecessary intermediate allocations. Similarly, repeated `.getTime()` calls on the same Date objects (e.g. comparing many bookings to the same set of lessons) add significant CPU overhead in processing loops.
+**Action:** Use a single `for...of` loop to populate a `Set` directly for ID extraction. For repeated date comparisons, cache timestamps in a local `Map` to avoid redundant method calls.
