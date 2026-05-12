@@ -15,6 +15,7 @@ beforeEach(() => {
   vi.stubGlobal('db', mockDb)
   vi.stubGlobal('readBody', vi.fn())
   vi.stubGlobal('createSession', vi.fn())
+  vi.stubGlobal('getRequestIP', vi.fn().mockReturnValue('127.0.0.1'))
 
   mockDb.select.mockReturnThis()
   mockDb.from.mockReturnThis()
@@ -40,14 +41,19 @@ describe('POST /api/auth/verify-otp', () => {
   })
 
   it('throws 401 when no OTP code found', async () => {
-    vi.mocked(readBody).mockResolvedValue({ email: 'user@test.com', code: '123456' })
+    const email = `user-${Math.random()}@test.com`
+    vi.mocked(readBody).mockResolvedValue({ email, code: '123456' })
     mockDb.where.mockResolvedValue([])
 
-    await expect(handle({} as any)).rejects.toMatchObject({ statusCode: 401 })
+    await expect(handle({} as any)).rejects.toMatchObject({
+      statusCode: 401,
+      statusMessage: 'Ongeldige of verlopen code. Vraag een nieuwe code aan.'
+    })
   })
 
   it('throws 401 when OTP is expired', async () => {
-    vi.mocked(readBody).mockResolvedValue({ email: 'user@test.com', code: '123456' })
+    const email = `user-${Math.random()}@test.com`
+    vi.mocked(readBody).mockResolvedValue({ email, code: '123456' })
     mockDb.where.mockResolvedValue([{
       id: 'otp1',
       code: '123456',
@@ -55,11 +61,15 @@ describe('POST /api/auth/verify-otp', () => {
       expiresAt: new Date(Date.now() - 60000), // expired 1 minute ago
     }])
 
-    await expect(handle({} as any)).rejects.toMatchObject({ statusCode: 401 })
+    await expect(handle({} as any)).rejects.toMatchObject({
+      statusCode: 401,
+      statusMessage: 'Ongeldige of verlopen code. Vraag een nieuwe code aan.'
+    })
   })
 
   it('throws 401 when OTP code is wrong', async () => {
-    vi.mocked(readBody).mockResolvedValue({ email: 'user@test.com', code: '000000' })
+    const email = `user-${Math.random()}@test.com`
+    vi.mocked(readBody).mockResolvedValue({ email, code: '000000' })
     mockDb.where.mockResolvedValue([{
       id: 'otp1',
       code: '123456',
@@ -67,11 +77,29 @@ describe('POST /api/auth/verify-otp', () => {
       expiresAt: new Date(Date.now() + 600000),
     }])
 
-    await expect(handle({} as any)).rejects.toMatchObject({ statusCode: 401 })
+    await expect(handle({} as any)).rejects.toMatchObject({
+      statusCode: 401,
+      statusMessage: 'Ongeldige of verlopen code. Vraag een nieuwe code aan.'
+    })
+  })
+
+  it('throws 429 when too many attempts from same IP/email pair', async () => {
+    const email = `user-${Math.random()}@test.com`
+    vi.mocked(readBody).mockResolvedValue({ email, code: '000000' })
+    mockDb.where.mockResolvedValue([])
+
+    // First 5 attempts
+    for (let i = 0; i < 5; i++) {
+      await expect(handle({} as any)).rejects.toMatchObject({ statusCode: 401 })
+    }
+
+    // 6th attempt should be rate limited
+    await expect(handle({} as any)).rejects.toMatchObject({ statusCode: 429 })
   })
 
   it('creates session and returns success on valid OTP', async () => {
-    vi.mocked(readBody).mockResolvedValue({ email: 'user@test.com', code: '123456' })
+    const email = `user-${Math.random()}@test.com`
+    vi.mocked(readBody).mockResolvedValue({ email, code: '123456' })
     mockDb.where.mockResolvedValue([{
       id: 'otp1',
       code: '123456',
