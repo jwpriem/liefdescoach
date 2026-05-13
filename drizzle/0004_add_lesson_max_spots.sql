@@ -1,0 +1,1 @@
+ALTER TABLE "lessons" ADD COLUMN "max_spots" integer DEFAULT 9 NOT NULL;

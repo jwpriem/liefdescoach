@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, boolean, pgEnum, index, uniqueIndex } from 'drizzle-orm/pg-core'
+import { pgTable, text, timestamp, boolean, integer, pgEnum, index, uniqueIndex } from 'drizzle-orm/pg-core'
 
 export const creditTypeEnum = pgEnum('credit_type', ['credit_1', 'credit_5', 'credit_10', 'credit_20'])
 export const lessonTypeEnum = pgEnum('lesson_type', ['hatha yoga', 'guest lesson', 'peachy bum'])
@@ -38,6 +38,7 @@ export const lessons = pgTable('lessons', {
   date: timestamp('date', { withTimezone: true }).notNull(),
   type: lessonTypeEnum('type').notNull(),
   teacher: text('teacher'),
+  maxSpots: integer('max_spots').notNull().default(9),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 }, (table) => [
   index('lessons_date_idx').on(table.date),

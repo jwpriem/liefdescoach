@@ -177,8 +177,9 @@ const computedLessons = computed(() => {
     return lessons.value.map((lesson) => {
         const metrics = lessonMetrics.value.get(lesson.$id);
         const regularCount = metrics ? metrics.regularCount : 0;
-        const spots = 9 - regularCount;
-        const isFull = regularCount >= 9;
+        const maxSpots = lesson.maxSpots ?? 9;
+        const spots = maxSpots - regularCount;
+        const isFull = regularCount >= maxSpots;
         const spotsContext = spots === 1 ? "plek" : "plekken";
         const spotsText = isFull ? " (Vol)" : ` (Nog ${spots} ${spotsContext})`;
 
@@ -213,6 +214,9 @@ const computedStudents = computed(() => {
 });
 
 const managedLesson = ref<any>(null);
+const editMaxSpots = ref<number>(9);
+const isSavingMaxSpots = ref(false);
+const toast = useToast();
 
 const processedManagedBookings = computed(() =>
     managedLesson.value
@@ -222,10 +226,27 @@ const processedManagedBookings = computed(() =>
 
 function openManage(lesson: any) {
     managedLesson.value = lesson;
+    editMaxSpots.value = lesson.maxSpots ?? 9;
 }
 
 function closeManage() {
     managedLesson.value = null;
+}
+
+async function saveMaxSpots() {
+    if (!managedLesson.value) return;
+    isSavingMaxSpots.value = true;
+    try {
+        await $fetch('/api/updateLesson', {
+            method: 'POST',
+            body: { lessonId: managedLesson.value.$id, maxSpots: editMaxSpots.value },
+        });
+        await refreshLessons();
+        managedLesson.value = lessons.value.find((l: any) => l.$id === managedLesson.value.$id) ?? managedLesson.value;
+        toast.add({ title: 'Opgeslagen', icon: 'i-lucide-check-circle', color: 'success' });
+    } finally {
+        isSavingMaxSpots.value = false;
+    }
 }
 
 const confirmRemoveBooking = ref(false);
@@ -337,7 +358,7 @@ async function onConfirmDeleteLesson() {
                                 class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide"
                                 >Boekingen ({{
                                     lessonMetrics.get(lesson.$id)?.regularCount || 0
-                                }}/9<span
+                                }}/{{ lesson.maxSpots ?? 9 }}<span
                                     v-if="lessonMetrics.get(lesson.$id)?.hasClasspass"
                                     class="text-sky-300"
                                 >
@@ -632,6 +653,31 @@ async function onConfirmDeleteLesson() {
                         class="text-gray-400 hover:text-white -mt-1 -mr-2"
                         @click="closeManage()"
                     />
+                </div>
+
+                <div class="mb-6 pb-6 border-b border-gray-800/50">
+                    <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
+                        Maximum plekken
+                    </h3>
+                    <div class="flex items-center gap-3">
+                        <UInput
+                            v-model="editMaxSpots"
+                            type="number"
+                            :min="1"
+                            :max="50"
+                            size="md"
+                            class="w-24"
+                        />
+                        <UButton
+                            color="primary"
+                            variant="solid"
+                            size="md"
+                            :loading="isSavingMaxSpots"
+                            @click="saveMaxSpots()"
+                        >
+                            Opslaan
+                        </UButton>
+                    </div>
                 </div>
 
                 <div class="mb-6">

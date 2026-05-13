@@ -43,7 +43,7 @@ export default defineEventHandler(async (event) => {
         : lesson.type === 'peachy bum' ? 'Peachy Bum' : 'Hatha Yoga'
 
     const formattedDate = formatLessonDate(lessonDate)
-    const spots = MAX_LESSON_CAPACITY - bookingRows.length
+    const spots = lesson.maxSpots - bookingRows.length
 
     const studentMail = cancellationStudentEmail({
         name: body.name,

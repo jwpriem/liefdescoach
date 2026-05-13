@@ -29,6 +29,13 @@
       "when": 1776536650775,
       "tag": "0003_mixed_mad_thinker",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1778696570904,
+      "tag": "0004_add_lesson_max_spots",
+      "breakpoints": true
     }
   ]
 }

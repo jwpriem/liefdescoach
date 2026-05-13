@@ -63,7 +63,7 @@ const lessonMetrics = computed(() => {
         }
       }
     }
-    const left = 9 - regularCount
+    const left = (lesson.maxSpots ?? 9) - regularCount
     const label = left === 1 ? '1 plek' : `${left} plekken`
 
     let badgeClass = ''

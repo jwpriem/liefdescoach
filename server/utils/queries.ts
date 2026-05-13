@@ -47,7 +47,7 @@ export async function countLessonBookings(lessonId: string): Promise<number> {
 
 /**
  * Count only 'regular' bookings for a lesson — used for capacity checks.
- * Classpass bookings do not count toward MAX_LESSON_CAPACITY.
+ * Classpass bookings do not count toward the lesson's maxSpots.
  */
 export async function countRegularLessonBookings(lessonId: string): Promise<number> {
   const result = await db
@@ -143,6 +143,7 @@ export function nestLessonsWithBookings(
     date: l.date?.toISOString?.() ?? l.date,
     type: l.type,
     teacher: l.teacher,
+    maxSpots: l.maxSpots ?? 9,
     bookings: bookingsByLesson.get(l.id) ?? [],
   }))
 
