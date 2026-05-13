@@ -1,6 +1,6 @@
 import { createError } from 'h3'
 import { eq } from 'drizzle-orm'
-import { lessons, bookings, students } from '../database/schema'
+import { bookings, students } from '../database/schema'
 
 export default defineEventHandler(async (event) => {
     await requireAdmin(event)
@@ -17,9 +17,15 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 400, statusMessage: 'lessonId is verplicht' })
     }
 
+    // Fetch lesson to get its capacity
+    const lesson = await getLessonWithBookings(body.lessonId)
+    if (!lesson) {
+        throw createError({ statusCode: 404, statusMessage: 'Les niet gevonden' })
+    }
+
     // Check capacity
     const bookingCount = await countLessonBookings(body.lessonId)
-    if (bookingCount >= MAX_LESSON_CAPACITY) {
+    if (bookingCount >= lesson.maxSpots) {
         throw createError({ statusCode: 409, statusMessage: 'Les is vol' })
     }
 

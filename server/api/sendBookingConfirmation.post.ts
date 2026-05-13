@@ -52,7 +52,7 @@ export default defineEventHandler(async (event) => {
         `https://calndr.link/d/event/?service=${stream}&start=${formatISODate(lessonDate)}%20${formatHour(lessonDate)}:${formatMinutes(lessonDate)}&title=${calendarTitle}%20Ravennah&timezone=Europe/Amsterdam&location=${encodeURIComponent(address)}`
 
     const formattedDate = formatLessonDate(lessonDate)
-    const spots = MAX_LESSON_CAPACITY - bookingRows.length
+    const spots = lesson.maxSpots - bookingRows.length
 
     const studentMail = bookingStudentEmail({
         name: body.name,

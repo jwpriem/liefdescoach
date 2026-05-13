@@ -53,7 +53,7 @@ export default defineEventHandler(async (event) => {
     // Only regular bookings count toward capacity. Classpass bookings ignore capacity.
     if (source === 'regular') {
         const regularCount = existingBookings.filter(b => b.source === 'regular').length
-        if (regularCount >= MAX_LESSON_CAPACITY) {
+        if (regularCount >= lesson.maxSpots) {
             throw createError({ statusCode: 409, statusMessage: 'Les is vol' })
         }
     }
@@ -99,6 +99,6 @@ export default defineEventHandler(async (event) => {
             teacher: lesson.teacher,
         },
         source,
-        spots: MAX_LESSON_CAPACITY - regularCountAfter,
+        spots: lesson.maxSpots - regularCountAfter,
     }
 })
