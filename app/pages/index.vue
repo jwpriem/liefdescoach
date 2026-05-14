@@ -43,7 +43,7 @@ useLocalBusinessSchema();
     <div>
         <!-- HERO -->
         <Header
-            image="/ravennah-donker.jpg"
+            image="/IMG_7917.JPG"
             alt="Yoga docent Ravennah in kleermakerszit"
         >
             <div class="mb-2">
@@ -197,8 +197,8 @@ useLocalBusinessSchema();
                 >
                     <div class="w-full md:w-1/2">
                         <img
-                            class="w-full h-72 md:h-[30rem] object-cover object-top rounded-3xl shadow-xl"
-                            src="/ravennah-zwart.jpg"
+                            class="w-full h-72 md:h-[40rem] object-cover object-top rounded-3xl shadow-xl"
+                            src="/IMG_7910.JPG"
                             alt="Yoga docent Ravennah"
                         />
                     </div>
@@ -488,8 +488,8 @@ useLocalBusinessSchema();
                     </div>
                     <div class="w-full md:w-1/2">
                         <img
-                            class="w-full h-72 md:h-[30rem] object-cover object-bottom rounded-3xl shadow-xl"
-                            src="/les-buiten.jpg"
+                            class="w-full h-72 md:h-[40rem] object-cover object-top rounded-3xl shadow-xl"
+                            src="/ravennah-donker.jpg"
                             alt="Yoga les buiten"
                         />
                     </div>
