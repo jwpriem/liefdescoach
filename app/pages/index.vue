@@ -44,6 +44,7 @@ useLocalBusinessSchema();
         <!-- HERO -->
         <Header
             image="/IMG_7917.JPG"
+            alignment="object-top"
             alt="Yoga docent Ravennah in kleermakerszit"
         >
             <div class="mb-2">
