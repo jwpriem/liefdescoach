@@ -21,6 +21,8 @@ const state = reactive({
   dueDate: null as string | null,
   password: null as string | null,
   newPassword: null as string | null,
+  showPassword: false,
+  showNewPassword: false,
   editAccountDetails: false,
   editHealthDetails: false,
   editDateOfBirth: false,
@@ -91,6 +93,8 @@ function cancel() {
   state.dueDate = null;
   state.password = null;
   state.newPassword = null;
+  state.showPassword = false;
+  state.showNewPassword = false;
 }
 
 async function update() {
@@ -265,14 +269,14 @@ async function requestVerification() {
             <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Herinneringsmail</span>
             <span class="block text-gray-400 text-xs mt-0.5">Ontvang een e-mail de avond voor je les</span>
           </div>
-          <USwitch v-model="remindersEnabled" color="primary" />
+          <USwitch v-model="remindersEnabled" color="primary" aria-label="Herinneringsmail inschakelen" />
         </div>
         <div v-if="pushSupported" class="flex items-center justify-between pt-2 border-t border-gray-800/50">
           <div>
             <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Pushberichten</span>
             <span class="block text-gray-400 text-xs mt-0.5">Ontvang meldingen op je telefoon voor herinneringen en updates</span>
           </div>
-          <USwitch v-model="pushEnabled" color="primary" />
+          <USwitch v-model="pushEnabled" color="primary" aria-label="Pushberichten inschakelen" />
         </div>
       </div>
       <div class="flex flex-col gap-3 mt-6">
@@ -323,17 +327,17 @@ async function requestVerification() {
 
           <div>
             <label for="name" class="block text-sm font-medium text-gray-300 mb-1.5">Naam</label>
-            <UInput id="name" color="primary" v-model="state.name" variant="outline" size="lg" placeholder="Je naam" />
+            <UInput id="name" color="primary" v-model="state.name" variant="outline" size="lg" placeholder="Je naam" icon="i-lucide-user" />
           </div>
           <div>
             <label for="phone" class="block text-sm font-medium text-gray-300 mb-1.5">Telefoonnummer</label>
             <UInput id="phone" color="primary" v-model="state.phone" variant="outline" size="lg"
-              placeholder="Je telefoonnummer" />
+              placeholder="Je telefoonnummer" icon="i-lucide-phone" />
           </div>
           <div>
             <label for="dateOfBirth" class="block text-sm font-medium text-gray-300 mb-1.5">Geboortedatum</label>
             <UInput type="date" id="dateOfBirth" color="primary" v-model="state.dateOfBirth" variant="outline"
-              size="lg" />
+              size="lg" icon="i-lucide-calendar" />
           </div>
         </div>
 
@@ -355,13 +359,35 @@ async function requestVerification() {
 
         <div>
           <label for="password" class="block text-sm font-medium text-gray-300 mb-1.5">Huidige wachtwoord</label>
-          <UInput id="password" color="primary" v-model="state.password" variant="outline" size="lg" type="password"
-            placeholder="Je wachtwoord" />
+          <UInput id="password" color="primary" v-model="state.password" variant="outline" size="lg" :type="state.showPassword ? 'text' : 'password'"
+            placeholder="Je wachtwoord" icon="i-lucide-lock">
+            <template #trailing>
+              <UButton
+                color="neutral"
+                variant="ghost"
+                size="sm"
+                :icon="state.showPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+                :aria-label="state.showPassword ? 'Wachtwoord verbergen' : 'Wachtwoord tonen'"
+                @click="state.showPassword = !state.showPassword"
+              />
+            </template>
+          </UInput>
         </div>
         <div>
           <label for="newPassword" class="block text-sm font-medium text-gray-300 mb-1.5">Nieuw wachtwoord</label>
           <UInput id="newPassword" color="primary" v-model="state.newPassword" variant="outline" size="lg"
-            type="password" placeholder="Je nieuwe wachtwoord" />
+            :type="state.showNewPassword ? 'text' : 'password'" placeholder="Je nieuwe wachtwoord" icon="i-lucide-lock">
+            <template #trailing>
+              <UButton
+                color="neutral"
+                variant="ghost"
+                size="sm"
+                :icon="state.showNewPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+                :aria-label="state.showNewPassword ? 'Wachtwoord verbergen' : 'Wachtwoord tonen'"
+                @click="state.showNewPassword = !state.showNewPassword"
+              />
+            </template>
+          </UInput>
 
           <div v-if="passwordStrength" class="flex items-center gap-2 mt-3">
             <svg v-if="passwordStrength == 'Veilig wachtwoord'" class="w-4 h-4 text-emerald-400 shrink-0" fill="none"
