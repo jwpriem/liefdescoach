@@ -1,14 +1,56 @@
-import { createError } from 'h3'
+import { createError, getRequestIP } from 'h3'
 import crypto from 'crypto'
 import { eq } from 'drizzle-orm'
 import { otpCodes, students } from '../../database/schema'
 
+const MAX_VERIFY_ATTEMPTS = 5;
+const VERIFY_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+
+const verifyAttemptsByIP = new Map<string, { count: number; firstAttempt: number }>();
+let lastCleanup = 0;
+
+function lazyCleanup(now: number) {
+    if (verifyAttemptsByIP.size > 1000 && now - lastCleanup > 60000) {
+        lastCleanup = now;
+        for (const [key, data] of verifyAttemptsByIP.entries()) {
+            if (now - data.firstAttempt > VERIFY_WINDOW_MS) {
+                verifyAttemptsByIP.delete(key);
+            }
+        }
+    }
+}
+
+// For testing purposes
+export function resetVerifyAttempts() {
+    verifyAttemptsByIP.clear();
+}
+
 /**
  * Verifies an OTP code, deletes it from the database,
  * creates a session, and returns the user info.
+ * Consolidates error messages to prevent user/state enumeration.
  */
 export default defineEventHandler(async (event) => {
     const body = await readBody(event)
+
+    const ip = getRequestIP(event) || 'unknown';
+    const now = Date.now();
+    lazyCleanup(now);
+
+    const ipData = verifyAttemptsByIP.get(ip);
+    if (ipData) {
+        if (now - ipData.firstAttempt > VERIFY_WINDOW_MS) {
+            verifyAttemptsByIP.set(ip, { count: 1, firstAttempt: now });
+        } else if (ipData.count >= MAX_VERIFY_ATTEMPTS) {
+            throw createError({ statusCode: 429, statusMessage: 'Te veel pogingen. Probeer het over 15 minuten opnieuw.' })
+        } else {
+            ipData.count++;
+        }
+    } else {
+        verifyAttemptsByIP.set(ip, { count: 1, firstAttempt: now });
+    }
+
+    const genericError = createError({ statusCode: 401, statusMessage: 'Ongeldige code of e-mailadres. Vraag een nieuwe code aan.' })
 
     if (!body?.email || typeof body.email !== 'string') {
         throw createError({ statusCode: 400, statusMessage: 'E-mailadres is verplicht' })
@@ -27,7 +69,7 @@ export default defineEventHandler(async (event) => {
         .where(eq(otpCodes.email, email))
 
     if (rows.length === 0) {
-        throw createError({ statusCode: 401, statusMessage: 'Geen code gevonden. Vraag een nieuwe code aan.' })
+        throw genericError
     }
 
     const otpDoc = rows[0]
@@ -35,7 +77,7 @@ export default defineEventHandler(async (event) => {
     // 2. Check expiry
     if (new Date(otpDoc.expiresAt) < new Date()) {
         await db.delete(otpCodes).where(eq(otpCodes.id, otpDoc.id))
-        throw createError({ statusCode: 401, statusMessage: 'Code is verlopen. Vraag een nieuwe code aan.' })
+        throw genericError
     }
 
     // 3. Verify code (constant-time comparison)
@@ -45,11 +87,14 @@ export default defineEventHandler(async (event) => {
     if (codeBuffer.length !== storedBuffer.length || !crypto.timingSafeEqual(codeBuffer, storedBuffer)) {
         // Prevent brute force by deleting the OTP immediately after a failed attempt
         await db.delete(otpCodes).where(eq(otpCodes.id, otpDoc.id))
-        throw createError({ statusCode: 401, statusMessage: 'Ongeldige code. Vraag een nieuwe code aan.' })
+        throw genericError
     }
 
     // 4. Delete OTP
     await db.delete(otpCodes).where(eq(otpCodes.id, otpDoc.id))
+
+    // Clear rate limit on success
+    verifyAttemptsByIP.delete(ip);
 
     // 5. Mark email as verified (OTP proves ownership of the email address)
     await db.update(students).set({ emailVerified: true }).where(eq(students.id, otpDoc.userId))

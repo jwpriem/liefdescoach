@@ -50,11 +50,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     sessionSecret: '',         // NUXT_SESSION_SECRET (for signing session cookies)
     vapidPrivateKey: '',       // NUXT_VAPID_PRIVATE_KEY (Web Push VAPID private key)
     vapidEmail: '',            // NUXT_VAPID_EMAIL (e.g. mailto:info@ravennah.com)
+    mailPass: '',              // NUXT_MAIL_PASS (formerly public)
+    mailPassDev: '',           // NUXT_MAIL_PASS_DEV (formerly public)
     // Public keys that are exposed to the client
     public: {
       vapidPublicKey: '',         // NUXT_PUBLIC_VAPID_PUBLIC_KEY (Web Push VAPID public key)
-      mailPass: '',
-      mailPassDev: ''
     }
   },
 
