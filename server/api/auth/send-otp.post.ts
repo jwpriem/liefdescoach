@@ -91,8 +91,8 @@ export default defineEventHandler(async (event) => {
             // 2. Delete any existing OTP codes for this email
             await db.delete(otpCodes).where(eq(otpCodes.email, email))
 
-            // 3. Generate a 6-digit code
-            const code = crypto.randomInt(100000, 999999).toString()
+            // 3. Generate a 6-digit code (100000 to 999999)
+            const code = crypto.randomInt(100000, 1000000).toString()
 
             // 4. Store with 10-minute expiry
             const expiresAt = new Date(Date.now() + 10 * 60 * 1000)
