@@ -37,3 +37,7 @@
 ## 2024-05-19 - Paginated List Processing
 **Learning:** When optimizing list rendering in Vue, avoid mapping over the entire collection ($O(N)$) if the UI is paginated. Processing the entire archive can cause performance regressions as the data grows.
 **Action:** Slice the collection first, then map over the current page's slice ($O(M)$ where $M$ is page size) to pre-calculate formatted strings and transformations, ensuring constant time performance regardless of total collection size.
+
+## 2025-05-20 - Server API Data Processing Efficiency
+**Learning:** Extracting unique identifiers from a list of records using `[...new Set(arr.map(i => i.id))]` and building lookup Maps using `new Map(arr.map(l => [l.id, l.val]))` incurs multiple redundant traversals and unnecessary intermediate array/object allocations.
+**Action:** Use single `for...of` loops to populate `Set` and `Map` objects directly. Additionally, consolidate data enrichment steps into a single loop to reduce iteration overhead and maintain reference stability for objects.
