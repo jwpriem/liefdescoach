@@ -18,3 +18,7 @@
 **Vulnerability:** The `/api/students/create.post.ts` endpoint allowed unauthenticated requests to create student records by providing a `userId`, `email`, and `name` in the request body. This was implemented as an insecure fallback for the registration flow.
 **Learning:** "Trusting client-provided data" for identity-critical fields is a fundamental security failure. Fallbacks that bypass authentication logic for specific "flows" create easy-to-exploit vulnerabilities.
 **Prevention:** Derive user identity (IDs, emails, roles) exclusively from trusted sources like authenticated session objects. Never allow clients to provide their own identity parameters in sensitive write operations.
+## 2025-05-26 - [Fix User Enumeration in OTP Verification]
+**Vulnerability:** The `/api/auth/verify-otp.post.ts` endpoint returned different error messages for non-existent, expired, or incorrect OTP codes. This allowed attackers to determine if a valid OTP had been sent to a specific email address, facilitating user enumeration when combined with the `send-otp` endpoint.
+**Learning:** Security through generic error messages is critical in multi-step authentication flows. Leaking state about previous steps (like whether an OTP exists) can be just as damaging as leaking database existence directly.
+**Prevention:** Consolidate error responses in authentication endpoints to use identical status codes and generic messages for all failure modes that could otherwise leak internal state or user existence.
