@@ -250,10 +250,11 @@ const filteredRows = computed(() => {
 		<!-- Mobile: card layout -->
 		<div v-else class="flex flex-col gap-y-3 md:hidden">
 			<div v-for="row in filteredRows" :key="row.$id"
-				class="rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-lg shadow-emerald-950/10 p-4">
+				:class="['rounded-2xl border backdrop-blur-sm shadow-lg p-4', row.archived ? 'bg-gray-950/30 border-gray-800/40 shadow-none opacity-60' : 'bg-gray-950/50 border-gray-800/80 shadow-emerald-950/10']">
 				<div class="flex items-center justify-between mb-3">
 					<span class="font-medium text-gray-100 flex items-center gap-2">
 						{{ row.name }}
+						<UBadge v-if="row.archived" color="neutral" variant="subtle" size="xs">Gearchiveerd</UBadge>
 						<UTooltip v-if="row.health?.injury" :text="row.health.injury">
 							<UIcon name="i-lucide-heart-pulse" class="w-5 h-5 text-red-500" />
 						</UTooltip>
@@ -314,11 +315,12 @@ const filteredRows = computed(() => {
 			class="hidden md:block rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-2xl shadow-emerald-950/20 overflow-hidden">
 			<UTable v-if="filteredRows.length" :columns="columns" :data="filteredRows">
 				<template #name-cell="{ row }">
-					<div class="flex items-center gap-2">
+					<div class="flex items-center gap-2" :class="{ 'opacity-50': row.original.archived }">
 						<UButton variant="link" color="neutral" @click="navigateTo(`/admin/users/${row.original.$id}`)"
 							class="p-0 font-medium hover:text-emerald-400">
 							{{ row.original.name }}
 						</UButton>
+						<UBadge v-if="row.original.archived" color="neutral" variant="subtle" size="xs">Gearchiveerd</UBadge>
 						<UTooltip v-if="row.original.health?.injury" :text="row.original.health.injury">
 							<UIcon name="i-lucide-heart-pulse" class="w-5 h-5 text-red-500" />
 						</UTooltip>
