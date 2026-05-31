@@ -26,7 +26,6 @@ export default defineEventHandler(async (event) => {
         .from(students)
         .leftJoin(health, eq(students.id, health.studentId))
         .orderBy(asc(students.name))
-        .limit(100)
 
     const users = rows.map((r) => ({
         $id: r.id,

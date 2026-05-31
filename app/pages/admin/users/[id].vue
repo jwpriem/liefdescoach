@@ -84,8 +84,12 @@ function formatEuro(value: number) {
 
             </div>
         </div>
-        <div v-else class="flex justify-center pt-40">
-            <UIcon name="i-lucide-refresh-cw" class="animate-spin text-emerald-500 w-8 h-8" />
+        <div v-else class="flex flex-col items-center pt-40 gap-4">
+            <UIcon name="i-lucide-user-x" class="text-gray-600 w-12 h-12" />
+            <p class="text-gray-400">Gebruiker niet gevonden.</p>
+            <UButton variant="ghost" icon="i-lucide-arrow-left" @click="navigateTo('/account?tab=gebruikers')">
+                Terug naar overzicht
+            </UButton>
         </div>
     </div>
 </template>
