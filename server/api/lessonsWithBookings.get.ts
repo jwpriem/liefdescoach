@@ -43,18 +43,29 @@ export default defineEventHandler(async (event) => {
             .where(inArray(bookings.lessonId, lessonIds))
     }
 
-    const studentIds = [...new Set(bookingRows.map((b: any) => b.studentId))]
-    const firstLessonDates = await getFirstLessonDatesForStudents(studentIds)
-    const lessonDateMap = new Map(lessonRows.map(l => [l.id, l.date]))
+    // ⚡ Bolt: Populate Map and Set using single for...of loops to avoid intermediate array allocations (O(N) instead of O(k*N)).
+    const lessonDateMap = new Map<string, Date>()
+    for (const l of lessonRows) {
+        lessonDateMap.set(l.id, l.date)
+    }
 
-    const enrichedBookingRows = bookingRows.map((b: any) => {
+    const studentIdsSet = new Set<string>()
+    for (const b of bookingRows) {
+        studentIdsSet.add(b.studentId)
+    }
+
+    const firstLessonDates = await getFirstLessonDatesForStudents([...studentIdsSet])
+
+    // ⚡ Bolt: Consolidate enrichment into a single loop to reduce iteration overhead.
+    const enrichedBookingRows = []
+    for (const b of bookingRows) {
         const firstDate = firstLessonDates.get(b.studentId)
         const lessonDate = lessonDateMap.get(b.lessonId)
-        return {
+        enrichedBookingRows.push({
             ...b,
-            isFirstTime: firstDate != null && lessonDate != null && firstDate.getTime() === lessonDate.getTime(),
-        }
-    })
+            isFirstTime: firstDate != null && lessonDate != null && (firstDate as Date).getTime() === (lessonDate as Date).getTime(),
+        })
+    }
 
     return nestLessonsWithBookings(lessonRows, enrichedBookingRows, true)
 })
