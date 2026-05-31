@@ -7,6 +7,8 @@ const token = route.query.token as string
 const password = ref('')
 const confirmPassword = ref('')
 const success = ref(false)
+const showPassword = ref(false)
+const showConfirmPassword = ref(false)
 
 definePageMeta({ ssr: false })
 
@@ -80,7 +82,15 @@ async function submit() {
                             <span class="font-normal text-gray-500">(min. 8 tekens)</span>
                         </label>
                         <UInput id="password" v-model="password" size="lg" color="primary"
-                            placeholder="Je nieuwe wachtwoord" type="password" variant="outline" />
+                            placeholder="Je nieuwe wachtwoord" :type="showPassword ? 'text' : 'password'"
+                            variant="outline" icon="i-lucide-lock">
+                            <template #trailing>
+                                <UButton color="neutral" variant="ghost" size="sm"
+                                    :icon="showPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+                                    :aria-label="showPassword ? 'Wachtwoord verbergen' : 'Wachtwoord tonen'"
+                                    @click="showPassword = !showPassword" />
+                            </template>
+                        </UInput>
                         <p v-if="passwordError" class="mt-1 text-xs text-red-400">{{ passwordError }}</p>
                     </div>
 
@@ -89,7 +99,15 @@ async function submit() {
                             Bevestig wachtwoord <span class="text-red-500">*</span>
                         </label>
                         <UInput id="confirm-password" v-model="confirmPassword" size="lg" color="primary"
-                            placeholder="Herhaal je wachtwoord" type="password" variant="outline" />
+                            placeholder="Herhaal je wachtwoord" :type="showConfirmPassword ? 'text' : 'password'"
+                            variant="outline" icon="i-lucide-lock">
+                            <template #trailing>
+                                <UButton color="neutral" variant="ghost" size="sm"
+                                    :icon="showConfirmPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+                                    :aria-label="showConfirmPassword ? 'Wachtwoord verbergen' : 'Wachtwoord tonen'"
+                                    @click="showConfirmPassword = !showConfirmPassword" />
+                            </template>
+                        </UInput>
                         <p v-if="confirmError" class="mt-1 text-xs text-red-400">{{ confirmError }}</p>
                     </div>
 

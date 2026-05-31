@@ -26,6 +26,8 @@ const state = reactive({
   editDateOfBirth: false,
   editPassword: false,
   passwordCheck: false,
+  showPassword: false,
+  showNewPassword: false,
 });
 
 const targetUser = computed(() => props.user || loggedInUser.value);
@@ -355,13 +357,27 @@ async function requestVerification() {
 
         <div>
           <label for="password" class="block text-sm font-medium text-gray-300 mb-1.5">Huidige wachtwoord</label>
-          <UInput id="password" color="primary" v-model="state.password" variant="outline" size="lg" type="password"
-            placeholder="Je wachtwoord" />
+          <UInput id="password" color="primary" v-model="state.password" variant="outline" size="lg"
+            :type="state.showPassword ? 'text' : 'password'" placeholder="Je wachtwoord" icon="i-lucide-lock">
+            <template #trailing>
+              <UButton color="neutral" variant="ghost" size="sm"
+                :icon="state.showPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+                :aria-label="state.showPassword ? 'Wachtwoord verbergen' : 'Wachtwoord tonen'"
+                @click="state.showPassword = !state.showPassword" />
+            </template>
+          </UInput>
         </div>
         <div>
           <label for="newPassword" class="block text-sm font-medium text-gray-300 mb-1.5">Nieuw wachtwoord</label>
           <UInput id="newPassword" color="primary" v-model="state.newPassword" variant="outline" size="lg"
-            type="password" placeholder="Je nieuwe wachtwoord" />
+            :type="state.showNewPassword ? 'text' : 'password'" placeholder="Je nieuwe wachtwoord" icon="i-lucide-lock">
+            <template #trailing>
+              <UButton color="neutral" variant="ghost" size="sm"
+                :icon="state.showNewPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+                :aria-label="state.showNewPassword ? 'Wachtwoord verbergen' : 'Wachtwoord tonen'"
+                @click="state.showNewPassword = !state.showNewPassword" />
+            </template>
+          </UInput>
 
           <div v-if="passwordStrength" class="flex items-center gap-2 mt-3">
             <svg v-if="passwordStrength == 'Veilig wachtwoord'" class="w-4 h-4 text-emerald-400 shrink-0" fill="none"
