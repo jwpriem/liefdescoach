@@ -30,30 +30,36 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 400, statusMessage: 'Selecteer een deelnemer voor de Classpass boeking' })
     }
 
-    // Fetch lesson
-    const lessonRows = await db.select().from(lessons).where(eq(lessons.id, body.lessonId)).limit(1)
-    if (lessonRows.length === 0) {
+    // ⚡ Bolt: Fetch lesson and its existing bookings in a single joined query to reduce database roundtrips.
+    const rows = await db
+        .select({
+            lesson: lessons,
+            booking: bookings,
+        })
+        .from(lessons)
+        .leftJoin(bookings, eq(lessons.id, bookings.lessonId))
+        .where(eq(lessons.id, body.lessonId))
+
+    if (rows.length === 0) {
         throw createError({ statusCode: 404, statusMessage: 'Les niet gevonden' })
     }
-    const lesson = lessonRows[0]
+
+    const lesson = rows[0].lesson
+    const existingBookings = rows.map(r => r.booking).filter((b): b is NonNullable<typeof b> => b !== null)
 
     const isAdminBookingForStudent = isAdmin && Boolean(body.onBehalfOfUserId)
 
-    if (!isAdminBookingForStudent && new Date(lesson.date) <= new Date()) {
+    // ⚡ Bolt: lesson.date is already a Date object from Drizzle, avoid redundant new Date() wrapping.
+    if (!isAdminBookingForStudent && lesson.date <= new Date()) {
         throw createError({ statusCode: 400, statusMessage: 'Kan niet boeken voor een les in het verleden' })
     }
 
     const allowDuplicateBooking = body.extraSpot === true
 
-    const existingBookings = await db
-        .select()
-        .from(bookings)
-        .where(eq(bookings.lessonId, body.lessonId))
-
     // Only regular bookings count toward capacity. Classpass bookings ignore capacity.
+    const existingRegularCount = existingBookings.filter(b => b.source === 'regular').length
     if (source === 'regular') {
-        const regularCount = existingBookings.filter(b => b.source === 'regular').length
-        if (regularCount >= lesson.maxSpots) {
+        if (existingRegularCount >= lesson.maxSpots) {
             throw createError({ statusCode: 409, statusMessage: 'Les is vol' })
         }
     }
@@ -88,7 +94,8 @@ export default defineEventHandler(async (event) => {
             .where(eq(credits.id, creditId))
     }
 
-    const regularCountAfter = await countRegularLessonBookings(body.lessonId)
+    // ⚡ Bolt: Calculate post-booking regular count locally to avoid another database roundtrip.
+    const regularCountAfter = existingRegularCount + (source === 'regular' ? 1 : 0)
 
     return {
         success: true,

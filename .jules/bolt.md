@@ -41,3 +41,7 @@
 ## 2025-05-20 - Server API Data Processing Efficiency
 **Learning:** Extracting unique identifiers from a list of records using `[...new Set(arr.map(i => i.id))]` and building lookup Maps using `new Map(arr.map(l => [l.id, l.val]))` incurs multiple redundant traversals and unnecessary intermediate array/object allocations.
 **Action:** Use single `for...of` loops to populate `Set` and `Map` objects directly. Additionally, consolidate data enrichment steps into a single loop to reduce iteration overhead and maintain reference stability for objects.
+
+## 2026-06-02 - Reduced DB Roundtrips in Core Handlers
+**Learning:** Consolidating parent and child lookups into a single joined query, combined with in-memory metric derivation (e.g., counting existing records), eliminates redundant database roundtrips. Redundant Date object re-instantiations should also be avoided when Drizzle already returns native Date objects.
+**Action:** Use left joins to fetch related collections and derive counts or state in-memory to minimize roundtrip latency in high-traffic handlers.
