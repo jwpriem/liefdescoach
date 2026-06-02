@@ -267,22 +267,21 @@ async function requestVerification() {
             <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Herinneringsmail</span>
             <span class="block text-gray-400 text-xs mt-0.5">Ontvang een e-mail de avond voor je les</span>
           </div>
-          <USwitch v-model="remindersEnabled" color="primary" />
+          <USwitch v-model="remindersEnabled" color="primary" aria-label="Herinneringsmail inschakelen" />
         </div>
         <div v-if="pushSupported" class="flex items-center justify-between pt-2 border-t border-gray-800/50">
           <div>
             <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Pushberichten</span>
             <span class="block text-gray-400 text-xs mt-0.5">Ontvang meldingen op je telefoon voor herinneringen en updates</span>
           </div>
-          <USwitch v-model="pushEnabled" color="primary" />
+          <USwitch v-model="pushEnabled" color="primary" aria-label="Pushberichten inschakelen" />
         </div>
       </div>
       <div class="flex flex-col gap-3 mt-6">
         <UButton color="primary" variant="solid" size="lg" class="justify-center" v-if="!state.editAccountDetails"
-          @click="openEdit()">Gegevens
-          bewerken</UButton>
+          icon="i-lucide-pencil" @click="openEdit()">Gegevens bewerken</UButton>
         <UButton color="primary" variant="outline" size="lg" class="justify-center" v-if="!state.editPassword"
-          @click="state.editPassword = true">
+          icon="i-lucide-lock" @click="state.editPassword = true">
           Wachtwoord wijzigen</UButton>
       </div>
     </div>
@@ -311,8 +310,8 @@ async function requestVerification() {
 
       </div>
       <div class="flex flex-col gap-3 mt-6">
-        <UButton color="primary" variant="solid" size="lg" class="justify-center" @click="openEditHealth()">
-          Medische info bewerken</UButton>
+        <UButton color="primary" variant="solid" size="lg" class="justify-center" icon="i-lucide-pencil"
+          @click="openEditHealth()">Medische info bewerken</UButton>
       </div>
     </div>
 
@@ -325,17 +324,18 @@ async function requestVerification() {
 
           <div>
             <label for="name" class="block text-sm font-medium text-gray-300 mb-1.5">Naam</label>
-            <UInput id="name" color="primary" v-model="state.name" variant="outline" size="lg" placeholder="Je naam" />
+            <UInput id="name" color="primary" v-model="state.name" variant="outline" size="lg" placeholder="Je naam"
+              icon="i-lucide-user" />
           </div>
           <div>
             <label for="phone" class="block text-sm font-medium text-gray-300 mb-1.5">Telefoonnummer</label>
             <UInput id="phone" color="primary" v-model="state.phone" variant="outline" size="lg"
-              placeholder="Je telefoonnummer" />
+              placeholder="Je telefoonnummer" icon="i-lucide-phone" />
           </div>
           <div>
             <label for="dateOfBirth" class="block text-sm font-medium text-gray-300 mb-1.5">Geboortedatum</label>
-            <UInput type="date" id="dateOfBirth" color="primary" v-model="state.dateOfBirth" variant="outline"
-              size="lg" />
+            <UInput type="date" id="dateOfBirth" color="primary" v-model="state.dateOfBirth" variant="outline" size="lg"
+              icon="i-lucide-calendar" />
           </div>
         </div>
 
@@ -426,7 +426,7 @@ async function requestVerification() {
           </div>
           <div class="flex items-center justify-between">
             <label for="pregnancy" class="block text-sm font-medium text-gray-300">Ben je zwanger?</label>
-            <USwitch v-model="state.pregnancy" color="primary" />
+            <USwitch v-model="state.pregnancy" color="primary" aria-label="Zwangerschap inschakelen" />
           </div>
           <div v-if="state.pregnancy">
             <label for="dueDate" class="block text-sm font-medium text-gray-300 mb-1.5">Uitgerekende datum</label>

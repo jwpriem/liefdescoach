@@ -55,3 +55,7 @@
 ## 2025-05-22 - Explicit focus indicators and tooltips for icon actions
 **Learning:** In Tailwind 4 environments, default browser focus rings can be nearly invisible on specific backgrounds (like dark navigation bars or list items). Additionally, icon-only actions (like calendar exports) lack immediate semantic clarity without persistent or hover-based micro-copy.
 **Action:** Always apply explicit `focus-visible:ring-2` (and `focus:outline-none`) to interactive elements to ensure accessibility for keyboard users. Use `ring-inset` for navigation links to prevent focus indicators from being clipped by container overflow (`overflow-hidden`). Enhance icon-only buttons with `UTooltip` and `aria-label` to provide both visual and screen-reader context.
+
+## 2025-05-23 - Missing ARIA labels on USwitch components
+**Learning:** In `@nuxt/ui` v4, `USwitch` components do not automatically inherit an accessible name from adjacent labels unless explicitly linked via `id` and `for` attributes. In this project's settings forms, switches were often used without these IDs, leaving screen reader users without context for what the switch controls.
+**Action:** When using `USwitch`, always provide an explicit `aria-label` if the visual label is not programmatically linked, ensuring the component's purpose is announced to assistive technologies.
