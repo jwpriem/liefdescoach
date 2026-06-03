@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { User } from '~/composables/useAuth'
+import type { PasskeySummary, User } from '~/composables/useAuth'
 
-const { user: loggedInUser, isAdmin, updateProfile, updatePassword: authUpdatePassword, updateHealth: authUpdateHealth, updateReminders: authUpdateReminders, requestEmailVerification } = useAuth()
+const { user: loggedInUser, isAdmin, updateProfile, updatePassword: authUpdatePassword, updateHealth: authUpdateHealth, updateReminders: authUpdateReminders, requestEmailVerification, listPasskeys, registerPasskey, deletePasskey } = useAuth()
 const { availableCredits: myCredits } = useCredits()
 const { isSupported: pushSupported, isSubscribed: pushSubscribed, subscribe: pushSubscribe, unsubscribe: pushUnsubscribe } = usePushNotifications()
 const { $rav } = useNuxtApp()
@@ -172,6 +172,72 @@ const passwordStrength = computed(() => {
 const verificationSent = ref(false)
 const toast = useToast()
 const requestingPhone = ref(false)
+const passkeys = ref<PasskeySummary[]>([])
+const passkeysSupported = ref(false)
+const passkeysLoading = ref(false)
+const passkeyBusy = ref(false)
+const showPasskeySettings = computed(() => !props.user && targetUser.value?.$id === loggedInUser.value?.$id)
+const hasPasskey = computed(() => passkeys.value.length > 0)
+
+onMounted(async () => {
+  passkeysSupported.value = !!window.PublicKeyCredential
+
+  if (showPasskeySettings.value) {
+    await refreshPasskeys()
+  }
+})
+
+async function refreshPasskeys() {
+  passkeysLoading.value = true
+  try {
+    passkeys.value = await listPasskeys()
+  } catch {
+    passkeys.value = []
+  } finally {
+    passkeysLoading.value = false
+  }
+}
+
+async function setupPasskey() {
+  passkeyBusy.value = true
+  try {
+    passkeys.value = await registerPasskey() || []
+    toast.add({
+      title: 'Passkey ingesteld',
+      description: 'Je kunt nu inloggen met Face ID, Touch ID of apparaatbeveiliging.',
+      color: 'success',
+      icon: 'i-lucide-fingerprint'
+    })
+  } catch (error: any) {
+    toast.add({
+      title: 'Passkey instellen mislukt',
+      description: error?.statusMessage || 'Probeer het later opnieuw.',
+      color: 'error'
+    })
+  } finally {
+    passkeyBusy.value = false
+  }
+}
+
+async function removePasskey(id: string) {
+  passkeyBusy.value = true
+  try {
+    passkeys.value = await deletePasskey(id)
+    toast.add({
+      title: 'Passkey verwijderd',
+      color: 'success',
+      icon: 'i-lucide-trash-2'
+    })
+  } catch {
+    toast.add({
+      title: 'Passkey verwijderen mislukt',
+      description: 'Probeer het later opnieuw.',
+      color: 'error'
+    })
+  } finally {
+    passkeyBusy.value = false
+  }
+}
 
 async function requestPhone() {
   requestingPhone.value = true
@@ -275,6 +341,59 @@ async function requestVerification() {
             <span class="block text-gray-400 text-xs mt-0.5">Ontvang meldingen op je telefoon voor herinneringen en updates</span>
           </div>
           <USwitch v-model="pushEnabled" color="primary" />
+        </div>
+        <div v-if="showPasskeySettings" class="pt-4 border-t border-gray-800/50">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Passkey</span>
+                <UBadge v-if="hasPasskey" color="success" variant="subtle" size="xs">Actief</UBadge>
+                <UBadge v-else color="neutral" variant="subtle" size="xs">Niet ingesteld</UBadge>
+              </div>
+              <span class="block text-gray-400 text-xs mt-0.5">Log sneller in met Face ID, Touch ID of apparaatbeveiliging</span>
+            </div>
+            <UIcon name="i-lucide-fingerprint" class="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+          </div>
+
+          <div v-if="!passkeysSupported" class="mt-3 rounded-lg bg-amber-950/40 border border-amber-800/50 p-3">
+            <p class="text-xs text-amber-200">Passkeys worden niet ondersteund op dit apparaat of in deze browser.</p>
+          </div>
+
+          <div v-else class="mt-4 space-y-3">
+            <div v-if="passkeysLoading" class="text-xs text-gray-400">Passkeys laden...</div>
+            <div v-for="passkey in passkeys" :key="passkey.id" class="flex items-center justify-between gap-3 rounded-lg bg-gray-900/60 border border-gray-800/70 px-3 py-2">
+              <div class="min-w-0">
+                <span class="block text-sm text-gray-100">Apparaat-passkey</span>
+                <span class="block text-xs text-gray-500">
+                  {{ passkey.lastUsedAt ? `Laatst gebruikt op ${$rav.formatDateInDutch(passkey.lastUsedAt)}` : 'Nog niet gebruikt' }}
+                </span>
+              </div>
+              <UTooltip text="Passkey verwijderen">
+                <UButton
+                  color="error"
+                  variant="ghost"
+                  size="sm"
+                  icon="i-lucide-trash-2"
+                  :loading="passkeyBusy"
+                  aria-label="Passkey verwijderen"
+                  @click="removePasskey(passkey.id)"
+                />
+              </UTooltip>
+            </div>
+
+            <UButton
+              color="primary"
+              variant="outline"
+              size="lg"
+              class="justify-center"
+              icon="i-lucide-fingerprint"
+              :disabled="!passkeysSupported"
+              :loading="passkeyBusy"
+              @click="setupPasskey"
+            >
+              {{ hasPasskey ? 'Nog een passkey toevoegen' : 'Passkey instellen' }}
+            </UButton>
+          </div>
         </div>
       </div>
       <div class="flex flex-col gap-3 mt-6">

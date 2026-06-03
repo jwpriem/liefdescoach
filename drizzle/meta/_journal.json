@@ -36,6 +36,13 @@
       "when": 1778696570904,
       "tag": "0004_add_lesson_max_spots",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1780480678005,
+      "tag": "0005_mixed_ultron",
+      "breakpoints": true
     }
   ]
 }

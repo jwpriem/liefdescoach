@@ -15,15 +15,16 @@ const passwordCheck = ref(false);
 const ready = ref(false)
 
 // OTP state
-const loginMode = ref<'password' | 'otp' | 'forgot'>('password')
+const loginMode = ref<'password' | 'otp' | 'passkey' | 'forgot'>('password')
 const otpStep = ref<'email' | 'code'>('email')
 const otpCode = ref('')
 const otpSent = ref(false)
+const passkeysSupported = ref(false)
 
 const resetSent = ref(false)
 const migrationResetSent = ref(false)
 
-const { user, login: authLogin, sendOtp: authSendOtp, verifyOtp: authVerifyOtp, register: authRegister, requestPasswordReset: authRequestPasswordReset, pending } = useAuth()
+const { user, login: authLogin, loginWithPasskey: authLoginWithPasskey, sendOtp: authSendOtp, verifyOtp: authVerifyOtp, register: authRegister, requestPasswordReset: authRequestPasswordReset, pending } = useAuth()
 const { call, error: errorMessage, pending: isLoading } = useApiCall()
 
 definePageMeta({
@@ -55,6 +56,8 @@ useHead({
 })
 
 onMounted(async () => {
+  passkeysSupported.value = !!window.PublicKeyCredential
+
   // useAuth's useAsyncData already started fetching immediately; wait for it
   // without triggering a redundant second request
   if (pending.value) {
@@ -74,6 +77,7 @@ const normalizedEmail = computed(() => email.value.trim().toLowerCase())
 const pageTitle = computed(() => {
   if (registerForm.value) return 'Account aanmaken'
   if (loginMode.value === 'forgot') return 'Wachtwoord vergeten'
+  if (loginMode.value === 'passkey') return 'Inloggen met passkey'
   if (loginMode.value === 'otp') return 'Inloggen met e-mailcode'
   return 'Inloggen'
 })
@@ -81,6 +85,7 @@ const pageTitle = computed(() => {
 const pageSubtitle = computed(() => {
   if (registerForm.value) return 'Maak een account aan om lessen te boeken'
   if (loginMode.value === 'forgot') return 'Ontvang een link om je wachtwoord te herstellen'
+  if (loginMode.value === 'passkey') return 'Gebruik Face ID, Touch ID of je apparaatbeveiliging'
   if (loginMode.value === 'otp' && otpStep.value === 'code') return `We hebben een code gestuurd naar ${normalizedEmail.value}`
   if (loginMode.value === 'otp') return 'Ontvang een eenmalige code op je e-mailadres'
   return 'Welkom terug bij Yoga Ravennah'
@@ -131,6 +136,14 @@ async function verifyOtp() {
   }
 }
 
+async function loginPasskey() {
+  await call(() => authLoginWithPasskey())
+
+  if (user.value) {
+    await navigateTo({ path: '/account' })
+  }
+}
+
 async function resendOtp() {
   otpCode.value = ''
   await call(() => authSendOtp(normalizedEmail.value))
@@ -149,7 +162,7 @@ function switchToRegister() {
   errorMessage.value = null
 }
 
-function switchLoginMode(mode: 'password' | 'otp' | 'forgot') {
+function switchLoginMode(mode: 'password' | 'otp' | 'passkey' | 'forgot') {
   loginMode.value = mode
   registerForm.value = false
   otpStep.value = 'email'
@@ -163,6 +176,7 @@ function handleSubmit() {
   if (migrationResetSent.value) return
   if (registerForm.value) return register()
   if (loginMode.value === 'password') return login()
+  if (loginMode.value === 'passkey') return loginPasskey()
   if (loginMode.value === 'otp' && otpStep.value === 'email') return sendOtp()
   if (loginMode.value === 'otp' && otpStep.value === 'code') return verifyOtp()
   if (loginMode.value === 'forgot' && !resetSent.value) return requestReset()
@@ -233,6 +247,11 @@ const passwordStrength = computed(() => {
               ? 'bg-emerald-600 text-white shadow-md shadow-emerald-900/40'
               : 'text-gray-400 hover:text-gray-200'" @click="switchLoginMode('otp')">
               E-mail code
+            </button>
+            <button class="flex-1 rounded-lg py-2.5 text-sm font-medium transition-all duration-200" :class="loginMode === 'passkey'
+              ? 'bg-emerald-600 text-white shadow-md shadow-emerald-900/40'
+              : 'text-gray-400 hover:text-gray-200'" @click="switchLoginMode('passkey')">
+              Passkey
             </button>
           </div>
         </div>
@@ -371,6 +390,19 @@ const passwordStrength = computed(() => {
             </template>
           </div>
 
+          <!-- ==================== PASSKEY LOGIN ==================== -->
+          <div v-if="loginMode === 'passkey' && !registerForm" class="space-y-5">
+            <div class="rounded-xl bg-gray-900/60 border border-gray-800/70 p-5 text-center">
+              <UIcon name="i-lucide-fingerprint" class="w-10 h-10 text-emerald-400 mx-auto mb-3" />
+              <p class="text-sm text-gray-300">
+                Log in met de passkey die je eerder op je account hebt ingesteld.
+              </p>
+            </div>
+            <div v-if="!passkeysSupported" class="rounded-xl bg-amber-950/40 border border-amber-800/50 p-4">
+              <p class="text-sm text-amber-200">Passkeys worden niet ondersteund op dit apparaat of in deze browser.</p>
+            </div>
+          </div>
+
           <!-- ==================== FORGOT PASSWORD ==================== -->
           <div v-if="loginMode === 'forgot'" class="space-y-5">
             <template v-if="!resetSent">
@@ -456,6 +488,23 @@ const passwordStrength = computed(() => {
               <div class="text-center">
                 <button type="button" class="text-sm text-gray-400 hover:text-emerald-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded px-2 py-0.5" @click="resendOtp">
                   Geen code ontvangen? <span class="font-medium underline underline-offset-2">Opnieuw versturen</span>
+                </button>
+              </div>
+            </template>
+
+            <!-- Passkey login -->
+            <template v-if="loginMode === 'passkey' && !registerForm">
+              <UTooltip :text="passkeysSupported ? 'Inloggen met je passkey' : 'Passkeys worden niet ondersteund op dit apparaat'" class="block w-full">
+                <div class="w-full">
+                  <UButton :disabled="!passkeysSupported" color="primary" variant="solid" size="lg" block icon="i-lucide-fingerprint" @click="loginPasskey">
+                    Inloggen met passkey
+                  </UButton>
+                </div>
+              </UTooltip>
+              <div class="text-center">
+                <button type="button" class="text-sm text-gray-400 hover:text-emerald-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded px-2 py-0.5"
+                  @click="switchLoginMode('password')">
+                  Terug naar wachtwoord
                 </button>
               </div>
             </template>

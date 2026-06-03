@@ -19,6 +19,24 @@ export type User = {
   } | null
 }
 
+export type PasskeySummary = {
+  id: string
+  deviceType?: string | null
+  backedUp: boolean
+  createdAt?: string | null
+  lastUsedAt?: string | null
+}
+
+function passkeyBrowserError(error: any) {
+  if (error?.name === 'NotAllowedError') {
+    throw { statusMessage: 'Passkey-actie is geannuleerd.' }
+  }
+  if (error?.name === 'NotSupportedError') {
+    throw { statusMessage: 'Passkeys worden niet ondersteund op dit apparaat.' }
+  }
+  throw error
+}
+
 export const useAuth = () => {
   const { data: user, refresh, status } = useAsyncData<User | null>('user', async () => {
     try {
@@ -60,6 +78,23 @@ export const useAuth = () => {
     await $fetch('/api/auth/verify-otp', { method: 'POST', body: { email, code } })
     await refresh()
     return user.value
+  }
+
+  async function loginWithPasskey() {
+    if (!import.meta.client || !window.PublicKeyCredential) {
+      throw { statusMessage: 'Passkeys worden niet ondersteund op dit apparaat.' }
+    }
+
+    try {
+      const { startAuthentication } = await import('@simplewebauthn/browser')
+      const options = await $fetch<any>('/api/auth/passkeys/login/options', { method: 'POST' })
+      const response = await startAuthentication({ optionsJSON: options })
+      await $fetch('/api/auth/passkeys/login/verify', { method: 'POST', body: response })
+      await refresh()
+      return user.value
+    } catch (error: any) {
+      passkeyBrowserError(error)
+    }
   }
 
   async function register(email: string, password: string, name: string, phone: string, dateOfBirth?: string | null, injury?: string | null) {
@@ -117,6 +152,32 @@ export const useAuth = () => {
     await refresh()
   }
 
+  async function listPasskeys() {
+    const res = await $fetch<{ passkeys: PasskeySummary[] }>('/api/auth/passkeys')
+    return res.passkeys
+  }
+
+  async function registerPasskey() {
+    if (!import.meta.client || !window.PublicKeyCredential) {
+      throw { statusMessage: 'Passkeys worden niet ondersteund op dit apparaat.' }
+    }
+
+    try {
+      const { startRegistration } = await import('@simplewebauthn/browser')
+      const options = await $fetch<any>('/api/auth/passkeys/register/options', { method: 'POST' })
+      const response = await startRegistration({ optionsJSON: options })
+      await $fetch('/api/auth/passkeys/register/verify', { method: 'POST', body: response })
+      return await listPasskeys()
+    } catch (error: any) {
+      passkeyBrowserError(error)
+    }
+  }
+
+  async function deletePasskey(id: string) {
+    await $fetch(`/api/auth/passkeys/${id}/delete`, { method: 'POST' })
+    return await listPasskeys()
+  }
+
   async function updateReminders(userId: string, reminders: boolean) {
     await $fetch('/api/updatePrefs', { method: 'POST', body: { userId, reminders } })
     await refresh()
@@ -140,9 +201,11 @@ export const useAuth = () => {
   return {
     user, isAdmin, pending, refresh,
     login, logout, sendOtp, verifyOtp, register,
+    loginWithPasskey,
     requestEmailVerification, verifyEmail,
     requestPasswordReset, resetPassword,
     updateProfile, updatePassword, updateReminders, updateHealth,
+    listPasskeys, registerPasskey, deletePasskey,
     submitPhone, skipPhoneRequest
   }
 }

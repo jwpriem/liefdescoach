@@ -104,6 +104,22 @@ export const loginHistory = pgTable('login_history', {
   index('login_history_student_id_idx').on(table.studentId),
 ])
 
+export const passkeyCredentials = pgTable('passkey_credentials', {
+  id: text('id').primaryKey(),
+  studentId: text('student_id').notNull().references(() => students.id, { onDelete: 'cascade' }),
+  credentialId: text('credential_id').notNull(),
+  publicKey: text('public_key').notNull(),
+  counter: integer('counter').notNull().default(0),
+  deviceType: text('device_type'),
+  backedUp: boolean('backed_up').notNull().default(false),
+  transports: text('transports'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  lastUsedAt: timestamp('last_used_at', { withTimezone: true }),
+}, (table) => [
+  index('passkey_credentials_student_id_idx').on(table.studentId),
+  uniqueIndex('passkey_credentials_credential_id_idx').on(table.credentialId),
+])
+
 export const otpCodes = pgTable('otp_codes', {
   id: text('id').primaryKey(),
   email: text('email').notNull(),
@@ -113,4 +129,3 @@ export const otpCodes = pgTable('otp_codes', {
 }, (table) => [
   index('otp_codes_email_idx').on(table.email),
 ])
-
