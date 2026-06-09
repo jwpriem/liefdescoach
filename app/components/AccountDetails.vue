@@ -170,6 +170,7 @@ const passwordStrength = computed(() => {
 });
 
 const verificationSent = ref(false)
+const isVerifying = ref(false)
 const toast = useToast()
 const requestingPhone = ref(false)
 const passkeys = ref<PasskeySummary[]>([])
@@ -250,9 +251,10 @@ async function requestPhone() {
 }
 
 async function requestVerification() {
-  verificationSent.value = true
+  isVerifying.value = true
   try {
     await requestEmailVerification()
+    verificationSent.value = true
     toast.add({
       title: 'Verificatie verzonden',
       description: 'Check je e-mailinbox (en spam) voor de verificatielink.',
@@ -260,12 +262,13 @@ async function requestVerification() {
       icon: 'i-lucide-send'
     })
   } catch (e) {
-    verificationSent.value = false
     toast.add({
       title: 'Fout bij verzenden',
       description: 'Kon verificatiemail niet versturen.',
       color: 'error'
     })
+  } finally {
+    isVerifying.value = false
   }
 }
 </script>
@@ -292,9 +295,9 @@ async function requestVerification() {
               <UBadge v-if="targetUser.emailVerification" color="success" variant="subtle" size="xs">Geverifieerd</UBadge>
               <template v-else>
                 <UBadge color="warning" variant="subtle" size="xs">Ongeverifieerd</UBadge>
-                <button @click="requestVerification" :disabled="verificationSent"
+                <button @click="requestVerification" :disabled="verificationSent || isVerifying"
                   class="text-xs text-emerald-400 hover:text-emerald-300 underline underline-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                  {{ verificationSent ? 'Verzonden' : 'Verifieer nu' }}
+                  {{ isVerifying ? 'Verzenden...' : (verificationSent ? 'Verzonden' : 'Verifieer nu') }}
                 </button>
               </template>
             </div>
@@ -333,14 +336,14 @@ async function requestVerification() {
             <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Herinneringsmail</span>
             <span class="block text-gray-400 text-xs mt-0.5">Ontvang een e-mail de avond voor je les</span>
           </div>
-          <USwitch v-model="remindersEnabled" color="primary" />
+          <USwitch v-model="remindersEnabled" color="primary" aria-label="Herinneringsmail inschakelen" />
         </div>
         <div v-if="pushSupported" class="flex items-center justify-between pt-2 border-t border-gray-800/50">
           <div>
             <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Pushberichten</span>
             <span class="block text-gray-400 text-xs mt-0.5">Ontvang meldingen op je telefoon voor herinneringen en updates</span>
           </div>
-          <USwitch v-model="pushEnabled" color="primary" />
+          <USwitch v-model="pushEnabled" color="primary" aria-label="Pushberichten inschakelen" />
         </div>
         <div v-if="showPasskeySettings" class="pt-4 border-t border-gray-800/50">
           <div class="flex items-start justify-between gap-4">
@@ -398,10 +401,10 @@ async function requestVerification() {
       </div>
       <div class="flex flex-col gap-3 mt-6">
         <UButton color="primary" variant="solid" size="lg" class="justify-center" v-if="!state.editAccountDetails"
-          @click="openEdit()">Gegevens
+          icon="i-lucide-pencil" @click="openEdit()">Gegevens
           bewerken</UButton>
         <UButton color="primary" variant="outline" size="lg" class="justify-center" v-if="!state.editPassword"
-          @click="state.editPassword = true">
+          icon="i-lucide-pencil" @click="state.editPassword = true">
           Wachtwoord wijzigen</UButton>
       </div>
     </div>
@@ -430,7 +433,7 @@ async function requestVerification() {
 
       </div>
       <div class="flex flex-col gap-3 mt-6">
-        <UButton color="primary" variant="solid" size="lg" class="justify-center" @click="openEditHealth()">
+        <UButton color="primary" variant="solid" size="lg" class="justify-center" icon="i-lucide-pencil" @click="openEditHealth()">
           Medische info bewerken</UButton>
       </div>
     </div>
@@ -444,17 +447,17 @@ async function requestVerification() {
 
           <div>
             <label for="name" class="block text-sm font-medium text-gray-300 mb-1.5">Naam</label>
-            <UInput id="name" color="primary" v-model="state.name" variant="outline" size="lg" placeholder="Je naam" />
+            <UInput id="name" color="primary" v-model="state.name" variant="outline" size="lg" placeholder="Je naam" icon="i-lucide-user" />
           </div>
           <div>
             <label for="phone" class="block text-sm font-medium text-gray-300 mb-1.5">Telefoonnummer</label>
             <UInput id="phone" color="primary" v-model="state.phone" variant="outline" size="lg"
-              placeholder="Je telefoonnummer" />
+              placeholder="Je telefoonnummer" icon="i-lucide-phone" />
           </div>
           <div>
             <label for="dateOfBirth" class="block text-sm font-medium text-gray-300 mb-1.5">Geboortedatum</label>
             <UInput type="date" id="dateOfBirth" color="primary" v-model="state.dateOfBirth" variant="outline"
-              size="lg" />
+              size="lg" icon="i-lucide-calendar" />
           </div>
         </div>
 
@@ -545,7 +548,7 @@ async function requestVerification() {
           </div>
           <div class="flex items-center justify-between">
             <label for="pregnancy" class="block text-sm font-medium text-gray-300">Ben je zwanger?</label>
-            <USwitch v-model="state.pregnancy" color="primary" />
+            <USwitch v-model="state.pregnancy" id="pregnancy" color="primary" />
           </div>
           <div v-if="state.pregnancy">
             <label for="dueDate" class="block text-sm font-medium text-gray-300 mb-1.5">Uitgerekende datum</label>

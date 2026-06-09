@@ -224,13 +224,13 @@ const filteredRows = computed(() => {
 			<div class="flex items-start justify-between gap-x-6 flex-wrap gap-y-4">
 				<div class="flex items-start gap-x-6 flex-wrap gap-y-4">
 					<div>
-						<label class="block text-sm font-medium text-gray-300 mb-1.5">Filter gebruikers</label>
+						<label for="naam" class="block text-sm font-medium text-gray-300 mb-1.5">Filter gebruikers</label>
 						<UInput id="naam" v-model="q" color="primary" placeholder="Zoek gebruiker" type="text"
 							variant="outline" size="lg" />
 					</div>
 					<div>
 						<label class="block text-sm font-medium text-gray-300 mb-1.5">Gearchiveerd</label>
-						<USwitch v-model="state.showArchived" unchecked-icon="i-lucide-x" checked-icon="i-lucide-check" />
+						<USwitch v-model="state.showArchived" aria-label="Gearchiveerde gebruikers tonen" unchecked-icon="i-lucide-x" checked-icon="i-lucide-check" />
 					</div>
 				</div>
 				<div class="flex items-end">
