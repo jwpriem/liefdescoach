@@ -15,11 +15,12 @@ const passwordCheck = ref(false);
 const ready = ref(false)
 
 // OTP state
-const loginMode = ref<'password' | 'otp' | 'passkey' | 'forgot'>('password')
+const loginMode = ref<'password' | 'otp' | 'passkey' | 'forgot'>('passkey')
 const otpStep = ref<'email' | 'code'>('email')
 const otpCode = ref('')
 const otpSent = ref(false)
 const passkeysSupported = ref(false)
+const showOtherLoginOptions = ref(false)
 
 const resetSent = ref(false)
 const migrationResetSent = ref(false)
@@ -159,17 +160,28 @@ async function requestReset() {
 function switchToRegister() {
   loginMode.value = 'password'
   registerForm.value = true
+  showOtherLoginOptions.value = false
   errorMessage.value = null
 }
 
 function switchLoginMode(mode: 'password' | 'otp' | 'passkey' | 'forgot') {
   loginMode.value = mode
   registerForm.value = false
+  showOtherLoginOptions.value = false
   otpStep.value = 'email'
   otpCode.value = ''
   otpSent.value = false
   resetSent.value = false
   errorMessage.value = null
+}
+
+function showOtherOptions() {
+  showOtherLoginOptions.value = true
+  errorMessage.value = null
+}
+
+function backToPasskey() {
+  switchLoginMode('passkey')
 }
 
 function handleSubmit() {
@@ -233,27 +245,6 @@ const passwordStrength = computed(() => {
         <div class="text-center mb-8">
           <h1 class="text-2xl font-bold text-emerald-100 tracking-tight">{{ pageTitle }}</h1>
           <p class="mt-2 text-sm text-gray-400">{{ pageSubtitle }}</p>
-        </div>
-
-        <!-- Login mode toggle (only in login, not register, not forgot) -->
-        <div v-if="!registerForm && loginMode !== 'forgot'" class="mb-8">
-          <div class="flex rounded-xl bg-gray-800/60 p-1">
-            <button class="flex-1 rounded-lg py-2.5 text-sm font-medium transition-all duration-200" :class="loginMode === 'password'
-              ? 'bg-emerald-600 text-white shadow-md shadow-emerald-900/40'
-              : 'text-gray-400 hover:text-gray-200'" @click="switchLoginMode('password')">
-              Wachtwoord
-            </button>
-            <button class="flex-1 rounded-lg py-2.5 text-sm font-medium transition-all duration-200" :class="loginMode === 'otp'
-              ? 'bg-emerald-600 text-white shadow-md shadow-emerald-900/40'
-              : 'text-gray-400 hover:text-gray-200'" @click="switchLoginMode('otp')">
-              E-mail code
-            </button>
-            <button class="flex-1 rounded-lg py-2.5 text-sm font-medium transition-all duration-200" :class="loginMode === 'passkey'
-              ? 'bg-emerald-600 text-white shadow-md shadow-emerald-900/40'
-              : 'text-gray-400 hover:text-gray-200'" @click="switchLoginMode('passkey')">
-              Passkey
-            </button>
-          </div>
         </div>
 
         <form @submit.prevent="handleSubmit">
@@ -392,14 +383,36 @@ const passwordStrength = computed(() => {
 
           <!-- ==================== PASSKEY LOGIN ==================== -->
           <div v-if="loginMode === 'passkey' && !registerForm" class="space-y-5">
-            <div class="rounded-xl bg-gray-900/60 border border-gray-800/70 p-5 text-center">
-              <UIcon name="i-lucide-fingerprint" class="w-10 h-10 text-emerald-400 mx-auto mb-3" />
+            <div class="text-center">
+              <UIcon name="i-lucide-fingerprint" class="w-12 h-12 text-emerald-400 mx-auto mb-4" />
               <p class="text-sm text-gray-300">
                 Log in met de passkey die je eerder op je account hebt ingesteld.
               </p>
             </div>
             <div v-if="!passkeysSupported" class="rounded-xl bg-amber-950/40 border border-amber-800/50 p-4">
               <p class="text-sm text-amber-200">Passkeys worden niet ondersteund op dit apparaat of in deze browser.</p>
+            </div>
+            <div v-if="showOtherLoginOptions || !passkeysSupported" class="space-y-3 rounded-xl bg-gray-900/60 border border-gray-800/70 p-4">
+              <UButton
+                color="primary"
+                variant="soft"
+                size="lg"
+                block
+                icon="i-lucide-mail"
+                @click="switchLoginMode('otp')"
+              >
+                E-mailcode ontvangen
+              </UButton>
+              <UButton
+                color="neutral"
+                variant="outline"
+                size="lg"
+                block
+                icon="i-lucide-lock"
+                @click="switchLoginMode('password')"
+              >
+                Wachtwoord gebruiken
+              </UButton>
             </div>
           </div>
 
@@ -446,6 +459,12 @@ const passwordStrength = computed(() => {
                   Nog geen account? <span class="font-medium underline underline-offset-2">Registreren</span>
                 </button>
               </div>
+              <div class="text-center">
+                <button type="button" class="text-sm text-gray-400 hover:text-emerald-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded px-2 py-0.5"
+                  @click="backToPasskey">
+                  Terug naar passkey
+                </button>
+              </div>
             </template>
 
             <!-- Register -->
@@ -459,7 +478,7 @@ const passwordStrength = computed(() => {
               </UTooltip>
               <div class="text-center">
                 <button type="button" class="text-sm text-gray-400 hover:text-emerald-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded px-2 py-0.5"
-                  @click="registerForm = false">
+                  @click="backToPasskey">
                   Al een account? <span class="font-medium underline underline-offset-2">Inloggen</span>
                 </button>
               </div>
@@ -474,6 +493,12 @@ const passwordStrength = computed(() => {
                   </UButton>
                 </div>
               </UTooltip>
+              <div class="text-center">
+                <button type="button" class="text-sm text-gray-400 hover:text-emerald-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded px-2 py-0.5"
+                  @click="backToPasskey">
+                  Terug naar passkey
+                </button>
+              </div>
             </template>
 
             <!-- OTP: verify code -->
@@ -490,6 +515,12 @@ const passwordStrength = computed(() => {
                   Geen code ontvangen? <span class="font-medium underline underline-offset-2">Opnieuw versturen</span>
                 </button>
               </div>
+              <div class="text-center">
+                <button type="button" class="text-sm text-gray-400 hover:text-emerald-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded px-2 py-0.5"
+                  @click="backToPasskey">
+                  Terug naar passkey
+                </button>
+              </div>
             </template>
 
             <!-- Passkey login -->
@@ -501,10 +532,16 @@ const passwordStrength = computed(() => {
                   </UButton>
                 </div>
               </UTooltip>
+              <div v-if="passkeysSupported && !showOtherLoginOptions" class="text-center">
+                <button type="button" class="text-sm text-gray-400 hover:text-emerald-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded px-2 py-0.5"
+                  @click="showOtherOptions">
+                  Andere manier gebruiken
+                </button>
+              </div>
               <div class="text-center">
                 <button type="button" class="text-sm text-gray-400 hover:text-emerald-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded px-2 py-0.5"
-                  @click="switchLoginMode('password')">
-                  Terug naar wachtwoord
+                  @click="registerForm = true">
+                  Nog geen account? <span class="font-medium underline underline-offset-2">Registreren</span>
                 </button>
               </div>
             </template>
@@ -520,7 +557,7 @@ const passwordStrength = computed(() => {
               </UTooltip>
               <div class="text-center">
                 <button type="button" class="text-sm text-gray-400 hover:text-emerald-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded px-2 py-0.5"
-                  @click="switchLoginMode('password')">
+                  @click="backToPasskey">
                   Terug naar inloggen
                 </button>
               </div>
