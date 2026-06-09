@@ -30,35 +30,52 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 400, statusMessage: 'Selecteer een deelnemer voor de Classpass boeking' })
     }
 
-    // Fetch lesson
-    const lessonRows = await db.select().from(lessons).where(eq(lessons.id, body.lessonId)).limit(1)
-    if (lessonRows.length === 0) {
+    // ⚡ Bolt: Fetch lesson and existing bookings in a single joined query to reduce database roundtrips.
+    const rows = await db
+        .select({
+            lesson: lessons,
+            booking: bookings,
+        })
+        .from(lessons)
+        .leftJoin(bookings, eq(lessons.id, bookings.lessonId))
+        .where(eq(lessons.id, body.lessonId))
+
+    if (rows.length === 0) {
         throw createError({ statusCode: 404, statusMessage: 'Les niet gevonden' })
     }
-    const lesson = lessonRows[0]
 
+    const lesson = rows[0].lesson
     const isAdminBookingForStudent = isAdmin && Boolean(body.onBehalfOfUserId)
 
-    if (!isAdminBookingForStudent && new Date(lesson.date) <= new Date()) {
+    // ⚡ Bolt: Use native getTime() and Date.now() for faster comparison without re-wrapping lesson.date.
+    if (!isAdminBookingForStudent && lesson.date.getTime() <= Date.now()) {
         throw createError({ statusCode: 400, statusMessage: 'Kan niet boeken voor een les in het verleden' })
     }
 
     const allowDuplicateBooking = body.extraSpot === true
 
-    const existingBookings = await db
-        .select()
-        .from(bookings)
-        .where(eq(bookings.lessonId, body.lessonId))
+    // ⚡ Bolt: Consolidate booking extraction, capacity check, and duplicate detection into a single loop to avoid multiple array traversals.
+    let regularCount = 0
+    let isAlreadyBooked = false
 
-    // Only regular bookings count toward capacity. Classpass bookings ignore capacity.
-    if (source === 'regular') {
-        const regularCount = existingBookings.filter(b => b.source === 'regular').length
-        if (regularCount >= lesson.maxSpots) {
-            throw createError({ statusCode: 409, statusMessage: 'Les is vol' })
+    for (const r of rows) {
+        const b = r.booking
+        if (!b) continue
+
+        if (b.source === 'regular') {
+            regularCount++
+        }
+        if (!allowDuplicateBooking && b.studentId === targetUserId) {
+            isAlreadyBooked = true
         }
     }
 
-    if (!allowDuplicateBooking && existingBookings.some(b => b.studentId === targetUserId)) {
+    // Only regular bookings count toward capacity. Classpass bookings ignore capacity.
+    if (source === 'regular' && regularCount >= lesson.maxSpots) {
+        throw createError({ statusCode: 409, statusMessage: 'Les is vol' })
+    }
+
+    if (isAlreadyBooked) {
         throw createError({ statusCode: 409, statusMessage: 'Gebruiker is al geboekt voor deze les' })
     }
 
@@ -88,7 +105,8 @@ export default defineEventHandler(async (event) => {
             .where(eq(credits.id, creditId))
     }
 
-    const regularCountAfter = await countRegularLessonBookings(body.lessonId)
+    // ⚡ Bolt: Use the in-memory regularCount (incremented if the new booking was 'regular') to calculate spots, eliminating one DB roundtrip.
+    const regularCountAfter = source === 'regular' ? regularCount + 1 : regularCount
 
     return {
         success: true,

@@ -41,3 +41,7 @@
 ## 2025-05-20 - Server API Data Processing Efficiency
 **Learning:** Extracting unique identifiers from a list of records using `[...new Set(arr.map(i => i.id))]` and building lookup Maps using `new Map(arr.map(l => [l.id, l.val]))` incurs multiple redundant traversals and unnecessary intermediate array/object allocations.
 **Action:** Use single `for...of` loops to populate `Set` and `Map` objects directly. Additionally, consolidate data enrichment steps into a single loop to reduce iteration overhead and maintain reference stability for objects.
+
+## 2024-06-09 - Server API Query Consolidation
+**Learning:** Consolidating multiple database queries (e.g., fetch parent, fetch children, fetch count) into a single joined query using `leftJoin` significantly reduces database roundtrip latency, which is the primary bottleneck in serverless/distributed environments.
+**Action:** Always look for opportunities to use joins instead of sequential queries in server handlers, and process the results in a single pass to derive metrics like counts or existence checks.
