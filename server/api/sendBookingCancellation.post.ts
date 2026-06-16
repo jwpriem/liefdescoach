@@ -12,17 +12,35 @@ export default defineEventHandler(async (event) => {
     }
 
     const isAdmin = user.labels.includes('admin')
-    if (body.email.trim().toLowerCase() !== user.email.toLowerCase() && !isAdmin) {
+    const email = body.email?.trim().toLowerCase()
+    if (email !== user.email.toLowerCase() && !isAdmin) {
         throw createError({ statusCode: 403, statusMessage: 'Geen toegang' })
     }
     if (!body?.lessonId || typeof body.lessonId !== 'string') {
         throw createError({ statusCode: 400, statusMessage: 'lessonId is verplicht' })
     }
 
+    // 1. Fetch student
+    const studentRows = await db
+        .select()
+        .from(students)
+        .where(eq(students.email, email))
+        .limit(1)
+
+    if (studentRows.length === 0) {
+        throw createError({ statusCode: 404, statusMessage: 'Student niet gevonden' })
+    }
+    const targetStudent = studentRows[0]
+
+    // 2. Fetch lesson
     const lessonRows = await db.select().from(lessons).where(eq(lessons.id, body.lessonId)).limit(1)
-    if (lessonRows.length === 0) return
+    if (lessonRows.length === 0) {
+        throw createError({ statusCode: 404, statusMessage: 'Les niet gevonden' })
+    }
 
     const lesson = lessonRows[0]
+
+    const studentName = targetStudent.name
 
     const bookingRows = await db
         .select({
@@ -46,14 +64,14 @@ export default defineEventHandler(async (event) => {
     const spots = lesson.maxSpots - bookingRows.length
 
     const studentMail = cancellationStudentEmail({
-        name: body.name,
+        name: studentName,
         lessonType: lessontype,
         lessonDate: formattedDate,
     })
 
     const adminMail = cancellationAdminEmail({
-        name: body.name,
-        email: body.email,
+        name: studentName,
+        email: email,
         lessonType: lessontype,
         lessonDate: formattedDate,
         spots,
@@ -61,7 +79,7 @@ export default defineEventHandler(async (event) => {
     })
 
     const emails = [
-        { label: 'student', to: body.email, ...studentMail },
+        { label: 'student', to: email, ...studentMail },
         { label: 'admin', to: 'info@ravennah.com', ...adminMail },
     ]
 
@@ -86,7 +104,7 @@ export default defineEventHandler(async (event) => {
     try {
         await sendPushToAdmins({
             title: 'Annulering',
-            body: `${body.name} heeft ${lessontype} geannuleerd op ${formattedDate}`,
+            body: `${studentName} heeft ${lessontype} geannuleerd op ${formattedDate}`,
             url: '/account',
         })
     } catch (err: any) {

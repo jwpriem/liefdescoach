@@ -12,7 +12,7 @@ const smtpConfig = {
     socketTimeout: 30_000,   // Close idle sockets after 30s
     auth: {
         user: isDev ? process.env.NUXT_PUBLIC_MAIL_USER_DEV : 'info@ravennah.com',
-        pass: isDev ? process.env.NUXT_PUBLIC_MAIL_PASS_DEV : process.env.NUXT_PUBLIC_MAIL_PASS,
+        pass: isDev ? useRuntimeConfig().mailPassDev : useRuntimeConfig().mailPass,
     },
 }
 
