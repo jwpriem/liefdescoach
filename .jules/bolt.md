@@ -41,3 +41,7 @@
 ## 2025-05-20 - Server API Data Processing Efficiency
 **Learning:** Extracting unique identifiers from a list of records using `[...new Set(arr.map(i => i.id))]` and building lookup Maps using `new Map(arr.map(l => [l.id, l.val]))` incurs multiple redundant traversals and unnecessary intermediate array/object allocations.
 **Action:** Use single `for...of` loops to populate `Set` and `Map` objects directly. Additionally, consolidate data enrichment steps into a single loop to reduce iteration overhead and maintain reference stability for objects.
+
+## 2025-05-21 - Reducing DB Roundtrips with Joined Queries
+**Learning:** Performing separate queries for a resource and then subsequent count or existence checks for its relations (e.g., `db.select().from(lessons)`, then `db.select().from(bookings).where(...)`, then `countRegularLessonBookings(...)`) causes multiple network roundtrips and increases latency.
+**Action:** Use a single `leftJoin` query to fetch the parent resource and all related records in one go. Consolidate business logic (capacity checks, duplicate prevention) into a single pass over the joined results in-memory. This allows calculating final metrics (like `spotsLeft`) without any additional database calls.
