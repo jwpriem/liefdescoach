@@ -329,18 +329,18 @@ async function requestVerification() {
           <span class="block text-gray-100 mt-0.5">{{ $rav.formatDateInDutch(targetUser.registration) }}</span>
         </div>
         <div class="flex items-center justify-between pt-2 border-t border-gray-800/50">
-          <div>
+          <label for="reminders-switch" class="cursor-pointer">
             <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Herinneringsmail</span>
             <span class="block text-gray-400 text-xs mt-0.5">Ontvang een e-mail de avond voor je les</span>
-          </div>
-          <USwitch v-model="remindersEnabled" color="primary" />
+          </label>
+          <USwitch id="reminders-switch" v-model="remindersEnabled" color="primary" />
         </div>
         <div v-if="pushSupported" class="flex items-center justify-between pt-2 border-t border-gray-800/50">
-          <div>
+          <label for="push-switch" class="cursor-pointer">
             <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Pushberichten</span>
             <span class="block text-gray-400 text-xs mt-0.5">Ontvang meldingen op je telefoon voor herinneringen en updates</span>
-          </div>
-          <USwitch v-model="pushEnabled" color="primary" />
+          </label>
+          <USwitch id="push-switch" v-model="pushEnabled" color="primary" />
         </div>
         <div v-if="showPasskeySettings" class="pt-4 border-t border-gray-800/50">
           <div class="flex items-start justify-between gap-4">
@@ -544,8 +544,8 @@ async function requestVerification() {
               placeholder="Heb je blessures of ben je zwanger? Laat het ons weten." />
           </div>
           <div class="flex items-center justify-between">
-            <label for="pregnancy" class="block text-sm font-medium text-gray-300">Ben je zwanger?</label>
-            <USwitch v-model="state.pregnancy" color="primary" />
+            <label for="pregnancy-switch" class="block text-sm font-medium text-gray-300 cursor-pointer">Ben je zwanger?</label>
+            <USwitch id="pregnancy-switch" v-model="state.pregnancy" color="primary" />
           </div>
           <div v-if="state.pregnancy">
             <label for="dueDate" class="block text-sm font-medium text-gray-300 mb-1.5">Uitgerekende datum</label>
