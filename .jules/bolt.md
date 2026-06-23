@@ -41,3 +41,7 @@
 ## 2025-05-20 - Server API Data Processing Efficiency
 **Learning:** Extracting unique identifiers from a list of records using `[...new Set(arr.map(i => i.id))]` and building lookup Maps using `new Map(arr.map(l => [l.id, l.val]))` incurs multiple redundant traversals and unnecessary intermediate array/object allocations.
 **Action:** Use single `for...of` loops to populate `Set` and `Map` objects directly. Additionally, consolidate data enrichment steps into a single loop to reduce iteration overhead and maintain reference stability for objects.
+
+## 2026-06-24 - Consolidated Authentication API
+**Learning:** Sequential network requests in core composables (like `useAuth` calling `/api/auth/me` then `/api/health/me`) create a performance waterfall that slows down every authenticated page load. Enriching the primary auth endpoint with related profile/health data eliminates unnecessary roundtrips.
+**Action:** Always check if multiple "me" or identity-related endpoints can be merged into a single enriched response to minimize application startup latency.

@@ -40,13 +40,8 @@ function passkeyBrowserError(error: any) {
 export const useAuth = () => {
   const { data: user, refresh, status } = useAsyncData<User | null>('user', async () => {
     try {
-      const me = await $fetch<User>('/api/auth/me')
-      try {
-        const { health, dateOfBirth, phone, phoneRequested } = await $fetch<any>('/api/health/me')
-        return { ...me, health, dateOfBirth, phone, phoneRequested }
-      } catch {
-        return me
-      }
+      // ⚡ Bolt: Fetch all user data in a single request, eliminating the redundant /api/health/me call.
+      return await $fetch<User>('/api/auth/me')
     } catch {
       return null
     }

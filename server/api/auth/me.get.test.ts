@@ -10,6 +10,14 @@ beforeEach(() => {
     err.statusMessage = opts.statusMessage
     return err
   }))
+
+  const mockDb = {
+    select: vi.fn().mockReturnThis(),
+    from: vi.fn().mockReturnThis(),
+    where: vi.fn().mockReturnThis(),
+    limit: vi.fn().mockResolvedValue([]),
+  }
+  vi.stubGlobal('db', mockDb)
 })
 
 const handle = typeof handler === 'function'
@@ -46,6 +54,10 @@ describe('GET /api/auth/me', () => {
       archived: false,
       reminders: true,
       pushNotifications: false,
+      dateOfBirth: null,
+      phone: undefined,
+      phoneRequested: undefined,
+      health: null,
     })
   })
 
