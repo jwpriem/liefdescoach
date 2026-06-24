@@ -92,8 +92,8 @@ Provides `$rav` globally with utility functions: Dutch date formatting, calendar
 
 ### Runtime Config
 
-**Private** (server only): `databaseUrl`, `sessionSecret`, `cronSecret`
-**Public**: `vapidPublicKey`, `mailPass`, `mailPassDev`
+**Private** (server only): `databaseUrl`, `sessionSecret`, `cronSecret`, `mailPass`, `mailPassDev`, `mailUserDev`
+**Public**: `vapidPublicKey`
 
 Set via environment variables prefixed with `NUXT_` (e.g., `NUXT_DATABASE_URL`, `NUXT_SESSION_SECRET`).
 
