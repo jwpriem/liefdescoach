@@ -229,8 +229,8 @@ const filteredRows = computed(() => {
 							variant="outline" size="lg" />
 					</div>
 					<div>
-						<label class="block text-sm font-medium text-gray-300 mb-1.5">Gearchiveerd</label>
-						<USwitch v-model="state.showArchived" unchecked-icon="i-lucide-x" checked-icon="i-lucide-check" />
+						<label for="archived-switch" class="block text-sm font-medium text-gray-300 mb-1.5 cursor-pointer">Gearchiveerd</label>
+						<USwitch id="archived-switch" v-model="state.showArchived" unchecked-icon="i-lucide-x" checked-icon="i-lucide-check" />
 					</div>
 				</div>
 				<div class="flex items-end">

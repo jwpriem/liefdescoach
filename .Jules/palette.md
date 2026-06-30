@@ -55,3 +55,7 @@
 ## 2025-05-22 - Explicit focus indicators and tooltips for icon actions
 **Learning:** In Tailwind 4 environments, default browser focus rings can be nearly invisible on specific backgrounds (like dark navigation bars or list items). Additionally, icon-only actions (like calendar exports) lack immediate semantic clarity without persistent or hover-based micro-copy.
 **Action:** Always apply explicit `focus-visible:ring-2` (and `focus:outline-none`) to interactive elements to ensure accessibility for keyboard users. Use `ring-inset` for navigation links to prevent focus indicators from being clipped by container overflow (`overflow-hidden`). Enhance icon-only buttons with `UTooltip` and `aria-label` to provide both visual and screen-reader context.
+
+## 2025-05-24 - Maximizing settings row hit areas
+**Learning:** For settings rows containing a toggle switch, users expect the entire row to be interactive. Simply placing a label next to a switch is often insufficient for a "delightful" mobile experience.
+**Action:** Convert the row's container `<div>` into a `<label>` element styled with `flex items-center justify-between` and `cursor-pointer`. Ensure the label is programmatically linked to the `USwitch` via corresponding `id` and `for` attributes.

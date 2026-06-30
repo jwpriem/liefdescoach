@@ -170,6 +170,7 @@ const passwordStrength = computed(() => {
 });
 
 const verificationSent = ref(false)
+const requestingVerification = ref(false)
 const toast = useToast()
 const requestingPhone = ref(false)
 const passkeys = ref<PasskeySummary[]>([])
@@ -251,6 +252,7 @@ async function requestPhone() {
 
 async function requestVerification() {
   verificationSent.value = true
+  requestingVerification.value = true
   try {
     await requestEmailVerification()
     toast.add({
@@ -266,6 +268,8 @@ async function requestVerification() {
       description: 'Kon verificatiemail niet versturen.',
       color: 'error'
     })
+  } finally {
+    requestingVerification.value = false
   }
 }
 </script>
@@ -282,19 +286,25 @@ async function requestVerification() {
       class="rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-2xl shadow-emerald-950/20 p-6 sm:p-8 w-full md:w-1/2">
       <div class="space-y-4">
         <div>
-          <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Naam</span>
+          <div class="flex items-center gap-2">
+            <UIcon name="i-lucide-user" class="w-4 h-4 text-emerald-400/80" />
+            <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Naam</span>
+          </div>
           <span class="block text-gray-100 mt-0.5">{{ targetUser.name }}</span>
         </div>
         <div>
           <div class="flex items-center gap-x-2">
-            <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Email</span>
+            <div class="flex items-center gap-2">
+              <UIcon name="i-lucide-mail" class="w-4 h-4 text-emerald-400/80" />
+              <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Email</span>
+            </div>
             <div class="flex items-center gap-x-2">
               <UBadge v-if="targetUser.emailVerification" color="success" variant="subtle" size="xs">Geverifieerd</UBadge>
               <template v-else>
                 <UBadge color="warning" variant="subtle" size="xs">Ongeverifieerd</UBadge>
-                <button @click="requestVerification" :disabled="verificationSent"
+                <button @click="requestVerification" :disabled="verificationSent || requestingVerification"
                   class="text-xs text-emerald-400 hover:text-emerald-300 underline underline-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                  {{ verificationSent ? 'Verzonden' : 'Verifieer nu' }}
+                  {{ requestingVerification ? 'Versturen...' : (verificationSent ? 'Verzonden' : 'Verifieer nu') }}
                 </button>
               </template>
             </div>
@@ -303,7 +313,10 @@ async function requestVerification() {
         </div>
         <div>
           <div class="flex items-center gap-x-2">
-            <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Telefoon</span>
+            <div class="flex items-center gap-2">
+              <UIcon name="i-lucide-phone" class="w-4 h-4 text-emerald-400/80" />
+              <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Telefoon</span>
+            </div>
             <button v-if="isAdmin && props.user && !targetUser.phone"
               @click="requestPhone" :disabled="requestingPhone || targetUser.phoneRequested"
               class="text-xs text-emerald-400 hover:text-emerald-300 underline underline-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
@@ -314,7 +327,10 @@ async function requestVerification() {
           <span class="block text-gray-400 mt-0.5" v-else>Geen telefoonnummer</span>
         </div>
         <div>
-          <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Geboortedatum</span>
+          <div class="flex items-center gap-2">
+            <UIcon name="i-lucide-calendar" class="w-4 h-4 text-emerald-400/80" />
+            <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Geboortedatum</span>
+          </div>
           <span class="block text-gray-100 mt-0.5" v-if="targetUser.dateOfBirth">{{
             $rav.formatDateInDutch(targetUser.dateOfBirth) }}</span>
           <span class="block text-gray-400 mt-0.5" v-else>Niet opgegeven</span>
@@ -328,20 +344,20 @@ async function requestVerification() {
           <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Geregistreerd op</span>
           <span class="block text-gray-100 mt-0.5">{{ $rav.formatDateInDutch(targetUser.registration) }}</span>
         </div>
-        <div class="flex items-center justify-between pt-2 border-t border-gray-800/50">
+        <label for="reminders-switch" class="flex items-center justify-between pt-2 border-t border-gray-800/50 cursor-pointer">
           <div>
             <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Herinneringsmail</span>
             <span class="block text-gray-400 text-xs mt-0.5">Ontvang een e-mail de avond voor je les</span>
           </div>
-          <USwitch v-model="remindersEnabled" color="primary" />
-        </div>
-        <div v-if="pushSupported" class="flex items-center justify-between pt-2 border-t border-gray-800/50">
+          <USwitch id="reminders-switch" v-model="remindersEnabled" color="primary" />
+        </label>
+        <label v-if="pushSupported" for="push-switch" class="flex items-center justify-between pt-2 border-t border-gray-800/50 cursor-pointer">
           <div>
             <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Pushberichten</span>
             <span class="block text-gray-400 text-xs mt-0.5">Ontvang meldingen op je telefoon voor herinneringen en updates</span>
           </div>
-          <USwitch v-model="pushEnabled" color="primary" />
-        </div>
+          <USwitch id="push-switch" v-model="pushEnabled" color="primary" />
+        </label>
         <div v-if="showPasskeySettings" class="pt-4 border-t border-gray-800/50">
           <div class="flex items-start justify-between gap-4">
             <div>
@@ -397,10 +413,10 @@ async function requestVerification() {
         </div>
       </div>
       <div class="flex flex-col gap-3 mt-6">
-        <UButton color="primary" variant="solid" size="lg" class="justify-center" v-if="!state.editAccountDetails"
+        <UButton color="primary" variant="solid" size="lg" class="justify-center" icon="i-lucide-pencil" v-if="!state.editAccountDetails"
           @click="openEdit()">Gegevens
           bewerken</UButton>
-        <UButton color="primary" variant="outline" size="lg" class="justify-center" v-if="!state.editPassword"
+        <UButton color="primary" variant="outline" size="lg" class="justify-center" icon="i-lucide-lock" v-if="!state.editPassword"
           @click="state.editPassword = true">
           Wachtwoord wijzigen</UButton>
       </div>
@@ -544,8 +560,8 @@ async function requestVerification() {
               placeholder="Heb je blessures of ben je zwanger? Laat het ons weten." />
           </div>
           <div class="flex items-center justify-between">
-            <label for="pregnancy" class="block text-sm font-medium text-gray-300">Ben je zwanger?</label>
-            <USwitch v-model="state.pregnancy" color="primary" />
+            <label for="pregnancy" class="block text-sm font-medium text-gray-300 cursor-pointer">Ben je zwanger?</label>
+            <USwitch id="pregnancy" v-model="state.pregnancy" color="primary" />
           </div>
           <div v-if="state.pregnancy">
             <label for="dueDate" class="block text-sm font-medium text-gray-300 mb-1.5">Uitgerekende datum</label>
