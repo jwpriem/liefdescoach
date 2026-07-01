@@ -41,3 +41,7 @@
 ## 2025-05-20 - Server API Data Processing Efficiency
 **Learning:** Extracting unique identifiers from a list of records using `[...new Set(arr.map(i => i.id))]` and building lookup Maps using `new Map(arr.map(l => [l.id, l.val]))` incurs multiple redundant traversals and unnecessary intermediate array/object allocations.
 **Action:** Use single `for...of` loops to populate `Set` and `Map` objects directly. Additionally, consolidate data enrichment steps into a single loop to reduce iteration overhead and maintain reference stability for objects.
+
+## 2025-05-21 - Consolidating Core Auth and Health Data
+**Learning:** Sequential network requests during application startup (e.g., fetching basic user data then detailed profile/health data) create a performance waterfall that significantly increases Time to Interactive (TTI). Consolidating these into a single authenticated response reduces network roundtrips and database connection overhead.
+**Action:** Always aim to provide a "fat" identity response for the initial authenticated handshake to ensure the UI can render its final state immediately without secondary loading spinners.

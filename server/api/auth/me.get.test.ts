@@ -4,6 +4,12 @@ import handler from './me.get'
 beforeEach(() => {
   vi.restoreAllMocks()
   vi.stubGlobal('getSessionUser', vi.fn())
+  vi.stubGlobal('db', {
+    select: vi.fn().mockReturnThis(),
+    from: vi.fn().mockReturnThis(),
+    where: vi.fn().mockReturnThis(),
+    limit: vi.fn().mockResolvedValue([]),
+  })
   vi.stubGlobal('createError', vi.fn((opts: any) => {
     const err = new Error(opts.statusMessage) as any
     err.statusCode = opts.statusCode
@@ -23,8 +29,8 @@ describe('GET /api/auth/me', () => {
     await expect(handle({} as any)).rejects.toMatchObject({ statusCode: 401 })
   })
 
-  it('returns user data for authenticated user', async () => {
-    vi.mocked(getSessionUser).mockResolvedValue({
+  it('returns consolidated user data for authenticated user', async () => {
+    const mockUser = {
       userId: 'u1',
       email: 'user@test.com',
       name: 'Test User',
@@ -33,7 +39,21 @@ describe('GET /api/auth/me', () => {
       archived: false,
       reminders: true,
       pushNotifications: false,
-    } as any)
+      dateOfBirth: new Date('1990-01-01'),
+      phone: '0612345678',
+      phoneRequested: false,
+      registration: new Date('2023-01-01'),
+    }
+    vi.mocked(getSessionUser).mockResolvedValue(mockUser as any)
+
+    const mockHealth = {
+      id: 'h1',
+      studentId: 'u1',
+      injury: 'None',
+      pregnancy: false,
+      dueDate: null,
+    }
+    vi.mocked(db.limit).mockResolvedValue([mockHealth])
 
     const result = await handle({} as any)
 
@@ -46,6 +66,16 @@ describe('GET /api/auth/me', () => {
       archived: false,
       reminders: true,
       pushNotifications: false,
+      dateOfBirth: mockUser.dateOfBirth.toISOString(),
+      phone: '0612345678',
+      phoneRequested: false,
+      registration: mockUser.registration.toISOString(),
+      health: {
+        $id: 'h1',
+        injury: 'None',
+        pregnancy: false,
+        dueDate: null,
+      },
     })
   })
 
