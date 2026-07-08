@@ -19,9 +19,39 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 400, statusMessage: 'lessonId is verplicht' })
     }
 
+    // Fetch student first to ensure they exist and to get their authentic name
+    const studentRows = await db
+        .select()
+        .from(students)
+        .where(eq(students.email, body.email.trim().toLowerCase()))
+        .limit(1)
+
+    if (studentRows.length === 0) {
+        throw createError({ statusCode: 404, statusMessage: 'Student niet gevonden' })
+    }
+    const student = studentRows[0]
+
+    // Verify booking existence to prevent unauthorized notification triggering
+    const studentBooking = await db
+        .select()
+        .from(bookings)
+        .where(
+            and(
+                eq(bookings.lessonId, body.lessonId),
+                eq(bookings.studentId, student.id)
+            )
+        )
+        .limit(1)
+
+    if (studentBooking.length === 0) {
+        throw createError({ statusCode: 404, statusMessage: 'Boeking niet gevonden voor deze student' })
+    }
+
     // Fetch lesson
     const lessonRows = await db.select().from(lessons).where(eq(lessons.id, body.lessonId)).limit(1)
-    if (lessonRows.length === 0) return
+    if (lessonRows.length === 0) {
+        throw createError({ statusCode: 404, statusMessage: 'Les niet gevonden' })
+    }
 
     const lesson = lessonRows[0]
 
@@ -55,7 +85,7 @@ export default defineEventHandler(async (event) => {
     const spots = lesson.maxSpots - bookingRows.length
 
     const studentMail = bookingStudentEmail({
-        name: body.name,
+        name: student.name,
         lessonType: lessontype,
         lessonDate: formattedDate,
         calendarLinks: {
@@ -66,8 +96,8 @@ export default defineEventHandler(async (event) => {
     })
 
     const adminMail = bookingAdminEmail({
-        name: body.name,
-        email: body.email,
+        name: student.name,
+        email: student.email!,
         lessonType: lessontype,
         lessonDate: formattedDate,
         spots,
@@ -100,7 +130,7 @@ export default defineEventHandler(async (event) => {
     try {
         await sendPushToAdmins({
             title: 'Nieuwe boeking',
-            body: `${body.name} heeft ${lessontype} geboekt op ${formattedDate}`,
+            body: `${student.name} heeft ${lessontype} geboekt op ${formattedDate}`,
             url: '/account',
         })
     } catch (err: any) {
@@ -109,33 +139,25 @@ export default defineEventHandler(async (event) => {
 
     // Check if student has zero remaining credits — alert admin
     try {
-        const studentRows = await db
-            .select({ id: students.id })
-            .from(students)
-            .where(eq(students.email, body.email))
+        const now = new Date()
+        const availableCredits = await db
+            .select()
+            .from(credits)
+            .where(
+                and(
+                    eq(credits.studentId, student.id),
+                    isNull(credits.bookingId),
+                    gt(credits.validTo, now)
+                )
+            )
             .limit(1)
 
-        if (studentRows.length > 0) {
-            const now = new Date()
-            const availableCredits = await db
-                .select()
-                .from(credits)
-                .where(
-                    and(
-                        eq(credits.studentId, studentRows[0].id),
-                        isNull(credits.bookingId),
-                        gt(credits.validTo, now)
-                    )
-                )
-                .limit(1)
-
-            if (availableCredits.length === 0) {
-                await sendPushToAdmins({
-                    title: 'Credits op',
-                    body: `${body.name} heeft geen credits meer`,
-                    url: '/account',
-                })
-            }
+        if (availableCredits.length === 0) {
+            await sendPushToAdmins({
+                title: 'Credits op',
+                body: `${student.name} heeft geen credits meer`,
+                url: '/account',
+            })
         }
     } catch (err: any) {
         console.error('[BookingConfirmation] Credit check push failed:', err?.message ?? err)

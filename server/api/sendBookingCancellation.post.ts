@@ -19,8 +19,22 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 400, statusMessage: 'lessonId is verplicht' })
     }
 
+    // Fetch student first to ensure they exist and to get their authentic name
+    const studentRows = await db
+        .select()
+        .from(students)
+        .where(eq(students.email, body.email.trim().toLowerCase()))
+        .limit(1)
+
+    if (studentRows.length === 0) {
+        throw createError({ statusCode: 404, statusMessage: 'Student niet gevonden' })
+    }
+    const student = studentRows[0]
+
     const lessonRows = await db.select().from(lessons).where(eq(lessons.id, body.lessonId)).limit(1)
-    if (lessonRows.length === 0) return
+    if (lessonRows.length === 0) {
+        throw createError({ statusCode: 404, statusMessage: 'Les niet gevonden' })
+    }
 
     const lesson = lessonRows[0]
 
@@ -46,14 +60,14 @@ export default defineEventHandler(async (event) => {
     const spots = lesson.maxSpots - bookingRows.length
 
     const studentMail = cancellationStudentEmail({
-        name: body.name,
+        name: student.name,
         lessonType: lessontype,
         lessonDate: formattedDate,
     })
 
     const adminMail = cancellationAdminEmail({
-        name: body.name,
-        email: body.email,
+        name: student.name,
+        email: student.email!,
         lessonType: lessontype,
         lessonDate: formattedDate,
         spots,
@@ -86,7 +100,7 @@ export default defineEventHandler(async (event) => {
     try {
         await sendPushToAdmins({
             title: 'Annulering',
-            body: `${body.name} heeft ${lessontype} geannuleerd op ${formattedDate}`,
+            body: `${student.name} heeft ${lessontype} geannuleerd op ${formattedDate}`,
             url: '/account',
         })
     } catch (err: any) {
