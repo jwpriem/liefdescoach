@@ -333,14 +333,14 @@ async function requestVerification() {
             <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Herinneringsmail</span>
             <span class="block text-gray-400 text-xs mt-0.5">Ontvang een e-mail de avond voor je les</span>
           </div>
-          <USwitch v-model="remindersEnabled" color="primary" />
+          <USwitch v-model="remindersEnabled" color="primary" aria-label="Herinneringsmail inschakelen" />
         </div>
         <div v-if="pushSupported" class="flex items-center justify-between pt-2 border-t border-gray-800/50">
           <div>
             <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Pushberichten</span>
             <span class="block text-gray-400 text-xs mt-0.5">Ontvang meldingen op je telefoon voor herinneringen en updates</span>
           </div>
-          <USwitch v-model="pushEnabled" color="primary" />
+          <USwitch v-model="pushEnabled" color="primary" aria-label="Pushberichten inschakelen" />
         </div>
         <div v-if="showPasskeySettings" class="pt-4 border-t border-gray-800/50">
           <div class="flex items-start justify-between gap-4">
@@ -545,7 +545,7 @@ async function requestVerification() {
           </div>
           <div class="flex items-center justify-between">
             <label for="pregnancy" class="block text-sm font-medium text-gray-300">Ben je zwanger?</label>
-            <USwitch v-model="state.pregnancy" color="primary" />
+            <USwitch id="pregnancy" v-model="state.pregnancy" color="primary" aria-label="Zwangerschap doorgeven" />
           </div>
           <div v-if="state.pregnancy">
             <label for="dueDate" class="block text-sm font-medium text-gray-300 mb-1.5">Uitgerekende datum</label>
