@@ -151,3 +151,65 @@ Dit verbeterplan beschrijft concrete securitymaatregelen voor de Nuxt 4-applicat
 - **Week 2:** Voeg rate limiting toe voor login, OTP en wachtwoordreset.
 - **Week 3:** Voeg security headers toe en draai CSP eerst in report-only modus.
 - **Week 4:** Voer een autorisatie-audit uit op endpoints die studenten, boekingen, credits en gezondheidsinformatie teruggeven.
+
+## Week 1 uitgevoerd
+
+De eerste mijlpaal is uitgevoerd met de volgende deliverables:
+
+- Alle muterende API-routes zijn geïnventariseerd op basis van de `.post.ts` routes onder `server/api/`.
+- Er is een gedeelde CSRF-helper toegevoegd die veilige HTTP-methodes overslaat, same-origin controleert en een double-submit token valideert.
+- Er is een `/api/csrf-token` endpoint toegevoegd dat een kortlevend CSRF-cookie zet en het token aan de client teruggeeft.
+- Er is server-middleware toegevoegd die CSRF-validatie centraal afdwingt voor muterende API-routes, met een expliciete uitzondering voor de cronroute die via `x-api-key` wordt beschermd.
+- Er is een client-plugin toegevoegd die voor muterende `/api/` requests automatisch een CSRF-token ophaalt en meestuurt via de `x-csrf-token` header.
+- Er zijn unit-tests toegevoegd voor tokenuitgifte, safe-method bypass, same-origin validatie en geldige/ontbrekende/foutieve tokens.
+
+## Inventarisatie muterende API-routes
+
+De volgende muterende API-routes vallen onder de centrale CSRF-middleware, behalve waar expliciet vermeld als server-to-server uitzondering:
+
+- `/api/admin/createStudent`
+- `/api/admin/request-phone`
+- `/api/auth/login`
+- `/api/auth/logout`
+- `/api/auth/passkeys/[id]/delete`
+- `/api/auth/passkeys/login/options`
+- `/api/auth/passkeys/login/verify`
+- `/api/auth/passkeys/register/options`
+- `/api/auth/passkeys/register/verify`
+- `/api/auth/register`
+- `/api/auth/request-password-reset`
+- `/api/auth/request-verification`
+- `/api/auth/reset-password`
+- `/api/auth/send-otp`
+- `/api/auth/update-password`
+- `/api/auth/update-profile`
+- `/api/auth/verify-email`
+- `/api/auth/verify-otp`
+- `/api/bookTrailLesson`
+- `/api/bookings`
+- `/api/cancelBooking`
+- `/api/createLesson`
+- `/api/credits/add`
+- `/api/credits/delete`
+- `/api/credits/history`
+- `/api/credits/welcome`
+- `/api/deleteLesson`
+- `/api/handleBooking`
+- `/api/health/update`
+- `/api/mail/send`
+- `/api/passwordRecovery`
+- `/api/push/subscribe`
+- `/api/push/test`
+- `/api/push/unsubscribe`
+- `/api/sendBookingCancellation`
+- `/api/sendBookingConfirmation`
+- `/api/sendLessonReminders`
+- `/api/studentCheck`
+- `/api/students/create`
+- `/api/students/skip-phone`
+- `/api/students/submit-phone`
+- `/api/students/update-profile`
+- `/api/updateLesson`
+- `/api/updatePrefs`
+
+**Uitzondering:** `/api/sendLessonReminders` blijft uitgesloten van browser-CSRF-validatie omdat deze route server-to-server via `x-api-key` wordt aangeroepen en zelf de cron secret valideert.
