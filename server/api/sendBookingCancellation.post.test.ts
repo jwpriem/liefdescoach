@@ -58,7 +58,9 @@ beforeEach(() => {
 })
 
 const handle = handler as any
-const fakeEvent = () => ({} as any)
+const fakeEvent = () => ({
+  waitUntil: vi.fn(),
+} as any)
 
 describe('POST /api/sendBookingCancellation', () => {
   it('throws 404 if student is not found', async () => {
@@ -101,7 +103,16 @@ describe('POST /api/sendBookingCancellation', () => {
     // Booking list (for cancellation context)
     mockDb.then = (onFulfilled: any) => Promise.resolve([{ id: 'booking-123', studentName: 'Other Student' }]).then(onFulfilled)
 
-    const result = await handle(fakeEvent())
+    let waitUntilPromise: Promise<void> | null = null
+    const event = {
+        waitUntil: vi.fn((p) => { waitUntilPromise = p })
+    } as any
+
+    const result = await handle(event)
+
+    if (waitUntilPromise) {
+        await waitUntilPromise
+    }
 
     expect(mockSmtp.sendMail).toHaveBeenCalled()
   })

@@ -109,59 +109,61 @@ export default defineEventHandler(async (event) => {
         { label: 'admin', to: 'info@ravennah.com', ...adminMail },
     ]
 
-    await Promise.allSettled(
-        emails.map(async (mail) => {
-            try {
-                const result = await smtpTransport.sendMail({
-                    from: 'Yoga Ravennah <info@ravennah.com>',
-                    to: mail.to,
-                    subject: mail.subject,
-                    html: mail.html,
-                    text: mail.text,
-                })
-                console.log(`[BookingConfirmation] ${mail.label} email sent:`, result?.accepted)
-            } catch (err: any) {
-                console.error(`[BookingConfirmation] ${mail.label} email failed:`, err?.message ?? err)
-            }
-        })
-    )
+    event.waitUntil(Promise.resolve().then(async () => {
+        await Promise.allSettled(
+            emails.map(async (mail) => {
+                try {
+                    const result = await smtpTransport.sendMail({
+                        from: 'Yoga Ravennah <info@ravennah.com>',
+                        to: mail.to,
+                        subject: mail.subject,
+                        html: mail.html,
+                        text: mail.text,
+                    })
+                    console.log(`[BookingConfirmation] ${mail.label} email sent:`, result?.accepted)
+                } catch (err: any) {
+                    console.error(`[BookingConfirmation] ${mail.label} email failed:`, err?.message ?? err)
+                }
+            })
+        )
 
-    // Send push notification to admin
-    try {
-        await sendPushToAdmins({
-            title: 'Nieuwe boeking',
-            body: `${student.name} heeft ${lessontype} geboekt op ${formattedDate}`,
-            url: '/account',
-        })
-    } catch (err: any) {
-        console.error('[BookingConfirmation] Admin push failed:', err?.message ?? err)
-    }
-
-    // Check if student has zero remaining credits — alert admin
-    try {
-        const now = new Date()
-        const availableCredits = await db
-            .select()
-            .from(credits)
-            .where(
-                and(
-                    eq(credits.studentId, student.id),
-                    isNull(credits.bookingId),
-                    gt(credits.validTo, now)
-                )
-            )
-            .limit(1)
-
-        if (availableCredits.length === 0) {
+        // Send push notification to admin
+        try {
             await sendPushToAdmins({
-                title: 'Credits op',
-                body: `${student.name} heeft geen credits meer`,
+                title: 'Nieuwe boeking',
+                body: `${student.name} heeft ${lessontype} geboekt op ${formattedDate}`,
                 url: '/account',
             })
+        } catch (err: any) {
+            console.error('[BookingConfirmation] Admin push failed:', err?.message ?? err)
         }
-    } catch (err: any) {
-        console.error('[BookingConfirmation] Credit check push failed:', err?.message ?? err)
-    }
+
+        // Check if student has zero remaining credits — alert admin
+        try {
+            const now = new Date()
+            const availableCredits = await db
+                .select()
+                .from(credits)
+                .where(
+                    and(
+                        eq(credits.studentId, student.id),
+                        isNull(credits.bookingId),
+                        gt(credits.validTo, now)
+                    )
+                )
+                .limit(1)
+
+            if (availableCredits.length === 0) {
+                await sendPushToAdmins({
+                    title: 'Credits op',
+                    body: `${student.name} heeft geen credits meer`,
+                    url: '/account',
+                })
+            }
+        } catch (err: any) {
+            console.error('[BookingConfirmation] Credit check push failed:', err?.message ?? err)
+        }
+    }))
 
     setResponseStatus(event, 202)
 })
