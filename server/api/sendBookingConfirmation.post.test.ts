@@ -60,7 +60,9 @@ beforeEach(() => {
 })
 
 const handle = handler as any
-const fakeEvent = () => ({} as any)
+const fakeEvent = () => ({
+  waitUntil: vi.fn(),
+} as any)
 
 describe('POST /api/sendBookingConfirmation', () => {
   it('throws 404 if student is not found', async () => {
@@ -131,7 +133,16 @@ describe('POST /api/sendBookingConfirmation', () => {
     // Credit check
     mockDb.limit.mockResolvedValueOnce([{ id: 'credit-123' }])
 
-    const result = await handle(fakeEvent())
+    let waitUntilPromise: Promise<void> | null = null
+    const event = {
+        waitUntil: vi.fn((p) => { waitUntilPromise = p })
+    } as any
+
+    const result = await handle(event)
+
+    if (waitUntilPromise) {
+        await waitUntilPromise
+    }
 
     expect(mockSmtp.sendMail).toHaveBeenCalled()
   })
