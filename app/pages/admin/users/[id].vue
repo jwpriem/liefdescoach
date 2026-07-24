@@ -17,8 +17,18 @@ const [{ data: userStats }, { data: adminUsers }, { data: loginHistoryData }] = 
 const user = computed(() => (adminUsers.value as any)?.users?.find((u: any) => u.$id === userId))
 const stats = computed(() => userStats.value)
 
+// ⚡ Bolt: Hoist formatter instances to avoid expensive re-creation in high-frequency functions or loops
+const euroFormatter = new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' })
+const dateFormatter = new Intl.DateTimeFormat('nl-NL', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+})
+
 function formatEuro(value: number) {
-    return new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(value)
+    return euroFormatter.format(value)
 }
 
 </script>
@@ -73,7 +83,7 @@ function formatEuro(value: number) {
                         class="bg-gray-900/50 border border-gray-800 rounded-xl divide-y divide-gray-800">
                         <div v-for="login in loginHistoryData.logins" :key="login.id" class="p-4 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4">
                             <span class="text-sm font-medium text-white whitespace-nowrap">
-                                {{ new Date(login.createdAt).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) }}
+                                {{ dateFormatter.format(new Date(login.createdAt)) }}
                             </span>
                             <span class="text-xs text-gray-500">{{ login.ipAddress || 'Onbekend IP' }}</span>
                             <span class="text-xs text-gray-600 truncate max-w-xs hidden sm:inline">{{ login.userAgent?.substring(0, 80) }}</span>
