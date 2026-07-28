@@ -141,6 +141,10 @@ export const useAuth = () => {
       await $fetch('/api/students/update-profile', { method: 'POST', body: data })
     }
     await refresh()
+    // ⚡ Bolt: Keep the cached single-user details page updated in sync
+    if (data.userId) {
+      await refreshNuxtData(`admin-user-${data.userId}`)
+    }
   }
 
   async function updatePassword(password: string, newPassword: string) {
@@ -177,11 +181,19 @@ export const useAuth = () => {
   async function updateReminders(userId: string, reminders: boolean) {
     await $fetch('/api/updatePrefs', { method: 'POST', body: { userId, reminders } })
     await refresh()
+    // ⚡ Bolt: Keep the cached single-user details page updated in sync
+    if (userId) {
+      await refreshNuxtData(`admin-user-${userId}`)
+    }
   }
 
   async function updateHealth(userId: string, healthData: any) {
     await $fetch('/api/health/update', { method: 'POST', body: { userId, ...healthData } })
     await refresh()
+    // ⚡ Bolt: Keep the cached single-user details page updated in sync
+    if (userId) {
+      await refreshNuxtData(`admin-user-${userId}`)
+    }
   }
 
   async function submitPhone(phone: string) {

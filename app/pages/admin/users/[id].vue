@@ -8,13 +8,14 @@ definePageMeta({
     layout: 'app',
 })
 
-const [{ data: userStats }, { data: adminUsers }, { data: loginHistoryData }] = await Promise.all([
+// ⚡ Bolt: Fetch only the specific target user instead of fetching all users of the platform
+const [{ data: userStats }, { data: adminUserData }, { data: loginHistoryData }] = await Promise.all([
     useFetch(`/api/users/${userId}/stats`),
-    useAsyncData('admin-users', () => $fetch<any>('/api/users')),
+    useFetch<{ user: any }>(`/api/users/${userId}`, { key: `admin-user-${userId}` }),
     useFetch<{ logins: any[] }>(`/api/users/${userId}/login-history`)
 ])
 
-const user = computed(() => (adminUsers.value as any)?.users?.find((u: any) => u.$id === userId))
+const user = computed(() => adminUserData.value?.user)
 const stats = computed(() => userStats.value)
 
 // ⚡ Bolt: Hoist formatter instances to avoid expensive re-creation in high-frequency functions or loops
