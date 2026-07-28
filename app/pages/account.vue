@@ -134,29 +134,29 @@ const tabs = computed<TabsItem[]>(() => {
 		<div class="container mx-auto px-4 sm:px-8 pt-1 md:pt-32"
 			style="padding-bottom: calc(6rem + max(env(safe-area-inset-bottom), 0px))"
 			@touchstart.passive="onSwipeStart" @touchend.passive="onSwipeEnd">
-			<div v-show="currentSlot === 'dashboard'" class="pt-3">
+			<div v-show="currentSlot === 'dashboard'" id="tabpanel-dashboard" role="tabpanel" aria-labelledby="tab-dashboard" class="pt-3">
 				<AccountDashboard v-if="!isAdmin && loggedInUser" />
 			</div>
-			<div v-show="currentSlot === 'lessen'" class="pt-3">
+			<div v-show="currentSlot === 'lessen'" id="tabpanel-lessen" role="tabpanel" aria-labelledby="tab-lessen" class="pt-3">
 				<AccountBookings />
 			</div>
-			<div v-show="currentSlot === 'credits'" class="pt-3">
+			<div v-show="currentSlot === 'credits'" id="tabpanel-credits" role="tabpanel" aria-labelledby="tab-credits" class="pt-3">
 				<AccountCredits />
 			</div>
-			<div v-show="currentSlot === 'gegevens'" class="pt-3">
+			<div v-show="currentSlot === 'gegevens'" id="tabpanel-gegevens" role="tabpanel" aria-labelledby="tab-gegevens" class="pt-3">
 				<div v-if="isAdmin" class="mb-4">
 					<UButton icon="i-lucide-credit-card" label="Credits" variant="outline"
 						@click="activeTab = tabs.findIndex((t: any) => t.slot === 'credits')" />
 				</div>
 				<AccountDetails v-if="loggedInUser" />
 			</div>
-			<div v-show="currentSlot === 'admin-lessen'" class="pt-3">
+			<div v-show="currentSlot === 'admin-lessen'" id="tabpanel-admin-lessen" role="tabpanel" aria-labelledby="tab-admin-lessen" class="pt-3">
 				<AccountLessons v-if="isAdmin" />
 			</div>
-			<div v-show="currentSlot === 'gebruikers'" class="pt-3">
+			<div v-show="currentSlot === 'gebruikers'" id="tabpanel-gebruikers" role="tabpanel" aria-labelledby="tab-gebruikers" class="pt-3">
 				<AccountUsers v-if="isAdmin && loggedInUser" />
 			</div>
-			<div v-show="currentSlot === 'omzet'" class="pt-3">
+			<div v-show="currentSlot === 'omzet'" id="tabpanel-omzet" role="tabpanel" aria-labelledby="tab-omzet" class="pt-3">
 				<LazyAccountRevenue v-if="isAdmin" />
 			</div>
 		</div>
