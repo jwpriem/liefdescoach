@@ -45,3 +45,7 @@
 ## 2025-05-21 - Reducing DB Roundtrips with Joined Queries
 **Learning:** Performing separate queries for a resource and then subsequent count or existence checks for its relations (e.g., `db.select().from(lessons)`, then `db.select().from(bookings).where(...)`, then `countRegularLessonBookings(...)`) causes multiple network roundtrips and increases latency.
 **Action:** Use a single `leftJoin` query to fetch the parent resource and all related records in one go. Consolidate business logic (capacity checks, duplicate prevention) into a single pass over the joined results in-memory. This allows calculating final metrics (like `spotsLeft`) without any additional database calls.
+
+## 2026-04-20 - Database Query and Payload O(N) to O(1) Optimization
+**Learning:** Fetching all entities (e.g., all platform users) on a details page and performing client-side searches is extremely inefficient. It performs an unnecessary database-wide scan, transmits heavy payloads over the wire, and degrades client performance as the dataset size grows.
+**Action:** Always implement a dedicated single-entity GET endpoint (e.g., `/api/users/[id]`) that retrieves only the necessary row using primary key filters, transforming O(N) database and network overhead into O(1).
