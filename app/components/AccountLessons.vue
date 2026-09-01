@@ -145,7 +145,7 @@ const futureLessons = computed(() => {
     return lessons.value.filter((l: any) => new Date(l.date).getTime() > nowTime);
 });
 
-// ⚡ Bolt: Cache derived metrics to avoid O(N) array filtering in the template on every render
+// ⚡ Bolt: Cache derived metrics and pre-computed formatted date strings to avoid O(N) filtering and Day.js/locale formatting on every render
 const lessonMetrics = computed(() => {
     const map = new Map();
     for (const lesson of lessons.value) {
@@ -167,6 +167,8 @@ const lessonMetrics = computed(() => {
             regularCount,
             classpassCount,
             hasClasspass,
+            formattedDateShort: $rav.formatDateInDutch(lesson.date),
+            formattedDateLong: $rav.formatDateInDutch(lesson.date, true),
             processedBookings: getLessonBookingsWithLabels(bookings)
         });
     }
@@ -177,6 +179,7 @@ const computedLessons = computed(() => {
     return lessons.value.map((lesson) => {
         const metrics = lessonMetrics.value.get(lesson.$id);
         const regularCount = metrics ? metrics.regularCount : 0;
+        const formattedDate = metrics?.formattedDateShort ?? $rav.formatDateInDutch(lesson.date);
         const maxSpots = lesson.maxSpots ?? 9;
         const spots = maxSpots - regularCount;
         const isFull = regularCount >= maxSpots;
@@ -187,7 +190,7 @@ const computedLessons = computed(() => {
         const disabled = state.addBookingType === "regular" && isFull;
 
         return {
-            label: $rav.formatDateInDutch(lesson.date) + spotsText,
+            label: formattedDate + spotsText,
             value: lesson,
             disabled,
         };
@@ -350,7 +353,7 @@ async function onConfirmDeleteLesson() {
                                 >Datum</span
                             >
                             <span class="block text-gray-100 mt-0.5">{{
-                                $rav.formatDateInDutch(lesson.date, true)
+                                lessonMetrics.get(lesson.$id)?.formattedDateLong || $rav.formatDateInDutch(lesson.date, true)
                             }}</span>
                         </div>
                         <div>
@@ -641,7 +644,7 @@ async function onConfirmDeleteLesson() {
                         </h2>
                         <p class="text-gray-400 text-sm mt-1">
                             {{
-                                $rav.formatDateInDutch(managedLesson.date, true)
+                                lessonMetrics.get(managedLesson.$id)?.formattedDateLong || $rav.formatDateInDutch(managedLesson.date, true)
                             }}
                         </p>
                     </div>
