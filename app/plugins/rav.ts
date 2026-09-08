@@ -69,9 +69,12 @@ export default defineNuxtPlugin(nuxtApp => {
             return isLesson ? `${lessonDate.format('dddd D MMMM')} van ${startTime} tot ${endTime} uur` : lessonDate.format('D MMMM YYYY');
         },
 
-        isFutureBooking(lessonDate: string) {
-            // ⚡ Bolt: Avoid allocating heavy dayjs objects inside filter loops by using native Date time comparison
-            return new Date(lessonDate).getTime() > Date.now()
+        isFutureBooking(lessonDate: string | Date) {
+            // ⚡ Bolt: Avoid allocating Date objects in filter loops by using ISO string comparison when possible
+            if (typeof lessonDate === 'string') {
+                return lessonDate > new Date().toISOString()
+            }
+            return (lessonDate as Date).getTime() > Date.now()
         },
         checkCancelPeriod(lesson: any) {
             return dayjs().utc().isBefore(dayjs(new Date(lesson.date)).utc().subtract(1, 'day'))
@@ -105,9 +108,13 @@ export default defineNuxtPlugin(nuxtApp => {
         },
 
         upcomingLessons(lessons: any) {
-            const nowTime = Date.now()
-            return lessons
-                .filter((lesson: any) => new Date(lesson.date).getTime() > nowTime)
+            if (!Array.isArray(lessons)) return []
+            const nowIso = new Date().toISOString()
+            // ⚡ Bolt: Avoid allocating Date objects inside filter loop by using ISO string comparison
+            return lessons.filter((lesson: any) => {
+                const d = lesson?.date
+                return typeof d === 'string' ? d > nowIso : (d instanceof Date ? d.getTime() > Date.now() : new Date(d).getTime() > Date.now())
+            })
         },
 
         checkAvailability(lesson: any, student: any) {
