@@ -14,6 +14,13 @@ const creditTypeLabels: Record<string, string> = {
   credit_10: 'Grote kaart (10)',
 }
 
+const pageSize = 10
+const page = ref(1)
+
+watch(() => props.credits, () => {
+  page.value = 1
+})
+
 // ⚡ Bolt: Move expensive data transformations out of the template render loop
 const processedCredits = computed(() => {
   const now = Date.now()
@@ -42,14 +49,29 @@ const processedCredits = computed(() => {
     }
   })
 })
+
+const paginatedCredits = computed(() =>
+  processedCredits.value.slice((page.value - 1) * pageSize, page.value * pageSize)
+)
+
+const rangeStart = computed(() => processedCredits.value.length ? (page.value - 1) * pageSize + 1 : 0)
+const rangeEnd = computed(() => Math.min(page.value * pageSize, processedCredits.value.length))
 </script>
 
 <template>
   <div>
     <div v-if="processedCredits.length">
+      <!-- Stats -->
+      <div class="flex items-center justify-between mb-4">
+        <span class="text-sm text-gray-400">
+          Toont <span class="text-gray-200 font-medium">{{ rangeStart }}-{{ rangeEnd }}</span>
+          van <span class="text-gray-200 font-medium">{{ processedCredits.length }}</span>
+        </span>
+      </div>
+
       <!-- Mobile: card layout -->
       <div class="flex flex-col gap-y-3 md:hidden">
-        <div v-for="credit in processedCredits" :key="credit.$id"
+        <div v-for="credit in paginatedCredits" :key="credit.$id"
           class="rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-lg shadow-emerald-950/10 p-4">
           <div class="flex items-center justify-between mb-3">
             <span class="text-sm font-medium text-gray-200">{{ credit._typeLabel }}</span>
@@ -89,7 +111,7 @@ const processedCredits = computed(() => {
             </tr>
           </thead>
           <tbody>
-            <tr v-for="credit in processedCredits" :key="credit.$id" class="border-b border-gray-800/50 last:border-b-0">
+            <tr v-for="credit in paginatedCredits" :key="credit.$id" class="border-b border-gray-800/50 last:border-b-0">
               <td class="py-3 px-4 text-sm text-gray-200">{{ credit._typeLabel }}</td>
               <td class="py-3 px-4 text-sm">
                 <UBadge :color="credit._badgeColor" variant="subtle" size="xs">{{ credit._status }}
@@ -103,6 +125,11 @@ const processedCredits = computed(() => {
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- Pagination -->
+      <div v-if="processedCredits.length > pageSize" class="flex justify-center mt-6">
+        <UPagination v-model:page="page" :total="processedCredits.length" :items-per-page="pageSize" />
       </div>
     </div>
 
