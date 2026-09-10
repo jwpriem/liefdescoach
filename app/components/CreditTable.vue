@@ -23,10 +23,10 @@ const processedCredits = computed(() => {
 
     if (credit.bookingId) {
       status = 'Gebruikt'
-      badgeColor = 'error'
+      badgeColor = 'neutral'
     } else if (new Date(credit.validTo).getTime() <= now) {
       status = 'Verlopen'
-      badgeColor = 'warning'
+      badgeColor = 'error'
     }
 
     return {
@@ -37,6 +37,7 @@ const processedCredits = computed(() => {
       _lessonTitle: credit.lesson?.type ? $rav.getLessonTitle(credit.lesson) : '-',
       _lessonTeacher: credit.lesson?.teacher || '-',
       _lessonDate: credit.lesson ? $rav.formatDateInDutch(credit.lesson.date) : '-',
+      _issuedAt: credit.createdAt ? $rav.formatDateInDutch(credit.createdAt) : '-',
       _validTo: $rav.formatDateInDutch(credit.validTo)
     }
   })
@@ -64,6 +65,8 @@ const processedCredits = computed(() => {
               <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Lesdatum</span>
               <span class="text-gray-300">{{ credit._lessonDate }}</span>
             </template>
+            <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Uitgegeven</span>
+            <span class="text-gray-300">{{ credit._issuedAt }}</span>
             <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Geldig tot</span>
             <span class="text-gray-300">{{ credit._validTo }}</span>
           </div>
@@ -81,6 +84,7 @@ const processedCredits = computed(() => {
               <th class="py-3 px-4 text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Les</th>
               <th class="py-3 px-4 text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Docent</th>
               <th class="py-3 px-4 text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Lesdatum</th>
+              <th class="py-3 px-4 text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Uitgegeven</th>
               <th class="py-3 px-4 text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Geldig tot</th>
             </tr>
           </thead>
@@ -94,6 +98,7 @@ const processedCredits = computed(() => {
               <td class="py-3 px-4 text-sm text-gray-300">{{ credit._lessonTitle }}</td>
               <td class="py-3 px-4 text-sm text-gray-300">{{ credit._lessonTeacher }}</td>
               <td class="py-3 px-4 text-sm text-gray-300">{{ credit._lessonDate }}</td>
+              <td class="py-3 px-4 text-sm text-gray-300">{{ credit._issuedAt }}</td>
               <td class="py-3 px-4 text-sm text-gray-300">{{ credit._validTo }}</td>
             </tr>
           </tbody>
