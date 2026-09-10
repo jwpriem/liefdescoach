@@ -8,11 +8,14 @@ definePageMeta({
     layout: 'app',
 })
 
-const [{ data: userStats }, { data: adminUsers }, { data: loginHistoryData }] = await Promise.all([
+const [{ data: userStats }, { data: adminUsers }, { data: loginHistoryData }, { data: creditHistoryData }] = await Promise.all([
     useFetch(`/api/users/${userId}/stats`),
     useAsyncData('admin-users', () => $fetch<any>('/api/users')),
-    useFetch<{ logins: any[] }>(`/api/users/${userId}/login-history`)
+    useFetch<{ logins: any[] }>(`/api/users/${userId}/login-history`),
+    useAsyncData(`admin-user-credits-${userId}`, () => $fetch<any>('/api/credits/history', { method: 'POST', body: { studentId: userId } }))
 ])
+
+const creditHistory = computed(() => creditHistoryData.value?.credits ?? [])
 
 const user = computed(() => (adminUsers.value as any)?.users?.find((u: any) => u.$id === userId))
 const stats = computed(() => userStats.value)
@@ -75,6 +78,12 @@ function formatEuro(value: number) {
 
                 <!-- Personal Details (Reused) -->
                 <AccountDetails :user="user" :credits="(stats as any)?.availableCredits" />
+
+                <!-- Credit History -->
+                <div>
+                    <h2 class="text-xl font-bold text-white mb-4">Credit historie</h2>
+                    <CreditTable :credits="creditHistory" empty-message="Deze gebruiker heeft nog geen credits" />
+                </div>
 
                 <!-- Login History -->
                 <div>
