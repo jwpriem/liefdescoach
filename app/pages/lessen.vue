@@ -153,7 +153,9 @@ async function book(lesson: any) {
                 <!-- Title -->
                 <div class="min-w-0">
                   <p class="font-semibold leading-snug">
-                    <nuxt-link v-if="lesson.type == 'hatha yoga'" to="/hatha-yoga">Hatha Yoga</nuxt-link>
+                    <nuxt-link v-if="lesson.type == 'hatha yoga'" to="/hatha-yoga">
+                      <span v-html="$rav.getLessonDescription(lesson)" />
+                    </nuxt-link>
                     <nuxt-link v-else-if="lesson.type == 'guest lesson'" to="/bo-bol">
                       <span v-html="$rav.getLessonDescription(lesson)" />
                     </nuxt-link>

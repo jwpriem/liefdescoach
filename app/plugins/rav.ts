@@ -118,20 +118,23 @@ export default defineNuxtPlugin(nuxtApp => {
             return type == 'peachy bum' ? 'Peachy Bum' : 'Hatha Yoga'
         },
 
+        getTeacherName(lesson: any) {
+            return lesson.teacher || 'Ravennah'
+        },
+
         getLessonTitle(lesson: any) {
             if (lesson.type == 'guest lesson') {
-                const safeTeacher = lesson.teacher || ""
-                return `Yin-Yang Yoga door gastdocent ${safeTeacher}`
+                return `Yin-Yang Yoga door gastdocent ${rav.getTeacherName(lesson)}`
             }
-            return rav.checkLessonType(lesson.type)
+            return `${rav.checkLessonType(lesson.type)} met ${rav.getTeacherName(lesson)}`
         },
 
         getLessonDescription(lesson: any) {
+            const safeTeacher = rav.getTeacherName(lesson).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;")
             if (lesson.type == 'guest lesson') {
-                const safeTeacher = (lesson.teacher || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;")
                 return `Yin-Yang Yoga door gastdocent <span class="text-yellow-600">${safeTeacher}</span>`
             }
-            return rav.checkLessonType(lesson.type)
+            return `${rav.checkLessonType(lesson.type)} met <span class="text-yellow-600">${safeTeacher}</span>`
         }
     };
 
