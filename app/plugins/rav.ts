@@ -114,8 +114,10 @@ export default defineNuxtPlugin(nuxtApp => {
             return lesson ? !lesson.bookings.some((x: any) => x.students.$id == student.$id) : false
         },
 
-        checkLessonType(type: string) {
-            return type == 'peachy bum' ? 'Peachy Bum' : 'Hatha Yoga'
+        checkLessonType(lesson: any) {
+            if (lesson.type == 'peachy bum') return 'Peachy Bum'
+            if (lesson.teacher == 'Bo Bol') return 'Yin Yoga'
+            return 'Hatha Yoga'
         },
 
         getTeacherName(lesson: any) {
@@ -126,7 +128,7 @@ export default defineNuxtPlugin(nuxtApp => {
             if (lesson.type == 'guest lesson') {
                 return `Yin-Yang Yoga door gastdocent ${rav.getTeacherName(lesson)}`
             }
-            return `${rav.checkLessonType(lesson.type)} met ${rav.getTeacherName(lesson)}`
+            return `${rav.checkLessonType(lesson)} met ${rav.getTeacherName(lesson)}`
         },
 
         getLessonDescription(lesson: any) {
@@ -134,7 +136,7 @@ export default defineNuxtPlugin(nuxtApp => {
             if (lesson.type == 'guest lesson') {
                 return `Yin-Yang Yoga door gastdocent <span class="text-yellow-600">${safeTeacher}</span>`
             }
-            return `${rav.checkLessonType(lesson.type)} met <span class="text-yellow-600">${safeTeacher}</span>`
+            return `${rav.checkLessonType(lesson)} met <span class="text-yellow-600">${safeTeacher}</span>`
         }
     };
 
