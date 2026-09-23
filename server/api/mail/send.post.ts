@@ -55,12 +55,43 @@ export default defineEventHandler(async (event) => {
     let to = 'info@ravennah.com'
 
     switch (body.type) {
-        case 'contact':
-            email = contactEmail(body.data)
+        case 'contact': {
+            if (!body.data || typeof body.data !== 'object') {
+                throw createError({ statusCode: 400, statusMessage: 'Data is verplicht' })
+            }
+            const name = typeof body.data.name === 'string' ? body.data.name.trim() : ''
+            const emailAddr = typeof body.data.email === 'string' ? body.data.email.trim() : ''
+            const message = typeof body.data.message === 'string' ? body.data.message.trim() : ''
+
+            if (!name || name.length > 100) {
+                throw createError({ statusCode: 400, statusMessage: 'Geldige naam is verplicht' })
+            }
+            if (!emailAddr || !emailAddr.includes('@') || emailAddr.length > 255) {
+                throw createError({ statusCode: 400, statusMessage: 'Geldig e-mailadres is verplicht' })
+            }
+            if (!message || message.length > 2000) {
+                throw createError({ statusCode: 400, statusMessage: 'Geldig bericht is verplicht' })
+            }
+
+            email = contactEmail({ name, email: emailAddr, message })
             break
-        case 'new-user':
-            email = newUserEmail(body.data)
+        }
+        case 'new-user': {
+            const user = await requireAuth(event)
+            if (!body.data || typeof body.data !== 'object') {
+                throw createError({ statusCode: 400, statusMessage: 'Data is verplicht' })
+            }
+            const phone = typeof body.data.phone === 'string' ? body.data.phone.trim().slice(0, 30) : ''
+            const dateStr = typeof body.data.date === 'string' ? body.data.date.trim().slice(0, 30) : new Date().toLocaleDateString('nl-NL')
+
+            email = newUserEmail({
+                name: user.name,
+                email: user.email,
+                phone,
+                date: dateStr,
+            })
             break
+        }
         default:
             throw createError({ statusCode: 400, statusMessage: `Onbekend email type: ${body.type}` })
     }
