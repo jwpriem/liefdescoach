@@ -32,6 +32,52 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 400, statusMessage: 'Email type is verplicht' })
     }
 
+    if (!body || typeof body !== 'object' || !body.data || typeof body.data !== 'object') {
+        throw createError({ statusCode: 400, statusMessage: 'Ongeldige aanvraag gegevens' })
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+    if (body.type === 'contact') {
+        const { name, email: cEmail, message } = body.data
+        if (typeof name !== 'string' || name.trim().length < 1 || name.trim().length > 100) {
+            throw createError({ statusCode: 400, statusMessage: 'Naam is verplicht (max 100 tekens)' })
+        }
+        if (typeof cEmail !== 'string' || cEmail.trim().length < 3 || cEmail.trim().length > 255 || !emailRegex.test(cEmail.trim())) {
+            throw createError({ statusCode: 400, statusMessage: 'Ongeldig e-mailadres' })
+        }
+        if (typeof message !== 'string' || message.trim().length < 1 || message.trim().length > 5000) {
+            throw createError({ statusCode: 400, statusMessage: 'Bericht is verplicht (max 5000 tekens)' })
+        }
+        body.data = {
+            name: name.trim(),
+            email: cEmail.trim().toLowerCase(),
+            message: message.trim()
+        }
+    } else if (body.type === 'new-user') {
+        const { name, email: uEmail, phone, date } = body.data
+        if (typeof name !== 'string' || name.trim().length < 1 || name.trim().length > 100) {
+            throw createError({ statusCode: 400, statusMessage: 'Naam is verplicht (max 100 tekens)' })
+        }
+        if (typeof uEmail !== 'string' || uEmail.trim().length < 3 || uEmail.trim().length > 255 || !emailRegex.test(uEmail.trim())) {
+            throw createError({ statusCode: 400, statusMessage: 'Ongeldig e-mailadres' })
+        }
+        if (phone && (typeof phone !== 'string' || !/^\+?[\d\s\-()]{7,20}$/.test(phone.trim()))) {
+            throw createError({ statusCode: 400, statusMessage: 'Ongeldig telefoonnummer' })
+        }
+        if (typeof date !== 'string' || date.trim().length < 1 || date.trim().length > 50) {
+            throw createError({ statusCode: 400, statusMessage: 'Datum is verplicht (max 50 tekens)' })
+        }
+        body.data = {
+            name: name.trim(),
+            email: uEmail.trim().toLowerCase(),
+            phone: phone ? phone.trim() : undefined,
+            date: date.trim()
+        }
+    } else {
+        throw createError({ statusCode: 400, statusMessage: `Onbekend email type: ${body.type}` })
+    }
+
     const ip = getRequestIP(event) || 'unknown';
     const now = Date.now();
 
