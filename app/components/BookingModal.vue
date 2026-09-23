@@ -31,9 +31,26 @@ function checkBooking(id: string) {
   return bookedLessonIds.value.has(id)
 }
 
-function spotsLeft(lesson: any): number {
-  return 9 - (lesson.bookings?.length || 0)
-}
+// ⚡ Bolt: Cache derived metrics to avoid O(N) array filtering/calculations in the template on every render.
+// This optimizes template rendering by avoiding function invocations (O(N) operations) during patch cycles,
+// and resolves an inconsistency where Classpass bookings incorrectly reduced available spots in the modal.
+const lessonMetrics = computed(() => {
+  const map = new Map<string, { left: number, label: string }>()
+  for (const lesson of lessons.value) {
+    let regularCount = 0
+    if (lesson.bookings) {
+      for (const b of lesson.bookings) {
+        if (b.source !== 'classpass') {
+          regularCount++
+        }
+      }
+    }
+    const left = (lesson.maxSpots ?? 9) - regularCount
+    const label = left === 1 ? '1 plek' : `${left} plekken`
+    map.set(lesson.$id, { left, label })
+  }
+  return map
+})
 
 const isBookingId = ref<string | null>(null)
 
@@ -116,7 +133,9 @@ async function book(lesson: any) {
             </div>
             <div class="flex items-center gap-4 text-sm text-gray-400">
               <span>{{ $rav.formatDateInDutch(lesson.date, true) }}</span>
-              <span v-if="spotsLeft(lesson) > 0" class="text-emerald-400/70">{{ spotsLeft(lesson) }} {{ spotsLeft(lesson) == 1 ? 'plek' : 'plekken' }}</span>
+              <span v-if="(lessonMetrics.get(lesson.$id)?.left ?? 0) > 0" class="text-emerald-400/70">
+                {{ lessonMetrics.get(lesson.$id)?.label }}
+              </span>
               <span v-else class="text-red-400/70">Vol</span>
             </div>
           </div>
@@ -134,7 +153,7 @@ async function book(lesson: any) {
               Geboekt
             </span>
             <!-- Full -->
-            <span v-else-if="spotsLeft(lesson) <= 0"
+            <span v-else-if="(lessonMetrics.get(lesson.$id)?.left ?? 0) <= 0"
               class="text-sm text-gray-500 font-medium">
               Vol
             </span>
