@@ -16,3 +16,9 @@ export function isServingTestBranch(lessonsJson: unknown): boolean {
     const rows = (lessonsJson as { rows?: unknown } | null | undefined)?.rows
     return Array.isArray(rows) && rows.some((row) => (row as { $id?: string })?.$id === E2E_LESSON_IDS[0])
 }
+
+/** Wraps async work so it runs once and every caller awaits that same run (e.g. cleanup on Ctrl-C and on normal exit). */
+export function once<T>(fn: () => Promise<T>): () => Promise<T> {
+    let running: Promise<T> | undefined
+    return () => (running ??= fn())
+}

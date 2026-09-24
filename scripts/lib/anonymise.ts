@@ -1,7 +1,7 @@
 /**
  * Turns a copy of production into test data: personal data is replaced or removed.
- * Every table and every students column must be listed here — the unit tests fail
- * when the schema gains one that isn't, so new personal data can't slip through.
+ * Every table, and every column of every table that isn't wiped, must be listed here —
+ * the unit tests fail when the schema gains one that isn't, so new personal data can't slip through.
  */
 
 export const TABLE_POLICY: Record<string, 'keep' | 'anonymise' | 'wipe'> = {
@@ -17,25 +17,57 @@ export const TABLE_POLICY: Record<string, 'keep' | 'anonymise' | 'wipe'> = {
     login_history: 'wipe',
 }
 
-export const STUDENT_COLUMN_POLICY: Record<string, 'keep' | 'fake' | 'null'> = {
-    id: 'keep',
-    name: 'fake',
-    email: 'fake',
-    password_hash: 'null',
-    is_admin: 'keep',
-    email_verified: 'keep',
-    date_of_birth: 'null',
-    phone: 'null',
-    archived: 'keep',
-    reminders: 'keep',
-    push_notifications: 'keep',
-    phone_requested: 'keep',
-    created_at: 'keep',
-}
+/** 'keep' copies the value, 'null' clears it, { sql } replaces it with a SQL expression. */
+export type ColumnPolicy = 'keep' | 'null' | { sql: string }
 
-const FAKE_STUDENT_COLUMNS: Record<string, string> = {
-    name: `'Student ' || left(md5("id"), 6)`,
-    email: `CASE WHEN "email" IS NULL THEN NULL ELSE 'student-' || left(md5("id"), 10) || '@example.test' END`,
+export const COLUMN_POLICY: Record<string, Record<string, ColumnPolicy>> = {
+    students: {
+        id: 'keep',
+        name: { sql: `'Student ' || left(md5("id"), 6)` },
+        email: { sql: `CASE WHEN "email" IS NULL THEN NULL ELSE 'student-' || left(md5("id"), 10) || '@example.test' END` },
+        password_hash: 'null',
+        is_admin: 'keep',
+        email_verified: 'keep',
+        date_of_birth: 'null',
+        phone: 'null',
+        archived: 'keep',
+        reminders: 'keep',
+        push_notifications: 'keep',
+        phone_requested: 'keep',
+        created_at: 'keep',
+    },
+    health: {
+        id: 'keep',
+        student_id: 'keep',
+        injury: { sql: `CASE WHEN "injury" IS NULL THEN NULL ELSE 'Testblessure' END` },
+        pregnancy: { sql: 'false' },
+        due_date: 'null',
+    },
+    lessons: {
+        id: 'keep',
+        date: 'keep',
+        type: 'keep',
+        teacher: 'keep', // public teacher names shown on the website
+        max_spots: 'keep',
+        created_at: 'keep',
+    },
+    bookings: {
+        id: 'keep',
+        lesson_id: 'keep',
+        student_id: 'keep',
+        source: 'keep',
+        created_at: 'keep',
+    },
+    credits: {
+        id: 'keep',
+        student_id: 'keep',
+        booking_id: 'keep',
+        type: 'keep',
+        valid_from: 'keep',
+        valid_to: 'keep',
+        created_at: 'keep',
+        used_at: 'keep',
+    },
 }
 
 export function anonymiseStatements(): string[] {
@@ -43,15 +75,14 @@ export function anonymiseStatements(): string[] {
         .filter(([, policy]) => policy === 'wipe')
         .map(([table]) => `DELETE FROM "${table}"`)
 
-    const studentSets = Object.entries(STUDENT_COLUMN_POLICY)
-        .filter(([, policy]) => policy !== 'keep')
-        .map(([column, policy]) => `"${column}" = ${policy === 'null' ? 'NULL' : FAKE_STUDENT_COLUMNS[column]}`)
+    const updates = Object.entries(COLUMN_POLICY).flatMap(([table, columns]) => {
+        const sets = Object.entries(columns)
+            .filter(([, policy]) => policy !== 'keep')
+            .map(([column, policy]) => `"${column}" = ${policy === 'null' ? 'NULL' : (policy as { sql: string }).sql}`)
+        return sets.length > 0 ? [`UPDATE "${table}" SET ${sets.join(', ')}`] : []
+    })
 
-    return [
-        ...wipes,
-        `UPDATE "students" SET ${studentSets.join(', ')}`,
-        `UPDATE "health" SET "injury" = CASE WHEN "injury" IS NULL THEN NULL ELSE 'Testblessure' END, "pregnancy" = false, "due_date" = NULL`,
-    ]
+    return [...wipes, ...updates]
 }
 
 export const VERIFY_QUERIES: { label: string; sql: string }[] = [
@@ -71,4 +102,12 @@ export async function verifyAnonymised(run: (sql: string) => Promise<{ n: number
         if (Number(row?.n ?? 0) > 0) failures.push(check.label)
     }
     return failures
+}
+
+/** Throws unless the branch passes every anonymisation check. */
+export async function assertAnonymised(run: (sql: string) => Promise<{ n: number | string }[]>): Promise<void> {
+    const failures = await verifyAnonymised(run)
+    if (failures.length > 0) {
+        throw new Error(`Anonymisation incomplete: ${failures.join(', ')}`)
+    }
 }

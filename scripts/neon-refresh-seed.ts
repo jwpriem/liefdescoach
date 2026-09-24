@@ -9,7 +9,7 @@
 import 'dotenv/config'
 import { neon } from '@neondatabase/serverless'
 import { neonClientFromEnv, assertNotProductionUrl, waitForDatabase, type NeonBranch } from './lib/neon'
-import { anonymiseStatements, verifyAnonymised } from './lib/anonymise'
+import { anonymiseStatements, assertAnonymised } from './lib/anonymise'
 
 async function main() {
     if (!process.argv.includes('--yes')) {
@@ -34,24 +34,35 @@ async function main() {
         await neonClient.deleteBranch(branch)
     }
 
-    console.log('Creating seed from production')
-    const { branch: seed, connectionUri } = await neonClient.createBranch('seed', production.id)
-    assertNotProductionUrl(connectionUri, await neonClient.productionHosts())
+    // From the moment Neon starts copying production until anonymisation is verified, `seed` holds
+    // real personal data. Any failure or Ctrl-C in that window must delete it — looked up by name,
+    // because createBranch can fail after Neon already created the branch.
+    const discardSeed = async () => {
+        console.error('Seed is not safe to use; deleting it')
+        await neonClient.deleteBranchNamed('seed')
+    }
+    const onSignal = () => { discardSeed().finally(() => process.exit(130)) }
+    process.once('SIGINT', onSignal)
+    process.once('SIGTERM', onSignal)
 
-    const sql = neon(connectionUri)
+    let seed: NeonBranch
     try {
+        console.log('Creating seed from production')
+        const created = await neonClient.createBranch('seed', production.id)
+        seed = created.branch
+        assertNotProductionUrl(created.connectionUri, await neonClient.productionHosts())
+
+        const sql = neon(created.connectionUri)
         await waitForDatabase(() => sql`select 1`)
         console.log('Anonymising seed')
         await sql.transaction(anonymiseStatements().map((statement) => sql.query(statement)))
-
-        const failures = await verifyAnonymised((statement) => sql.query(statement) as Promise<{ n: number | string }[]>)
-        if (failures.length > 0) {
-            throw new Error(`Anonymisation incomplete: ${failures.join(', ')}`)
-        }
+        await assertAnonymised((statement) => sql.query(statement) as Promise<{ n: number | string }[]>)
     } catch (err) {
-        console.error('Seed is not safe to use; deleting it')
-        await neonClient.deleteBranch(seed)
+        await discardSeed()
         throw err
+    } finally {
+        process.off('SIGINT', onSignal)
+        process.off('SIGTERM', onSignal)
     }
 
     console.log('Creating dev from seed')

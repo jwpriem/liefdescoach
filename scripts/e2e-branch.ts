@@ -13,7 +13,8 @@ import 'dotenv/config'
 import { spawn, type ChildProcess } from 'node:child_process'
 import { neon } from '@neondatabase/serverless'
 import { neonClientFromEnv, assertNotProductionUrl, waitForDatabase, type NeonBranch } from './lib/neon'
-import { e2eBranchName, staleE2EBranches, isServingTestBranch } from './lib/e2e-runner'
+import { e2eBranchName, staleE2EBranches, isServingTestBranch, once } from './lib/e2e-runner'
+import { assertAnonymised } from './lib/anonymise'
 import { seedE2E } from './lib/seed-e2e'
 import { E2E_STUDENT, E2E_PASSWORD } from '../e2e/fixtures'
 
@@ -28,12 +29,10 @@ const playwrightArgs = args.filter((a) => a !== '--keep')
 const neonClient = neonClientFromEnv()
 let branch: NeonBranch | undefined
 let devServer: ChildProcess | undefined
-let cleanedUp = false
 let interrupted = false
 
-async function cleanup() {
-    if (cleanedUp) return
-    cleanedUp = true
+// once(): Ctrl-C and normal exit both await the same cleanup, so we never exit mid-delete
+const cleanup = once(async () => {
     // The server runs in its own process group (detached), so kill the group: yarn + nuxt + workers
     if (devServer?.pid && devServer.exitCode === null) {
         try { process.kill(-devServer.pid, 'SIGTERM') } catch { /* already gone */ }
@@ -44,7 +43,7 @@ async function cleanup() {
     } else if (branch) {
         console.log(`Keeping branch ${branch.name} (yarn -s db:branch-url ${branch.name} | pbcopy)`)
     }
-}
+})
 
 for (const signal of ['SIGINT', 'SIGTERM'] as const) {
     process.on(signal, () => {
@@ -91,6 +90,8 @@ async function main(): Promise<number> {
     console.log(`Created branch ${branch.name}; seeding test data`)
     const sql = neon(created.connectionUri)
     await waitForDatabase(() => sql`select 1`)
+    // Defence in depth: never run tests on a copy that still holds personal data
+    await assertAnonymised((statement) => sql.query(statement) as Promise<{ n: number | string }[]>)
     await seedE2E(created.connectionUri)
 
     const appEnv = { ...process.env, NUXT_DATABASE_URL: created.connectionUri, NODE_ENV: 'development' }
@@ -107,7 +108,7 @@ async function main(): Promise<number> {
 }
 
 main()
-    .then(async (code) => { await cleanup(); process.exit(code) })
+    .then(async (code) => { await cleanup(); process.exit(interrupted ? 130 : code) })
     .catch(async (err) => {
         // After Ctrl-C the cleanup itself stops the dev server; don't report that as a failure
         if (!interrupted) console.error(err instanceof Error ? err.message : err)

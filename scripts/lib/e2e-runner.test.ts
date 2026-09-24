@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest'
-import { e2eBranchName, staleE2EBranches, isServingTestBranch } from './e2e-runner'
+import { describe, it, expect, vi } from 'vitest'
+import { e2eBranchName, staleE2EBranches, isServingTestBranch, once } from './e2e-runner'
 
 describe('e2eBranchName', () => {
     it('is e2e- plus a sortable UTC timestamp', () => {
@@ -31,5 +31,24 @@ describe('isServingTestBranch', () => {
 
     it.each([null, undefined, 'Server Error', {}, { rows: 'x' }])('is false for unexpected body %j', (body) => {
         expect(isServingTestBranch(body)).toBe(false)
+    })
+})
+
+describe('once', () => {
+    it('runs cleanup once and makes every caller wait for that same run', async () => {
+        let finish!: () => void
+        const work = vi.fn(() => new Promise<void>((resolve) => { finish = resolve }))
+        const cleanup = once(work)
+        const order: string[] = []
+
+        const first = cleanup().then(() => order.push('first'))
+        const second = cleanup().then(() => order.push('second'))
+        await Promise.resolve()
+        expect(order).toEqual([]) // the second caller must not resolve before the work is done
+
+        finish()
+        await Promise.all([first, second])
+        expect(work).toHaveBeenCalledTimes(1)
+        expect(order).toEqual(['first', 'second'])
     })
 })

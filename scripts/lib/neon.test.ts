@@ -133,3 +133,31 @@ describe('waitForDatabase', () => {
         expect(query).toHaveBeenCalledTimes(3)
     })
 })
+
+describe('deleteBranchNamed', () => {
+    it('deletes a leftover branch found by name', async () => {
+        const fetch = fakeFetch({
+            'GET /branches': { branches: [production, seed] },
+            'DELETE /branches/br-seed': { operations: [] },
+        })
+        const client = createNeonClient({ apiKey: 'k', projectId: 'proj-1', fetch })
+
+        await expect(client.deleteBranchNamed('seed')).resolves.toBe(true)
+        expect(fetch).toHaveBeenCalledWith(`${API}/branches/br-seed`, expect.objectContaining({ method: 'DELETE' }))
+    })
+
+    it('does nothing when no branch has that name', async () => {
+        const fetch = fakeFetch({ 'GET /branches': { branches: [production] } })
+        const client = createNeonClient({ apiKey: 'k', projectId: 'proj-1', fetch })
+
+        await expect(client.deleteBranchNamed('seed')).resolves.toBe(false)
+        expect(fetch).toHaveBeenCalledTimes(1)
+    })
+
+    it('still refuses production by name', async () => {
+        const fetch = fakeFetch({ 'GET /branches': { branches: [production] } })
+        const client = createNeonClient({ apiKey: 'k', projectId: 'proj-1', fetch })
+
+        await expect(client.deleteBranchNamed('production')).rejects.toThrow(/Refusing/)
+    })
+})

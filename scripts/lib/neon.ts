@@ -143,6 +143,17 @@ export function createNeonClient(opts: { apiKey: string; projectId: string; fetc
             const { operations } = await api<{ operations: Operation[] }>('DELETE', `/branches/${branch.id}`)
             await waitForOperations(operations)
         },
+
+        /** Deletes the branch with this name if it exists (same guard as deleteBranch). Returns whether one was deleted. */
+        async deleteBranchNamed(name: string) {
+            assertSafeToModify({ id: '(by name)', name })
+            const branch = (await listBranches()).find((b) => b.name === name)
+            if (!branch) return false
+            assertSafeToModify(branch)
+            const { operations } = await api<{ operations: Operation[] }>('DELETE', `/branches/${branch.id}`)
+            await waitForOperations(operations)
+            return true
+        },
     }
 }
 
