@@ -17,7 +17,7 @@ export async function seedE2E(databaseUrl: string): Promise<void> {
     const now = new Date()
 
     for (const user of [{ ...E2E_STUDENT, isAdmin: false }, { ...E2E_ADMIN, isAdmin: true }]) {
-        const values = { name: user.name, email: user.email, passwordHash, isAdmin: user.isAdmin, emailVerified: true, archived: false, phoneRequested: true }
+        const values = { name: user.name, email: user.email, passwordHash, isAdmin: user.isAdmin, emailVerified: true, archived: false, phoneRequested: false }
         await db.insert(schema.students)
             .values({ id: user.id, ...values })
             .onConflictDoUpdate({ target: schema.students.id, set: values })

@@ -19,6 +19,7 @@
     "db:branch-url": "tsx --tsconfig scripts/tsconfig.json scripts/neon-branch-url.ts",
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",
+    "test:e2e:branch": "tsx --tsconfig scripts/tsconfig.json scripts/e2e-branch.ts",
     "test:booking": "playwright test e2e/booking.spec.ts",
     "test:registration": "playwright test e2e/registration.spec.ts",
     "test:unit": "vitest run"
