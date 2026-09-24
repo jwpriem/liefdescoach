@@ -39,3 +39,29 @@ export async function requireAdmin(event: H3Event): Promise<AuthenticatedUser> {
 
     return user
 }
+
+/**
+ * Resolves whose data a request operates on.
+ * Students can only act on themselves; admins may pass another student's id.
+ * Missing/empty ids (and an admin's own id) mean "self".
+ */
+export async function requireSelfOrAdmin(
+    event: H3Event,
+    requestedId?: unknown
+): Promise<{ user: AuthenticatedUser; targetId: string; isOnBehalf: boolean }> {
+    const user = await requireAuth(event)
+
+    if (requestedId === undefined || requestedId === null || requestedId === '' || requestedId === user.$id) {
+        return { user, targetId: user.$id, isOnBehalf: false }
+    }
+
+    if (typeof requestedId !== 'string') {
+        throw createError({ statusCode: 400, statusMessage: 'Ongeldige gebruiker' })
+    }
+
+    if (!user.labels.includes('admin')) {
+        throw createError({ statusCode: 403, statusMessage: 'Geen toegang' })
+    }
+
+    return { user, targetId: requestedId, isOnBehalf: true }
+}
