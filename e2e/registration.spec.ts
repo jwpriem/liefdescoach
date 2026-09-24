@@ -10,6 +10,7 @@
  */
 
 import { test, expect, Page } from '@playwright/test'
+import { openAccountTab } from './helpers'
 
 // Dutch first names (mixed male/female)
 const DUTCH_FIRST_NAMES = [
@@ -105,10 +106,9 @@ function generateTestUser(): TestUser {
 
 async function register(page: Page, user: TestUser) {
     await page.goto('/login')
-    await page.waitForSelector('#email')
 
-    // Switch to register form
-    await page.click('button:has-text("Registreren")', { strict: false })
+    // Switch to register form ("Nog geen account? Registreren")
+    await page.getByRole('button', { name: /Registreren/ }).first().click()
 
     // Wait for register form fields
     await page.waitForSelector('#name')
@@ -163,15 +163,15 @@ test.describe('Registration flow', () => {
         // Verify welcome credit was granted (should show "1 les" in the default "Mijn lessen" tab)
         await expect(page.locator('text=1 les').or(page.locator('text=lessen'))).toBeVisible({ timeout: 10_000 })
 
-        // Switch to "Mijn gegevens" to check profile details
-        await page.getByText('Mijn gegevens').click()
+        // Switch to "Instellingen" to check profile details
+        await openAccountTab(page, 'Instellingen')
 
         // If date of birth was provided, verify it's displayed (or shows "Niet opgegeven" otherwise)
         await expect(page.locator('text=Geboortedatum')).toBeVisible({ timeout: 5_000 })
 
         // If injury was provided, check medical section
         if (user.injury) {
-            await expect(page.locator('text=Medische info')).toBeVisible({ timeout: 5_000 })
+            await expect(page.getByText('Medische info', { exact: true })).toBeVisible({ timeout: 5_000 })
         }
 
         // Logout to clean up session
@@ -213,8 +213,8 @@ test.describe('Registration flow', () => {
         // Verify user name displays correctly
         await expect(page.getByRole('link', { name: minimalUser.fullName })).toBeVisible({ timeout: 10_000 })
 
-        // Switch to "Mijn gegevens" to check profile details
-        await page.getByText('Mijn gegevens').click()
+        // Switch to "Instellingen" to check profile details
+        await openAccountTab(page, 'Instellingen')
 
         // Verify empty states for optional fields
         await expect(page.locator('text=Geen telefoonnummer')).toBeVisible({ timeout: 5_000 })
