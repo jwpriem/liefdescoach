@@ -5,10 +5,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Build & Dev Commands
 
 ```bash
-yarn dev        # Dev server on localhost:3000
+yarn dev        # Dev server on localhost:3000, always on the Neon `dev` branch (never production)
 yarn build      # Production build (outputs to .output/)
 yarn preview    # Preview production build locally
 ```
+
+`yarn dev`, `yarn preview`, `yarn db:push` and `yarn db:studio` run through `scripts/with-dev-db.ts`, which fetches the `dev` branch's connection string from the Neon API (`NEON_API_KEY`, `NEON_PROJECT_ID` in `.env`). Local `.env` has no `NUXT_DATABASE_URL`; production (DigitalOcean App Platform) sets its own.
 
 No linter is configured. Node 20 is required.
 
@@ -105,6 +107,8 @@ Provides `$rav` globally with utility functions: Dutch date formatting, calendar
 **Public**: `vapidPublicKey`
 
 Set via environment variables prefixed with `NUXT_` (e.g., `NUXT_DATABASE_URL`, `NUXT_SESSION_SECRET`).
+
+Locally, `NUXT_DATABASE_URL` is injected by `scripts/with-dev-db.ts` (Neon `dev` branch) or by `yarn test:e2e:branch` (a throwaway `e2e-*` branch) — never put it in `.env`.
 
 ### UI Framework
 
