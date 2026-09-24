@@ -29,6 +29,15 @@ describe('POST /api/cancelBooking notifications', () => {
         expect(event.waitUntil).toHaveBeenCalledOnce()
     })
 
+    it('skips notifications when an admin removes a student from a past lesson', async () => {
+        vi.stubGlobal('db', createQueuedDb([[booking({ studentId: 'student-b', lessonDate: new Date(Date.now() - 864e5) })], []]))
+        asUser('admin-1', { admin: true })
+
+        await handle(event)
+
+        expect(sendBookingNotifications).not.toHaveBeenCalled()
+    })
+
     it('skips notifications for classpass bookings', async () => {
         vi.stubGlobal('db', createQueuedDb([[booking({ source: 'classpass' })]]))
         asUser('admin-1', { admin: true })
