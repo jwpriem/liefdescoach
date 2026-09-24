@@ -1,4 +1,8 @@
 import { describe, it, expect } from 'vitest'
+import { mkdtempSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { setupDotenv } from 'c12'
 import { devCommandEnv } from './dev-db'
 
 describe('devCommandEnv', () => {
@@ -18,10 +22,23 @@ describe('devCommandEnv', () => {
         expect(devCommandEnv(env, 'postgresql://dev-branch')).toMatchObject({ PATH: '/usr/bin', NUXT_SESSION_SECRET: 'secret' })
     })
 
-    it('does not pass the Neon API credentials to the app', () => {
+    it('blanks the Neon API credentials for the app', () => {
         const result = devCommandEnv(env, 'postgresql://dev-branch')
-        expect(result).not.toHaveProperty('NEON_API_KEY')
-        expect(result).not.toHaveProperty('NEON_PROJECT_ID')
+        expect(result.NEON_API_KEY).toBe('')
+        expect(result.NEON_PROJECT_ID).toBe('')
+    })
+
+    it('survives Nuxt reloading .env: the dev URL wins and the Neon key does not come back', async () => {
+        // nuxt dev / nuxt preview load .env through c12, which fills in every key that is undefined
+        const dir = mkdtempSync(join(tmpdir(), 'dev-db-'))
+        writeFileSync(join(dir, '.env'), 'NUXT_DATABASE_URL=postgresql://prod-from-dotenv\nNEON_API_KEY=napi_key\nNEON_PROJECT_ID=proj-1\n')
+        const childEnv = devCommandEnv(env, 'postgresql://dev-branch')
+
+        await setupDotenv({ cwd: dir, env: childEnv })
+
+        expect(childEnv.NUXT_DATABASE_URL).toBe('postgresql://dev-branch')
+        expect(childEnv.NEON_API_KEY).toBe('')
+        expect(childEnv.NEON_PROJECT_ID).toBe('')
     })
 
     it('does not modify the environment it was given', () => {
