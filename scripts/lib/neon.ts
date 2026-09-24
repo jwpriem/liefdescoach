@@ -38,6 +38,28 @@ export function assertNotProductionUrl(url: string, productionHosts: string[]): 
     }
 }
 
+/**
+ * The first request to a just-created branch can fail with "fetch failed" even after
+ * Neon reports the create operation finished. Retry a trivial query until it answers.
+ */
+export async function waitForDatabase(
+    query: () => Promise<unknown>,
+    { attempts = 15, delayMs = 2000 }: { attempts?: number; delayMs?: number } = {}
+): Promise<void> {
+    let lastError: unknown
+    for (let attempt = 1; attempt <= attempts; attempt++) {
+        try {
+            await query()
+            return
+        } catch (err) {
+            lastError = err
+            if (attempt < attempts) await new Promise((resolve) => setTimeout(resolve, delayMs))
+        }
+    }
+    const reason = lastError instanceof Error ? lastError.message : String(lastError)
+    throw new Error(`Database not reachable after ${attempts} attempts: ${reason}`)
+}
+
 export function createNeonClient(opts: { apiKey: string; projectId: string; fetch?: typeof fetch; pollMs?: number }) {
     const doFetch = opts.fetch ?? fetch
     const pollMs = opts.pollMs ?? 1000

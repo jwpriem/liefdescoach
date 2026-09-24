@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { createNeonClient, assertSafeToModify, assertNotProductionUrl, type NeonBranch } from './neon'
+import { createNeonClient, assertSafeToModify, assertNotProductionUrl, waitForDatabase, type NeonBranch } from './neon'
 
 const API = 'https://console.neon.tech/api/v2/projects/proj-1'
 const production: NeonBranch = { id: 'br-prod', name: 'production', primary: true, default: true }
@@ -111,5 +111,25 @@ describe('createNeonClient', () => {
         const client = createNeonClient({ apiKey: 'k', projectId: 'proj-1', fetch })
 
         await expect(client.listBranches()).rejects.toThrow(/404/)
+    })
+})
+
+describe('waitForDatabase', () => {
+    it('retries until the first query succeeds on a freshly started compute', async () => {
+        const query = vi.fn()
+            .mockRejectedValueOnce(new TypeError('fetch failed'))
+            .mockRejectedValueOnce(new TypeError('fetch failed'))
+            .mockResolvedValue([{ ok: 1 }])
+
+        await waitForDatabase(query, { attempts: 5, delayMs: 0 })
+
+        expect(query).toHaveBeenCalledTimes(3)
+    })
+
+    it('gives up with the last error after the attempts run out', async () => {
+        const query = vi.fn().mockRejectedValue(new TypeError('fetch failed'))
+
+        await expect(waitForDatabase(query, { attempts: 3, delayMs: 0 })).rejects.toThrow(/not reachable after 3 attempts.*fetch failed/)
+        expect(query).toHaveBeenCalledTimes(3)
     })
 })

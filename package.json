@@ -15,6 +15,8 @@
     "db:migrate-data": "tsx --tsconfig scripts/tsconfig.json scripts/migrate-to-neon.ts",
     "db:verify-migration": "tsx --tsconfig scripts/tsconfig.json scripts/verify-migration.ts",
     "db:seed-lessons": "tsx --tsconfig scripts/tsconfig.json scripts/seed-lessons.ts",
+    "db:refresh-seed": "tsx --tsconfig scripts/tsconfig.json scripts/neon-refresh-seed.ts",
+    "db:branch-url": "tsx --tsconfig scripts/tsconfig.json scripts/neon-branch-url.ts",
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",
     "test:booking": "playwright test e2e/booking.spec.ts",
