@@ -3,17 +3,8 @@ import { eq } from 'drizzle-orm'
 import { health, students } from '../../database/schema'
 
 export default defineEventHandler(async (event) => {
-    const authUser = await requireAuth(event)
-
     const body = await readBody(event)
-
-    if (!body?.userId || typeof body.userId !== 'string') {
-        throw createError({ statusCode: 400, statusMessage: 'userId is verplicht' })
-    }
-
-    if (body.userId !== authUser.$id && !authUser.labels.includes('admin')) {
-        throw createError({ statusCode: 403, statusMessage: 'Geen toegang' })
-    }
+    const { user: authUser, targetId, isOnBehalf } = await requireSelfOrAdmin(event, body?.userId)
 
     const { injury, pregnancy, dueDate } = body
 
@@ -21,17 +12,17 @@ export default defineEventHandler(async (event) => {
     const studentRows = await db
         .select({ id: students.id })
         .from(students)
-        .where(eq(students.id, body.userId))
+        .where(eq(students.id, targetId))
         .limit(1)
 
     if (studentRows.length === 0) {
         // Self-healing: only create the record if the user is updating their own profile
-        if (body.userId !== authUser.$id) {
+        if (isOnBehalf) {
             throw createError({ statusCode: 404, statusMessage: 'Gebruiker niet gevonden' })
         }
 
         await db.insert(students).values({
-            id: body.userId,
+            id: targetId,
             email: authUser.email,
             name: authUser.name,
         })
@@ -41,7 +32,7 @@ export default defineEventHandler(async (event) => {
     const existing = await db
         .select({ id: health.id })
         .from(health)
-        .where(eq(health.studentId, body.userId))
+        .where(eq(health.studentId, targetId))
         .limit(1)
 
     const data = {
@@ -63,7 +54,7 @@ export default defineEventHandler(async (event) => {
             .insert(health)
             .values({
                 id: generateId(),
-                studentId: body.userId,
+                studentId: targetId,
                 ...data,
             })
             .returning()

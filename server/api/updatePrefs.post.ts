@@ -3,18 +3,8 @@ import { eq } from 'drizzle-orm'
 import { students } from '../database/schema'
 
 export default defineEventHandler(async (event) => {
-    const authUser = await requireAuth(event)
-
     const body = await readBody(event)
-
-    if (!body?.userId || typeof body.userId !== 'string') {
-        throw createError({ statusCode: 400, statusMessage: 'userId is verplicht' })
-    }
-
-    // Non-admins can only update their own preferences
-    if (body.userId !== authUser.$id && !authUser.labels.includes('admin')) {
-        throw createError({ statusCode: 403, statusMessage: 'Geen toegang' })
-    }
+    const { targetId } = await requireSelfOrAdmin(event, body?.userId)
 
     const updates: Record<string, any> = {}
 
@@ -32,7 +22,7 @@ export default defineEventHandler(async (event) => {
     await db
         .update(students)
         .set(updates)
-        .where(eq(students.id, body.userId))
+        .where(eq(students.id, targetId))
 
     return { ok: true }
 })

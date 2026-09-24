@@ -3,9 +3,8 @@ import { eq, and } from 'drizzle-orm'
 import { lessons, bookings, credits } from '../database/schema'
 
 export default defineEventHandler(async (event) => {
-    const user = await requireAuth(event)
-
     const body = await readBody(event)
+    const { user, targetId: targetUserId, isOnBehalf } = await requireSelfOrAdmin(event, body?.onBehalfOfUserId)
 
     if (!body?.lessonId || typeof body.lessonId !== 'string') {
         throw createError({ statusCode: 400, statusMessage: 'lessonId is verplicht' })
@@ -18,15 +17,7 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 403, statusMessage: 'Alleen admins kunnen Classpass boekingen toevoegen' })
     }
 
-    let targetUserId = user.$id
-    if (body.onBehalfOfUserId && typeof body.onBehalfOfUserId === 'string') {
-        if (!isAdmin) {
-            throw createError({ statusCode: 403, statusMessage: 'Geen toegang om voor anderen te boeken' })
-        }
-        targetUserId = body.onBehalfOfUserId
-    }
-
-    if (source === 'classpass' && targetUserId === user.$id) {
+    if (source === 'classpass' && !isOnBehalf) {
         throw createError({ statusCode: 400, statusMessage: 'Selecteer een deelnemer voor de Classpass boeking' })
     }
 
@@ -37,9 +28,8 @@ export default defineEventHandler(async (event) => {
     }
     const lesson = lessonRows[0]
 
-    const isAdminBookingForStudent = isAdmin && Boolean(body.onBehalfOfUserId)
-
-    if (!isAdminBookingForStudent && new Date(lesson.date) <= new Date()) {
+    // Admins booking for a student may add them to past lessons (attendance correction)
+    if (!isOnBehalf && new Date(lesson.date) <= new Date()) {
         throw createError({ statusCode: 400, statusMessage: 'Kan niet boeken voor een les in het verleden' })
     }
 

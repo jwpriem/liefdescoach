@@ -2,13 +2,8 @@ import { eq } from 'drizzle-orm'
 import { bookings, lessons, students } from '../database/schema'
 
 export default defineEventHandler(async (event) => {
-    const user = await requireAuth(event)
-
     const body = await readBody(event)
-
-    const targetUserId = body?.userId && typeof body.userId === 'string' && user.labels.includes('admin')
-        ? body.userId
-        : user.$id
+    const { targetId: targetUserId } = await requireSelfOrAdmin(event, body?.userId)
 
     const rows = await db
         .select({
