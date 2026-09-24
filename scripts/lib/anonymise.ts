@@ -17,15 +17,40 @@ export const TABLE_POLICY: Record<string, 'keep' | 'anonymise' | 'wipe'> = {
     login_history: 'wipe',
 }
 
+/** Every anonymised student can log in with their fake email and this password (test branches only). */
+export const TEST_PASSWORD = 'welkom'
+/** bcrypt hash of TEST_PASSWORD, cost 12 like the app (verified by the unit tests). */
+export const TEST_PASSWORD_HASH = '$2b$12$GsMuKb.3S9I/.trAHZLbmuL6f/8Q9v9UcJOr/wrxOasc1ns9rFsd.'
+
+export const DUTCH_FIRST_NAMES = [
+    'Anna', 'Emma', 'Sanne', 'Lotte', 'Fleur', 'Eva', 'Julia', 'Sophie', 'Lisa', 'Iris',
+    'Noa', 'Tess', 'Femke', 'Anouk', 'Roos', 'Lieke', 'Marloes', 'Esther', 'Ingrid', 'Karin',
+    'Daan', 'Sem', 'Lucas', 'Levi', 'Bram', 'Thijs', 'Ruben', 'Jesse', 'Sven', 'Joris',
+    'Pieter', 'Bas', 'Maarten', 'Jeroen', 'Niels', 'Wouter', 'Tim', 'Koen', 'Stijn', 'Mark',
+]
+
+export const DUTCH_LAST_NAMES = [
+    'de Jong', 'Jansen', 'de Vries', 'van den Berg', 'van Dijk', 'Bakker', 'Janssen', 'Visser', 'Smit', 'Meijer',
+    'de Boer', 'Mulder', 'de Groot', 'Bos', 'Vos', 'Peters', 'Hendriks', 'van Leeuwen', 'Dekker', 'Brouwer',
+    'de Wit', 'Dijkstra', 'Smits', 'de Graaf', 'van der Meer', 'van der Linden', 'Kok', 'Jacobs', 'de Haan', 'Vermeulen',
+    'van den Heuvel', 'van der Veen', 'van den Broek', 'de Bruijn', 'de Bruin', 'van der Heijden', 'Schouten', 'van Beek', 'Willems', 'van Vliet',
+]
+
+/** SQL picking one entry of `names`, deterministically from the student id (same result on every refresh). */
+function pickByStudentId(names: string[], salt: string): string {
+    const list = names.map((name) => `'${name}'`).join(', ')
+    return `(ARRAY[${list}])[1 + mod(abs(hashtext("id" || '${salt}')::bigint), ${names.length})]`
+}
+
 /** 'keep' copies the value, 'null' clears it, { sql } replaces it with a SQL expression. */
 export type ColumnPolicy = 'keep' | 'null' | { sql: string }
 
 export const COLUMN_POLICY: Record<string, Record<string, ColumnPolicy>> = {
     students: {
         id: 'keep',
-        name: { sql: `'Student ' || left(md5("id"), 6)` },
+        name: { sql: `${pickByStudentId(DUTCH_FIRST_NAMES, ':first')} || ' ' || ${pickByStudentId(DUTCH_LAST_NAMES, ':last')}` },
         email: { sql: `CASE WHEN "email" IS NULL THEN NULL ELSE 'student-' || left(md5("id"), 10) || '@example.test' END` },
-        password_hash: 'null',
+        password_hash: { sql: `'${TEST_PASSWORD_HASH}'` },
         is_admin: 'keep',
         email_verified: 'keep',
         date_of_birth: 'null',
@@ -85,11 +110,18 @@ export function anonymiseStatements(): string[] {
     return [...wipes, ...updates]
 }
 
+/** One check per rewritten/cleared column (must match its rule exactly) and per wiped table (must be empty). */
 export const VERIFY_QUERIES: { label: string; sql: string }[] = [
-    { label: 'students with a real email address', sql: `SELECT count(*) AS n FROM "students" WHERE "email" IS NOT NULL AND "email" NOT LIKE '%@example.test'` },
-    { label: 'students with a real name', sql: `SELECT count(*) AS n FROM "students" WHERE "name" NOT LIKE 'Student %'` },
-    { label: 'students with phone, birth date or password', sql: `SELECT count(*) AS n FROM "students" WHERE "phone" IS NOT NULL OR "date_of_birth" IS NOT NULL OR "password_hash" IS NOT NULL` },
-    { label: 'health rows with real details', sql: `SELECT count(*) AS n FROM "health" WHERE ("injury" IS NOT NULL AND "injury" <> 'Testblessure') OR "pregnancy" = true OR "due_date" IS NOT NULL` },
+    ...Object.entries(COLUMN_POLICY).flatMap(([table, columns]) =>
+        Object.entries(columns)
+            .filter(([, policy]) => policy !== 'keep')
+            .map(([column, policy]) => ({
+                label: `${table}.${column} not anonymised`,
+                sql: policy === 'null'
+                    ? `SELECT count(*) AS n FROM "${table}" WHERE "${column}" IS NOT NULL`
+                    : `SELECT count(*) AS n FROM "${table}" WHERE "${column}" IS DISTINCT FROM (${(policy as { sql: string }).sql})`,
+            }))
+    ),
     ...Object.entries(TABLE_POLICY)
         .filter(([, policy]) => policy === 'wipe')
         .map(([table]) => ({ label: `rows left in ${table}`, sql: `SELECT count(*) AS n FROM "${table}"` })),
