@@ -105,10 +105,9 @@ function generateTestUser(): TestUser {
 
 async function register(page: Page, user: TestUser) {
     await page.goto('/login')
-    await page.waitForSelector('#email')
 
-    // Switch to register form
-    await page.click('button:has-text("Registreren")', { strict: false })
+    // Switch to register form ("Nog geen account? Registreren")
+    await page.getByRole('button', { name: /Registreren/ }).first().click()
 
     // Wait for register form fields
     await page.waitForSelector('#name')

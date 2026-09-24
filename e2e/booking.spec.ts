@@ -1,79 +1,18 @@
 /**
  * E2E test: Login and book a lesson.
  *
- * Required env vars:
- *   TEST_EMAIL       – email address of an existing user
- *   TEST_PASSWORD    – password for that user
- *   BASE_URL         – (optional) defaults to http://localhost:3000
- *
- * The user must have at least 1 credit to complete the booking test.
- *
- * Run:
- *   TEST_EMAIL=x@y.com TEST_PASSWORD=secret yarn dlx playwright test
- *   yarn test:e2e   (reads from .env)
+ * Run against a throwaway Neon branch (recommended): yarn test:e2e:branch
+ * Credentials default to the seeded e2e student; override with TEST_EMAIL / TEST_PASSWORD.
  */
 
 import { test, expect, Page } from '@playwright/test'
+import { E2E_PASSWORD, E2E_STUDENT } from './fixtures'
+import { login as loginAs, logout } from './helpers'
 
-const email = process.env.TEST_EMAIL
-const password = process.env.TEST_PASSWORD
+const email = process.env.TEST_EMAIL ?? E2E_STUDENT.email
+const password = process.env.TEST_PASSWORD ?? E2E_PASSWORD
 
-/**
- * Login and ensure the Appwrite session cookie is set for server-side auth.
- *
- * The Appwrite Web SDK v21 stores sessions internally (localStorage /
- * X-Fallback-Cookies) but does not reliably set document.cookie on HTTP.
- * The Nuxt server reads the session from document.cookie, so we capture
- * the session secret from the Appwrite API response at creation time and
- * set the cookie explicitly.
- */
-async function login(page: Page) {
-    // Listen for the Appwrite session creation API response
-    const sessionResponsePromise = page.waitForResponse(
-        resp => resp.url().includes('/v1/account/sessions') && resp.ok()
-    )
-
-    await page.goto('/login')
-    await page.waitForSelector('#email')
-    await page.fill('#email', email!)
-    await page.fill('#password', password!)
-    await page.click('button:has-text("Inloggen")')
-
-    // Capture the session secret and project ID from the API exchange
-    const sessionResponse = await sessionResponsePromise
-    const projectId = await sessionResponse.request().headerValue('x-appwrite-project')
-    const sessionData = await sessionResponse.json()
-
-    await page.waitForURL('**/account', { timeout: 15_000 })
-
-    // Set the cookie so the Nuxt server can authenticate API requests
-    if (sessionData?.secret && projectId) {
-        await page.evaluate(({ name, value }) => {
-            document.cookie = `${name}=${value}; path=/; max-age=31536000; SameSite=Lax`
-        }, { name: `a_session_${projectId}`, value: sessionData.secret })
-    }
-}
-
-async function logout(page: Page) {
-    await page.locator('nav').getByText('Logout', { exact: true }).click()
-    await page.waitForURL('**/', { timeout: 10_000 })
-}
-
-/**
- * Helper: navigate from account to /lessen using client-side navigation.
- * This preserves the composable state (including loggedInUser), unlike
- * page.goto() which triggers a full SSR reload and re-authentication.
- */
-async function navigateToLessen(page: Page) {
-    await page.locator('nav a.nav-item', { hasText: 'Les schema' }).click()
-    await page.waitForURL('**/lessen', { timeout: 10_000 })
-}
-
-test.beforeEach(() => {
-    if (!email || !password) {
-        throw new Error('Set TEST_EMAIL and TEST_PASSWORD environment variables')
-    }
-})
+const login = (page: Page) => loginAs(page, email, password)
 
 test.describe('Authentication', () => {
     test('should log in and redirect to account page', async ({ page }) => {
