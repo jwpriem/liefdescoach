@@ -138,6 +138,16 @@ export function createNeonClient(opts: { apiKey: string; projectId: string; fetc
             return uri
         },
 
+        /** Connection string of a test branch (seed, dev, e2e-*) — never of production. */
+        async safeConnectionUri(name: string) {
+            const branch = (await listBranches()).find((b) => b.name === name)
+            if (!branch) throw new Error(`No Neon branch named "${name}". Create it with: yarn db:refresh-seed --yes`)
+            assertSafeToModify(branch)
+            const uri = await this.connectionUri(branch)
+            assertNotProductionUrl(uri, await this.productionHosts())
+            return uri
+        },
+
         async deleteBranch(branch: NeonBranch) {
             assertSafeToModify(branch)
             const { operations } = await api<{ operations: Operation[] }>('DELETE', `/branches/${branch.id}`)

@@ -161,3 +161,44 @@ describe('deleteBranchNamed', () => {
         await expect(client.deleteBranchNamed('production')).rejects.toThrow(/Refusing/)
     })
 })
+describe('safeConnectionUri', () => {
+    const dev: NeonBranch = { id: 'br-dev', name: 'dev', parent_id: 'br-seed' }
+    const devRoutes = {
+        'GET /branches': { branches: [production, seed, dev] },
+        'GET /branches/br-dev/databases': { databases: [{ name: 'neondb', owner_name: 'neondb_owner' }] },
+        'GET /connection_uri?branch_id=br-dev&database_name=neondb&role_name=neondb_owner': { uri: 'postgresql://u:p@ep-dev.neon.tech/neondb' },
+        'GET /branches/br-prod/endpoints': { endpoints: [{ host: 'ep-prod.neon.tech' }] },
+    }
+
+    it('returns the connection string of a test branch', async () => {
+        const client = createNeonClient({ apiKey: 'k', projectId: 'proj-1', fetch: fakeFetch(devRoutes) })
+        await expect(client.safeConnectionUri('dev')).resolves.toBe('postgresql://u:p@ep-dev.neon.tech/neondb')
+    })
+
+    it('tells you how to create a missing branch', async () => {
+        const client = createNeonClient({ apiKey: 'k', projectId: 'proj-1', fetch: fakeFetch({ 'GET /branches': { branches: [production] } }) })
+        await expect(client.safeConnectionUri('dev')).rejects.toThrow('No Neon branch named "dev". Create it with: yarn db:refresh-seed --yes')
+    })
+
+    it('refuses production before fetching any connection string', async () => {
+        const fetch = fakeFetch(devRoutes)
+        const client = createNeonClient({ apiKey: 'k', projectId: 'proj-1', fetch })
+
+        await expect(client.safeConnectionUri('production')).rejects.toThrow(/Refusing/)
+        expect(fetch.mock.calls.map((c) => c[0])).not.toContainEqual(expect.stringContaining('connection_uri'))
+    })
+
+    it('refuses a test branch whose host is a production endpoint', async () => {
+        const client = createNeonClient({
+            apiKey: 'k', projectId: 'proj-1',
+            fetch: fakeFetch({ ...devRoutes, 'GET /branches/br-prod/endpoints': { endpoints: [{ host: 'ep-dev.neon.tech' }] } }),
+        })
+        await expect(client.safeConnectionUri('dev')).rejects.toThrow(/production/)
+    })
+
+    it('fails when the Neon API is unreachable', async () => {
+        const fetch = vi.fn().mockRejectedValue(new TypeError('fetch failed'))
+        const client = createNeonClient({ apiKey: 'k', projectId: 'proj-1', fetch })
+        await expect(client.safeConnectionUri('dev')).rejects.toThrow('fetch failed')
+    })
+})

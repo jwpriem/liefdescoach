@@ -6,18 +6,13 @@
  */
 
 import 'dotenv/config'
-import { neonClientFromEnv, assertSafeToModify } from './lib/neon'
+import { neonClientFromEnv } from './lib/neon'
 
 async function main() {
     const name = process.argv[2]
     if (!name) throw new Error('Usage: yarn -s db:branch-url <seed|dev|e2e-...>')
 
-    const neonClient = neonClientFromEnv()
-    const branch = await neonClient.findBranch(name)
-    if (!branch) throw new Error(`No branch named "${name}"`)
-    assertSafeToModify(branch) // same allowlist: never hand out production credentials
-
-    process.stdout.write(await neonClient.connectionUri(branch))
+    process.stdout.write(await neonClientFromEnv().safeConnectionUri(name))
 }
 
 main().catch((err) => {
