@@ -6,6 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 yarn dev        # Dev server on localhost:3000, always on the Neon `dev` branch (never production)
+yarn dev --new-database  # First rebuild seed + dev from a fresh anonymised copy of production (dev data is lost), then start
 yarn build      # Production build (outputs to .output/)
 yarn preview    # Preview production build locally
 ```

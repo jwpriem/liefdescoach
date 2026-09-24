@@ -3,7 +3,7 @@ import { mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { setupDotenv } from 'c12'
-import { devCommandEnv } from './dev-db'
+import { devCommandEnv, parseWrapperArgs } from './dev-db'
 
 describe('devCommandEnv', () => {
     const env = {
@@ -45,5 +45,22 @@ describe('devCommandEnv', () => {
         devCommandEnv(env, 'postgresql://dev-branch')
         expect(env.NUXT_DATABASE_URL).toBe('postgresql://prod-from-dotenv')
         expect(env.NEON_API_KEY).toBe('napi_key')
+    })
+})
+
+describe('parseWrapperArgs', () => {
+    it('passes the command and its arguments through', () => {
+        expect(parseWrapperArgs(['nuxt', 'dev', '--port', '4000'])).toEqual({ newDatabase: false, command: 'nuxt', args: ['dev', '--port', '4000'] })
+    })
+
+    it('takes --new-database out wherever yarn appended it', () => {
+        expect(parseWrapperArgs(['nuxt', 'dev', '--new-database'])).toEqual({ newDatabase: true, command: 'nuxt', args: ['dev'] })
+        expect(parseWrapperArgs(['nuxt', 'dev', '--port', '4000', '--new-database'])).toEqual({ newDatabase: true, command: 'nuxt', args: ['dev', '--port', '4000'] })
+        expect(parseWrapperArgs(['drizzle-kit', 'studio', '--new-database'])).toEqual({ newDatabase: true, command: 'drizzle-kit', args: ['studio'] })
+    })
+
+    it('rejects a missing command', () => {
+        expect(() => parseWrapperArgs([])).toThrow(/Usage/)
+        expect(() => parseWrapperArgs(['--new-database'])).toThrow(/Usage/)
     })
 })
