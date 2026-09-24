@@ -126,15 +126,19 @@ export function nestLessonsWithBookings(
     if (!bookingsByLesson.has(lessonId)) {
       bookingsByLesson.set(lessonId, [])
     }
-    const booking: any = {
-      $id: b.id,
-      lessons: b.lessonId,
-      source: b.source ?? 'regular',
-      isFirstTime: b.isFirstTime ?? false,
-      students: includeStudents && b.studentName
-        ? { $id: b.studentId, name: b.studentName, email: b.studentEmail, injury: b.studentInjury ?? null, pregnancy: b.studentPregnancy ?? false }
-        : b.studentId,
-    }
+    const source = b.source ?? 'regular'
+    // Public feed: only what's needed to count spots — no booking or student ids.
+    const booking: any = includeStudents
+      ? {
+          $id: b.id,
+          lessons: b.lessonId,
+          source,
+          isFirstTime: b.isFirstTime ?? false,
+          students: b.studentName
+            ? { $id: b.studentId, name: b.studentName, email: b.studentEmail, injury: b.studentInjury ?? null, pregnancy: b.studentPregnancy ?? false }
+            : b.studentId,
+        }
+      : { source }
     bookingsByLesson.get(lessonId)!.push(booking)
   }
 

@@ -110,10 +110,6 @@ export default defineNuxtPlugin(nuxtApp => {
                 .filter((lesson: any) => new Date(lesson.date).getTime() > nowTime)
         },
 
-        checkAvailability(lesson: any, student: any) {
-            return lesson ? !lesson.bookings.some((x: any) => x.students.$id == student.$id) : false
-        },
-
         checkLessonType(type: string) {
             return type == 'peachy bum' ? 'Peachy Bum' : 'Hatha Yoga'
         },
