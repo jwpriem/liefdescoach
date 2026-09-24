@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { asUser } from '../../test-utils'
 
 // Mock h3
 vi.mock('h3', () => ({
@@ -25,7 +26,6 @@ beforeEach(() => {
   vi.restoreAllMocks()
   vi.stubGlobal('db', mockDb)
   vi.stubGlobal('readBody', vi.fn())
-  vi.stubGlobal('requireAuth', vi.fn())
 
   mockDb.select.mockReturnValue(mockDb)
   mockDb.from.mockReturnValue(mockDb)
@@ -52,12 +52,7 @@ const fakeEvent = () => ({} as any)
 
 describe('POST /api/students/update-profile self-healing', () => {
   it('allows self-healing when user updates OWN profile', async () => {
-    vi.mocked(requireAuth).mockResolvedValue({
-        $id: 'user-123',
-        email: 'user@test.com',
-        name: 'Test User',
-        labels: []
-    })
+    asUser('user-123', { email: 'user@test.com', name: 'Test User' })
     vi.mocked(readBody).mockResolvedValue({ name: 'New Name' })
     mockDb.limit.mockResolvedValue([]) // Not existing
 
@@ -68,12 +63,7 @@ describe('POST /api/students/update-profile self-healing', () => {
   })
 
   it('throws 404 when ADMIN tries to update NON-EXISTENT user (prevents leak)', async () => {
-    vi.mocked(requireAuth).mockResolvedValue({
-        $id: 'admin-id',
-        email: 'admin@test.com',
-        name: 'Admin User',
-        labels: ['admin']
-    })
+    asUser('admin-id', { admin: true, email: 'admin@test.com', name: 'Admin User' })
     vi.mocked(readBody).mockResolvedValue({ userId: 'other-id', name: 'New Name' })
     mockDb.limit.mockResolvedValue([]) // Not existing
 

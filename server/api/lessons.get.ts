@@ -15,7 +15,7 @@ export default defineEventHandler(async () => {
     let bookingRows: any[] = []
     if (lessonIds.length > 0) {
         bookingRows = await db
-            .select()
+            .select({ lessonId: bookings.lessonId, source: bookings.source })
             .from(bookings)
             .where(inArray(bookings.lessonId, lessonIds))
     }

@@ -6,16 +6,8 @@ import { students } from '../../database/schema'
  * Updates name, phone, and dateOfBirth for a student.
  */
 export default defineEventHandler(async (event) => {
-    const authUser = await requireAuth(event)
-
     const body = await readBody(event)
-
-    const userId = body?.userId || authUser.$id
-
-    // Only allow users to update their own profile, or admins to update anyone's
-    if (userId !== authUser.$id && !authUser.labels?.includes('admin')) {
-        throw createError({ statusCode: 403, statusMessage: 'Geen toegang' })
-    }
+    const { user: authUser, targetId: userId, isOnBehalf } = await requireSelfOrAdmin(event, body?.userId)
 
     // Prepare update data
     const updateData: Record<string, any> = {}
@@ -46,7 +38,7 @@ export default defineEventHandler(async (event) => {
         result = updated[0]
     } else {
         // Self-healing: only create the record if the user is updating their own profile
-        if (userId !== authUser.$id) {
+        if (isOnBehalf) {
             throw createError({ statusCode: 404, statusMessage: 'Gebruiker niet gevonden' })
         }
 

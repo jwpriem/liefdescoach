@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { requireAuth, requireAdmin } from './auth'
+import { requireAuth, requireAdmin, requireSelfOrAdmin } from './auth'
+import { asUser } from '../test-utils'
 
 describe('requireAuth', () => {
   beforeEach(() => {
@@ -81,5 +82,61 @@ describe('requireAdmin', () => {
       name: 'Admin 2',
       labels: ['admin'],
     })
+  })
+})
+
+describe('requireSelfOrAdmin', () => {
+  beforeEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  it.each([undefined, null, ''])('treats %s as the logged-in user', async (requested) => {
+    asUser('student-a')
+    await expect(requireSelfOrAdmin({} as any, requested)).resolves.toMatchObject({
+      targetId: 'student-a',
+      isOnBehalf: false,
+    })
+  })
+
+  it('lets a student act on their own id', async () => {
+    asUser('student-a')
+    await expect(requireSelfOrAdmin({} as any, 'student-a')).resolves.toMatchObject({
+      targetId: 'student-a',
+      isOnBehalf: false,
+    })
+  })
+
+  it('rejects a student acting on another student with 403', async () => {
+    asUser('student-a')
+    await expect(requireSelfOrAdmin({} as any, 'student-b')).rejects.toMatchObject({
+      statusCode: 403,
+      statusMessage: 'Geen toegang',
+    })
+  })
+
+  it('lets an admin act on another student', async () => {
+    asUser('admin-1', { admin: true })
+    await expect(requireSelfOrAdmin({} as any, 'student-b')).resolves.toMatchObject({
+      targetId: 'student-b',
+      isOnBehalf: true,
+    })
+  })
+
+  it('treats an admin passing their own id as self (not on behalf)', async () => {
+    asUser('admin-1', { admin: true })
+    await expect(requireSelfOrAdmin({} as any, 'admin-1')).resolves.toMatchObject({
+      targetId: 'admin-1',
+      isOnBehalf: false,
+    })
+  })
+
+  it.each([123, ['student-b'], { id: 'student-b' }])('rejects non-string id %j with 400', async (requested) => {
+    asUser('admin-1', { admin: true })
+    await expect(requireSelfOrAdmin({} as any, requested)).rejects.toMatchObject({ statusCode: 400 })
+  })
+
+  it('throws 401 without a session', async () => {
+    vi.stubGlobal('getSessionUser', vi.fn().mockResolvedValue(null))
+    await expect(requireSelfOrAdmin({} as any, 'student-b')).rejects.toMatchObject({ statusCode: 401 })
   })
 })

@@ -3,9 +3,8 @@ import { eq, and } from 'drizzle-orm'
 import { lessons, bookings, credits } from '../database/schema'
 
 export default defineEventHandler(async (event) => {
-    const user = await requireAuth(event)
-
     const body = await readBody(event)
+    const { user, targetId: targetUserId, isOnBehalf } = await requireSelfOrAdmin(event, body?.onBehalfOfUserId)
 
     if (!body?.lessonId || typeof body.lessonId !== 'string') {
         throw createError({ statusCode: 400, statusMessage: 'lessonId is verplicht' })
@@ -18,15 +17,7 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 403, statusMessage: 'Alleen admins kunnen Classpass boekingen toevoegen' })
     }
 
-    let targetUserId = user.$id
-    if (body.onBehalfOfUserId && typeof body.onBehalfOfUserId === 'string') {
-        if (!isAdmin) {
-            throw createError({ statusCode: 403, statusMessage: 'Geen toegang om voor anderen te boeken' })
-        }
-        targetUserId = body.onBehalfOfUserId
-    }
-
-    if (source === 'classpass' && targetUserId === user.$id) {
+    if (source === 'classpass' && !isOnBehalf) {
         throw createError({ statusCode: 400, statusMessage: 'Selecteer een deelnemer voor de Classpass boeking' })
     }
 
@@ -51,10 +42,9 @@ export default defineEventHandler(async (event) => {
     }
 
     const lesson = rows[0]
-    const isAdminBookingForStudent = isAdmin && Boolean(body.onBehalfOfUserId)
 
-    // ⚡ Bolt: lesson.date is already a Date object; use getTime() for faster comparison.
-    if (!isAdminBookingForStudent && lesson.date.getTime() <= Date.now()) {
+    // Admins booking for a student may add them to past lessons (attendance correction)
+    if (!isOnBehalf && lesson.date.getTime() <= Date.now()) {
         throw createError({ statusCode: 400, statusMessage: 'Kan niet boeken voor een les in het verleden' })
     }
 
@@ -106,6 +96,14 @@ export default defineEventHandler(async (event) => {
         await db.update(credits)
             .set({ bookingId, usedAt: now })
             .where(eq(credits.id, creditId))
+    }
+
+    // Admins correcting attendance on past lessons don't trigger mails; classpass guests often have no email.
+    if (source === 'regular' && !(isAdmin && lesson.date.getTime() <= now.getTime())) {
+        event.waitUntil(
+            sendBookingNotifications('confirmation', { lessonId: lesson.id, studentId: targetUserId })
+                .catch((err: any) => console.error('[handleBooking] Notifications failed:', err?.message ?? err))
+        )
     }
 
     // ⚡ Bolt: Calculate remaining spots using in-memory count, avoiding another database call.

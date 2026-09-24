@@ -3,6 +3,7 @@
  * load time (e.g. defineEventHandler). Must run before any test file imports.
  */
 import { vi } from 'vitest'
+import { requireSelfOrAdmin } from './utils/auth'
 
 // defineEventHandler just returns its handler so tests can call it directly
 vi.stubGlobal('defineEventHandler', (handler: any) => handler)
@@ -39,6 +40,10 @@ vi.stubGlobal('getSessionUser', vi.fn())
 vi.stubGlobal('destroySession', vi.fn())
 vi.stubGlobal('requireAuth', vi.fn())
 vi.stubGlobal('requireAdmin', vi.fn())
+// Real implementation: route tests drive it through asUser() → getSessionUser
+vi.stubGlobal('requireSelfOrAdmin', requireSelfOrAdmin)
+vi.stubGlobal('nestBookingsWithLessons', vi.fn((rows: any[]) => ({ rows, total: rows.length })))
+vi.stubGlobal('sendBookingNotifications', vi.fn().mockResolvedValue(undefined))
 vi.stubGlobal('generateSignedToken', vi.fn().mockReturnValue('mock-token'))
 vi.stubGlobal('verifySignedToken', vi.fn().mockReturnValue({}))
 vi.stubGlobal('generateId', vi.fn().mockReturnValue('mock-id'))

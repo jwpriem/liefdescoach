@@ -5,13 +5,8 @@ import { credits, bookings, lessons } from '../../database/schema'
  * Fetch credit history for a student with lesson details.
  */
 export default defineEventHandler(async (event) => {
-    const user = await requireAuth(event)
-
     const body = await readBody(event)
-
-    const targetUserId = body?.studentId && typeof body.studentId === 'string' && user.labels.includes('admin')
-        ? body.studentId
-        : user.$id
+    const { targetId: targetUserId } = await requireSelfOrAdmin(event, body?.studentId)
 
     // Fetch all credits with optional booking+lesson data in one query
     const rows = await db
