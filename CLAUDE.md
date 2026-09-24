@@ -26,13 +26,13 @@ No linter is configured. Node 20 is required.
 ### E2E Tests (Playwright)
 
 ```bash
-# Requires dev server running (yarn dev) and Playwright browsers installed (yarn dlx playwright install chromium)
-TEST_EMAIL=user@example.com TEST_PASSWORD=secret yarn test:e2e          # headless
-TEST_EMAIL=user@example.com TEST_PASSWORD=secret yarn test:e2e:headed   # visible browser
-BASE_URL=http://localhost:3000 yarn test:e2e                            # custom base URL
+yarn test:e2e:branch                              # recommended: fresh Neon branch of the anonymised seed, deleted afterwards
+yarn test:e2e:branch e2e/booking.spec.ts --headed # one spec, visible browser
+yarn test:e2e:branch --keep                       # keep the branch to debug (yarn -s db:branch-url <name> | pbcopy)
+BASE_URL=http://localhost:3000 yarn test:e2e      # run against an already-running server (uses TEST_EMAIL/TEST_PASSWORD or the seeded e2e user)
 ```
 
-Tests are in `e2e/`. The test user must exist in the database and have at least 1 credit for the booking test to pass.
+Tests are in `e2e/`. Test users and lessons are seeded on every e2e branch from `e2e/fixtures.ts` (`scripts/lib/seed-e2e.ts`). Requires `NEON_API_KEY` and `NEON_PROJECT_ID` in `.env` and Playwright browsers (`yarn playwright install chromium`).
 
 ### Database Scripts
 
@@ -43,6 +43,15 @@ yarn db:seed-lessons     # Seed 12 weeks of Sunday 09:45 hatha yoga + 3 guest le
 ```
 
 `db:seed-lessons` accepts `--weeks N` to customize. Legacy Appwrite migration scripts remain in `scripts/` but are no longer functional.
+
+Neon branches (project `orange-shape-96414119`): `production` (live — never point local `.env` at it), `seed` (anonymised copy of production), `dev` (local development, child of seed), `e2e-*` (throwaway, one per test run).
+
+```bash
+yarn db:refresh-seed --yes          # rebuild seed from production (anonymised) + fresh dev; deletes old seed/dev/e2e-*
+yarn -s db:branch-url dev | pbcopy  # connection string for a test branch (never printed, never production)
+```
+
+When a table or a `students` column is added to `server/database/schema.ts`, classify it in `scripts/lib/anonymise.ts` — the unit tests fail until you do.
 
 ## Architecture
 
