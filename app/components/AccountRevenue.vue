@@ -16,8 +16,11 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, T
 
 const { $rav } = useNuxtApp()
 
+// ⚡ Bolt: Hoist the Intl.NumberFormat instance to avoid expensive re-creation in high-frequency rendering paths
+const euroFormatter = new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' })
+
 function formatEuro(value: number): string {
-  return new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(value)
+  return euroFormatter.format(value)
 }
 
 const bucketOptions = [

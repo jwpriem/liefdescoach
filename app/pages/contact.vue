@@ -11,6 +11,10 @@ const name = ref("");
 const email = ref("");
 const message = ref("");
 
+const canSubmit = computed(() => {
+    return name.value.trim().length > 0 && email.value.trim().length > 0 && message.value.trim().length > 0;
+});
+
 definePageMeta({});
 
 useHead({
@@ -78,6 +82,7 @@ async function send() {
                         variant="outline"
                         type="text"
                         placeholder="Je naam"
+                        icon="i-lucide-user"
                     />
                 </UFormField>
                 <UFormField label="Email" required>
@@ -88,6 +93,7 @@ async function send() {
                         variant="outline"
                         type="email"
                         placeholder="Je e-mailadres"
+                        icon="i-lucide-mail"
                     />
                 </UFormField>
                 <UFormField label="Bericht" required>
@@ -100,9 +106,20 @@ async function send() {
                         placeholder="Waar gaat het over?"
                     />
                 </UFormField>
-                <UButton color="primary" variant="solid" size="xl" @click="send"
-                    >Verzenden</UButton
-                >
+                <UTooltip :text="!canSubmit ? 'Vul alle verplichte velden in' : 'Bericht verzenden'">
+                    <div>
+                        <UButton
+                            color="primary"
+                            variant="solid"
+                            size="xl"
+                            :loading="isLoading"
+                            :disabled="!canSubmit"
+                            @click="send"
+                        >
+                            Verzenden
+                        </UButton>
+                    </div>
+                </UTooltip>
                 <Addresses />
             </div>
         </Header>

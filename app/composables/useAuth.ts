@@ -40,13 +40,9 @@ function passkeyBrowserError(error: any) {
 export const useAuth = () => {
   const { data: user, refresh, status } = useAsyncData<User | null>('user', async () => {
     try {
-      const me = await $fetch<User>('/api/auth/me')
-      try {
-        const { health, dateOfBirth, phone, phoneRequested } = await $fetch<any>('/api/health/me')
-        return { ...me, health, dateOfBirth, phone, phoneRequested }
-      } catch {
-        return me
-      }
+      // ⚡ Bolt: Consolidated core user identity, health, and profile data into a single network request.
+      // Expected impact: Reduces network roundtrips and redundant database queries during app initialization.
+      return await $fetch<User>('/api/auth/me')
     } catch {
       return null
     }

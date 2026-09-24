@@ -34,7 +34,6 @@ beforeEach(() => {
     // Real auth so routes still on requireAuth (cancelBooking) are exercised too
     vi.stubGlobal('requireAuth', requireAuth)
     vi.stubGlobal('findAvailableCredit', vi.fn().mockResolvedValue(null))
-    vi.stubGlobal('countRegularLessonBookings', vi.fn().mockResolvedValue(0))
 })
 
 describe.each(routes)('$route ownership', ({ handler, body }) => {

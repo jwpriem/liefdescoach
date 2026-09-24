@@ -18,6 +18,7 @@ const PUBLIC_ROUTES = [
     'auth/send-otp.post.ts',
     'auth/verify-email.post.ts',
     'auth/verify-otp.post.ts',
+    'csrf-token.get.ts', // issues the CSRF token; must work before login
     'lessons.get.ts',
     'mail/send.post.ts',
     'passwordRecovery.post.ts', // empty legacy file

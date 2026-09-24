@@ -21,34 +21,54 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 400, statusMessage: 'Selecteer een deelnemer voor de Classpass boeking' })
     }
 
-    // Fetch lesson
-    const lessonRows = await db.select().from(lessons).where(eq(lessons.id, body.lessonId)).limit(1)
-    if (lessonRows.length === 0) {
+    // ⚡ Bolt: Use a single joined query to fetch lesson and its bookings simultaneously, reducing database roundtrips.
+    const rows = await db
+        .select({
+            id: lessons.id,
+            date: lessons.date,
+            maxSpots: lessons.maxSpots,
+            type: lessons.type,
+            teacher: lessons.teacher,
+            bookingId: bookings.id,
+            bookingStudentId: bookings.studentId,
+            bookingSource: bookings.source,
+        })
+        .from(lessons)
+        .leftJoin(bookings, eq(lessons.id, bookings.lessonId))
+        .where(eq(lessons.id, body.lessonId))
+
+    if (rows.length === 0) {
         throw createError({ statusCode: 404, statusMessage: 'Les niet gevonden' })
     }
-    const lesson = lessonRows[0]
+
+    const lesson = rows[0]
 
     // Admins booking for a student may add them to past lessons (attendance correction)
-    if (!isOnBehalf && new Date(lesson.date) <= new Date()) {
+    if (!isOnBehalf && lesson.date.getTime() <= Date.now()) {
         throw createError({ statusCode: 400, statusMessage: 'Kan niet boeken voor een les in het verleden' })
     }
 
     const allowDuplicateBooking = body.extraSpot === true
+    let regularCount = 0
+    let alreadyBooked = false
 
-    const existingBookings = await db
-        .select()
-        .from(bookings)
-        .where(eq(bookings.lessonId, body.lessonId))
-
-    // Only regular bookings count toward capacity. Classpass bookings ignore capacity.
-    if (source === 'regular') {
-        const regularCount = existingBookings.filter(b => b.source === 'regular').length
-        if (regularCount >= lesson.maxSpots) {
-            throw createError({ statusCode: 409, statusMessage: 'Les is vol' })
+    // ⚡ Bolt: Consolidate capacity and duplicate checks into a single pass over the joined results.
+    for (const row of rows) {
+        if (!row.bookingId) continue
+        if (row.bookingSource === 'regular') {
+            regularCount++
+        }
+        if (row.bookingStudentId === targetUserId) {
+            alreadyBooked = true
         }
     }
 
-    if (!allowDuplicateBooking && existingBookings.some(b => b.studentId === targetUserId)) {
+    // Only regular bookings count toward capacity. Classpass bookings ignore capacity.
+    if (source === 'regular' && regularCount >= lesson.maxSpots) {
+        throw createError({ statusCode: 409, statusMessage: 'Les is vol' })
+    }
+
+    if (!allowDuplicateBooking && alreadyBooked) {
         throw createError({ statusCode: 409, statusMessage: 'Gebruiker is al geboekt voor deze les' })
     }
 
@@ -79,14 +99,15 @@ export default defineEventHandler(async (event) => {
     }
 
     // Admins correcting attendance on past lessons don't trigger mails; classpass guests often have no email.
-    if (source === 'regular' && !(isAdmin && new Date(lesson.date) <= now)) {
+    if (source === 'regular' && !(isAdmin && lesson.date.getTime() <= now.getTime())) {
         event.waitUntil(
             sendBookingNotifications('confirmation', { lessonId: lesson.id, studentId: targetUserId })
                 .catch((err: any) => console.error('[handleBooking] Notifications failed:', err?.message ?? err))
         )
     }
 
-    const regularCountAfter = await countRegularLessonBookings(body.lessonId)
+    // ⚡ Bolt: Calculate remaining spots using in-memory count, avoiding another database call.
+    const spotsLeft = lesson.maxSpots - (source === 'regular' ? regularCount + 1 : regularCount)
 
     return {
         success: true,
@@ -97,6 +118,6 @@ export default defineEventHandler(async (event) => {
             teacher: lesson.teacher,
         },
         source,
-        spots: lesson.maxSpots - regularCountAfter,
+        spots: spotsLeft,
     }
 })

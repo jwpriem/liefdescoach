@@ -110,24 +110,29 @@ export default defineNuxtPlugin(nuxtApp => {
                 .filter((lesson: any) => new Date(lesson.date).getTime() > nowTime)
         },
 
-        checkLessonType(type: string) {
-            return type == 'peachy bum' ? 'Peachy Bum' : 'Hatha Yoga'
+        checkLessonType(lesson: any) {
+            if (lesson.type == 'peachy bum') return 'Peachy Bum'
+            if (lesson.teacher == 'Bo Bol') return 'Yin Yoga'
+            return 'Hatha Yoga'
+        },
+
+        getTeacherName(lesson: any) {
+            return lesson.teacher || 'Ravennah'
         },
 
         getLessonTitle(lesson: any) {
             if (lesson.type == 'guest lesson') {
-                const safeTeacher = lesson.teacher || ""
-                return `Yin-Yang Yoga door gastdocent ${safeTeacher}`
+                return `Yin-Yang Yoga door gastdocent ${rav.getTeacherName(lesson)}`
             }
-            return rav.checkLessonType(lesson.type)
+            return `${rav.checkLessonType(lesson)} met ${rav.getTeacherName(lesson)}`
         },
 
         getLessonDescription(lesson: any) {
+            const safeTeacher = rav.getTeacherName(lesson).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;")
             if (lesson.type == 'guest lesson') {
-                const safeTeacher = (lesson.teacher || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;")
                 return `Yin-Yang Yoga door gastdocent <span class="text-yellow-600">${safeTeacher}</span>`
             }
-            return rav.checkLessonType(lesson.type)
+            return `${rav.checkLessonType(lesson)} met <span class="text-yellow-600">${safeTeacher}</span>`
         }
     };
 

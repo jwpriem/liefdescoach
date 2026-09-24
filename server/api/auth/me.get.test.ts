@@ -4,6 +4,12 @@ import handler from './me.get'
 beforeEach(() => {
   vi.restoreAllMocks()
   vi.stubGlobal('getSessionUser', vi.fn())
+  vi.stubGlobal('db', {
+    select: vi.fn().mockReturnThis(),
+    from: vi.fn().mockReturnThis(),
+    where: vi.fn().mockReturnThis(),
+    limit: vi.fn().mockResolvedValue([]),
+  })
   vi.stubGlobal('createError', vi.fn((opts: any) => {
     const err = new Error(opts.statusMessage) as any
     err.statusCode = opts.statusCode
@@ -46,6 +52,10 @@ describe('GET /api/auth/me', () => {
       archived: false,
       reminders: true,
       pushNotifications: false,
+      phone: undefined,
+      dateOfBirth: null,
+      phoneRequested: undefined,
+      health: null,
     })
   })
 

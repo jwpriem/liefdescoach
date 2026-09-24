@@ -55,3 +55,11 @@
 ## 2025-05-22 - Explicit focus indicators and tooltips for icon actions
 **Learning:** In Tailwind 4 environments, default browser focus rings can be nearly invisible on specific backgrounds (like dark navigation bars or list items). Additionally, icon-only actions (like calendar exports) lack immediate semantic clarity without persistent or hover-based micro-copy.
 **Action:** Always apply explicit `focus-visible:ring-2` (and `focus:outline-none`) to interactive elements to ensure accessibility for keyboard users. Use `ring-inset` for navigation links to prevent focus indicators from being clipped by container overflow (`overflow-hidden`). Enhance icon-only buttons with `UTooltip` and `aria-label` to provide both visual and screen-reader context.
+
+## 2025-05-18 - Accessibility of USwitch components
+**Learning:** Found that USwitch components in settings forms (like `AccountDetails.vue`) were missing `aria-label` attributes and some were not correctly linked to their visual labels via `id`. This prevents screen readers from announcing the switch's purpose to users.
+**Action:** When using `USwitch`, always ensure it has a descriptive `aria-label` or is programmatically linked to a label using an `id`.
+
+## 2025-05-18 - Consistent Password Input UX
+**Learning:** Found inconsistencies in password input fields across the app. While the login page had visibility toggles, the password reset and account settings pages did not. Providing a consistent "lock icon + visibility toggle" pattern reduces user error and improves confidence during sensitive actions.
+**Action:** Always implement a leading `i-lucide-lock` icon and a trailing visibility toggle (using the `#trailing` slot with a ghost `UButton`) for all password fields.
