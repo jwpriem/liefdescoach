@@ -65,6 +65,13 @@ export default defineEventHandler(async (event) => {
     // Delete booking
     await db.delete(bookings).where(eq(bookings.id, body.bookingId))
 
+    if (booking.source !== 'classpass' && booking.studentId) {
+        event.waitUntil(
+            sendBookingNotifications('cancellation', { lessonId: booking.lessonId, studentId: booking.studentId })
+                .catch((err: any) => console.error('[cancelBooking] Notifications failed:', err?.message ?? err))
+        )
+    }
+
     return {
         success: true,
         lessonId: booking.lessonId,

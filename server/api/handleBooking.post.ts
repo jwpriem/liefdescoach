@@ -78,6 +78,14 @@ export default defineEventHandler(async (event) => {
             .where(eq(credits.id, creditId))
     }
 
+    // Admins correcting attendance on past lessons don't trigger mails; classpass guests often have no email.
+    if (source === 'regular' && !(isAdmin && new Date(lesson.date) <= now)) {
+        event.waitUntil(
+            sendBookingNotifications('confirmation', { lessonId: lesson.id, studentId: targetUserId })
+                .catch((err: any) => console.error('[handleBooking] Notifications failed:', err?.message ?? err))
+        )
+    }
+
     const regularCountAfter = await countRegularLessonBookings(body.lessonId)
 
     return {

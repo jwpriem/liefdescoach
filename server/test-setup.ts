@@ -43,6 +43,7 @@ vi.stubGlobal('requireAdmin', vi.fn())
 // Real implementation: route tests drive it through asUser() → getSessionUser
 vi.stubGlobal('requireSelfOrAdmin', requireSelfOrAdmin)
 vi.stubGlobal('nestBookingsWithLessons', vi.fn((rows: any[]) => ({ rows, total: rows.length })))
+vi.stubGlobal('sendBookingNotifications', vi.fn().mockResolvedValue(undefined))
 vi.stubGlobal('generateSignedToken', vi.fn().mockReturnValue('mock-token'))
 vi.stubGlobal('verifySignedToken', vi.fn().mockReturnValue({}))
 vi.stubGlobal('generateId', vi.fn().mockReturnValue('mock-id'))

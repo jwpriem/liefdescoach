@@ -22,8 +22,8 @@ function lazyCleanup(now: number) {
  * Body: { type: string, data: object }
  * Types: 'contact' | 'new-user'
  *
- * Booking/cancellation emails are handled by their own dedicated endpoints
- * (sendBookingConfirmation / SendBookingCancellation) which send 2 emails each.
+ * Booking/cancellation emails are sent server-side by handleBooking / cancelBooking
+ * via sendBookingNotifications (server/utils/bookingNotifications.ts).
  */
 export default defineEventHandler(async (event) => {
     const body = await readBody(event)
