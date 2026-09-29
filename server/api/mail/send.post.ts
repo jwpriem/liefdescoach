@@ -16,6 +16,17 @@ function lazyCleanup(now: number) {
     }
 }
 
+function validateString(val: unknown, minLen: number, maxLen: number, fieldName: string): string {
+    if (typeof val !== 'string') {
+        throw createError({ statusCode: 400, statusMessage: `Ongeldige waarde voor ${fieldName}` })
+    }
+    const trimmed = val.trim()
+    if (trimmed.length < minLen || trimmed.length > maxLen) {
+        throw createError({ statusCode: 400, statusMessage: `Ongeldige lengte voor ${fieldName}` })
+    }
+    return trimmed
+}
+
 /**
  * Server-side email API for simple notification emails.
  *
@@ -30,6 +41,9 @@ export default defineEventHandler(async (event) => {
 
     if (!body?.type || typeof body.type !== 'string') {
         throw createError({ statusCode: 400, statusMessage: 'Email type is verplicht' })
+    }
+    if (!body.data || typeof body.data !== 'object') {
+        throw createError({ statusCode: 400, statusMessage: 'Email data is verplicht' })
     }
 
     const ip = getRequestIP(event) || 'unknown';
@@ -55,12 +69,21 @@ export default defineEventHandler(async (event) => {
     let to = 'info@ravennah.com'
 
     switch (body.type) {
-        case 'contact':
-            email = contactEmail(body.data)
+        case 'contact': {
+            const name = validateString(body.data.name, 1, 100, 'naam')
+            const clientEmail = validateString(body.data.email, 3, 255, 'e-mailadres')
+            const message = validateString(body.data.message, 1, 5000, 'bericht')
+            email = contactEmail({ name, email: clientEmail, message })
             break
-        case 'new-user':
-            email = newUserEmail(body.data)
+        }
+        case 'new-user': {
+            const name = validateString(body.data.name, 1, 100, 'naam')
+            const clientEmail = validateString(body.data.email, 3, 255, 'e-mailadres')
+            const phone = typeof body.data.phone === 'string' ? body.data.phone.trim().slice(0, 50) : ''
+            const date = typeof body.data.date === 'string' ? body.data.date.trim().slice(0, 50) : new Date().toLocaleDateString('nl-NL')
+            email = newUserEmail({ name, email: clientEmail, phone, date })
             break
+        }
         default:
             throw createError({ statusCode: 400, statusMessage: `Onbekend email type: ${body.type}` })
     }
