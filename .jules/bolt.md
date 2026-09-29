@@ -45,3 +45,7 @@
 ## 2025-05-21 - Reducing DB Roundtrips with Joined Queries
 **Learning:** Performing separate queries for a resource and then subsequent count or existence checks for its relations (e.g., `db.select().from(lessons)`, then `db.select().from(bookings).where(...)`, then `countRegularLessonBookings(...)`) causes multiple network roundtrips and increases latency.
 **Action:** Use a single `leftJoin` query to fetch the parent resource and all related records in one go. Consolidate business logic (capacity checks, duplicate prevention) into a single pass over the joined results in-memory. This allows calculating final metrics (like `spotsLeft`) without any additional database calls.
+
+## 2026-04-20 - DayJS vs Native Date Formatting Performance
+**Learning:** In high-frequency date arithmetic and formatting (such as calendar link generation or cancel period calculations in Vue templates), instantiating Dayjs objects and plugin instances is very expensive. Native `Date` getters (`getUTCFullYear`, `getUTCHours`, etc.) and timestamp arithmetic (`new Date().getTime() - Date.now()`) are 13x–16x faster.
+**Action:** Use native Date methods or timestamp arithmetic for simple date comparisons, formatting, and calendar link generation instead of Dayjs.

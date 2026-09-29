@@ -31,6 +31,13 @@ const futureBookingGroups = computed(() => {
         lessons: booking.lessons,
         bookings: [booking],
         spots: 1,
+        // ⚡ Bolt: Precalculate formatted strings and links to avoid calling methods inside v-for loops on re-renders
+        description: $rav.getLessonDescription(booking.lessons),
+        formattedDate: $rav.formatDateInDutch(booking.lessons.date, true),
+        appleCalLink: $rav.getCalenderLink('apple', booking.lessons.date, booking.lessons.type),
+        googleCalLink: $rav.getCalenderLink('google', booking.lessons.date, booking.lessons.type),
+        outlookCalLink: $rav.getCalenderLink('outlook', booking.lessons.date, booking.lessons.type),
+        canCancel: $rav.checkCancelPeriod(booking.lessons),
       })
     } else {
       current.bookings.push(booking)
@@ -119,7 +126,7 @@ async function bookExtraSpot(lesson: any) {
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-emerald-500 shrink-0">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5" />
                 </svg>
-                <span v-html="$rav.getLessonDescription(bookingGroup.lessons)"></span>
+                <span v-html="bookingGroup.description"></span>
               </span>
             </div>
 
@@ -134,7 +141,7 @@ async function bookExtraSpot(lesson: any) {
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-emerald-500 shrink-0">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
                 </svg>
-                {{ $rav.formatDateInDutch(bookingGroup.lessons.date, true) }}
+                {{ bookingGroup.formattedDate }}
               </span>
             </div>
 
@@ -142,13 +149,13 @@ async function bookExtraSpot(lesson: any) {
               <span class="text-xs font-medium text-emerald-400/80 uppercase tracking-wide">Zet in je agenda</span>
               <div class="flex gap-3 mt-2">
                 <UTooltip text="Apple Agenda">
-                  <a :href="$rav.getCalenderLink('apple', bookingGroup.lessons.date, bookingGroup.lessons.type)" class="hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-lg p-0.5" aria-label="Voeg toe aan Apple Agenda"><img src="/apple.png" class="w-6" alt="" aria-hidden="true" /></a>
+                  <a :href="bookingGroup.appleCalLink" class="hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-lg p-0.5" aria-label="Voeg toe aan Apple Agenda"><img src="/apple.png" class="w-6" alt="" aria-hidden="true" /></a>
                 </UTooltip>
                 <UTooltip text="Google Agenda">
-                  <a :href="$rav.getCalenderLink('google', bookingGroup.lessons.date, bookingGroup.lessons.type)" class="hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-lg p-0.5" aria-label="Voeg toe aan Google Agenda"><img src="/gmail.png" class="w-6" alt="" aria-hidden="true" /></a>
+                  <a :href="bookingGroup.googleCalLink" class="hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-lg p-0.5" aria-label="Voeg toe aan Google Agenda"><img src="/gmail.png" class="w-6" alt="" aria-hidden="true" /></a>
                 </UTooltip>
                 <UTooltip text="Outlook Agenda">
-                  <a :href="$rav.getCalenderLink('outlook', bookingGroup.lessons.date, bookingGroup.lessons.type)" class="hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-lg p-0.5" aria-label="Voeg toe aan Outlook Agenda"><img src="/outlook.png" class="w-6" alt="" aria-hidden="true" /></a>
+                  <a :href="bookingGroup.outlookCalLink" class="hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-lg p-0.5" aria-label="Voeg toe aan Outlook Agenda"><img src="/outlook.png" class="w-6" alt="" aria-hidden="true" /></a>
                 </UTooltip>
               </div>
             </div>
@@ -159,9 +166,9 @@ async function bookExtraSpot(lesson: any) {
                   <UButton :loading="isBookingExtraId === bookingGroup.lessonId" color="primary" variant="solid" size="lg" block :disabled="availableCredits < 1" @click="bookExtraSpot(bookingGroup.lessons)">Boek extra plek</UButton>
                 </div>
               </UTooltip>
-              <UTooltip :text="!$rav.checkCancelPeriod(bookingGroup.lessons) ? 'Annuleren kan tot 24 uur voor de les' : 'Annuleer deze boeking'" class="w-full" :ui="{ width: 'w-full' }">
+              <UTooltip :text="!bookingGroup.canCancel ? 'Annuleren kan tot 24 uur voor de les' : 'Annuleer deze boeking'" class="w-full" :ui="{ width: 'w-full' }">
                 <div class="w-full">
-                  <UButton :loading="isCancelingId === bookingGroup.lessonId" color="error" variant="soft" size="lg" block @click="removeBooking(bookingGroup)" :disabled="!$rav.checkCancelPeriod(bookingGroup.lessons)">Annuleer 1 plek</UButton>
+                  <UButton :loading="isCancelingId === bookingGroup.lessonId" color="error" variant="soft" size="lg" block @click="removeBooking(bookingGroup)" :disabled="!bookingGroup.canCancel">Annuleer 1 plek</UButton>
                 </div>
               </UTooltip>
             </div>
