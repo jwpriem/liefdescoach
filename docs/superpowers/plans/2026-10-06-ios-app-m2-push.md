@@ -2030,8 +2030,8 @@ Before committing, check `git status --short`: commit nothing under `ios/App/App
 - [ ] **Step 9: Simulator and device checklist (owner, manual)**
 
 In the simulator (`yarn dev` in one terminal, `yarn dev:ios` in another):
-- [ ] No permission prompt at launch or at login.
-- [ ] After the first booking, iOS asks for notification permission.
+- [ ] iOS asks for notification permission the first time the app opens (before login).
+- [ ] With permission still undecided, the first booking asks again.
 - [ ] With permission granted, `xcrun simctl push booted com.ravennah.app docs/ios/push-sample-reminder.apns` shows the notification, also while the app is open.
 - [ ] Long-pressing it shows "Route" and "Bekijk les"; "Bekijk les" opens `/lessen`; "Route" opens Maps with the studio address.
 - [ ] The app icon shows a badge after the push and loses it when the app is opened.
@@ -2191,14 +2191,46 @@ git commit -m "Do not treat a Keychain error as a logout"
 
 ## Release steps for the owner
 
-In this order:
+The migration is safe under the code that is live today, so it goes first. Deploying first would make every logged-in request fail until the migration runs.
 
-1. Review and merge the pull request, but do not let it deploy yet if merging deploys automatically — do step 2 first.
-2. Apply the migration to production:
-   `NUXT_DATABASE_URL="<production connection string>" tsx --tsconfig scripts/tsconfig.json scripts/migrate-0006-ios-push.ts --yes`
-3. Deploy.
-4. Add the APNs settings to the production environment: `NUXT_APNS_KEY`, `NUXT_APNS_KEY_ID`, `NUXT_APNS_TEAM_ID`, `NUXT_APNS_PRODUCTION=true`.
-5. Build and upload a new TestFlight build (`yarn build:ios`, then archive in Xcode).
+**Before anything else**
+
+- Do not run `yarn db:refresh-seed` or `yarn dev --new-database` until production is migrated: both rebuild `seed` and `dev` from production without the new columns.
+- Run the simulator checklist (Task 7, Step 9).
+
+**1. Apple developer account**
+
+- Enable Push Notifications on the App ID `com.ravennah.app`.
+- Create an APNs auth key (`.p8`); note its Key ID and your Team ID.
+- Open the project in Xcode once so it regenerates the provisioning profile.
+
+**2. Migrate production (before merging)**
+
+From the repo root of a checkout of this branch:
+
+    NUXT_DATABASE_URL="<production connection string>" yarn tsx --tsconfig scripts/tsconfig.json scripts/migrate-0006-ios-push.ts --yes
+
+Keep the connection string out of your shell history. Then check:
+
+- "Applying to" shows the production host.
+- "Columns after" lists `platform` and `kind` with default `'web'`, and `p256dh` / `auth` as nullable.
+- Running the same command again prints "Already applied — nothing to do."
+
+**3. Set the APNs environment variables in production**
+
+`NUXT_APNS_KEY` (the `.p8` contents on one line, line breaks written as `\n`, stored as an encrypted value), `NUXT_APNS_KEY_ID`, `NUXT_APNS_TEAM_ID`, and `NUXT_APNS_PRODUCTION=true`.
+
+`NUXT_APNS_PRODUCTION=true` is required on the live site: TestFlight and App Store builds use Apple's production push service. A debug build run from Xcode uses the sandbox and cannot receive notifications from the live site.
+
+**4. Merge and deploy**
+
+Before merging, start the production build once locally (`yarn build && yarn preview`) and log in. After the deploy, check on the live site that you are still logged in in your browser and that a browser notification still arrives (as admin: `POST /api/push/test`).
+
+If something is wrong: redeploy the previous version. Do not reverse the migration; the previous version runs fine on the new columns.
+
+**5. Build and upload a new TestFlight build**
+
+`yarn build:ios`, then archive in Xcode. Do the real-iPhone part of the checklist with this TestFlight build, not with a debug build.
 
 Anyone logged in to a TestFlight build made before this release is logged out once, because sessions created before the migration count as website sessions.
 
