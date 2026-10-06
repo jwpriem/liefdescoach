@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const apns = vi.hoisted(() => ({
   clientOptions: [] as any[],
@@ -36,9 +36,15 @@ beforeEach(() => {
   apns.send.mockResolvedValue(undefined)
 })
 
+afterEach(() => {
+  vi.useRealTimers()
+  vi.restoreAllMocks()
+})
+
 describe('sendApns', () => {
   it('does nothing and reports failure when APNs is not configured', async () => {
     const sendApns = await loadSender({ ...CONFIGURED, apnsKey: '' })
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
 
     await expect(sendApns('token', { title: 'T', body: 'B' })).resolves.toBe('failed')
     expect(apns.send).not.toHaveBeenCalled()
@@ -86,18 +92,64 @@ describe('sendApns', () => {
     })
   })
 
-  it.each(['BadDeviceToken', 'Unregistered', 'DeviceTokenNotForTopic'])('reports %s as an invalid token', async (reason) => {
+  it('reports Unregistered as an invalid token', async () => {
     const sendApns = await loadSender(CONFIGURED)
-    apns.send.mockRejectedValue({ reason })
+    apns.send.mockRejectedValue({ reason: 'Unregistered' })
 
     await expect(sendApns('token', { title: 'T', body: 'B' })).resolves.toBe('invalid-token')
   })
 
+  it.each([
+    ['BadDeviceToken', 'NUXT_APNS_PRODUCTION'],
+    ['DeviceTokenNotForTopic', 'NUXT_APNS_BUNDLE_ID'],
+  ])('reports %s as a failure (server setting), never an invalid token, and names the cause', async (reason, setting) => {
+    const sendApns = await loadSender(CONFIGURED)
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {})
+    apns.send.mockRejectedValue({ reason })
+
+    await expect(sendApns('token', { title: 'T', body: 'B' })).resolves.toBe('failed')
+    expect(error).toHaveBeenCalledWith(expect.stringContaining(setting))
+  })
+
   it('reports any other error as a failure, not an invalid token', async () => {
     const sendApns = await loadSender(CONFIGURED)
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {})
     apns.send.mockRejectedValue({ reason: 'TooManyRequests' })
 
     await expect(sendApns('token', { title: 'T', body: 'B' })).resolves.toBe('failed')
+    expect(error).toHaveBeenCalled()
+  })
+
+  it('warns once, on the first send, when APNs is not configured', async () => {
+    const sendApns = await loadSender({ ...CONFIGURED, apnsKey: '' })
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    await sendApns('a', { title: 'T', body: 'B' })
+    await sendApns('b', { title: 'T', body: 'B' })
+
+    expect(warn).toHaveBeenCalledTimes(1)
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('not configured'))
+  })
+
+  it('gives up on a send Apple never answers and leaves no timer pending', async () => {
+    vi.useFakeTimers()
+    const sendApns = await loadSender(CONFIGURED)
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    apns.send.mockReturnValue(new Promise(() => {}))
+
+    const outcome = sendApns('token', { title: 'T', body: 'B' })
+    await vi.advanceTimersByTimeAsync(10_000)
+
+    await expect(outcome).resolves.toBe('failed')
+    expect(vi.getTimerCount()).toBe(0)
+  })
+
+  it('clears the timer when a send settles', async () => {
+    vi.useFakeTimers()
+    const sendApns = await loadSender(CONFIGURED)
+
+    await expect(sendApns('token', { title: 'T', body: 'B' })).resolves.toBe('sent')
+    expect(vi.getTimerCount()).toBe(0)
   })
 
   it('reuses one client across sends', async () => {
