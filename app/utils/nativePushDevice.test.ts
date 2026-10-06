@@ -112,7 +112,7 @@ describe('disablePush', () => {
 
     await disablePush()
 
-    expect(fetchMock).toHaveBeenCalledWith('/api/push/unsubscribe', { method: 'POST', body: { token: TOKEN } })
+    expect(fetchMock).toHaveBeenCalledWith('/api/push/unsubscribe', { method: 'POST', body: { token: TOKEN }, timeout: 5_000 })
     expect(plugin.unregister).toHaveBeenCalled()
     await expect(isPushEnabled()).resolves.toBe(false)
 
@@ -130,7 +130,7 @@ describe('forgetPushDevice', () => {
     fetchMock.mockClear()
 
     await forgetPushDevice()
-    expect(fetchMock).toHaveBeenCalledWith('/api/push/unsubscribe', { method: 'POST', body: { token: TOKEN } })
+    expect(fetchMock).toHaveBeenCalledWith('/api/push/unsubscribe', { method: 'POST', body: { token: TOKEN }, timeout: 5_000 })
 
     // The next user who logs in on this phone gets notifications again
     fetchMock.mockClear()
@@ -209,7 +209,7 @@ describe('forgetPushDevice failure handling', () => {
     // The token is still remembered, so the next attempt tells the server again
     fetchMock.mockClear().mockResolvedValue({ success: true })
     await forgetPushDevice()
-    expect(fetchMock).toHaveBeenCalledWith('/api/push/unsubscribe', { method: 'POST', body: { token: TOKEN } })
+    expect(fetchMock).toHaveBeenCalledWith('/api/push/unsubscribe', { method: 'POST', body: { token: TOKEN }, timeout: 5_000 })
   })
 
   it('forgets the token once the server accepted the removal', async () => {
@@ -236,6 +236,24 @@ describe('deviceToken timeout', () => {
 
       await expect(result).resolves.toBe(false)
       expect(fetchMock).not.toHaveBeenCalled()
+      expect(plugin.listeners.size).toBe(0)
+      expect(vi.getTimerCount()).toBe(0)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('gives up when register() itself never answers, and removes the listeners', async () => {
+    vi.useFakeTimers()
+    try {
+      plugin.register.mockReset().mockReturnValue(new Promise(() => {}))
+      const { enablePush } = await load()
+
+      const result = enablePush()
+      await vi.waitFor(() => expect(plugin.register).toHaveBeenCalled())
+      await vi.advanceTimersByTimeAsync(15_000)
+
+      await expect(result).resolves.toBe(false)
       expect(plugin.listeners.size).toBe(0)
       expect(vi.getTimerCount()).toBe(0)
     } finally {

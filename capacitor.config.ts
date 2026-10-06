@@ -7,8 +7,8 @@ const config: CapacitorConfig = {
   webDir: '.output-ios/public',
   plugins: {
     PushNotifications: {
-      // Also show a notification that arrives while the app is open
-      presentationOptions: ['badge', 'sound', 'alert'],
+      // Also show a notification that arrives while the app is open, without leaving a badge behind
+      presentationOptions: ['sound', 'alert'],
     },
   },
 }
