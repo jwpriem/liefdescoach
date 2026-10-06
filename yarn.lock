@@ -877,6 +877,11 @@
   resolved "https://registry.yarnpkg.com/@capacitor/ios/-/ios-8.5.2.tgz#05f805fc6e4b0478156212f06a30862abae67a67"
   integrity sha512-eOT2S67AfTFG7KN0T3oxwAajrJz4rSye+ODfvChiwrk0F/+kWufFM1qU6cDjGJUOfwdAoeuEpZyWHSwZlu4GFg==
 
+"@capacitor/push-notifications@^8.1.3":
+  version "8.1.3"
+  resolved "https://registry.yarnpkg.com/@capacitor/push-notifications/-/push-notifications-8.1.3.tgz#00ae8fbc8347e733d9292df025a5a95201cf8551"
+  integrity sha512-UlOCTS3uiw8ZUJ1rkFKJgoqPADipHDNn0lq5mNRwtXALVxQXIeIoRd3iqpzC+962R2LpCRJRkCTjPX2OHK3tBA==
+
 "@capsizecss/metrics@^3.5.0":
   version "3.7.0"
   resolved "https://registry.yarnpkg.com/@capsizecss/metrics/-/metrics-3.7.0.tgz#f5fa487582d7b6f194790485c2d3d78d96eac089"
