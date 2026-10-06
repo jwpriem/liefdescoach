@@ -9,6 +9,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         registerNotificationCategories()
+        clearBadgeWhenActive()
         return true
     }
 
@@ -26,6 +27,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             category("BOOKING_CHANGE", [button("VIEW_PARTICIPANTS", "Bekijk deelnemers")]),
             category("CREDITS_EMPTY", [button("ADD_CREDITS", "Credits toevoegen")]),
         ])
+    }
+
+    /// Every push sets the badge to 1; once the app is in front of the user it has been seen.
+    /// Observed as a notification because a scene-based app is not sent applicationDidBecomeActive.
+    private func clearBadgeWhenActive() {
+        NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: .main) { _ in
+            if #available(iOS 16.0, *) {
+                UNUserNotificationCenter.current().setBadgeCount(0)
+            } else {
+                UIApplication.shared.applicationIconBadgeNumber = 0
+            }
+        }
     }
 
     // Capacitor's push plugin learns the device token through these two notifications
@@ -52,12 +65,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
-        // Every push sets the badge to 1; opening the app means it has been seen
-        if #available(iOS 16.0, *) {
-            UNUserNotificationCenter.current().setBadgeCount(0)
-        } else {
-            application.applicationIconBadgeNumber = 0
-        }
+        // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
