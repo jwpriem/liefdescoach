@@ -2,6 +2,7 @@ import { createError } from 'h3'
 import crypto from 'node:crypto'
 import { and, gte, lte, eq } from 'drizzle-orm'
 import { lessons, bookings, students } from '../database/schema'
+import { lessonReminderPush } from '../utils/pushMessages'
 
 export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig()
@@ -102,11 +103,7 @@ export default defineEventHandler(async (event) => {
             // Send push reminder (if opted in)
             if (student.pushNotifications) {
                 try {
-                    const sent = await sendPushToStudent(student.studentId, {
-                        title: 'Morgen yoga!',
-                        body: `Je hebt morgen ${lessonType} — tot dan!`,
-                        url: '/lessen',
-                    })
+                    const sent = await sendPushToStudent(student.studentId, lessonReminderPush(lessonType, address))
                     pushSent += sent
                     console.log(`[LessonReminder] Push sent to ${student.studentEmail} (${sent} devices)`)
                 } catch (err: any) {

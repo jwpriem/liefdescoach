@@ -1,5 +1,6 @@
 import { eq } from 'drizzle-orm'
 import { lessons, bookings, students } from '../database/schema'
+import { bookingChangePush, creditsEmptyPush } from './pushMessages'
 
 export type BookingNotificationKind = 'confirmation' | 'cancellation'
 
@@ -78,13 +79,9 @@ export async function sendBookingNotifications(
         })
     )
 
-    const pushes = [{
-        title: isConfirmation ? 'Nieuwe boeking' : 'Annulering',
-        body: `${student.name} heeft ${lessonType} ${isConfirmation ? 'geboekt' : 'geannuleerd'} op ${formattedDate}`,
-        url: '/account',
-    }]
+    const pushes = [bookingChangePush(kind, student.name, lessonType, formattedDate)]
     if (isConfirmation && !(await findAvailableCredit(studentId))) {
-        pushes.push({ title: 'Credits op', body: `${student.name} heeft geen credits meer`, url: '/account' })
+        pushes.push(creditsEmptyPush(student.name, studentId))
     }
 
     for (const push of pushes) {

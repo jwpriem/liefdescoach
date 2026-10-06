@@ -1,12 +1,10 @@
 import webpush from 'web-push'
 import { eq } from 'drizzle-orm'
 import { pushSubscriptions, students } from '../database/schema'
+import type { PushPayload } from '../../shared/push'
+import { sendApns, type PushOutcome } from './apns'
 
-type PushPayload = {
-    title: string
-    body: string
-    url?: string
-}
+type Subscription = { id: string; platform: string; endpoint: string; p256dh: string | null; auth: string | null }
 
 function getVapidConfig() {
     const config = useRuntimeConfig()
@@ -20,16 +18,10 @@ function getVapidConfig() {
     }
 }
 
-/**
- * Send a push notification to a single subscription.
- * Returns true if sent, false if the subscription was expired/invalid (and cleaned up).
- */
-async function sendToSubscription(
-    sub: { id: string; endpoint: string; p256dh: string; auth: string },
-    payload: PushPayload
-): Promise<boolean> {
+/** Sends through Web Push. Never throws. */
+async function sendWebPush(sub: Subscription, payload: PushPayload): Promise<PushOutcome> {
     const vapid = getVapidConfig()
-    if (!vapid) return false
+    if (!vapid || !sub.p256dh || !sub.auth) return 'failed'
 
     webpush.setVapidDetails(vapid.email, vapid.publicKey, vapid.privateKey)
 
@@ -41,17 +33,27 @@ async function sendToSubscription(
             },
             JSON.stringify(payload)
         )
-        return true
+        return 'sent'
     } catch (err: any) {
-        // 410 Gone or 404 = subscription expired, clean up
-        if (err?.statusCode === 410 || err?.statusCode === 404) {
-            await db.delete(pushSubscriptions).where(eq(pushSubscriptions.id, sub.id))
-            console.log(`[Push] Removed expired subscription ${sub.id}`)
-        } else {
-            console.error(`[Push] Failed to send to ${sub.endpoint}:`, err?.message ?? err)
-        }
-        return false
+        // 410 Gone or 404 = subscription expired
+        if (err?.statusCode === 410 || err?.statusCode === 404) return 'invalid-token'
+        console.error(`[Push] Failed to send to ${sub.endpoint}:`, err?.message ?? err)
+        return 'failed'
     }
+}
+
+/**
+ * Send a push notification to a single subscription: an iPhone through APNs, a browser through Web Push.
+ * Returns true if sent; a subscription the push service no longer knows is cleaned up.
+ */
+async function sendToSubscription(sub: Subscription, payload: PushPayload): Promise<boolean> {
+    const outcome = sub.platform === 'ios' ? await sendApns(sub.endpoint, payload) : await sendWebPush(sub, payload)
+
+    if (outcome === 'invalid-token') {
+        await db.delete(pushSubscriptions).where(eq(pushSubscriptions.id, sub.id))
+        console.log(`[Push] Removed expired subscription ${sub.id}`)
+    }
+    return outcome === 'sent'
 }
 
 /**
