@@ -88,9 +88,16 @@ describe('createNativeApiHooks', () => {
   })
 
   it('clears a token the server no longer accepts', async () => {
-    await hooks.onResponse({ request: `${API_BASE}/api/auth/me`, response: response(401) } as any)
+    const options = { headers: new Headers({ authorization: 'Bearer stored-token' }) }
+    await hooks.onResponse({ request: `${API_BASE}/api/auth/me`, options, response: response(401) } as any)
 
     expect(store.value).toBeNull()
+  })
+
+  it('keeps the token when the 401 was for a request that sent none', async () => {
+    await hooks.onResponse({ request: `${API_BASE}/api/auth/me`, options: {}, response: response(401) } as any)
+
+    expect(store.value).toBe('stored-token')
   })
 
   it('keeps the token when a 401 is not about the session', async () => {
@@ -101,7 +108,8 @@ describe('createNativeApiHooks', () => {
   })
 
   it('recognises API paths with a query string and without a base URL', async () => {
-    await hooks.onResponse({ request: '/api/auth/me?x=1', response: response(401) } as any)
+    const options = { headers: new Headers({ authorization: 'Bearer stored-token' }) }
+    await hooks.onResponse({ request: '/api/auth/me?x=1', options, response: response(401) } as any)
 
     expect(store.value).toBeNull()
   })

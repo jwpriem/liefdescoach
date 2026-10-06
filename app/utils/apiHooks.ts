@@ -36,15 +36,16 @@ export function createNativeApiHooks(tokenStore: TokenStore, apiBase: string) {
       // A logout that cannot reach the server still signs the app out on this device
       if (apiPath(request, apiBase) === '/api/auth/logout') await tokenStore.clear()
     },
-    async onResponse({ request, response }: { request: unknown; response: Response }) {
+    async onResponse({ request, options, response }: { request: unknown; options?: { headers?: any }; response: Response }) {
       const path = apiPath(request, apiBase)
       if (!path) return
 
       const token = response.headers.get(SESSION_TOKEN_HEADER)
       if (token) {
         await tokenStore.set(token)
-      } else if (path === '/api/auth/logout' || (path === '/api/auth/me' && response.status === 401)) {
-        // Other 401s (a wrong password, for example) say nothing about the stored session
+      } else if (path === '/api/auth/logout' || (path === '/api/auth/me' && response.status === 401 && new Headers(options?.headers).has('authorization'))) {
+        // Other 401s (a wrong password, for example) say nothing about the stored session, and
+        // neither does a 401 for a request that carried no token (the Keychain may just have been unreadable)
         await tokenStore.clear()
       }
     },

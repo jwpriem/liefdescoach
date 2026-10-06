@@ -8,7 +8,8 @@ const keychain = vi.hoisted(() => ({
 vi.mock('capacitor-secure-storage-plugin', () => {
   const guard = () => { if (keychain.failing) throw new Error('Keychain is locked') }
   const plugin = {
-    async keys() { guard(); return { value: [...keychain.items.keys()] } },
+    // Like the native plugin: an unavailable Keychain gives an empty list, not an error
+    async keys() { return { value: keychain.failing ? [] : [...keychain.items.keys()] } },
     async get({ key }: { key: string }) {
       guard()
       if (!keychain.items.has(key)) throw new Error('Item with given key does not exist')
@@ -51,12 +52,12 @@ describe('sessionTokenStore', () => {
     await expect(afterRestart.get()).resolves.toBe('token-1')
   })
 
-  it('does not mistake a Keychain error for "logged out"', async () => {
+  it('does not remember "nothing there" while the Keychain is unavailable', async () => {
     keychain.items.set('rav_session_token', 'token-1')
     const store = await load()
 
     keychain.failing = true
-    await expect(store.get()).rejects.toThrow('Keychain is locked')
+    await expect(store.get()).resolves.toBeNull()
 
     keychain.failing = false
     await expect(store.get()).resolves.toBe('token-1')
