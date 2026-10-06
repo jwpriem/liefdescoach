@@ -268,3 +268,49 @@ describe('deviceToken timeout', () => {
     }
   })
 })
+
+describe('askPushPermissionAtLaunch', () => {
+  it('asks when permission was never decided, without contacting the server', async () => {
+    const { askPushPermissionAtLaunch } = await load()
+
+    await askPushPermissionAtLaunch()
+    expect(plugin.requestPermissions).toHaveBeenCalledTimes(1)
+    expect(plugin.permission).toBe('granted')
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it.each(['granted', 'denied'])('does not ask when permission is already %s', async (state) => {
+    plugin.permission = state
+    const { askPushPermissionAtLaunch } = await load()
+
+    await askPushPermissionAtLaunch()
+    expect(plugin.requestPermissions).not.toHaveBeenCalled()
+  })
+
+  it('does not ask after the user switched notifications off', async () => {
+    const { enablePush, disablePush, askPushPermissionAtLaunch } = await load()
+    await enablePush()
+    await disablePush()
+    plugin.permission = 'prompt'
+    plugin.requestPermissions.mockClear()
+
+    await askPushPermissionAtLaunch()
+    expect(plugin.requestPermissions).not.toHaveBeenCalled()
+  })
+
+  it('resolves silently where push does not exist, such as a desktop browser', async () => {
+    plugin.checkPermissions.mockRejectedValue(new Error('Not implemented on web.'))
+    plugin.requestPermissions.mockRejectedValue(new Error('Not implemented on web.'))
+    const { askPushPermissionAtLaunch } = await load()
+
+    await expect(askPushPermissionAtLaunch()).resolves.toBeUndefined()
+  })
+
+  it('lets syncPushDevice register the device afterwards', async () => {
+    const { askPushPermissionAtLaunch, syncPushDevice } = await load()
+
+    await askPushPermissionAtLaunch()
+    await syncPushDevice()
+    expect(fetchMock).toHaveBeenCalledWith('/api/push/subscribe', { method: 'POST', body: { platform: 'ios', token: TOKEN } })
+  })
+})

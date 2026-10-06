@@ -10,9 +10,13 @@ export default defineNuxtPlugin(() => {
   const { user } = useAuth()
   const router = useRouter()
 
-  watch(() => user.value?.$id, (id) => {
-    if (id) void syncPushDevice()
-  }, { immediate: true })
+  // First ask (once, if the user never decided), then keep the logged-in user's device registered.
+  // The watcher starts after the question is settled so a fresh "allow" registers straight away.
+  void askPushPermissionAtLaunch().then(() => {
+    watch(() => user.value?.$id, (id) => {
+      if (id) void syncPushDevice()
+    }, { immediate: true })
+  })
 
   void onPushTap((actionId, data) => {
     const destination = pushDestination(actionId, data)

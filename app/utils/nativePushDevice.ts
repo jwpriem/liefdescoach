@@ -63,10 +63,14 @@ async function unregister(): Promise<void> {
   await withPush((push) => push.unregister()).catch(() => {})
 }
 
+/** Shows the iOS permission dialog if still undecided; resolves whether notifications are allowed. */
+async function requestPermission(): Promise<boolean> {
+  return withPush((push) => push.requestPermissions()).then((status) => status.receive === 'granted', () => false)
+}
+
 /** The user switches notifications on: asks permission if needed. */
 export async function enablePush(): Promise<boolean> {
-  const granted = await withPush((push) => push.requestPermissions()).then((status) => status.receive === 'granted', () => false)
-  if (!granted) return false
+  if (!await requestPermission()) return false
 
   localStorage.removeItem(OFF_KEY)
   return register()
@@ -88,6 +92,13 @@ export async function syncPushDevice(): Promise<void> {
   if (localStorage.getItem(OFF_KEY)) return
   if (await permission() !== 'granted') return
   await register()
+}
+
+/** At launch: settle the permission question if the user never decided. Does not register; that needs a logged-in user. */
+export async function askPushPermissionAtLaunch(): Promise<void> {
+  if (localStorage.getItem(OFF_KEY)) return
+  if (await permission() !== 'prompt') return
+  await requestPermission()
 }
 
 /** After a booking: the one moment the app asks, and only if the user never decided. */
