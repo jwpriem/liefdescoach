@@ -9,11 +9,15 @@ yarn dev        # Dev server on localhost:3000, always on the Neon `dev` branch 
 yarn dev --new-database  # First rebuild seed + dev from a fresh anonymised copy of production (dev data is lost), then start
 yarn build      # Production build (outputs to .output/)
 yarn preview    # Preview production build locally
+yarn build:ios  # iOS app: client-only member bundle against https://www.ravennah.com, synced into ios/
+yarn dev:ios    # iOS app in the simulator against a running `yarn dev` (Neon dev branch); no live reload
 ```
 
 `yarn dev`, `yarn preview`, `yarn db:push` and `yarn db:studio` run through `scripts/with-dev-db.ts`, which fetches the `dev` branch's connection string from the Neon API (`NEON_API_KEY`, `NEON_PROJECT_ID` in `.env`). Local `.env` has no `NUXT_DATABASE_URL`; production (DigitalOcean App Platform) sets its own.
 
-No linter is configured. Node 20 is required.
+The iOS app (Capacitor, `ios/`) bundles only the member pages (`config/ios-target.ts`) and calls the API cross-origin. The server recognises it by its `Origin` (`isNativeAppRequest` in `server/utils/native-app.ts`): those requests use a bearer session token instead of the cookie, skip CSRF, and get CORS. In components, ask `useNativeApp()` — never check the platform directly. `yarn test:e2e:branch --app` smoke-tests the bundle in a browser.
+
+No linter is configured. Node 22 or newer is required (Capacitor CLI).
 
 ## Do
 1. Follow the DRY (Don't Repeat Yourself) pattern while creating new functionality. When a piece of code is copied or has a similarity of 90%, make it a generic reusable component
