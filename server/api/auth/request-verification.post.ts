@@ -1,4 +1,5 @@
 import { createError } from 'h3'
+import { getSiteOrigin } from '../../utils/native-app'
 
 const MAX_VERIFICATION_REQUESTS = 3;
 const REQUEST_WINDOW_MS = 60 * 60 * 1000; // 1 hour
@@ -50,7 +51,7 @@ export default defineEventHandler(async (event) => {
         config.sessionSecret
     )
 
-    const verifyUrl = `${getHeader(event, 'origin')}/verify-email?token=${token}`
+    const verifyUrl = `${getSiteOrigin(event)}/verify-email?token=${token}`
     const email = verificationEmail(verifyUrl)
 
     event.waitUntil(Promise.resolve().then(async () => {

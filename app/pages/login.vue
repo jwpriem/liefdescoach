@@ -15,7 +15,12 @@ const passwordCheck = ref(false);
 const ready = ref(false)
 
 // OTP state
-const loginMode = ref<'password' | 'otp' | 'passkey' | 'forgot'>('passkey')
+// Passkeys are bound to the website's hostname, so the iOS app starts with the password form
+const { isNativeApp } = useNativeApp()
+const defaultLoginMode = isNativeApp ? 'password' : 'passkey'
+const backLabel = isNativeApp ? 'Terug naar wachtwoord' : 'Terug naar passkey'
+const otherLoginLabel = isNativeApp ? 'Inloggen met e-mailcode' : backLabel
+const loginMode = ref<'password' | 'otp' | 'passkey' | 'forgot'>(defaultLoginMode)
 const otpStep = ref<'email' | 'code'>('email')
 const otpCode = ref('')
 const otpSent = ref(false)
@@ -180,8 +185,8 @@ function showOtherOptions() {
   errorMessage.value = null
 }
 
-function backToPasskey() {
-  switchLoginMode('passkey')
+function backToDefaultLogin() {
+  switchLoginMode(defaultLoginMode)
 }
 
 function handleSubmit() {
@@ -461,8 +466,8 @@ const passwordStrength = computed(() => {
               </div>
               <div class="text-center">
                 <button type="button" class="text-sm text-gray-400 hover:text-emerald-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded px-2 py-0.5"
-                  @click="backToPasskey">
-                  Terug naar passkey
+                  @click="isNativeApp ? switchLoginMode('otp') : backToDefaultLogin()">
+                  {{ otherLoginLabel }}
                 </button>
               </div>
             </template>
@@ -476,9 +481,14 @@ const passwordStrength = computed(() => {
                   </UButton>
                 </div>
               </UTooltip>
+              <p class="text-center text-xs text-gray-500">
+                Lees in onze
+                <nuxt-link to="/privacy" class="underline underline-offset-2 hover:text-emerald-400 transition-colors">privacyverklaring</nuxt-link>
+                hoe we met je gegevens omgaan.
+              </p>
               <div class="text-center">
                 <button type="button" class="text-sm text-gray-400 hover:text-emerald-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded px-2 py-0.5"
-                  @click="backToPasskey">
+                  @click="backToDefaultLogin">
                   Al een account? <span class="font-medium underline underline-offset-2">Inloggen</span>
                 </button>
               </div>
@@ -495,8 +505,8 @@ const passwordStrength = computed(() => {
               </UTooltip>
               <div class="text-center">
                 <button type="button" class="text-sm text-gray-400 hover:text-emerald-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded px-2 py-0.5"
-                  @click="backToPasskey">
-                  Terug naar passkey
+                  @click="backToDefaultLogin">
+                  {{ backLabel }}
                 </button>
               </div>
             </template>
@@ -517,8 +527,8 @@ const passwordStrength = computed(() => {
               </div>
               <div class="text-center">
                 <button type="button" class="text-sm text-gray-400 hover:text-emerald-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded px-2 py-0.5"
-                  @click="backToPasskey">
-                  Terug naar passkey
+                  @click="backToDefaultLogin">
+                  {{ backLabel }}
                 </button>
               </div>
             </template>
@@ -557,7 +567,7 @@ const passwordStrength = computed(() => {
               </UTooltip>
               <div class="text-center">
                 <button type="button" class="text-sm text-gray-400 hover:text-emerald-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded px-2 py-0.5"
-                  @click="backToPasskey">
+                  @click="backToDefaultLogin">
                   Terug naar inloggen
                 </button>
               </div>

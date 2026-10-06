@@ -46,6 +46,11 @@
                         <li>
                             <nuxt-link to="/contact"> Contact </nuxt-link>
                         </li>
+                        <li>
+                            <nuxt-link to="/privacy">
+                                Privacyverklaring
+                            </nuxt-link>
+                        </li>
                     </ul>
                 </div>
                 <div class="w-full md:w-1/4">

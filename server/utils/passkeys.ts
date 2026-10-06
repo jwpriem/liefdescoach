@@ -1,4 +1,5 @@
 import { createError, deleteCookie, getCookie, getHeader, getRequestURL, setCookie, type H3Event } from 'h3'
+import { isNativeAppRequest } from './native-app'
 import type { AuthenticatorTransportFuture, WebAuthnCredential } from '@simplewebauthn/server'
 
 const RP_NAME = 'Yoga Ravennah'
@@ -16,6 +17,11 @@ type PasskeyChallenge = {
 }
 
 export function getPasskeyRequestInfo(event: H3Event) {
+  // Passkeys are not offered in the app, whose origin would give an unusable rpID
+  if (isNativeAppRequest(event)) {
+    throw createError({ statusCode: 400, statusMessage: 'Passkeys zijn niet beschikbaar in de app' })
+  }
+
   const origin = getHeader(event, 'origin') || getRequestURL(event).origin
   const hostname = new URL(origin).hostname
 

@@ -1,5 +1,6 @@
 import crypto from 'node:crypto'
 import { createError, getCookie, getHeader, getMethod, setCookie, type H3Event } from 'h3'
+import { isNativeAppRequest } from './native-app'
 
 const CSRF_COOKIE = 'rav_csrf'
 const CSRF_HEADER = 'x-csrf-token'
@@ -67,6 +68,8 @@ export function assertValidCsrfToken(event: H3Event): void {
 
 export function requireCsrfProtection(event: H3Event): void {
   if (isCsrfSafeMethod(getMethod(event))) return
+  // The iOS app authenticates with a bearer token, never with cookies, so there is nothing to forge
+  if (isNativeAppRequest(event)) return
 
   assertSameOrigin(event)
   assertValidCsrfToken(event)

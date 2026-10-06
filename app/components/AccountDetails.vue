@@ -176,7 +176,8 @@ const passkeys = ref<PasskeySummary[]>([])
 const passkeysSupported = ref(false)
 const passkeysLoading = ref(false)
 const passkeyBusy = ref(false)
-const showPasskeySettings = computed(() => !props.user && targetUser.value?.$id === loggedInUser.value?.$id)
+const { isNativeApp } = useNativeApp()
+const showPasskeySettings = computed(() => !isNativeApp && !props.user && targetUser.value?.$id === loggedInUser.value?.$id)
 const hasPasskey = computed(() => passkeys.value.length > 0)
 
 onMounted(async () => {
@@ -404,6 +405,11 @@ async function requestVerification() {
           @click="state.editPassword = true">
           Wachtwoord wijzigen</UButton>
       </div>
+      <p class="mt-4 text-xs text-gray-500">
+        Lees in onze
+        <nuxt-link to="/privacy" class="underline underline-offset-2 hover:text-emerald-400 transition-colors">privacyverklaring</nuxt-link>
+        hoe we met je gegevens omgaan.
+      </p>
     </div>
 
     <h2 class="text-2xl md:text-4xl uppercase font-black my-6">

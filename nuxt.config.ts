@@ -1,6 +1,15 @@
+import { fileURLToPath } from 'node:url'
+import { toIosPages } from './config/ios-target'
+
+// APP_TARGET=ios builds the client-only bundle that ships inside the iOS app (yarn build:ios)
+const iosTarget = process.env.APP_TARGET === 'ios'
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
+
+  // Own build and output dirs so an iOS build never disturbs a running `yarn dev`
+  ...(iosTarget ? { ssr: false, buildDir: '.nuxt-ios' } : {}),
 
   // SEO: Site-wide head configuration
   app: {
@@ -22,7 +31,7 @@ export default defineNuxtConfig({
         { name: 'theme-color', content: '#030712' },
       ],
       // GTM script (replaces @zadigetvoltaire/nuxt-gtm)
-      script: [
+      script: iosTarget ? [] : [
         {
           innerHTML: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -32,7 +41,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           type: 'text/javascript'
         }
       ],
-      noscript: [
+      noscript: iosTarget ? [] : [
         {
           innerHTML: '<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PZP28PP" height="0" width="0" style="display:none;visibility:hidden"></iframe>',
           tagPosition: 'bodyOpen'
@@ -48,6 +57,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     revenuePerBooking: '14',   // NUXT_REVENUE_PER_BOOKING
     costPerLesson: '35',       // NUXT_COST_PER_LESSON
     sessionSecret: '',         // NUXT_SESSION_SECRET (for signing session cookies)
+    appOrigin: 'capacitor://localhost', // NUXT_APP_ORIGIN (Origin the iOS app sends; those requests use token auth)
     vapidPrivateKey: '',       // NUXT_VAPID_PRIVATE_KEY (Web Push VAPID private key)
     vapidEmail: '',            // NUXT_VAPID_EMAIL (e.g. mailto:info@ravennah.com)
     mailPass: '',              // NUXT_MAIL_PASS
@@ -56,6 +66,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     // Public keys that are exposed to the client
     public: {
       vapidPublicKey: '',         // NUXT_PUBLIC_VAPID_PUBLIC_KEY (Web Push VAPID public key)
+      apiBase: '',                // NUXT_PUBLIC_API_BASE (empty on the web; the site URL inside the iOS bundle)
+      nativeApp: iosTarget,       // true only in the iOS bundle
     }
   },
 
@@ -73,10 +85,18 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   modules: [
     '@nuxt/fonts',
     'dayjs-nuxt',
-    '@nuxtjs/sitemap',
     '@nuxt/ui',
-    '@vite-pwa/nuxt',
+    // Web only: the app has no service worker and no sitemap
+    ...(iosTarget ? [] : ['@nuxtjs/sitemap', '@vite-pwa/nuxt']),
   ],
+
+  hooks: {
+    'pages:extend'(pages) {
+      if (!iosTarget) return
+      const externalPage = fileURLToPath(new URL('./app/native/external.vue', import.meta.url))
+      pages.splice(0, pages.length, ...toIosPages(pages, externalPage))
+    },
+  },
 
   pwa: {
     registerType: 'autoUpdate',
@@ -146,6 +166,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     '/yoga-waddinxveen': { isr: true },
     '/yoga-zevenhuizen': { isr: true },
     '/eerste-les': { isr: true },
+    '/privacy': { isr: true },
     '/yoga-of-pilates': { isr: true },
     // Dynamic/authenticated pages: disable SSR to prevent Vue instance accumulation
     '/lessen': { ssr: false },
@@ -181,6 +202,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   },
 
   nitro: {
+    ...(iosTarget ? { output: { dir: '.output-ios' } } : {}),
     // Compress static assets with gzip + brotli — reduces bandwidth and memory transfer
     compressPublicAssets: { gzip: true, brotli: true },
     // Minify the server bundle to reduce startup memory footprint

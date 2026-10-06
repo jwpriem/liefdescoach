@@ -7,6 +7,9 @@
     "dev": "tsx --tsconfig scripts/tsconfig.json scripts/with-dev-db.ts nuxt dev",
     "start": "NODE_OPTIONS='--max-old-space-size=256' node .output/server/index.mjs",
     "generate": "nuxt generate",
+    "build:ios:bundle": "APP_TARGET=ios nuxt generate",
+    "build:ios": "NUXT_PUBLIC_API_BASE=https://www.ravennah.com yarn build:ios:bundle && cap sync ios",
+    "dev:ios": "NUXT_PUBLIC_API_BASE=http://localhost:3000 yarn build:ios:bundle && cap sync ios && cap run ios",
     "preview": "tsx --tsconfig scripts/tsconfig.json scripts/with-dev-db.ts nuxt preview",
     "postinstall": "nuxt prepare",
     "db:generate": "drizzle-kit generate",
@@ -25,6 +28,8 @@
     "test:unit": "vitest run"
   },
   "dependencies": {
+    "@capacitor/core": "^8.5.2",
+    "@capacitor/ios": "^8.5.2",
     "@neondatabase/serverless": "^1.0.2",
     "@nuxt/ui": "^4.0.0",
     "@nuxtjs/sitemap": "^7.0.0",
@@ -34,6 +39,7 @@
     "@tailwindcss/vite": "^4.0.0",
     "@vite-pwa/nuxt": "^1.1.1",
     "bcryptjs": "^3.0.3",
+    "capacitor-secure-storage-plugin": "^0.13.0",
     "chart.js": "^4.5.1",
     "drizzle-orm": "^0.45.1",
     "nanoid": "^5.1.6",
@@ -45,6 +51,7 @@
     "web-push": "^3.6.7"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.5.2",
     "@iconify-json/lucide": "^1.2.27",
     "@nuxt/fonts": "^0.11.0",
     "@playwright/test": "^1.58.1",
@@ -54,9 +61,10 @@
     "drizzle-kit": "^0.31.10",
     "h3": "^1.15.5",
     "tsx": "^4.21.0",
+    "typescript": "^7.0.2",
     "vitest": "^2.1.9"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   }
 }

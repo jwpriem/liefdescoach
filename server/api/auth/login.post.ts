@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs'
 import { eq } from 'drizzle-orm'
 import { nanoid } from 'nanoid'
 import { students, loginHistory } from '../../database/schema'
+import { getSiteOrigin } from '../../utils/native-app'
 
 const MAX_LOGIN_ATTEMPTS = 5;
 const LOGIN_LOCKOUT_MS = 15 * 60 * 1000; // 15 minutes
@@ -112,7 +113,7 @@ export default defineEventHandler(async (event) => {
                 },
                 config.sessionSecret
             )
-            const resetUrl = `${getHeader(event, 'origin')}/reset-wachtwoord?token=${token}`
+            const resetUrl = `${getSiteOrigin(event)}/reset-wachtwoord?token=${token}`
             const emailContent = passwordResetMigrationEmail(resetUrl)
 
             event.waitUntil(Promise.resolve().then(async () => {

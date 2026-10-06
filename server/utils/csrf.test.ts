@@ -41,6 +41,7 @@ beforeEach(() => {
   testState.headers.set('host', 'ravennah.test')
   testState.headers.set('x-forwarded-proto', 'https')
   testState.headers.set('origin', 'https://ravennah.test')
+  vi.stubGlobal('useRuntimeConfig', vi.fn().mockReturnValue({ appOrigin: 'capacitor://localhost', public: {} }))
 })
 
 describe('CSRF helper', () => {
@@ -116,5 +117,19 @@ describe('CSRF helper', () => {
     testState.headers.set('origin', 'https://attacker.test')
 
     expect(() => requireCsrfProtection(event)).not.toThrow()
+  })
+
+  it('skips origin and token checks for requests from the iOS app', () => {
+    testState.headers.set('origin', 'capacitor://localhost')
+
+    expect(() => requireCsrfProtection(event)).not.toThrow()
+  })
+
+  it('still rejects other cross-origin requests that carry a valid token', () => {
+    testState.headers.set('origin', 'https://attacker.test')
+    testState.cookies.set('rav_csrf', 'valid-token')
+    testState.headers.set('x-csrf-token', 'valid-token')
+
+    expect(() => requireCsrfProtection(event)).toThrow(expect.objectContaining({ statusCode: 403 }))
   })
 })
