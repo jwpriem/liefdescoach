@@ -18,7 +18,6 @@ export default defineNuxtPlugin(() => {
 
   if (isNativeApp) {
     globalThis.$fetch = rawFetch.create({
-      baseURL: apiBase,
       ...createNativeApiHooks(sessionTokenStore, apiBase),
     }) as typeof globalThis.$fetch
     return

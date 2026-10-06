@@ -1,6 +1,7 @@
 import { createError, getRequestIP } from 'h3'
 import { eq } from 'drizzle-orm'
 import { students } from '../../database/schema'
+import { getSiteOrigin } from '../../utils/native-app'
 
 const MAX_IP_REQUESTS = 5;
 const REQUEST_WINDOW_MS = 60 * 60 * 1000; // 1 hour
@@ -99,7 +100,7 @@ export default defineEventHandler(async (event) => {
                 config.sessionSecret
             )
 
-            const resetUrl = `${getHeader(event, 'origin')}/reset-wachtwoord?token=${token}`
+            const resetUrl = `${getSiteOrigin(event)}/reset-wachtwoord?token=${token}`
             const emailContent = passwordResetEmail(resetUrl)
 
             await smtpTransport.sendMail({

@@ -46,6 +46,34 @@ describe('createNativeApiHooks', () => {
     expect(context.options.headers).toBeUndefined()
   })
 
+  it('sets the API base on API requests, even without a token', async () => {
+    store.value = null
+    const context: any = { request: '/api/auth/login', options: {} }
+    await hooks.onRequest(context)
+
+    expect(context.options.baseURL).toBe(API_BASE)
+  })
+
+  it('leaves non-API requests alone', async () => {
+    const context: any = { request: '/_nuxt/builds/latest.json', options: {} }
+    await hooks.onRequest(context)
+
+    expect(context.options.baseURL).toBeUndefined()
+    expect(context.options.headers).toBeUndefined()
+  })
+
+  it('clears the token when the logout request cannot reach the server', async () => {
+    await hooks.onRequestError({ request: '/api/auth/logout', options: {} } as any)
+
+    expect(store.value).toBeNull()
+  })
+
+  it('keeps the token when another request fails to reach the server', async () => {
+    await hooks.onRequestError({ request: '/api/lessons', options: {} } as any)
+
+    expect(store.value).toBe('stored-token')
+  })
+
   it('stores the token a login response hands over', async () => {
     store.value = null
     await hooks.onResponse({ request: `${API_BASE}/api/auth/login`, response: response(200, { 'x-session-token': 'new-token' }) } as any)

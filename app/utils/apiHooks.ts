@@ -19,8 +19,11 @@ function apiPath(request: unknown, apiBase: string): string | null {
  */
 export function createNativeApiHooks(tokenStore: TokenStore, apiBase: string) {
   return {
-    async onRequest({ request, options }: { request: unknown; options: { headers?: any } }) {
+    async onRequest({ request, options }: { request: unknown; options: { headers?: any; baseURL?: string } }) {
       if (!apiPath(request, apiBase)) return
+
+      // Only API calls go to the website; Nuxt's own fetches (/_nuxt/...) stay local
+      options.baseURL = apiBase
 
       const token = await tokenStore.get()
       if (!token) return
@@ -28,6 +31,10 @@ export function createNativeApiHooks(tokenStore: TokenStore, apiBase: string) {
       const headers = new Headers(options.headers as HeadersInit | undefined)
       headers.set('authorization', `Bearer ${token}`)
       options.headers = headers
+    },
+    async onRequestError({ request }: { request: unknown }) {
+      // A logout that cannot reach the server still signs the app out on this device
+      if (apiPath(request, apiBase) === '/api/auth/logout') await tokenStore.clear()
     },
     async onResponse({ request, response }: { request: unknown; response: Response }) {
       const path = apiPath(request, apiBase)

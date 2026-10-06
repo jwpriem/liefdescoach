@@ -1,13 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const testState = vi.hoisted(() => ({ headers: new Map<string, string>() }))
+const testState = vi.hoisted(() => ({ headers: new Map<string, string>(), requestOrigin: 'https://www.ravennah.com' }))
 
 vi.mock('h3', () => ({
   createError: (opts: any) => Object.assign(new Error(opts.statusMessage), opts),
   getHeader: vi.fn((_: any, name: string) => testState.headers.get(name.toLowerCase())),
+  getRequestURL: vi.fn(() => ({ origin: testState.requestOrigin })),
 }))
 
-import { getBearerToken, isNativeAppRequest } from './native-app'
+import { getBearerToken, getSiteOrigin, isNativeAppRequest } from './native-app'
 
 const event = {} as any
 
@@ -50,5 +51,18 @@ describe('getBearerToken', () => {
     expect(getBearerToken(event)).toBeNull()
     testState.headers.set('authorization', 'Basic abc123')
     expect(getBearerToken(event)).toBeNull()
+  })
+})
+
+describe('getSiteOrigin', () => {
+  it('returns the Origin header unchanged for website requests', () => {
+    testState.headers.set('origin', 'https://www.ravennah.com')
+    expect(getSiteOrigin(event)).toBe('https://www.ravennah.com')
+  })
+
+  it('returns the address the server was reached at for app requests, never the app origin', () => {
+    testState.headers.set('origin', 'capacitor://localhost')
+    expect(getSiteOrigin(event)).toBe('https://www.ravennah.com')
+    expect(getSiteOrigin(event)).not.toBe('capacitor://localhost')
   })
 })

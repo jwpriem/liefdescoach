@@ -22,10 +22,11 @@ import { createSession, destroySession, getSessionUser } from './auth-session'
 
 const event = {} as any
 const DAY = 24 * 60 * 60 * 1000
-const sessionRow = (expiresInDays: number) => ({
+const sessionRow = (expiresInDays: number, createdDaysAgo: number | null = 1) => ({
   sessionId: 'session_1',
   userId: 'user_1',
   expiresAt: new Date(Date.now() + expiresInDays * DAY),
+  createdAt: createdDaysAgo === null ? null : new Date(Date.now() - createdDaysAgo * DAY),
   name: 'Test',
   email: 'test@example.test',
   isAdmin: false,
@@ -118,6 +119,48 @@ describe('getSessionUser', () => {
     expect(db.updater.set).toHaveBeenCalledWith({ expiresAt: expect.any(Date) })
     const renewedTo = db.updater.set.mock.calls[0][0].expiresAt.getTime()
     expect(renewedTo).toBeGreaterThan(Date.now() + 29 * DAY)
+  })
+
+  it('renews a session created 10 days ago to about 30 days from now', async () => {
+    const db = useDb([[sessionRow(20, 10)]])
+    fromApp()
+    testState.headers.set('authorization', 'Bearer app-token')
+
+    await getSessionUser(event)
+
+    const renewedTo = db.updater.set.mock.calls[0][0].expiresAt.getTime()
+    expect(Math.abs(renewedTo - (Date.now() + 30 * DAY))).toBeLessThan(60_000)
+  })
+
+  it('caps renewal at one year after the session was created', async () => {
+    const db = useDb([[sessionRow(5, 350)]])
+    fromApp()
+    testState.headers.set('authorization', 'Bearer app-token')
+
+    await getSessionUser(event)
+
+    const renewedTo = db.updater.set.mock.calls[0][0].expiresAt.getTime()
+    expect(Math.abs(renewedTo - (Date.now() + 15 * DAY))).toBeLessThan(60_000)
+  })
+
+  it('does not renew a session created a year ago or more', async () => {
+    const db = useDb([[sessionRow(5, 365)]])
+    fromApp()
+    testState.headers.set('authorization', 'Bearer app-token')
+
+    await getSessionUser(event)
+
+    expect(db.update).not.toHaveBeenCalled()
+  })
+
+  it('does not renew a session without a createdAt', async () => {
+    const db = useDb([[sessionRow(20, null)]])
+    fromApp()
+    testState.headers.set('authorization', 'Bearer app-token')
+
+    await getSessionUser(event)
+
+    expect(db.update).not.toHaveBeenCalled()
   })
 
   it('does not write on every request of a fresh app session', async () => {

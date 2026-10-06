@@ -19,6 +19,7 @@ const ready = ref(false)
 const { isNativeApp } = useNativeApp()
 const defaultLoginMode = isNativeApp ? 'password' : 'passkey'
 const backLabel = isNativeApp ? 'Terug naar wachtwoord' : 'Terug naar passkey'
+const otherLoginLabel = isNativeApp ? 'Inloggen met e-mailcode' : backLabel
 const loginMode = ref<'password' | 'otp' | 'passkey' | 'forgot'>(defaultLoginMode)
 const otpStep = ref<'email' | 'code'>('email')
 const otpCode = ref('')
@@ -466,7 +467,7 @@ const passwordStrength = computed(() => {
               <div class="text-center">
                 <button type="button" class="text-sm text-gray-400 hover:text-emerald-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded px-2 py-0.5"
                   @click="isNativeApp ? switchLoginMode('otp') : backToDefaultLogin()">
-                  {{ isNativeApp ? 'Inloggen met e-mailcode' : 'Terug naar passkey' }}
+                  {{ otherLoginLabel }}
                 </button>
               </div>
             </template>

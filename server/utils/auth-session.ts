@@ -7,6 +7,7 @@ import { getBearerToken, isNativeAppRequest, SESSION_TOKEN_HEADER } from './nati
 
 const SESSION_COOKIE = 'rav_session'
 const SESSION_MAX_AGE = 30 * 24 * 60 * 60 // 30 days in seconds
+const SESSION_ABSOLUTE_MAX_AGE = 365 * 24 * 60 * 60 // an app session can be renewed for at most a year after login
 const SESSION_RENEW_INTERVAL = 24 * 60 * 60 // app sessions slide forward at most once a day
 
 function hashToken(token: string): string {
@@ -66,6 +67,7 @@ export async function getSessionUser(event: H3Event) {
       sessionId: sessions.id,
       userId: sessions.userId,
       expiresAt: sessions.expiresAt,
+      createdAt: sessions.createdAt,
       name: students.name,
       email: students.email,
       isAdmin: students.isAdmin,
@@ -91,11 +93,18 @@ export async function getSessionUser(event: H3Event) {
 
   const session = result[0]
   // The app has no login cookie to refresh, so an app session in use stays alive
-  const remainingMs = session.expiresAt.getTime() - now.getTime()
-  if (isNativeAppRequest(event) && remainingMs < (SESSION_MAX_AGE - SESSION_RENEW_INTERVAL) * 1000) {
-    await db.update(sessions)
-      .set({ expiresAt: new Date(now.getTime() + SESSION_MAX_AGE * 1000) })
-      .where(eq(sessions.id, session.sessionId))
+  // but never beyond an absolute lifetime measured from the login
+  if (isNativeAppRequest(event) && session.createdAt) {
+    const renewedTo = Math.min(
+      now.getTime() + SESSION_MAX_AGE * 1000,
+      session.createdAt.getTime() + SESSION_ABSOLUTE_MAX_AGE * 1000,
+    )
+    const gainMs = renewedTo - session.expiresAt.getTime()
+    if (gainMs > SESSION_RENEW_INTERVAL * 1000) {
+      await db.update(sessions)
+        .set({ expiresAt: new Date(renewedTo) })
+        .where(eq(sessions.id, session.sessionId))
+    }
   }
 
   return session
