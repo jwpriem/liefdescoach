@@ -7,7 +7,7 @@
 
 import { test, expect, Page } from '@playwright/test'
 import { E2E_PASSWORD, E2E_STUDENT } from './fixtures'
-import { login as loginAs, logout, openAccountTab } from './helpers'
+import { bookFirstAvailableLesson, login as loginAs, logout, openAccountTab } from './helpers'
 
 const email = process.env.TEST_EMAIL ?? E2E_STUDENT.email
 const password = process.env.TEST_PASSWORD ?? E2E_PASSWORD
@@ -52,36 +52,8 @@ test.describe('Booking flow', () => {
         await expect.poll(() => getCredits(page), { message: 'the seeded e2e student has credits', timeout: 10_000 }).toBeGreaterThan(0)
         const creditsBefore = await getCredits(page)
 
-        // --- Step 3: Open booking modal from the Boekingen tab ---
-        await openAccountTab(page, 'Boekingen')
-        // Ensure we click the visible button (there might be one in hidden tabs)
-        await page.locator('button:has-text("Boek een les"):visible').first().click()
-        await expect(page.locator('.fixed.inset-0')).toBeVisible() // Modal overlay
-
-        // --- Step 4: Find and click the first available "Boek" button inside the modal ---
-        // Wait for lessons to load in modal
-        await page.waitForTimeout(1000)
-        // Accessible name is the aria-label "Boek <lesson title> op <date>"
-        const bookButton = page.getByRole('button', { name: /^Boek .+ op / }).first()
-        await expect(bookButton, 'the seeded e2e lessons have free spots').toBeVisible({ timeout: 15_000 })
-
-        // Count existing "Geboekt" elements before booking
-        const geboektBefore = await page.locator('text=Geboekt').count()
-
-        await bookButton.click()
-
-        // --- Step 5: Verify booking succeeded ---
-        // Wait for the number of "Geboekt" elements to increase by one
-        try {
-            await expect(async () => {
-                const geboektAfter = await page.locator('text=Geboekt').count()
-                expect(geboektAfter).toBe(geboektBefore + 1)
-            }).toPass({ timeout: 15_000 })
-        } catch (e) {
-            // Debug: log page state
-            console.log('DEBUG: Booking verification timed out — "Geboekt" count did not increase.')
-            throw e
-        }
+        // --- Steps 3-5: Book the first available lesson from the Boekingen tab ---
+        await bookFirstAvailableLesson(page)
 
         // --- Step 6: Verify credits decreased by 1 ---
         // Close modal by clicking backdrop (top-left corner to avoid content)

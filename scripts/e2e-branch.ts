@@ -5,6 +5,7 @@
  *   yarn test:e2e:branch                    # all specs, branch deleted afterwards
  *   yarn test:e2e:branch e2e/booking.spec.ts --headed
  *   yarn test:e2e:branch --keep             # keep the branch for debugging
+ *   yarn test:e2e:branch --app              # only the iOS bundle smoke test (e2e/app-mode.spec.ts)
  *
  * Required env vars: NEON_API_KEY, NEON_PROJECT_ID (and a `seed` branch: yarn db:refresh-seed --yes)
  */
@@ -20,22 +21,28 @@ import { E2E_STUDENT, E2E_PASSWORD } from '../e2e/fixtures'
 
 const PORT = 3100
 const BASE_URL = `http://localhost:${PORT}`
+const APP_PORT = 4173
+const APP_BASE_URL = `http://localhost:${APP_PORT}`
 const READY_TIMEOUT_MS = 180_000
 
 const args = process.argv.slice(2)
 const keepBranch = args.includes('--keep')
-const playwrightArgs = args.filter((a) => a !== '--keep')
+const appMode = args.includes('--app')
+const playwrightArgs = args.filter((a) => a !== '--keep' && a !== '--app')
 
 const neonClient = neonClientFromEnv()
 let branch: NeonBranch | undefined
 let devServer: ChildProcess | undefined
+let appServer: ChildProcess | undefined
 let interrupted = false
 
 // once(): Ctrl-C and normal exit both await the same cleanup, so we never exit mid-delete
 const cleanup = once(async () => {
     // The server runs in its own process group (detached), so kill the group: yarn + nuxt + workers
-    if (devServer?.pid && devServer.exitCode === null) {
-        try { process.kill(-devServer.pid, 'SIGTERM') } catch { /* already gone */ }
+    for (const server of [devServer, appServer]) {
+        if (server?.pid && server.exitCode === null) {
+            try { process.kill(-server.pid, 'SIGTERM') } catch { /* already gone */ }
+        }
     }
     if (branch && !keepBranch) {
         console.log(`Deleting branch ${branch.name}`)
@@ -74,6 +81,21 @@ function run(command: string, commandArgs: string[], env: NodeJS.ProcessEnv): Pr
     })
 }
 
+/** Builds the iOS bundle against the test server and serves it like the app shell would. */
+async function serveIosBundle(): Promise<void> {
+    console.log('Building the iOS bundle')
+    const buildCode = await run('yarn', ['build:ios:bundle'], { ...process.env, NUXT_PUBLIC_API_BASE: BASE_URL })
+    if (buildCode !== 0) throw new Error('iOS bundle build failed')
+
+    appServer = spawn('yarn', ['tsx', 'scripts/serve-ios-bundle.ts', String(APP_PORT)], { stdio: ['ignore', 'ignore', 'inherit'], detached: true })
+    const deadline = Date.now() + 30_000
+    while (Date.now() < deadline) {
+        if (await fetch(APP_BASE_URL).then((r) => r.ok, () => false)) return
+        await new Promise((resolve) => setTimeout(resolve, 500))
+    }
+    throw new Error('iOS bundle server not ready after 30s')
+}
+
 async function main(): Promise<number> {
     const branches = await neonClient.listBranches()
     const seed = branches.find((b) => b.name === 'seed')
@@ -94,14 +116,18 @@ async function main(): Promise<number> {
     await assertAnonymised((statement) => sql.query(statement) as Promise<{ n: number | string }[]>)
     await seedE2E(created.connectionUri)
 
-    const appEnv = { ...process.env, NUXT_DATABASE_URL: created.connectionUri, NODE_ENV: 'development' }
+    // NUXT_APP_ORIGIN: the test server treats the served iOS bundle as "the app"
+    const appEnv = { ...process.env, NUXT_DATABASE_URL: created.connectionUri, NUXT_APP_ORIGIN: APP_BASE_URL, NODE_ENV: 'development' }
     devServer = spawn('yarn', ['nuxt', 'dev', '--port', String(PORT)], { stdio: ['ignore', 'ignore', 'inherit'], env: appEnv, detached: true })
     console.log(`Starting dev server on ${BASE_URL}`)
     await waitForTestBranch()
 
-    return run('yarn', ['playwright', 'test', ...playwrightArgs], {
+    if (appMode) await serveIosBundle()
+
+    return run('yarn', ['playwright', 'test', '--project', appMode ? 'app' : 'chromium', ...playwrightArgs], {
         ...process.env,
         BASE_URL,
+        ...(appMode ? { APP_BASE_URL } : {}),
         TEST_EMAIL: E2E_STUDENT.email,
         TEST_PASSWORD: E2E_PASSWORD,
     })

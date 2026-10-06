@@ -2,6 +2,7 @@
 const { user: loggedInUser, logout: authLogout } = useAuth()
 const router = useRouter()
 const navOpen = ref(false);
+const { isNativeApp } = useNativeApp()
 
 const toggle = () => {
 	navOpen.value = !navOpen.value;
@@ -38,6 +39,7 @@ const logout = async () => {
 			<div :class="navOpen ? 'translate-x-0' : 'translate-x-full'"
 				class="transition-transform duration-300 ease-in-out fixed top-0 left-0 bg-gray-950 min-h-screen flex justify-start items-center text-center z-40 w-screen">
 				<ul class="w-full space-y-8">
+					<template v-if="!isNativeApp">
 					<li>
 						<nuxt-link class="mobile-nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded-md px-2" to="/" @click="toggle">
 							Home
@@ -53,11 +55,13 @@ const logout = async () => {
 							Voordelen
 						</nuxt-link>
 					</li>
+					</template>
 					<li>
 						<nuxt-link class="mobile-nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded-md px-2" to="/lessen" @click="toggle">
 							Les schema
 						</nuxt-link>
 					</li>
+					<template v-if="!isNativeApp">
 					<li>
 						<nuxt-link class="mobile-nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded-md px-2" to="/priveles" @click="toggle">
 							Priveles
@@ -78,6 +82,7 @@ const logout = async () => {
 							Contact
 						</nuxt-link>
 					</li>
+					</template>
 					<li v-if="loggedInUser">
 						<nuxt-link class="mobile-nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded-md px-2" to="/account" @click="toggle">
 							{{ loggedInUser.name }}
@@ -103,6 +108,7 @@ const logout = async () => {
 						<Yoga color="#d1fae5" />
 					</nuxt-link>
 				</li>
+				<template v-if="!isNativeApp">
 				<li>
 					<nuxt-link class="nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-md px-1" to="/">
 						Home
@@ -113,11 +119,13 @@ const logout = async () => {
 						Over mij
 					</nuxt-link>
 				</li>
+				</template>
 				<li>
 					<nuxt-link class="nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-md px-1" to="/lessen">
 						Les schema
 					</nuxt-link>
 				</li>
+				<template v-if="!isNativeApp">
 				<li>
 					<nuxt-link class="nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-md px-1" to="/priveles">
 						Priveles
@@ -143,6 +151,7 @@ const logout = async () => {
 						Contact
 					</nuxt-link>
 				</li>
+				</template>
 				<li v-if="loggedInUser">
 					<nuxt-link class="nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-md px-1" to="/account">
 						{{ loggedInUser.name }}

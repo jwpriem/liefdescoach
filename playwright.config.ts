@@ -18,6 +18,15 @@ export default defineConfig({
         {
             name: 'chromium',
             use: { browserName: 'chromium' },
+            testIgnore: /app-mode\.spec\.ts/,
         },
+        // The iOS bundle in a browser; only when the runner serves it (yarn test:e2e:branch --app)
+        ...(process.env.APP_BASE_URL
+            ? [{
+                name: 'app',
+                use: { browserName: 'chromium' as const, baseURL: process.env.APP_BASE_URL },
+                testMatch: /app-mode\.spec\.ts/,
+            }]
+            : []),
     ],
 })
