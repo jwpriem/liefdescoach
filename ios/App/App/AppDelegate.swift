@@ -1,5 +1,6 @@
 import UIKit
 import Capacitor
+import UserNotifications
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -7,8 +8,33 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        registerNotificationCategories()
         return true
+    }
+
+    /// The buttons under each kind of notification. Ids must match shared/push.ts.
+    private func registerNotificationCategories() {
+        func button(_ id: String, _ title: String) -> UNNotificationAction {
+            UNNotificationAction(identifier: id, title: title, options: [.foreground])
+        }
+        func category(_ id: String, _ buttons: [UNNotificationAction]) -> UNNotificationCategory {
+            UNNotificationCategory(identifier: id, actions: buttons, intentIdentifiers: [])
+        }
+
+        UNUserNotificationCenter.current().setNotificationCategories([
+            category("LESSON_REMINDER", [button("ROUTE", "Route"), button("VIEW_LESSON", "Bekijk les")]),
+            category("BOOKING_CHANGE", [button("VIEW_PARTICIPANTS", "Bekijk deelnemers")]),
+            category("CREDITS_EMPTY", [button("ADD_CREDITS", "Credits toevoegen")]),
+        ])
+    }
+
+    // Capacitor's push plugin learns the device token through these two notifications
+    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        NotificationCenter.default.post(name: .capacitorDidRegisterForRemoteNotifications, object: deviceToken)
+    }
+
+    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        NotificationCenter.default.post(name: .capacitorDidFailToRegisterForRemoteNotifications, object: error)
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
@@ -26,7 +52,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
-        // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+        // Every push sets the badge to 1; opening the app means it has been seen
+        if #available(iOS 16.0, *) {
+            UNUserNotificationCenter.current().setBadgeCount(0)
+        } else {
+            application.applicationIconBadgeNumber = 0
+        }
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
