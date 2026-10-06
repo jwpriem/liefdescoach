@@ -31,3 +31,46 @@ console.log('Generated icon-192.png')
 
 await sharp(Buffer.from(svg)).resize(512, 512).toFile(path.join(publicDir, 'icon-512.png'))
 console.log('Generated icon-512.png')
+
+// iOS app icon and launch screen: the same figure, centred and sized as a share of the canvas.
+// Inside its 100x125 viewBox the figure is drawn at roughly x 10–89, y 2–98.
+const figure = { centerX: 49.5, centerY: 50, height: 96 }
+const iosAssetsDir = path.join(__dirname, '..', 'ios', 'App', 'App', 'Assets.xcassets')
+
+function figureSvg(options: { canvas: number, share: number, background: string, fill: string, defs?: string }) {
+  const { canvas, share, background, fill, defs = '' } = options
+  const scale = (canvas * share) / figure.height
+  const x = canvas / 2 - figure.centerX * scale
+  const y = canvas / 2 - figure.centerY * scale
+  // The stroke thickens the hairlines so the figure stays legible at home-screen size
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${canvas} ${canvas}" width="${canvas}" height="${canvas}">
+  <defs>${defs}</defs>
+  <rect width="${canvas}" height="${canvas}" fill="${background}"/>
+  <g transform="translate(${x}, ${y}) scale(${scale})">
+    <path fill="${fill}" stroke="${fill}" stroke-width="0.9" stroke-linejoin="round" d="${yogaPath}"/>
+  </g>
+</svg>`
+}
+
+// iOS masks the corners itself and rejects icons with an alpha channel, hence removeAlpha
+async function writeIosPng(svgSource: string, ...segments: string[]) {
+  await sharp(Buffer.from(svgSource)).removeAlpha().png().toFile(path.join(iosAssetsDir, ...segments))
+  console.log(`Generated ${segments.join('/')}`)
+}
+
+const emeraldField = `<linearGradient id="field" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#047857"/>
+    <stop offset="1" stop-color="#064e3b"/>
+  </linearGradient>`
+
+const appIcon = { canvas: 1024, share: 0.64 }
+await writeIosPng(figureSvg({ ...appIcon, background: 'url(#field)', fill: '#d1fae5', defs: emeraldField }), 'AppIcon.appiconset', 'AppIcon-512@2x.png')
+await writeIosPng(figureSvg({ ...appIcon, background: '#030712', fill: '#d1fae5' }), 'AppIcon.appiconset', 'AppIcon-dark.png')
+// Tinted icons are greyscale; iOS lays the member's chosen colour over them
+await writeIosPng(figureSvg({ ...appIcon, background: '#000000', fill: '#ffffff' }), 'AppIcon.appiconset', 'AppIcon-tinted.png')
+
+// The launch screen is a square that iOS crops to the device, so the figure stays small and central
+const splash = figureSvg({ canvas: 2732, share: 0.17, background: '#030712', fill: '#d1fae5' })
+for (const file of ['splash-2732x2732.png', 'splash-2732x2732-1.png', 'splash-2732x2732-2.png']) {
+  await writeIosPng(splash, 'Splash.imageset', file)
+}
