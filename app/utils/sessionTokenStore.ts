@@ -16,14 +16,18 @@ async function withStorage<T>(use: (plugin: typeof import('capacitor-secure-stor
 export const sessionTokenStore: TokenStore = {
   async get() {
     if (cached === undefined) {
-      // The plugin rejects when the key does not exist
-      cached = await withStorage((storage) => storage.get({ key: KEY }).then((result) => result.value, () => null))
+      // Ask which keys exist first: a failing read then means "Keychain unavailable",
+      // which must surface as an error and not be remembered as "no token"
+      cached = await withStorage(async (storage) => {
+        const { value: keys } = await storage.keys()
+        return keys.includes(KEY) ? (await storage.get({ key: KEY })).value : null
+      })
     }
     return cached
   },
   async set(token) {
-    cached = token
     await withStorage((storage) => storage.set({ key: KEY, value: token }))
+    cached = token
   },
   async clear() {
     cached = null
