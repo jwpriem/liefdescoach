@@ -8,6 +8,7 @@ import type { PushTapData } from '~~/shared/push'
 
 const TOKEN_KEY = 'rav_push_token' // the device token the server knows this phone by
 const OFF_KEY = 'rav_push_off' // set when the user switched notifications off in the app
+const REGISTRATION_TIMEOUT_MS = 15_000 // iOS normally answers within a second or two
 
 // Loaded on demand so the website bundle never ships the native plugin.
 // The plugin is handed to a callback instead of being returned: resolving a promise with
@@ -26,6 +27,7 @@ function deviceToken(): Promise<string> {
   return withPush(async (push) => {
     let settle!: { resolve: (token: string) => void; reject: (error: Error) => void }
     const token = new Promise<string>((resolve, reject) => { settle = { resolve, reject } })
+    const timer = setTimeout(() => settle.reject(new Error('iOS did not answer the registration')), REGISTRATION_TIMEOUT_MS)
     const handles = await Promise.all([
       push.addListener('registration', (registered) => settle.resolve(registered.value)),
       push.addListener('registrationError', (failure) => settle.reject(new Error(failure.error))),
@@ -34,6 +36,7 @@ function deviceToken(): Promise<string> {
       await push.register()
       return await token
     } finally {
+      clearTimeout(timer)
       await Promise.all(handles.map((handle) => handle.remove()))
     }
   })
@@ -54,8 +57,9 @@ async function register(): Promise<boolean> {
 async function unregister(): Promise<void> {
   const token = localStorage.getItem(TOKEN_KEY)
   if (!token) return
-  localStorage.removeItem(TOKEN_KEY)
-  await $fetch('/api/push/unsubscribe', { method: 'POST', body: { token } }).catch(() => {})
+  // Forget the token only once the server removed it; offline, the next attempt can still tell it
+  await $fetch('/api/push/unsubscribe', { method: 'POST', body: { token } })
+    .then(() => localStorage.removeItem(TOKEN_KEY), () => {})
   await withPush((push) => push.unregister()).catch(() => {})
 }
 

@@ -196,3 +196,75 @@ describe('onPushTap', () => {
     expect(handler).toHaveBeenCalledWith('ROUTE', { url: '/lessen', address: 'Emmy van Leersumhof 24a', studentId: undefined })
   })
 })
+
+describe('forgetPushDevice failure handling', () => {
+  it('keeps the token when the server cannot be reached, and still unregisters the device', async () => {
+    const { enablePush, forgetPushDevice } = await load()
+    await enablePush()
+    fetchMock.mockClear().mockRejectedValue(new Error('offline'))
+
+    await expect(forgetPushDevice()).resolves.toBeUndefined()
+    expect(plugin.unregister).toHaveBeenCalled()
+
+    // The token is still remembered, so the next attempt tells the server again
+    fetchMock.mockClear().mockResolvedValue({ success: true })
+    await forgetPushDevice()
+    expect(fetchMock).toHaveBeenCalledWith('/api/push/unsubscribe', { method: 'POST', body: { token: TOKEN } })
+  })
+
+  it('forgets the token once the server accepted the removal', async () => {
+    const { enablePush, forgetPushDevice } = await load()
+    await enablePush()
+    await forgetPushDevice()
+    fetchMock.mockClear()
+
+    await forgetPushDevice()
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+})
+
+describe('deviceToken timeout', () => {
+  it('gives up when iOS fires neither event, and removes the listeners', async () => {
+    vi.useFakeTimers()
+    try {
+      plugin.register.mockReset().mockResolvedValue(undefined)
+      const { enablePush } = await load()
+
+      const result = enablePush()
+      await vi.waitFor(() => expect(plugin.register).toHaveBeenCalled())
+      await vi.advanceTimersByTimeAsync(15_000)
+
+      await expect(result).resolves.toBe(false)
+      expect(fetchMock).not.toHaveBeenCalled()
+      expect(plugin.listeners.size).toBe(0)
+      expect(vi.getTimerCount()).toBe(0)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('leaves no timer running once the token arrived', async () => {
+    vi.useFakeTimers()
+    try {
+      const { enablePush } = await load()
+
+      await expect(enablePush()).resolves.toBe(true)
+      expect(vi.getTimerCount()).toBe(0)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('leaves no timer running when registration fails', async () => {
+    vi.useFakeTimers()
+    try {
+      plugin.registrationFails = true
+      const { enablePush } = await load()
+
+      await expect(enablePush()).resolves.toBe(false)
+      expect(vi.getTimerCount()).toBe(0)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+})
