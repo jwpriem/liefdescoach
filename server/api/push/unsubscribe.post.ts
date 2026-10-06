@@ -7,15 +7,17 @@ export default defineEventHandler(async (event) => {
 
     const body = await readBody(event)
 
-    if (!body?.endpoint || typeof body.endpoint !== 'string') {
-        throw createError({ statusCode: 400, statusMessage: 'endpoint is verplicht' })
+    // A browser sends its endpoint, an iPhone its device token; both live in the endpoint column
+    const endpoint = body?.endpoint ?? body?.token
+    if (!endpoint || typeof endpoint !== 'string') {
+        throw createError({ statusCode: 400, statusMessage: 'endpoint of token is verplicht' })
     }
 
     // Delete the subscription
     await db.delete(pushSubscriptions)
         .where(
             and(
-                eq(pushSubscriptions.endpoint, body.endpoint),
+                eq(pushSubscriptions.endpoint, endpoint),
                 eq(pushSubscriptions.studentId, user.$id)
             )
         )
