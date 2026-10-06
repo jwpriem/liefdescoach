@@ -8,9 +8,13 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event)
 
     // A browser sends its endpoint, an iPhone its device token; both live in the endpoint column
-    const endpoint = body?.endpoint ?? body?.token
+    let endpoint = body?.endpoint ?? body?.token
     if (!endpoint || typeof endpoint !== 'string') {
         throw createError({ statusCode: 400, statusMessage: 'endpoint of token is verplicht' })
+    }
+    // Normalize iPhone tokens to lower case when the value came from body.token
+    if (!body?.endpoint && body?.token) {
+        endpoint = endpoint.toLowerCase()
     }
 
     // Delete the subscription

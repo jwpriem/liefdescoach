@@ -22,6 +22,7 @@ describe('POST /api/push/unsubscribe', () => {
 
     await expect(handle({})).resolves.toEqual({ success: true })
     expect(db.delete).toHaveBeenCalled()
+    expect(db.deleter.where).toHaveBeenCalled()
     expect(db.update).not.toHaveBeenCalled()
   })
 
@@ -32,6 +33,7 @@ describe('POST /api/push/unsubscribe', () => {
     await handle({})
 
     expect(db.delete).toHaveBeenCalled()
+    expect(db.deleter.where).toHaveBeenCalled()
     expect(db.updater.set).toHaveBeenCalledWith({ pushNotifications: false })
   })
 

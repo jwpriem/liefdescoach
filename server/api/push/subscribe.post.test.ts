@@ -35,7 +35,7 @@ describe('POST /api/push/subscribe', () => {
   })
 
   it('moves a device token to the user who now uses the phone', async () => {
-    const db = useDb([[{ id: 'existing', studentId: 'student_a', endpoint: IOS_TOKEN }]])
+    const db = useDb([[{ id: 'existing', studentId: 'student_a', endpoint: IOS_TOKEN, platform: 'ios' }]])
     withBody({ platform: 'ios', token: IOS_TOKEN })
 
     await handle({})
@@ -72,5 +72,38 @@ describe('POST /api/push/subscribe', () => {
     withBody({ endpoint: 'https://push.example/abc' })
 
     await expect(handle({})).rejects.toMatchObject({ statusCode: 400 })
+  })
+
+  it('rejects a web endpoint that is not an https URL', async () => {
+    const db = useDb([[]])
+    withBody({ endpoint: IOS_TOKEN, keys: { p256dh: 'key', auth: 'auth' } })
+
+    await expect(handle({})).rejects.toMatchObject({ statusCode: 400 })
+    expect(db.insert).not.toHaveBeenCalled()
+    expect(db.update).not.toHaveBeenCalled()
+  })
+
+  it('rejects an iOS token that matches an existing row with platform web', async () => {
+    const db = useDb([[{ id: 'existing', studentId: 'student_a', platform: 'web', endpoint: IOS_TOKEN }]])
+    withBody({ platform: 'ios', token: IOS_TOKEN })
+
+    await expect(handle({})).rejects.toMatchObject({ statusCode: 400 })
+    expect(db.update).not.toHaveBeenCalled()
+  })
+
+  it('stores an upper-case iOS token lower-cased', async () => {
+    const db = useDb([[]])
+    const upperToken = IOS_TOKEN.toUpperCase()
+    withBody({ platform: 'ios', token: upperToken })
+
+    await expect(handle({})).resolves.toEqual({ success: true })
+    expect(db.inserter.values).toHaveBeenCalledWith({
+      id: 'new-id',
+      studentId: 'student_b',
+      platform: 'ios',
+      endpoint: IOS_TOKEN,
+      p256dh: null,
+      auth: null,
+    })
   })
 })

@@ -11,11 +11,14 @@ function readSubscription(body: any) {
         if (typeof body.token !== 'string' || !IOS_TOKEN.test(body.token)) {
             throw createError({ statusCode: 400, statusMessage: 'token is ongeldig' })
         }
-        return { platform: 'ios', endpoint: body.token as string, p256dh: null, auth: null }
+        return { platform: 'ios', endpoint: body.token.toLowerCase() as string, p256dh: null, auth: null }
     }
 
     if (!body?.endpoint || typeof body.endpoint !== 'string') {
         throw createError({ statusCode: 400, statusMessage: 'endpoint is verplicht' })
+    }
+    if (!/^https:\/\//i.test(body.endpoint)) {
+        throw createError({ statusCode: 400, statusMessage: 'endpoint is ongeldig' })
     }
     if (!body?.keys?.p256dh || !body?.keys?.auth) {
         throw createError({ statusCode: 400, statusMessage: 'keys (p256dh, auth) zijn verplicht' })
@@ -35,6 +38,9 @@ export default defineEventHandler(async (event) => {
         .limit(1)
 
     if (existing.length > 0) {
+        if (existing[0].platform !== subscription.platform) {
+            throw createError({ statusCode: 400, statusMessage: 'endpoint is al in gebruik' })
+        }
         await db.update(pushSubscriptions)
             .set({ studentId: user.$id, ...subscription })
             .where(eq(pushSubscriptions.id, existing[0].id))
