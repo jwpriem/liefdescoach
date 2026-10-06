@@ -38,6 +38,7 @@
     "@simplewebauthn/server": "^13.3.1",
     "@tailwindcss/vite": "^4.0.0",
     "@vite-pwa/nuxt": "^1.1.1",
+    "apns2": "^12.2.0",
     "bcryptjs": "^3.0.3",
     "capacitor-secure-storage-plugin": "^0.13.0",
     "chart.js": "^4.5.1",
