@@ -4,6 +4,9 @@
  * issue is visible right away rather than causing silent runtime failures.
  */
 export default defineNitroPlugin(() => {
+    // Prerendering (nuxt generate, used for the iOS bundle) serves no API requests
+    if (import.meta.prerender) return
+
     const required: string[] = [
         'NUXT_DATABASE_URL',
         'NUXT_SESSION_SECRET',

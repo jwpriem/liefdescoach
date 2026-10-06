@@ -7,6 +7,7 @@
     "dev": "tsx --tsconfig scripts/tsconfig.json scripts/with-dev-db.ts nuxt dev",
     "start": "NODE_OPTIONS='--max-old-space-size=256' node .output/server/index.mjs",
     "generate": "nuxt generate",
+    "build:ios:bundle": "APP_TARGET=ios nuxt generate",
     "preview": "tsx --tsconfig scripts/tsconfig.json scripts/with-dev-db.ts nuxt preview",
     "postinstall": "nuxt prepare",
     "db:generate": "drizzle-kit generate",
