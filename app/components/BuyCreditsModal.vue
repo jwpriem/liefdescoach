@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
   modelValue: boolean
 }>()
 
@@ -22,6 +22,15 @@ function buyPlan(plan: typeof pricingPlans[0]) {
 function close() {
   emit('update:modelValue', false)
 }
+
+function onKeydown(e: KeyboardEvent) {
+  if (e.key === 'Escape' && props.modelValue) {
+    close()
+  }
+}
+
+onMounted(() => window.addEventListener('keydown', onKeydown))
+onUnmounted(() => window.removeEventListener('keydown', onKeydown))
 </script>
 
 <template>
@@ -31,10 +40,15 @@ function close() {
       class="fixed inset-0 bg-black/75 flex justify-center items-center z-50 p-4"
       @click.self="close"
     >
-      <div class="w-full max-w-2xl max-h-[80vh] overflow-y-auto rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-2xl shadow-emerald-950/20 p-6 sm:p-8">
+      <div
+        class="w-full max-w-2xl max-h-[80vh] overflow-y-auto rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-2xl shadow-emerald-950/20 p-6 sm:p-8"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="buy-credits-modal-title"
+      >
         <!-- Header -->
         <div class="flex items-center justify-between mb-6">
-          <h2 class="text-2xl font-bold text-emerald-100 tracking-tight">Koop credits</h2>
+          <h2 id="buy-credits-modal-title" class="text-2xl font-bold text-emerald-100 tracking-tight">Koop credits</h2>
           <button @click="close" aria-label="Sluiten" class="text-gray-400 hover:text-gray-200 transition-colors rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
               <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
