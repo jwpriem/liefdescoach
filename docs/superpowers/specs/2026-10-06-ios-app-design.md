@@ -134,6 +134,12 @@ All buttons open the app at a destination; none perform background work.
 
 No cancel button on the reminder: it is sent the day before and may arrive inside the 24-hour cancellation window.
 
+### Added after milestone 1's review
+
+- **Session kind:** `sessions` gains a `kind` column (`'web'` or `'app'`, default `'web'`), added in the same migration as the push columns. A session is only accepted on the path it was created for, so a website cookie cannot be replayed as an app token. Sessions created before the migration count as website sessions.
+- **Migrations are applied with a per-migration script** (dry run on a throwaway branch of `seed`, then apply to a named database). `drizzle-kit migrate` is not used: the database's migration table is out of sync with the journal.
+- **Deploy order:** the migration is applied to production before the code that reads the new columns is deployed.
+
 ## 4. Other native features
 
 Each is exposed through `useNativeApp()` with a web fallback or a no-op outside the app.
