@@ -19,6 +19,11 @@ function readSessionToken(event: H3Event): string | null {
   return isNativeAppRequest(event) ? getBearerToken(event) : getCookie(event, SESSION_COOKIE) ?? null
 }
 
+/** A session is only valid on the path it was created for, so a leaked cookie cannot become an app token. */
+function sessionKind(event: H3Event): 'app' | 'web' {
+  return isNativeAppRequest(event) ? 'app' : 'web'
+}
+
 /**
  * Creates a session for the given user. The website gets the session cookie;
  * the iOS app gets the token in a response header and stores it in the Keychain.
@@ -33,6 +38,7 @@ export async function createSession(event: H3Event, userId: string): Promise<str
     id: nanoid(),
     userId,
     tokenHash,
+    kind: sessionKind(event),
     expiresAt,
   })
 
@@ -68,6 +74,7 @@ export async function getSessionUser(event: H3Event) {
       userId: sessions.userId,
       expiresAt: sessions.expiresAt,
       createdAt: sessions.createdAt,
+      kind: sessions.kind,
       name: students.name,
       email: students.email,
       isAdmin: students.isAdmin,
@@ -92,6 +99,7 @@ export async function getSessionUser(event: H3Event) {
   if (result.length === 0) return null
 
   const session = result[0]
+  if (session.kind !== sessionKind(event)) return null
   // The app has no login cookie to refresh, so an app session in use stays alive
   // but never beyond an absolute lifetime measured from the login
   if (isNativeAppRequest(event) && session.createdAt) {

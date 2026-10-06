@@ -27,6 +27,8 @@ const sessionRow = (expiresInDays: number, createdDaysAgo: number | null = 1) =>
   userId: 'user_1',
   expiresAt: new Date(Date.now() + expiresInDays * DAY),
   createdAt: createdDaysAgo === null ? null : new Date(Date.now() - createdDaysAgo * DAY),
+  // Read when the code checks it, so a row matches the path of the test that uses it
+  get kind() { return testState.headers.get('origin') === 'capacitor://localhost' ? 'app' : 'web' },
   name: 'Test',
   email: 'test@example.test',
   isAdmin: false,
@@ -65,9 +67,36 @@ describe('createSession', () => {
     expect(testState.responseHeaders.get('x-session-token')).toBe(token)
     expect(testState.setCookie).not.toHaveBeenCalled()
   })
+
+  it('stores the kind of path the session was created on', async () => {
+    const web = useDb()
+    await createSession(event, 'user_1')
+    expect(web.inserter.values).toHaveBeenCalledWith(expect.objectContaining({ kind: 'web' }))
+
+    const app = useDb()
+    fromApp()
+    await createSession(event, 'user_1')
+    expect(app.inserter.values).toHaveBeenCalledWith(expect.objectContaining({ kind: 'app' }))
+  })
 })
 
 describe('getSessionUser', () => {
+  it('rejects a website session presented as an app token', async () => {
+    const db = useDb([[{ ...sessionRow(10), kind: 'web' }]])
+    fromApp()
+    testState.headers.set('authorization', 'Bearer stolen-cookie-value')
+
+    await expect(getSessionUser(event)).resolves.toBeNull()
+    expect(db.update).not.toHaveBeenCalled()
+  })
+
+  it('rejects an app session presented as a website cookie', async () => {
+    useDb([[{ ...sessionRow(10), kind: 'app' }]])
+    testState.cookies.set('rav_session', 'app-token-value')
+
+    await expect(getSessionUser(event)).resolves.toBeNull()
+  })
+
   it('reads the cookie for the website', async () => {
     useDb([[sessionRow(10)]])
     testState.cookies.set('rav_session', 'web-token')
