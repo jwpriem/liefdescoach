@@ -7,10 +7,25 @@ function isMutatingApiRequest(request: any, options: any): boolean {
   return MUTATING_METHODS.has(method) && url.startsWith('/api/')
 }
 
+/**
+ * Every API call goes through the global $fetch wrapped here.
+ * Website: adds the CSRF token to mutating requests.
+ * iOS app: adds the API base and the session token instead (no cookies, so no CSRF).
+ */
 export default defineNuxtPlugin(() => {
+  const rawFetch = globalThis.$fetch
+  const { isNativeApp, apiBase } = useNativeApp()
+
+  if (isNativeApp) {
+    globalThis.$fetch = rawFetch.create({
+      baseURL: apiBase,
+      ...createNativeApiHooks(sessionTokenStore, apiBase),
+    }) as typeof globalThis.$fetch
+    return
+  }
+
   let csrfToken: string | null = null
   let csrfTokenPromise: Promise<string> | null = null
-  const rawFetch = globalThis.$fetch
 
   async function getCsrfToken(): Promise<string> {
     if (csrfToken) return csrfToken
