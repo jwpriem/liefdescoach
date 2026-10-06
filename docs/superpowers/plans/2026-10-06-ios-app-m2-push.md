@@ -22,7 +22,7 @@
 - Button titles (Dutch), verbatim: `Route`, `Bekijk les`, `Bekijk deelnemers`, `Credits toevoegen`.
 - Every push sets the app badge to 1; opening the app clears it.
 - All action buttons open the app at a destination; none do background work.
-- Permission is requested after the first successful booking in the app, never at launch.
+- Permission is requested at the first opening of the app, and again after the first successful booking if it is still undecided. (Changed by the owner during execution; the plan originally said "never at launch".) The device is registered with the server only once a user is logged in.
 - APNs credentials come from environment variables only; never commit a key.
 - DRY: no copied code. Tests are written before the code they cover. Run `yarn test:unit` before deleting or moving existing code.
 - Work on a new branch `feature/ios-push` created from `origin/master`.

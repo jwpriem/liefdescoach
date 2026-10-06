@@ -118,7 +118,7 @@ New private runtime settings: APNs key, key ID, team ID, bundle ID, and a flag s
 
 `usePushNotifications` keeps its interface (`isSupported`, `isSubscribed`, `subscribe`, `unsubscribe`). In the app it registers with iOS and posts the device token to `/api/push/subscribe`, which accepts `{ platform: 'ios', token }` next to the web format. `/api/push/unsubscribe` accepts the same.
 
-- Permission is requested after the first successful booking in the app, not at launch. The toggle in `AccountDetails.vue` remains the manual switch.
+- Permission is requested at the first opening of the app, and again after the first successful booking if it is still undecided. The device is registered with the server once a user is logged in. The toggle in `AccountDetails.vue` remains the manual switch.
 - The app re-registers its token on each start. Logout removes that device's row.
 - Tapping a notification navigates to its `url`.
 
