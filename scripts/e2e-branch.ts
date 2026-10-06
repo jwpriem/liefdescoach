@@ -124,7 +124,7 @@ async function main(): Promise<number> {
 
     if (appMode) await serveIosBundle()
 
-    return run('yarn', ['playwright', 'test', '--project', appMode ? 'app' : 'chromium', ...playwrightArgs], {
+    return run('yarn', ['playwright', 'test', `--project=${appMode ? 'app' : 'chromium'}`, ...playwrightArgs], {
         ...process.env,
         BASE_URL,
         ...(appMode ? { APP_BASE_URL } : {}),
