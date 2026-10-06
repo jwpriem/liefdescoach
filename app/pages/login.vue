@@ -481,6 +481,11 @@ const passwordStrength = computed(() => {
                   </UButton>
                 </div>
               </UTooltip>
+              <p class="text-center text-xs text-gray-500">
+                Lees in onze
+                <nuxt-link to="/privacy" class="underline underline-offset-2 hover:text-emerald-400 transition-colors">privacyverklaring</nuxt-link>
+                hoe we met je gegevens omgaan.
+              </p>
               <div class="text-center">
                 <button type="button" class="text-sm text-gray-400 hover:text-emerald-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded px-2 py-0.5"
                   @click="backToDefaultLogin">
