@@ -31,7 +31,7 @@ export const useBookingActions = () => {
         if (isNativeApp) {
           // First the notification question (only asked if never answered), then the calendar offer,
           // so the offer is never hidden under the system's permission dialog
-          void offerPushAfterBooking().then(() => {
+          void offerPushAfterBooking().catch(() => {}).then(() => {
             toast.add({
               id: 'calendar-offer',
               title: 'Zet de les in je agenda',
