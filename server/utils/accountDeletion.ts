@@ -1,5 +1,6 @@
-import { and, eq, gt, inArray, isNull } from 'drizzle-orm'
+import { and, eq, gt, inArray } from 'drizzle-orm'
 import { bookings, credits, health, lessons, loginHistory, otpCodes, passkeyCredentials, pushSubscriptions, sessions, students } from '../database/schema'
+import { dutchClockNow } from '../../shared/lesson'
 
 export const DELETED_ACCOUNT_NAME = 'Verwijderd account'
 
@@ -27,25 +28,30 @@ export async function deleteAccount(studentId: string): Promise<DeletedAccount |
     if (!student) return null
 
     const now = new Date()
+    const upcomingBooking = and(eq(bookings.studentId, studentId), gt(lessons.date, dutchClockNow(now)))
     const upcoming = await db
         .select({ bookingId: bookings.id, type: lessons.type, teacher: lessons.teacher, date: lessons.date })
         .from(bookings)
         .innerJoin(lessons, eq(bookings.lessonId, lessons.id))
-        .where(and(eq(bookings.studentId, studentId), gt(lessons.date, now)))
-    const unused = await db
-        .select({ id: credits.id })
+        .where(upcomingBooking)
+    const studentCredits = await db
+        .select({ bookingId: credits.bookingId, validTo: credits.validTo })
         .from(credits)
-        .where(and(eq(credits.studentId, studentId), isNull(credits.bookingId), gt(credits.validTo, now)))
+        .where(eq(credits.studentId, studentId))
 
-    const upcomingBookingIds = upcoming.map((booking) => booking.bookingId)
+    // Forfeited: the valid credits not yet used, and the ones released from the bookings cancelled here
+    const upcomingBookingIds = new Set(upcoming.map((booking) => booking.bookingId))
+    const forfeited = studentCredits.filter((credit) =>
+        credit.bookingId ? upcomingBookingIds.has(credit.bookingId) : credit.validTo > now
+    )
+
+    // The batch finds the upcoming bookings itself, so one made after the reads above is cancelled too
+    const upcomingBookingIdsQuery = () =>
+        db.select({ id: bookings.id }).from(bookings).innerJoin(lessons, eq(bookings.lessonId, lessons.id)).where(upcomingBooking)
     const queries = [
         // A credit points at the booking it paid for, so it is released before that booking can go
-        ...(upcomingBookingIds.length > 0
-            ? [
-                db.update(credits).set({ bookingId: null, usedAt: null }).where(inArray(credits.bookingId, upcomingBookingIds)),
-                db.delete(bookings).where(inArray(bookings.id, upcomingBookingIds)),
-            ]
-            : []),
+        db.update(credits).set({ bookingId: null, usedAt: null }).where(inArray(credits.bookingId, upcomingBookingIdsQuery())),
+        db.delete(bookings).where(inArray(bookings.id, upcomingBookingIdsQuery())),
         db.delete(health).where(eq(health.studentId, studentId)),
         db.delete(sessions).where(eq(sessions.userId, studentId)),
         db.delete(passkeyCredentials).where(eq(passkeyCredentials.studentId, studentId)),
@@ -74,6 +80,6 @@ export async function deleteAccount(studentId: string): Promise<DeletedAccount |
         name: student.name,
         email: student.email,
         cancelledLessons: upcoming.map(({ type, teacher, date }) => ({ type, teacher, date })),
-        unusedCredits: unused.length,
+        unusedCredits: forfeited.length,
     }
 }

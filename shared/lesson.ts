@@ -69,3 +69,11 @@ export function lessonStartInstant(date: Date | string): Date {
   const guess = clockTime - amsterdamOffsetMs(new Date(clockTime))
   return new Date(clockTime - amsterdamOffsetMs(new Date(guess)))
 }
+
+/**
+ * The current Dutch wall-clock time written as UTC, the way lesson dates are stored (the inverse of `lessonStartInstant`).
+ * Compare a stored lesson date with this, not with the real time, to tell whether the lesson has started.
+ */
+export function dutchClockNow(now: Date = new Date()): Date {
+  return new Date(now.getTime() + amsterdamOffsetMs(now))
+}

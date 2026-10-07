@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { calendarLink, lessonAddress, lessonCalendarTitle, lessonStartInstant, lessonTypeLabel, LESSON_DURATION_MS } from './lesson'
+import { calendarLink, dutchClockNow, lessonAddress, lessonCalendarTitle, lessonStartInstant, lessonTypeLabel, LESSON_DURATION_MS } from './lesson'
 
 const hatha = { type: 'hatha yoga', teacher: null }
 const peachy = { type: 'peachy bum', teacher: null }
@@ -82,6 +82,21 @@ describe('lessonStartInstant', () => {
     const repeated = lessonStartInstant('2026-10-25T02:30:00.000Z').getTime()
     expect(Math.abs(repeated - Date.parse('2026-10-25T00:30:00.000Z'))).toBeLessThanOrEqual(3_600_000)
     expect(Math.abs(repeated - Date.parse('2026-10-25T01:30:00.000Z'))).toBeLessThanOrEqual(3_600_000)
+  })
+})
+
+describe('dutchClockNow', () => {
+  it('writes the current Dutch clock time as UTC, the way lesson dates are stored, in summer (UTC+2)', () => {
+    expect(dutchClockNow(new Date('2026-07-05T07:45:00.000Z')).toISOString()).toBe('2026-07-05T09:45:00.000Z')
+  })
+
+  it('does the same in winter (UTC+1)', () => {
+    expect(dutchClockNow(new Date('2026-01-04T08:45:00.000Z')).toISOString()).toBe('2026-01-04T09:45:00.000Z')
+  })
+
+  it('is the inverse of lessonStartInstant', () => {
+    const stored = new Date('2026-10-25T09:45:00.000Z')
+    expect(dutchClockNow(lessonStartInstant(stored))).toEqual(stored)
   })
 })
 
