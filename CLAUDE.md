@@ -88,6 +88,10 @@ Booking and cancellation are handled atomically in server API routes:
 
 The UI delegates to these endpoints via `$fetch`.
 
+### Account Deletion
+
+A member deletes their own account with `POST /api/auth/delete-account` (button in `AccountDetails.vue`, dialog `AccountDeleteDialog.vue`). `server/utils/accountDeletion.ts` anonymises the student row in place (name "Verwijderd account", personal fields null, archived) and removes health details, sessions, passkeys, push subscriptions, login history and email codes in one `db.batch`, which the Neon HTTP driver runs as a transaction. Upcoming bookings are removed after their credits are released; past bookings and credit rows stay for the revenue report. Admin accounts cannot delete themselves. When a table or `students` column holding personal data is added, add it to that function.
+
 ### Email
 
 Uses **nodemailer** (SMTP) for all transactional emails. Dev uses Mailtrap sandbox, production uses PrivateEmail. Templates in `server/utils/emailTemplates.ts`.

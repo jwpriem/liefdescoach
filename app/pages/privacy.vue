@@ -46,7 +46,7 @@ useHead({
                     je er zelf over te zeggen hebt.
                 </p>
                 <p class="text-sm text-gray-400">
-                    Laatst bijgewerkt: 6 oktober 2026
+                    Laatst bijgewerkt: 7 oktober 2026
                 </p>
             </header>
 
@@ -245,12 +245,15 @@ useHead({
                     Je gegevens laten verwijderen
                 </h2>
                 <p>
-                    Wil je je account en je gegevens laten verwijderen? Stuur
-                    een e-mail naar
+                    Je kunt je account zelf verwijderen: log in, ga naar je
+                    account en kies onder Instellingen "Account verwijderen".
+                    Je persoonsgegevens worden dan direct gewist en je komende
+                    boekingen geannuleerd. Lukt dat niet, stuur dan een e-mail
+                    naar
                     <a class="underline" :href="`mailto:${privacyEmail}`">{{
                         privacyEmail
                     }}</a
-                    >. We verwijderen je persoonsgegevens dan binnen 30 dagen.
+                    >; we verwijderen je gegevens dan binnen 30 dagen.
                     Gegevens over boekingen en credits bewaren we zonder je
                     naam of andere persoonsgegevens voor onze administratie.
                 </p>
