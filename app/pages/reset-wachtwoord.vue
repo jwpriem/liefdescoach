@@ -10,7 +10,8 @@ const success = ref(false)
 const showPassword = ref(false)
 const showConfirmPassword = ref(false)
 
-definePageMeta({ ssr: false })
+// A newer link while the page is open re-creates it, so the new token is used
+definePageMeta({ ssr: false, key: (route) => route.fullPath })
 
 useHead({ title: 'Wachtwoord herstellen | Yoga Ravennah' })
 
