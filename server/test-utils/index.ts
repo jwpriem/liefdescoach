@@ -35,6 +35,8 @@ export function createQueuedDb(results: any[][] = []) {
         insert: vi.fn(() => inserter),
         update: vi.fn(() => updater),
         delete: vi.fn(() => deleter),
+        // Like drizzle's neon-http batch: runs the given queries together and resolves when all are done
+        batch: vi.fn((queries: any[]) => Promise.all(queries)),
         selectChain,
         inserter,
         updater,
