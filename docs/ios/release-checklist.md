@@ -80,3 +80,4 @@ Account deletion
 
 - `NSAllowsLocalNetworking` is also set in release builds (it is needed for `yarn dev:ios`); it only permits plain connections to local network addresses.
 - The bundle contains marketing photos the app does not show.
+- `NSCalendarsUsageDescription` is in `Info.plist` although the app never asks for calendar access: the calendar plugin contains the older access call, and App Store Connect rejects the upload without the key (ITMS-90683).
