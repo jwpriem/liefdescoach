@@ -58,6 +58,7 @@
   },
   "devDependencies": {
     "@capacitor/cli": "^8.5.2",
+    "@iconify-json/heroicons": "^1.2.3",
     "@iconify-json/lucide": "^1.2.27",
     "@nuxt/fonts": "^0.11.0",
     "@playwright/test": "^1.58.1",

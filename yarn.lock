@@ -1528,6 +1528,13 @@
   resolved "https://registry.yarnpkg.com/@hexagon/base64/-/base64-1.1.28.tgz#7d306a97f1423829be5b27c9d388fe50e3099d48"
   integrity sha512-lhqDEAvWixy3bZ+UOYbPwUbBkwBq5C1LAJ/xPC8Oi+lL54oyakv/npbA0aU2hgCsx/1NUd4IBvV03+aUBWxerw==
 
+"@iconify-json/heroicons@^1.2.3":
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/@iconify-json/heroicons/-/heroicons-1.2.3.tgz#041fe0d689535dddc51e97c8b692cdff792ac4b2"
+  integrity sha512-n+vmCEgTesRsOpp5AB5ILB6srsgsYK+bieoQBNlafvoEhjVXLq8nIGN4B0v/s4DUfa0dOrjwE/cKJgIKdJXOEg==
+  dependencies:
+    "@iconify/types" "*"
+
 "@iconify-json/lucide@^1.2.27":
   version "1.2.98"
   resolved "https://registry.yarnpkg.com/@iconify-json/lucide/-/lucide-1.2.98.tgz#4ed188034fe3288304e90c53559f0609b36cd798"

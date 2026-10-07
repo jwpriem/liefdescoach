@@ -1,5 +1,6 @@
 import { fileURLToPath } from 'node:url'
 import { toIosPages } from './config/ios-target'
+import { NUXT_UI_DEFAULT_ICONS } from './config/ios-icons'
 
 // APP_TARGET=ios builds the client-only bundle that ships inside the iOS app (yarn build:ios)
 const iosTarget = process.env.APP_TARGET === 'ios'
@@ -199,8 +200,15 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   icon: {
     mode: 'svg',
     // The iOS app has no server to ask for icons: ship the ones the source uses inside the bundle
-    // (loader-circle is Nuxt UI's loading icon, set in its config where the scan cannot see it)
-    ...(iosTarget ? { clientBundle: { scan: true, icons: ['lucide:loader-circle'] } } : {}),
+    // Nuxt UI's own icons live in node_modules, which the scan skips, so they are listed; .ts files are scanned too
+    ...(iosTarget
+      ? {
+          clientBundle: {
+            scan: { globInclude: ['**/*.{vue,jsx,tsx,ts,md,mdc,mdx,yml,yaml}'] },
+            icons: NUXT_UI_DEFAULT_ICONS,
+          },
+        }
+      : {}),
   },
 
   vite: {
