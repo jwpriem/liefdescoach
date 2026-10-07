@@ -38,19 +38,20 @@ export function calendarLink(service: string, lesson: LessonKind, start: Date): 
   return `https://calndr.link/d/event/?service=${service}&start=${day}%20${time}&title=${calendarTitleBase(lesson)}%20Ravennah&timezone=Europe/Amsterdam&location=${encodeURIComponent(lessonAddress(lesson))}`
 }
 
-const amsterdamClock = new Intl.DateTimeFormat('en-US', {
-  timeZone: 'Europe/Amsterdam',
-  hourCycle: 'h23',
-  year: 'numeric',
-  month: 'numeric',
-  day: 'numeric',
-  hour: 'numeric',
-  minute: 'numeric',
-  second: 'numeric',
-})
+let amsterdamClock: Intl.DateTimeFormat | undefined
 
 /** How far the Dutch clock is ahead of UTC at the given moment, in milliseconds. */
 function amsterdamOffsetMs(moment: Date): number {
+  amsterdamClock ??= new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Europe/Amsterdam',
+    hourCycle: 'h23',
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+  })
   const parts = Object.fromEntries(amsterdamClock.formatToParts(moment).map((part) => [part.type, Number(part.value)]))
   const clockAsUtc = Date.UTC(parts.year!, parts.month! - 1, parts.day!, parts.hour!, parts.minute!, parts.second!)
   return clockAsUtc - Math.floor(moment.getTime() / 1000) * 1000
@@ -59,8 +60,12 @@ function amsterdamOffsetMs(moment: Date): number {
 /**
  * Lesson dates are stored with the Dutch wall-clock time written as UTC ("09:45Z" means 09:45 in the Netherlands).
  * This returns the real moment the lesson starts, for anything that needs an absolute time (a calendar event).
+ * The offset is read at a first guess of that moment, so the hours around a clock change come out right.
+ * For the hour that does not exist (spring) and the hour that happens twice (autumn) the result is one of the
+ * two possible moments; which one is arbitrary.
  */
 export function lessonStartInstant(date: Date | string): Date {
   const clockTime = new Date(date).getTime()
-  return new Date(clockTime - amsterdamOffsetMs(new Date(clockTime)))
+  const guess = clockTime - amsterdamOffsetMs(new Date(clockTime))
+  return new Date(clockTime - amsterdamOffsetMs(new Date(guess)))
 }

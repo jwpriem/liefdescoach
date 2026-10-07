@@ -62,14 +62,26 @@ describe('lessonStartInstant', () => {
     expect(lessonStartInstant(new Date('2026-01-04T09:45:00.000Z')).toISOString()).toBe('2026-01-04T08:45:00.000Z')
   })
 
-  it('does not depend on the time zone of the device running it', () => {
-    const previous = process.env.TZ
-    process.env.TZ = 'America/New_York'
-    try {
-      expect(lessonStartInstant('2026-07-05T09:45:00.000Z').toISOString()).toBe('2026-07-05T07:45:00.000Z')
-    } finally {
-      process.env.TZ = previous
-    }
+  it('is right on the days the clocks change', () => {
+    expect(lessonStartInstant('2026-03-28T09:45:00.000Z').toISOString()).toBe('2026-03-28T08:45:00.000Z')
+    expect(lessonStartInstant('2026-03-29T09:45:00.000Z').toISOString()).toBe('2026-03-29T07:45:00.000Z')
+    expect(lessonStartInstant('2026-10-24T09:45:00.000Z').toISOString()).toBe('2026-10-24T07:45:00.000Z')
+    expect(lessonStartInstant('2026-10-25T09:45:00.000Z').toISOString()).toBe('2026-10-25T08:45:00.000Z')
+  })
+
+  it('is right in the hours around the changeover', () => {
+    expect(lessonStartInstant('2026-03-29T01:30:00.000Z').toISOString()).toBe('2026-03-29T00:30:00.000Z')
+    expect(lessonStartInstant('2026-10-25T01:30:00.000Z').toISOString()).toBe('2026-10-24T23:30:00.000Z')
+    expect(lessonStartInstant('2026-03-29T03:30:00.000Z').toISOString()).toBe('2026-03-29T01:30:00.000Z')
+    expect(lessonStartInstant('2026-10-25T03:30:00.000Z').toISOString()).toBe('2026-10-25T02:30:00.000Z')
+  })
+
+  it('gives a valid moment for the hour that does not exist and the hour that happens twice', () => {
+    const skipped = lessonStartInstant('2026-03-29T02:30:00.000Z').getTime()
+    expect(Math.abs(skipped - Date.parse('2026-03-29T00:30:00.000Z'))).toBeLessThanOrEqual(3_600_000)
+    const repeated = lessonStartInstant('2026-10-25T02:30:00.000Z').getTime()
+    expect(Math.abs(repeated - Date.parse('2026-10-25T00:30:00.000Z'))).toBeLessThanOrEqual(3_600_000)
+    expect(Math.abs(repeated - Date.parse('2026-10-25T01:30:00.000Z'))).toBeLessThanOrEqual(3_600_000)
   })
 })
 

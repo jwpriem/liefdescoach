@@ -14,6 +14,13 @@ describe('push messages', () => {
     })
   })
 
+  it('expires the lesson reminder at the right moment in winter', () => {
+    // 09:45 Dutch time in January is 08:45 UTC
+    expect(lessonReminderPush('Hatha Yoga', 'Emmy van Leersumhof 24a, 3059 LT Rotterdam', new Date('2026-01-04T09:45:00.000Z')).expiresAt).toBe(
+      Date.parse('2026-01-04T08:45:00.000Z') / 1000,
+    )
+  })
+
   it('builds the booking confirmation for admins', () => {
     expect(bookingChangePush('confirmation', 'Bea', 'Hatha Yoga', 'zondag 11 oktober')).toEqual({
       title: 'Nieuwe boeking',
