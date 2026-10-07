@@ -944,6 +944,11 @@
   resolved "https://registry.yarnpkg.com/@dxup/unimport/-/unimport-0.1.2.tgz#a08e4039efe41c50d9c36fbb39d9976b88eefa68"
   integrity sha512-/B8YJGPzaYq1NbsQmwgP8EZqg40NpTw4ZB3suuI0TplbxKHeK94jeaawLmVhCv+YwUnOpiWEz9U6SeThku/8JQ==
 
+"@ebarooni/capacitor-calendar@^8.8.0":
+  version "8.8.0"
+  resolved "https://registry.yarnpkg.com/@ebarooni/capacitor-calendar/-/capacitor-calendar-8.8.0.tgz#595cf02fbcf456a425ec8d04963a5de63a766c07"
+  integrity sha512-Cas7G0F2GpQKbnGCT6/k1IKKS4AX9egHERwBtvQ9WuXxtOs/Saw3YInf4LMs5RrWp9taj2krlLEHu+KReBk3Uw==
+
 "@emnapi/core@^1.7.1", "@emnapi/core@^1.8.1":
   version "1.9.1"
   resolved "https://registry.yarnpkg.com/@emnapi/core/-/core-1.9.1.tgz#2143069c744ca2442074f8078462e51edd63c7bd"

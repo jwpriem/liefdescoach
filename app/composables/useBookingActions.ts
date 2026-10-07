@@ -4,6 +4,7 @@ export const useBookingActions = () => {
   const { refresh: refreshCredits } = useCredits()
   const { call, error, pending } = useApiCall()
   const { isNativeApp } = useNativeApp()
+  const toast = useToast()
 
   async function handleBooking(lesson: any, options: { extraSpot?: boolean; source?: 'regular' | 'classpass' } = {}) {
     await call(async () => {
@@ -27,8 +28,17 @@ export const useBookingActions = () => {
       } else {
         await refreshUser()
         await refreshCredits()
-        // The moment a reminder becomes useful: offer notifications, once
-        if (isNativeApp) void offerPushAfterBooking()
+        if (isNativeApp) {
+          // The moment a reminder becomes useful: offer notifications, once
+          void offerPushAfterBooking()
+          toast.add({
+            id: 'calendar-offer',
+            title: 'Zet de les in je agenda',
+            icon: 'i-lucide-calendar-plus',
+            color: 'primary',
+            actions: [{ label: 'Zet in agenda', onClick: () => { void addLessonToCalendar(lesson) } }],
+          })
+        }
       }
     })
   }
