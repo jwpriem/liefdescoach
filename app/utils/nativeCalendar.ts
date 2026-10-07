@@ -14,7 +14,7 @@ export function lessonCalendarEvent(lesson: DatedLesson) {
 
 /**
  * iOS app: opens the system's "new event" sheet with the lesson filled in; the user taps Add.
- * The system sheet writes the event itself, so the app needs no calendar permission.
+ * The system sheet writes the event itself, so the app needs no calendar permission (this holds because the app requires iOS 17).
  * Only call this inside the iOS app (callers check `useNativeApp().isNativeApp`): in a browser the plugin
  * does not reject but opens a confirm dialog and downloads an .ics file.
  */

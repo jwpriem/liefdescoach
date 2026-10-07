@@ -20,6 +20,7 @@
 - Universal links cover exactly the member paths: `/login`, `/lessen`, `/account`, `/archief`, `/admin`, `/verify-email`, `/reset-wachtwoord` and everything below them. Marketing pages keep opening in Safari.
 - Dutch UI text, verbatim: `Zet in agenda`, `Zet de les in je agenda`, `Deel deze les`.
 - The shared link in a shared lesson is `https://www.ravennah.com/eerste-les`.
+- The app requires iOS 17 or later (owner decision): the calendar feature relies on the system event sheet working without calendar permission.
 - A Capacitor plugin object is a Proxy: never return it from an `async` function or resolve a promise with it. Import the plugin inside the function that uses it and call it there.
 - Every native util must be safe where its plugin does not exist (a desktop browser): no thrown error may reach a booking, cancellation or page load.
 - DRY: no copied code. Tests are written before the code they cover. Run `yarn test:unit` before deleting or moving existing code.
@@ -1550,7 +1551,6 @@ On a real iPhone with a TestFlight build (haptics and universal links do not wor
 - [ ] A second reset link, opened while the reset page is already showing, uses the new link.
 - [ ] As an admin, a link to https://www.ravennah.com/archief opens the archive in the app.
 - [ ] A reset email requested from inside the app contains a link starting with https://www.ravennah.com.
-- [ ] On an iPhone or simulator running iOS 16, "Zet in agenda" opens a usable event sheet (see the note on the minimum iOS version).
 
 ## Release steps for the owner
 
