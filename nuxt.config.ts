@@ -208,6 +208,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
   nitro: {
     ...(iosTarget ? { output: { dir: '.output-ios' } } : {}),
+    // iOS reads this file (served as JSON, no extension) to learn which links open the app
+    handlers: [
+      { route: '/.well-known/apple-app-site-association', handler: fileURLToPath(new URL('./server/handlers/appleAppSiteAssociation.ts', import.meta.url)) },
+    ],
     // Compress static assets with gzip + brotli — reduces bandwidth and memory transfer
     compressPublicAssets: { gzip: true, brotli: true },
     // Minify the server bundle to reduce startup memory footprint
