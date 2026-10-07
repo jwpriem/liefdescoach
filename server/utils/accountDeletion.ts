@@ -1,0 +1,85 @@
+import { and, eq, gt, inArray } from 'drizzle-orm'
+import { bookings, credits, health, lessons, loginHistory, otpCodes, passkeyCredentials, pushSubscriptions, sessions, students } from '../database/schema'
+import { dutchClockNow } from '../../shared/lesson'
+
+export const DELETED_ACCOUNT_NAME = 'Verwijderd account'
+
+export type DeletedAccount = {
+    name: string
+    email: string | null
+    cancelledLessons: { type: string | null; teacher: string | null; date: Date }[]
+    unusedCredits: number
+}
+
+/**
+ * Deletes a member's account by anonymising it in place.
+ *
+ * The student row stays, stripped of everything personal, so past bookings and credit history
+ * (which the revenue report reads, and which `credits.student_id` requires) remain as anonymous records.
+ * Everything else that is personal is removed, upcoming bookings are cancelled, and it all happens
+ * in one atomic batch. Returns what the caller needs for the confirmation emails, or null if there is no such student.
+ */
+export async function deleteAccount(studentId: string): Promise<DeletedAccount | null> {
+    const [student] = await db
+        .select({ name: students.name, email: students.email })
+        .from(students)
+        .where(eq(students.id, studentId))
+        .limit(1)
+    if (!student) return null
+
+    const now = new Date()
+    const upcomingBooking = and(eq(bookings.studentId, studentId), gt(lessons.date, dutchClockNow(now)))
+    const upcoming = await db
+        .select({ bookingId: bookings.id, type: lessons.type, teacher: lessons.teacher, date: lessons.date })
+        .from(bookings)
+        .innerJoin(lessons, eq(bookings.lessonId, lessons.id))
+        .where(upcomingBooking)
+    const studentCredits = await db
+        .select({ bookingId: credits.bookingId, validTo: credits.validTo })
+        .from(credits)
+        .where(eq(credits.studentId, studentId))
+
+    // Forfeited: the valid credits not yet used, and the ones released from the bookings cancelled here
+    const upcomingBookingIds = new Set(upcoming.map((booking) => booking.bookingId))
+    const forfeited = studentCredits.filter((credit) =>
+        credit.bookingId ? upcomingBookingIds.has(credit.bookingId) : credit.validTo > now
+    )
+
+    // The batch finds the upcoming bookings itself, so one made after the reads above is cancelled too
+    const upcomingBookingIdsQuery = () =>
+        db.select({ id: bookings.id }).from(bookings).innerJoin(lessons, eq(bookings.lessonId, lessons.id)).where(upcomingBooking)
+    const queries = [
+        // A credit points at the booking it paid for, so it is released before that booking can go
+        db.update(credits).set({ bookingId: null, usedAt: null }).where(inArray(credits.bookingId, upcomingBookingIdsQuery())),
+        db.delete(bookings).where(inArray(bookings.id, upcomingBookingIdsQuery())),
+        db.delete(health).where(eq(health.studentId, studentId)),
+        db.delete(sessions).where(eq(sessions.userId, studentId)),
+        db.delete(passkeyCredentials).where(eq(passkeyCredentials.studentId, studentId)),
+        db.delete(pushSubscriptions).where(eq(pushSubscriptions.studentId, studentId)),
+        db.delete(loginHistory).where(eq(loginHistory.studentId, studentId)),
+        db.delete(otpCodes).where(eq(otpCodes.userId, studentId)),
+        db.update(students)
+            .set({
+                name: DELETED_ACCOUNT_NAME,
+                email: null,
+                passwordHash: null,
+                phone: null,
+                dateOfBirth: null,
+                archived: true,
+                emailVerified: false,
+                reminders: false,
+                pushNotifications: false,
+                phoneRequested: false,
+            })
+            .where(eq(students.id, studentId)),
+    ]
+    // All or nothing: the Neon HTTP driver runs a batch as one transaction
+    await db.batch(queries as [typeof queries[number], ...typeof queries])
+
+    return {
+        name: student.name,
+        email: student.email,
+        cancelledLessons: upcoming.map(({ type, teacher, date }) => ({ type, teacher, date })),
+        unusedCredits: forfeited.length,
+    }
+}

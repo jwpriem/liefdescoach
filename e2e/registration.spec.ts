@@ -10,7 +10,7 @@
  */
 
 import { test, expect, Page } from '@playwright/test'
-import { openAccountTab } from './helpers'
+import { bookFirstAvailableLesson, openAccountTab, submitLogin } from './helpers'
 
 // Dutch first names (mixed male/female)
 const DUTCH_FIRST_NAMES = [
@@ -223,5 +223,43 @@ test.describe('Registration flow', () => {
         // Logout
         await page.locator('nav').getByText('Logout', { exact: true }).click()
         await page.waitForURL('**/', { timeout: 10_000 })
+    })
+
+    test('a member can delete their own account, and the email address is free again', async ({ page }) => {
+        const user = generateTestUser()
+        await register(page, user)
+        await page.waitForURL('**/account', { timeout: 20_000 })
+
+        // An upcoming booking that used the welcome credit: deleting must cope with it
+        await bookFirstAvailableLesson(page)
+        await page.locator('.fixed.inset-0').first().click({ position: { x: 10, y: 10 } })
+        await expect(page.locator('.fixed.inset-0')).not.toBeVisible()
+
+        await openAccountTab(page, 'Instellingen')
+        await page.getByRole('button', { name: 'Account verwijderen', exact: true }).click()
+
+        const dialog = page.getByRole('dialog', { name: 'Account verwijderen' })
+        await expect(dialog).toBeVisible()
+        await expect(dialog.getByText('Je komende boekingen worden geannuleerd.')).toBeVisible()
+
+        // The confirm button only works once the word is typed
+        const confirm = dialog.getByRole('button', { name: 'Account definitief verwijderen' })
+        await expect(confirm).toBeDisabled()
+        await dialog.getByLabel('Typ VERWIJDER om te bevestigen').fill('VERWIJDER')
+        await expect(confirm).toBeEnabled()
+        await confirm.click()
+
+        // Logged out, back on the home page
+        await page.waitForURL((url) => url.pathname === '/', { timeout: 15_000 })
+        await expect(page.locator('nav').getByRole('link', { name: 'Login' })).toBeVisible({ timeout: 10_000 })
+
+        // The old password no longer works
+        await submitLogin(page, user.email, user.password)
+        await expect(page.getByText(/Verkeerde e-mailadres of wachtwoord/)).toBeVisible({ timeout: 10_000 })
+
+        // The same address can register again as a new account
+        await register(page, user)
+        await page.waitForURL('**/account', { timeout: 20_000 })
+        await expect(page.getByRole('link', { name: user.fullName })).toBeVisible({ timeout: 10_000 })
     })
 })

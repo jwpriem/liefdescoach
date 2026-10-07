@@ -60,12 +60,24 @@ export const useAuth = () => {
     return user.value
   }
 
+  /** Nobody is logged in any more: forget the user and everything fetched for them. */
+  function clearSessionState() {
+    user.value = null
+    clearNuxtData(['my-credits', 'my-bookings', 'admin-users', 'admin-lessons', 'lessons', 'credit-summary'])
+  }
+
   async function logout() {
     // While still logged in: this phone stops receiving the account's notifications
     if (useNativeApp().isNativeApp) await forgetPushDevice()
     await $fetch('/api/auth/logout', { method: 'POST' })
-    user.value = null
-    clearNuxtData(['my-credits', 'my-bookings', 'admin-users', 'admin-lessons', 'lessons', 'credit-summary'])
+    clearSessionState()
+  }
+
+  /** Deletes the logged-in member's own account. `confirmation` is the word the member typed. */
+  async function deleteAccount(confirmation: string) {
+    if (useNativeApp().isNativeApp) await forgetPushDevice()
+    await $fetch('/api/auth/delete-account', { method: 'POST', body: { confirmation } })
+    clearSessionState()
   }
 
   async function sendOtp(email: string) {
@@ -198,7 +210,7 @@ export const useAuth = () => {
 
   return {
     user, isAdmin, pending, refresh,
-    login, logout, sendOtp, verifyOtp, register,
+    login, logout, deleteAccount, sendOtp, verifyOtp, register,
     loginWithPasskey,
     requestEmailVerification, verifyEmail,
     requestPasswordReset, resetPassword,

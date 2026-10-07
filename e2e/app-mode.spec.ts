@@ -50,6 +50,10 @@ test('the app logs in with a token, stays signed in, books a lesson and logs out
     await page.waitForURL('**/account', { timeout: 15_000 })
     await expect(accountNav(page)).toBeVisible({ timeout: 10_000 })
 
+    // A member can delete their own account from the app (required by the App Store)
+    await openAccountTab(page, 'Instellingen')
+    await expect(page.getByRole('button', { name: 'Account verwijderen', exact: true })).toBeVisible({ timeout: 10_000 })
+
     await bookFirstAvailableLesson(page)
     // After a booking the app offers to put the lesson in the calendar (the toast stays for 15 seconds)
     await expect(page.getByText('Zet de les in je agenda', { exact: true })).toBeVisible({ timeout: 10_000 })
@@ -89,6 +93,10 @@ test('the admin screens of the app need no icon from a server', async ({ page })
         await openAccountTab(page, tab)
         await page.waitForLoadState('networkidle')
     }
+
+    // Still on the settings tab: an admin account cannot delete itself
+    await expect(page.getByRole('button', { name: 'Wachtwoord wijzigen' })).toBeVisible({ timeout: 10_000 })
+    await expect(page.getByRole('button', { name: 'Account verwijderen', exact: true })).toHaveCount(0)
 
     // A select renders its dropdown with the chevron and check icons of Nuxt UI
     await openAccountTab(page, 'Omzet')
