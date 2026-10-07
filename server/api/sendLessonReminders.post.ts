@@ -3,6 +3,7 @@ import crypto from 'node:crypto'
 import { and, gte, lte, eq } from 'drizzle-orm'
 import { lessons, bookings, students } from '../database/schema'
 import { lessonReminderPush } from '../utils/pushMessages'
+import { lessonAddress, lessonTypeLabel } from '../../shared/lesson'
 
 export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig()
@@ -61,13 +62,9 @@ export default defineEventHandler(async (event) => {
         if (bookingRows.length === 0) continue
 
         const lessonDate = new Date(lesson.date!)
-        const lessonType = lesson.type === 'guest lesson'
-            ? `Yin-Yang Yoga door gastdocent ${lesson.teacher}`
-            : lesson.type === 'peachy bum' ? 'Peachy Bum' : 'Hatha Yoga'
+        const lessonType = lessonTypeLabel(lesson)
         const formattedDate = formatLessonDate(lessonDate)
-        const address = lesson.type === 'peachy bum'
-            ? 'Kosboulevard 5, 3059 XZ Rotterdam'
-            : 'Emmy van Leersumhof 24a, 3059 LT Rotterdam'
+        const address = lessonAddress(lesson)
 
         for (const student of bookingRows) {
             if (!student.studentEmail) continue
