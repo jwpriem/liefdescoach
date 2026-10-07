@@ -198,6 +198,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
   icon: {
     mode: 'svg',
+    // The iOS app has no server to ask for icons: ship the ones the source uses inside the bundle
+    // (loader-circle is Nuxt UI's loading icon, set in its config where the scan cannot see it)
+    ...(iosTarget ? { clientBundle: { scan: true, icons: ['lucide:loader-circle'] } } : {}),
   },
 
   vite: {
@@ -213,7 +216,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       { route: '/.well-known/apple-app-site-association', handler: fileURLToPath(new URL('./server/handlers/appleAppSiteAssociation.ts', import.meta.url)) },
     ],
     // Compress static assets with gzip + brotli — reduces bandwidth and memory transfer
-    compressPublicAssets: { gzip: true, brotli: true },
+    // The app's own file server never serves .gz/.br copies, so the iOS bundle skips them
+    compressPublicAssets: iosTarget ? false : { gzip: true, brotli: true },
     // Minify the server bundle to reduce startup memory footprint
     minify: true,
     // Use bounded LRU cache instead of unbounded in-memory default

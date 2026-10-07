@@ -15,6 +15,12 @@ const accountNav = (page: import('@playwright/test').Page) =>
     page.locator('nav').getByRole('button', { name: 'Boekingen', exact: true })
 
 test('the app logs in with a token, stays signed in, books a lesson and logs out', async ({ page, context }) => {
+    // The app bundle must carry its own icons: no icon requests to any server
+    const iconRequests: string[] = []
+    page.on('request', (request) => {
+        if (/iconify|_nuxt_icon/.test(request.url())) iconRequests.push(request.url())
+    })
+
     // The app opens at its root and lands on the login page
     await page.goto('/')
     await page.waitForURL('**/login', { timeout: 15_000 })
@@ -60,4 +66,5 @@ test('the app logs in with a token, stays signed in, books a lesson and logs out
     await page.waitForURL('**/login', { timeout: 10_000 })
     await page.goto('/')
     await page.waitForURL('**/login', { timeout: 15_000 })
+    expect(iconRequests, 'icons fetched at runtime').toEqual([])
 })
