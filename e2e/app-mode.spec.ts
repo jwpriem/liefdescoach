@@ -45,6 +45,8 @@ test('the app logs in with a token, stays signed in, books a lesson and logs out
 
     // A link that leaves the member area opens the website instead of a 404
     await page.goto('/lessen')
+    // Every lesson can be shared from the app
+    await expect(page.getByRole('button', { name: 'Deel deze les' }).first()).toBeVisible({ timeout: 10_000 })
     const lessonInfo = page.locator('a[href="/hatha-yoga"]').first()
     await expect(lessonInfo).toBeVisible({ timeout: 10_000 })
     const [website] = await Promise.all([page.waitForEvent('popup'), lessonInfo.click()])
