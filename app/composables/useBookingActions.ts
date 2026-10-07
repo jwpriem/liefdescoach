@@ -3,6 +3,7 @@ export const useBookingActions = () => {
   const { onBehalfOf, clear: clearOnBehalf } = useOnBehalfOf()
   const { refresh: refreshCredits } = useCredits()
   const { call, error, pending } = useApiCall()
+  const { isNativeApp } = useNativeApp()
 
   async function handleBooking(lesson: any, options: { extraSpot?: boolean; source?: 'regular' | 'classpass' } = {}) {
     await call(async () => {
@@ -26,6 +27,8 @@ export const useBookingActions = () => {
       } else {
         await refreshUser()
         await refreshCredits()
+        // The moment a reminder becomes useful: offer notifications, once
+        if (isNativeApp) void offerPushAfterBooking()
       }
     })
   }

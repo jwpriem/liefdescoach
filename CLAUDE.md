@@ -17,6 +17,8 @@ yarn dev:ios    # iOS app in the simulator against a running `yarn dev` (Neon de
 
 The iOS app (Capacitor, `ios/`) bundles only the member pages (`config/ios-target.ts`) and calls the API cross-origin. The server recognises it by its `Origin` (`isNativeAppRequest` in `server/utils/native-app.ts`): those requests use a bearer session token instead of the cookie, skip CSRF, and get CORS. In components, ask `useNativeApp()` — never check the platform directly. `yarn test:e2e:branch --app` smoke-tests the bundle in a browser.
 
+Push: `server/utils/push.ts` delivers each notification to browsers (Web Push) and iPhones (APNs, `server/utils/apns.ts`); `push_subscriptions.platform` says which. Notification categories, action ids and tap destinations live in `shared/push.ts`; the same ids are registered in `ios/App/App/AppDelegate.swift` — change them together. Without `NUXT_APNS_KEY` nothing is sent to iPhones. To try a notification in the simulator: `xcrun simctl push booted com.ravennah.app docs/ios/push-sample-reminder.apns`. `NUXT_APNS_PRODUCTION` must match the build: `true` for TestFlight and App Store builds, `false` for a debug build run from Xcode; a mismatch means no iPhone notifications.
+
 No linter is configured. Node 22 or newer is required (Capacitor CLI).
 
 ## Do
@@ -108,7 +110,7 @@ Provides `$rav` globally with utility functions: Dutch date formatting, calendar
 
 ### Runtime Config
 
-**Private** (server only): `databaseUrl`, `sessionSecret`, `cronSecret`, `mailPass`, `mailPassDev`, `mailUserDev`
+**Private** (server only): `databaseUrl`, `sessionSecret`, `cronSecret`, `mailPass`, `mailPassDev`, `mailUserDev`, `apnsKey`, `apnsKeyId`, `apnsTeamId`, `apnsBundleId`, `apnsProduction`
 **Public**: `vapidPublicKey`
 
 Set via environment variables prefixed with `NUXT_` (e.g., `NUXT_DATABASE_URL`, `NUXT_SESSION_SECRET`).

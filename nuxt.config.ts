@@ -60,6 +60,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     appOrigin: 'capacitor://localhost', // NUXT_APP_ORIGIN (Origin the iOS app sends; those requests use token auth)
     vapidPrivateKey: '',       // NUXT_VAPID_PRIVATE_KEY (Web Push VAPID private key)
     vapidEmail: '',            // NUXT_VAPID_EMAIL (e.g. mailto:info@ravennah.com)
+    apnsKey: '',               // NUXT_APNS_KEY (contents of the .p8 key, line breaks written as \n)
+    apnsKeyId: '',             // NUXT_APNS_KEY_ID
+    apnsTeamId: '',            // NUXT_APNS_TEAM_ID
+    apnsBundleId: 'com.ravennah.app', // NUXT_APNS_BUNDLE_ID
+    apnsProduction: false,     // NUXT_APNS_PRODUCTION (true on the live site: App Store and TestFlight builds)
     mailPass: '',              // NUXT_MAIL_PASS
     mailPassDev: '',           // NUXT_MAIL_PASS_DEV
     mailUserDev: '',           // NUXT_MAIL_USER_DEV

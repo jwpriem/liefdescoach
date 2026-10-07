@@ -118,7 +118,7 @@ New private runtime settings: APNs key, key ID, team ID, bundle ID, and a flag s
 
 `usePushNotifications` keeps its interface (`isSupported`, `isSubscribed`, `subscribe`, `unsubscribe`). In the app it registers with iOS and posts the device token to `/api/push/subscribe`, which accepts `{ platform: 'ios', token }` next to the web format. `/api/push/unsubscribe` accepts the same.
 
-- Permission is requested after the first successful booking in the app, not at launch. The toggle in `AccountDetails.vue` remains the manual switch.
+- Permission is requested at the first opening of the app, and again after the first successful booking if it is still undecided. The device is registered with the server once a user is logged in. The toggle in `AccountDetails.vue` remains the manual switch.
 - The app re-registers its token on each start. Logout removes that device's row.
 - Tapping a notification navigates to its `url`.
 
@@ -133,6 +133,12 @@ All buttons open the app at a destination; none perform background work.
 | "Credits op" | admins | Credits toevoegen (that student's admin page) |
 
 No cancel button on the reminder: it is sent the day before and may arrive inside the 24-hour cancellation window.
+
+### Added after milestone 1's review
+
+- **Session kind:** `sessions` gains a `kind` column (`'web'` or `'app'`, default `'web'`), added in the same migration as the push columns. A session is only accepted on the path it was created for, so a website cookie cannot be replayed as an app token. Sessions created before the migration count as website sessions.
+- **Migrations are applied with a per-migration script** (dry run on a throwaway branch of `seed`, then apply to a named database). `drizzle-kit migrate` is not used: the database's migration table is out of sync with the journal.
+- **Deploy order:** the migration is applied to production before the code that reads the new columns is deployed.
 
 ## 4. Other native features
 

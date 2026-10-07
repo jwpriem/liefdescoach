@@ -35,9 +35,18 @@ let branch: NeonBranch | undefined
 let devServer: ChildProcess | undefined
 let appServer: ChildProcess | undefined
 let interrupted = false
+let tearingDown = false
+
+/** Starts a server in its own process group. Its stderr is shown only while the run is live: a killed server prints EPIPE noise that looks like a failure. */
+function spawnServer(command: string, commandArgs: string[], env?: NodeJS.ProcessEnv): ChildProcess {
+    const server = spawn(command, commandArgs, { stdio: ['ignore', 'ignore', 'pipe'], env, detached: true })
+    server.stderr?.on('data', (chunk) => { if (!tearingDown) process.stderr.write(chunk) })
+    return server
+}
 
 // once(): Ctrl-C and normal exit both await the same cleanup, so we never exit mid-delete
 const cleanup = once(async () => {
+    tearingDown = true
     // The server runs in its own process group (detached), so kill the group: yarn + nuxt + workers
     for (const server of [devServer, appServer]) {
         if (server?.pid && server.exitCode === null) {
@@ -87,7 +96,7 @@ async function serveIosBundle(): Promise<void> {
     const buildCode = await run('yarn', ['build:ios:bundle'], { ...process.env, NUXT_PUBLIC_API_BASE: BASE_URL })
     if (buildCode !== 0) throw new Error('iOS bundle build failed')
 
-    appServer = spawn('yarn', ['tsx', 'scripts/serve-ios-bundle.ts', String(APP_PORT)], { stdio: ['ignore', 'ignore', 'inherit'], detached: true })
+    appServer = spawnServer('yarn', ['tsx', 'scripts/serve-ios-bundle.ts', String(APP_PORT)])
     const deadline = Date.now() + 30_000
     while (Date.now() < deadline) {
         if (await fetch(APP_BASE_URL).then((r) => r.ok, () => false)) return
@@ -118,7 +127,7 @@ async function main(): Promise<number> {
 
     // NUXT_APP_ORIGIN: the test server treats the served iOS bundle as "the app"
     const appEnv = { ...process.env, NUXT_DATABASE_URL: created.connectionUri, NUXT_APP_ORIGIN: APP_BASE_URL, NODE_ENV: 'development' }
-    devServer = spawn('yarn', ['nuxt', 'dev', '--port', String(PORT)], { stdio: ['ignore', 'ignore', 'inherit'], env: appEnv, detached: true })
+    devServer = spawnServer('yarn', ['nuxt', 'dev', '--port', String(PORT)], appEnv)
     console.log(`Starting dev server on ${BASE_URL}`)
     await waitForTestBranch()
 

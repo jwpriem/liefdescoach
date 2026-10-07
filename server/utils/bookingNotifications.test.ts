@@ -29,7 +29,7 @@ describe('sendBookingNotifications', () => {
         expect(bookingAdminEmail).toHaveBeenCalledWith(expect.objectContaining({ name: 'Bea uit DB', email: 'bea@test.nl', spots: 8 }))
         expect(smtpTransport.sendMail).toHaveBeenCalledWith(expect.objectContaining({ to: 'bea@test.nl' }))
         expect(smtpTransport.sendMail).toHaveBeenCalledWith(expect.objectContaining({ to: 'info@ravennah.com' }))
-        expect(sendPushToAdmins).toHaveBeenCalledWith(expect.objectContaining({ title: 'Nieuwe boeking' }))
+        expect(sendPushToAdmins).toHaveBeenCalledWith(expect.objectContaining({ title: 'Nieuwe boeking', category: 'BOOKING_CHANGE' }))
     })
 
     it('alerts the admin when the student has no credits left after booking', async () => {
@@ -38,7 +38,7 @@ describe('sendBookingNotifications', () => {
 
         await sendBookingNotifications('confirmation', { lessonId: 'lesson-1', studentId: 'student-b' })
 
-        expect(sendPushToAdmins).toHaveBeenCalledWith(expect.objectContaining({ title: 'Credits op' }))
+        expect(sendPushToAdmins).toHaveBeenCalledWith(expect.objectContaining({ title: 'Credits op', category: 'CREDITS_EMPTY', studentId: expect.any(String) }))
     })
 
     it('sends cancellation templates without a credit check', async () => {

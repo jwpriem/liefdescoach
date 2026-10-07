@@ -1,4 +1,4 @@
-export const usePushNotifications = () => {
+const useWebPush = () => {
   const config = useRuntimeConfig()
   const isSupported = ref(false)
   const isSubscribed = ref(false)
@@ -105,3 +105,38 @@ export const usePushNotifications = () => {
     checkSubscription,
   }
 }
+
+/** The same interface inside the iOS app, backed by native notifications. */
+const useNativePush = () => {
+  const isSupported = ref(true)
+  const isSubscribed = ref(false)
+  const permissionState = ref<NotificationPermission>('default')
+
+  async function checkSubscription() {
+    isSubscribed.value = await isPushEnabled()
+  }
+
+  async function subscribe(): Promise<boolean> {
+    isSubscribed.value = await enablePush()
+    return isSubscribed.value
+  }
+
+  async function unsubscribe(): Promise<boolean> {
+    await disablePush()
+    isSubscribed.value = false
+    return true
+  }
+
+  checkSubscription()
+
+  return {
+    isSupported,
+    isSubscribed,
+    permissionState,
+    subscribe,
+    unsubscribe,
+    checkSubscription,
+  }
+}
+
+export const usePushNotifications = () => useNativeApp().isNativeApp ? useNativePush() : useWebPush()

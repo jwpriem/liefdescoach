@@ -26,6 +26,7 @@ export const sessions = pgTable('sessions', {
   id: text('id').primaryKey(),
   userId: text('user_id').notNull().references(() => students.id, { onDelete: 'cascade' }),
   tokenHash: text('token_hash').notNull(),
+  kind: text('kind').notNull().default('web'), // 'web' (cookie) or 'app' (bearer token); a session is only valid on its own path
   expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 }, (table) => [
@@ -85,9 +86,10 @@ export const health = pgTable('health', {
 export const pushSubscriptions = pgTable('push_subscriptions', {
   id: text('id').primaryKey(),
   studentId: text('student_id').notNull().references(() => students.id, { onDelete: 'cascade' }),
-  endpoint: text('endpoint').notNull(),
-  p256dh: text('p256dh').notNull(),
-  auth: text('auth').notNull(),
+  platform: text('platform').notNull().default('web'), // 'web' (Web Push) or 'ios' (APNs)
+  endpoint: text('endpoint').notNull(), // Web Push endpoint URL, or the APNs device token for iOS
+  p256dh: text('p256dh'), // Web Push only
+  auth: text('auth'), // Web Push only
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 }, (table) => [
   index('push_subscriptions_student_id_idx').on(table.studentId),

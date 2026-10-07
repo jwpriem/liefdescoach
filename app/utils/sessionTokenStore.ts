@@ -2,7 +2,7 @@ import type { TokenStore } from './apiHooks'
 
 const KEY = 'rav_session_token'
 
-let cached: string | null | undefined
+let cached: string | null = null
 
 // Loaded on demand so the website bundle never ships the native plugin.
 // The plugin is handed to a callback instead of being returned: resolving a promise with
@@ -15,15 +15,19 @@ async function withStorage<T>(use: (plugin: typeof import('capacitor-secure-stor
 /** The iOS app's session token, kept in the Keychain. */
 export const sessionTokenStore: TokenStore = {
   async get() {
-    if (cached === undefined) {
-      // The plugin rejects when the key does not exist
-      cached = await withStorage((storage) => storage.get({ key: KEY }).then((result) => result.value, () => null))
-    }
-    return cached
+    if (cached) return cached
+    // The native plugin answers an unavailable Keychain with an empty key list, so "nothing there"
+    // is not remembered: it is read again next time. Only a token that was actually read is cached.
+    const token = await withStorage(async (storage) => {
+      const { value: keys } = await storage.keys()
+      return keys.includes(KEY) ? (await storage.get({ key: KEY })).value : null
+    })
+    if (token) cached = token
+    return token
   },
   async set(token) {
-    cached = token
     await withStorage((storage) => storage.set({ key: KEY, value: token }))
+    cached = token
   },
   async clear() {
     cached = null

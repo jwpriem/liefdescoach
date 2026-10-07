@@ -1,0 +1,11 @@
+{
+  "Simulator Target Bundle": "com.ravennah.app",
+  "aps": {
+    "alert": { "title": "Morgen yoga!", "body": "Je hebt morgen Hatha Yoga — tot dan!" },
+    "badge": 1,
+    "sound": "default",
+    "category": "LESSON_REMINDER"
+  },
+  "url": "/lessen",
+  "address": "Emmy van Leersumhof 24a, 3059 LT Rotterdam"
+}

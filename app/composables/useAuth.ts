@@ -61,6 +61,8 @@ export const useAuth = () => {
   }
 
   async function logout() {
+    // While still logged in: this phone stops receiving the account's notifications
+    if (useNativeApp().isNativeApp) await forgetPushDevice()
     await $fetch('/api/auth/logout', { method: 'POST' })
     user.value = null
     clearNuxtData(['my-credits', 'my-bookings', 'admin-users', 'admin-lessons', 'lessons', 'credit-summary'])
