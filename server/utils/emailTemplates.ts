@@ -403,3 +403,47 @@ export function verificationEmail(url: string): { subject: string; html: string;
         text: `Verifieer je e-mailadres\n\nKlik op deze link om je e-mailadres te bevestigen:\n${url}\n\nDeze link is 24 uur geldig.`,
     }
 }
+
+// ─── Account deleted: email to STUDENT ────────────────────────────────────────
+
+export function accountDeletedEmail(data: { name: string }): { subject: string; html: string; text: string } {
+    const safeName = escapeHtml(data.name)
+    const content = `
+    ${heading('Je account is verwijderd')}
+    ${subtext(`Hoi ${safeName}, je account bij Yoga Ravennah is verwijderd.`)}
+    <p style="font-size:14px;color:#374151;text-align:center;margin:20px 0;">Je persoonsgegevens zijn gewist en je komende boekingen zijn geannuleerd. Wil je later weer meedoen, dan kun je altijd een nieuw account aanmaken.</p>
+    <p style="font-size:13px;color:#9ca3af;text-align:center;margin-top:24px;">Heb je dit niet zelf gedaan? Neem dan contact op via info@ravennah.com.</p>`
+
+    return {
+        subject: 'Je account is verwijderd',
+        html: wrapInLayout('Account verwijderd', content),
+        text: `Hoi ${data.name},\n\nJe account bij Yoga Ravennah is verwijderd.\n\nJe persoonsgegevens zijn gewist en je komende boekingen zijn geannuleerd. Wil je later weer meedoen, dan kun je altijd een nieuw account aanmaken.\n\nHeb je dit niet zelf gedaan? Neem dan contact op via info@ravennah.com.\n\nYoga Ravennah`,
+    }
+}
+
+// ─── Account deleted: email to ADMIN (info@ravennah.com) ──────────────────────
+
+export function accountDeletedAdminEmail(data: {
+    name: string
+    email: string | null
+    cancelledLessons: string[]
+    unusedCredits: number
+}): { subject: string; html: string; text: string } {
+    const email = data.email ?? 'onbekend'
+    const lessons = data.cancelledLessons.length > 0 ? data.cancelledLessons.join('; ') : 'geen'
+    const content = `
+    ${heading('Account verwijderd')}
+    ${subtext(`${escapeHtml(data.name)} heeft het eigen account verwijderd.`)}
+    ${infoTable(
+        infoRow('Leerling', data.name) +
+        infoRow('E-mail', email) +
+        infoRow('Ongebruikte credits', String(data.unusedCredits)) +
+        infoRow('Geannuleerde lessen', lessons)
+    )}`
+
+    return {
+        subject: `Account verwijderd: ${data.name}`,
+        html: wrapInLayout('Account verwijderd', content),
+        text: `Account verwijderd\n\nLeerling: ${data.name}\nE-mail: ${email}\nOngebruikte credits: ${data.unusedCredits}\nGeannuleerde lessen: ${lessons}`,
+    }
+}

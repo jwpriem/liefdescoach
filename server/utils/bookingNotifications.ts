@@ -2,11 +2,9 @@ import { eq } from 'drizzle-orm'
 import { lessons, bookings, students } from '../database/schema'
 import { bookingChangePush, creditsEmptyPush } from './pushMessages'
 import { calendarLink, lessonTypeLabel } from '../../shared/lesson'
+import { MAIL_FROM, STUDIO_EMAIL } from './constants'
 
 export type BookingNotificationKind = 'confirmation' | 'cancellation'
-
-const FROM = 'Yoga Ravennah <info@ravennah.com>'
-const ADMIN_EMAIL = 'info@ravennah.com'
 
 function calendarLinks(lesson: { type: string | null }, lessonDate: Date) {
     return {
@@ -62,10 +60,10 @@ export async function sendBookingNotifications(
     await Promise.allSettled(
         [
             { label: 'student', to: student.email, ...studentMail },
-            { label: 'admin', to: ADMIN_EMAIL, ...adminMail },
+            { label: 'admin', to: STUDIO_EMAIL, ...adminMail },
         ].map(async (mail) => {
             try {
-                const result = await smtpTransport.sendMail({ from: FROM, to: mail.to, subject: mail.subject, html: mail.html, text: mail.text })
+                const result = await smtpTransport.sendMail({ from: MAIL_FROM, to: mail.to, subject: mail.subject, html: mail.html, text: mail.text })
                 console.log(`[${label}] ${mail.label} email sent:`, result?.accepted)
             } catch (err: any) {
                 console.error(`[${label}] ${mail.label} email failed:`, err?.message ?? err)
