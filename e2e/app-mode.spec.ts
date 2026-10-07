@@ -96,13 +96,19 @@ test('the admin screens of the app need no icon from a server', async ({ page })
     await expect(page.getByRole('option').first()).toBeVisible({ timeout: 10_000 })
     await page.keyboard.press('Escape')
 
-    // The archive is reached from the lessons tab (a cold start on it would bounce an admin to the home page)
+    // The archive is reached from the lessons tab
     await openAccountTab(page, 'Lessen')
     await page.getByRole('link', { name: 'Archief' }).click()
     await page.waitForURL('**/archief', { timeout: 10_000 })
     await page.waitForLoadState('networkidle')
     await page.getByRole('link', { name: 'Terug' }).click()
     await page.waitForURL('**/account?tab=admin-lessen', { timeout: 10_000 })
+
+    // A cold start on the archive (a link from outside) keeps the admin there
+    await page.goto('/archief')
+    await expect(page.getByRole('heading', { name: 'Lessen Archief' })).toBeVisible({ timeout: 15_000 })
+    await expect(page).toHaveURL(/\/archief$/)
+    await page.goto('/account')
     await expect(page.locator('nav').getByText('Logout', { exact: true })).toBeVisible({ timeout: 10_000 })
     await page.locator('nav').getByText('Logout', { exact: true }).click()
     // Logout drops the token: a cold start lands on the login page again

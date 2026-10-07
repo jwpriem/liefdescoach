@@ -6,13 +6,13 @@ const description = ref('Lessen archief');
 const ogImage = ref('https://www.ravennah.com/ravennah-social.jpg');
 const pageUrl = ref('https://www.ravennah.com/archief');
 
-const { isAdmin } = useAuth()
 const { cancelBooking, pending: isLoading } = useBookingActions()
 const dayjs = useDayjs()
 const { $rav } = useNuxtApp()
 
 definePageMeta({
-  layout: 'app'
+  layout: 'app',
+  middleware: ['auth', 'admin']
 })
 
 useHead({
@@ -29,10 +29,6 @@ useHead({
     { hid: "twitter:image", name: "twitter:image", content: ogImage },
   ]
 })
-
-if (!isAdmin.value) {
-  navigateTo('/')
-}
 
 const dateFrom = ref(dayjs().subtract(3, 'month').format('YYYY-MM-DD'))
 const dateTo = ref(dayjs().format('YYYY-MM-DD'))
