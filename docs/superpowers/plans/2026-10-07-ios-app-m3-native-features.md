@@ -1545,15 +1545,22 @@ On a real iPhone with a TestFlight build (haptics and universal links do not wor
 - [ ] Booking gives a tap; cancelling gives a different one.
 - [ ] A password-reset email opened in Mail opens the app on the reset page.
 - [ ] A link to `https://www.ravennah.com/tarieven` still opens Safari.
+- [ ] A password-reset link opens the app on the reset page when the app was force-quit.
+- [ ] A verification link works while logged out in the app.
+- [ ] A second reset link, opened while the reset page is already showing, uses the new link.
+- [ ] As an admin, a link to https://www.ravennah.com/archief opens the archive in the app.
+- [ ] A reset email requested from inside the app contains a link starting with https://www.ravennah.com.
+- [ ] On an iPhone or simulator running iOS 16, "Zet in agenda" opens a usable event sheet (see the note on the minimum iOS version).
 
 ## Release steps for the owner
 
 Nothing here needs a database change, so merging is safe at any time.
 
 1. Merge the pull request; the website deploys. After the deploy, `https://www.ravennah.com/.well-known/apple-app-site-association` must return JSON.
-2. In the Apple developer account, enable **Associated Domains** on the App ID `com.ravennah.app` (Xcode's automatic signing usually does this when it sees the entitlement).
-3. Build and upload a new TestFlight build (`yarn build:ios`, then archive in Xcode).
-4. Do the real-iPhone part of the checklist. iOS fetches the association file when the app is installed, so universal links only work for a build installed after step 1.
+2. Confirm the association file is live: `https://www.ravennah.com/.well-known/apple-app-site-association` returns JSON without a redirect, and `https://app-site-association.cdn-apple.com/a/v1/www.ravennah.com` shows the same content (Apple's copy can lag behind).
+3. In the Apple developer account, enable **Associated Domains** on the App ID `com.ravennah.app` (Xcode's automatic signing usually does this when it sees the entitlement).
+4. Build and upload a new TestFlight build (`yarn build:ios`, then archive in Xcode).
+5. Do the real-iPhone part of the checklist. iOS fetches the association file when the app is installed, so universal links only work for a build installed after step 1.
 
 ## Self-review notes
 
