@@ -107,6 +107,18 @@ describe('createNativeApiHooks', () => {
     expect(store.value).toBe('stored-token')
   })
 
+  it('clears the token after the account was deleted', async () => {
+    await hooks.onResponse({ request: `${API_BASE}/api/auth/delete-account`, response: response(200) } as any)
+
+    expect(store.value).toBeNull()
+  })
+
+  it('keeps the token when deleting the account was refused', async () => {
+    await hooks.onResponse({ request: `${API_BASE}/api/auth/delete-account`, response: response(400) } as any)
+
+    expect(store.value).toBe('stored-token')
+  })
+
   it('recognises API paths with a query string and without a base URL', async () => {
     const options = { headers: new Headers({ authorization: 'Bearer stored-token' }) }
     await hooks.onResponse({ request: '/api/auth/me?x=1', options, response: response(401) } as any)

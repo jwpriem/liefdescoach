@@ -1,7 +1,7 @@
 import { Page, expect } from '@playwright/test'
 
-/** Password login through the passkey-first login page. */
-export async function login(page: Page, email: string, password: string) {
+/** Fills in and sends the password form of the passkey-first login page, without waiting for what happens next. */
+export async function submitLogin(page: Page, email: string, password: string) {
     await page.goto('/login')
 
     const otherOptions = page.getByRole('button', { name: 'Andere manier gebruiken' })
@@ -13,6 +13,11 @@ export async function login(page: Page, email: string, password: string) {
     await page.fill('#email', email)
     await page.fill('#password', password)
     await page.getByRole('button', { name: 'Inloggen', exact: true }).click()
+}
+
+/** Password login through the passkey-first login page. */
+export async function login(page: Page, email: string, password: string) {
+    await submitLogin(page, email, password)
     await page.waitForURL('**/account', { timeout: 15_000 })
 }
 

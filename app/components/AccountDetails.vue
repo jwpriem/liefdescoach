@@ -181,6 +181,9 @@ const passkeyBusy = ref(false)
 const { isNativeApp } = useNativeApp()
 const showPasskeySettings = computed(() => !isNativeApp && !props.user && targetUser.value?.$id === loggedInUser.value?.$id)
 const hasPasskey = computed(() => passkeys.value.length > 0)
+// A member can delete their own account; an admin cannot, and nobody can do it for someone else from here
+const canDeleteAccount = computed(() => !props.user && !isAdmin.value)
+const showDeleteDialog = ref(false)
 
 onMounted(async () => {
   passkeysSupported.value = !!window.PublicKeyCredential
@@ -412,6 +415,9 @@ async function requestVerification() {
         <nuxt-link to="/privacy" class="underline underline-offset-2 hover:text-emerald-400 transition-colors">privacyverklaring</nuxt-link>
         hoe we met je gegevens omgaan.
       </p>
+      <div v-if="canDeleteAccount" class="mt-6 pt-4 border-t border-gray-800/50">
+        <UButton color="error" variant="ghost" size="sm" icon="i-lucide-trash-2" @click="showDeleteDialog = true">Account verwijderen</UButton>
+      </div>
     </div>
 
     <h2 class="text-2xl md:text-4xl uppercase font-black my-6">
@@ -568,4 +574,6 @@ async function requestVerification() {
       </div>
     </div>
   </div>
+
+  <AccountDeleteDialog v-if="showDeleteDialog" :credits="myCredits" @close="showDeleteDialog = false" />
 </template>

@@ -43,7 +43,11 @@ export function createNativeApiHooks(tokenStore: TokenStore, apiBase: string) {
       const token = response.headers.get(SESSION_TOKEN_HEADER)
       if (token) {
         await tokenStore.set(token)
-      } else if (path === '/api/auth/logout' || (path === '/api/auth/me' && response.status === 401 && new Headers(options?.headers).has('authorization'))) {
+      } else if (
+        path === '/api/auth/logout'
+        || (path === '/api/auth/delete-account' && response.ok)
+        || (path === '/api/auth/me' && response.status === 401 && new Headers(options?.headers).has('authorization'))
+      ) {
         // Other 401s (a wrong password, for example) say nothing about the stored session, and
         // neither does a 401 for a request that carried no token (the Keychain may just have been unreadable)
         await tokenStore.clear()
