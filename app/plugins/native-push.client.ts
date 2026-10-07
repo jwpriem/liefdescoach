@@ -8,7 +8,7 @@ export default defineNuxtPlugin(() => {
   if (!useNativeApp().isNativeApp) return
 
   const { user } = useAuth()
-  const router = useRouter()
+  const navigate = useNativeNavigation()
 
   // First ask (once, if the user never decided), then keep the logged-in user's device registered.
   // The watcher starts after the question is settled so a fresh "allow" registers straight away.
@@ -23,7 +23,7 @@ export default defineNuxtPlugin(() => {
     if ('maps' in destination) {
       window.open(`https://maps.apple.com/?daddr=${encodeURIComponent(destination.maps)}`, '_blank')
     } else {
-      void router.push(destination.path)
+      navigate(destination.path)
     }
   })
 })

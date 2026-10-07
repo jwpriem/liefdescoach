@@ -6,9 +6,9 @@ export default defineNuxtPlugin(() => {
   const { isNativeApp, apiBase } = useNativeApp()
   if (!isNativeApp) return
 
-  const router = useRouter()
+  const navigate = useNativeNavigation()
   void onAppLink((url) => {
     const path = appPathFromLink(url, apiBase)
-    if (path) void router.push(path)
+    if (path) navigate(path)
   })
 })
