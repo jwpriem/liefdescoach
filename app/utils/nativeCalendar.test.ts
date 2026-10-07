@@ -37,8 +37,11 @@ describe('addLessonToCalendar', () => {
     expect(calendar.createEventWithPrompt).toHaveBeenCalledWith(lessonCalendarEvent(lesson))
   })
 
-  it('reports failure instead of throwing where the calendar does not exist', async () => {
-    calendar.createEventWithPrompt.mockRejectedValue(new Error('Not implemented on web.'))
+  it('reports failure instead of throwing when the calendar cannot be opened', async () => {
+    const logged = vi.spyOn(console, 'error').mockImplementation(() => {})
+    calendar.createEventWithPrompt.mockRejectedValue(new Error('Calendar unavailable'))
     await expect(addLessonToCalendar(lesson)).resolves.toBe(false)
+    expect(logged).toHaveBeenCalled()
+    logged.mockRestore()
   })
 })

@@ -29,14 +29,18 @@ export const useBookingActions = () => {
         await refreshUser()
         await refreshCredits()
         if (isNativeApp) {
-          // The moment a reminder becomes useful: offer notifications, once
-          void offerPushAfterBooking()
-          toast.add({
-            id: 'calendar-offer',
-            title: 'Zet de les in je agenda',
-            icon: 'i-lucide-calendar-plus',
-            color: 'primary',
-            actions: [{ label: 'Zet in agenda', onClick: () => { void addLessonToCalendar(lesson) } }],
+          // First the notification question (only asked if never answered), then the calendar offer,
+          // so the offer is never hidden under the system's permission dialog
+          void offerPushAfterBooking().then(() => {
+            toast.add({
+              id: 'calendar-offer',
+              title: 'Zet de les in je agenda',
+              icon: 'i-lucide-calendar-plus',
+              color: 'primary',
+              duration: 15_000,
+              close: true,
+              actions: [{ label: 'Zet in agenda', onClick: () => { void addLessonToCalendar(lesson) } }],
+            })
           })
         }
       }

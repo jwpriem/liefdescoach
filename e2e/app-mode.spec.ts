@@ -39,11 +39,9 @@ test('the app logs in with a token, stays signed in, books a lesson and logs out
     await page.waitForURL('**/account', { timeout: 15_000 })
     await expect(accountNav(page)).toBeVisible({ timeout: 10_000 })
 
-    // After a booking the app offers to put the lesson in the calendar; the toast is short-lived,
-    // so start watching before the booking helper (which takes several seconds) returns
-    const calendarOffer = expect(page.getByText('Zet de les in je agenda', { exact: true })).toBeVisible({ timeout: 30_000 })
     await bookFirstAvailableLesson(page)
-    await calendarOffer
+    // After a booking the app offers to put the lesson in the calendar (the toast stays for 15 seconds)
+    await expect(page.getByText('Zet de les in je agenda', { exact: true })).toBeVisible({ timeout: 10_000 })
 
     // A link that leaves the member area opens the website instead of a 404
     await page.goto('/lessen')
