@@ -1,4 +1,5 @@
 import { defineNuxtPlugin } from '#app';
+import { calendarLink } from '~~/shared/lesson'
 
 export default defineNuxtPlugin(nuxtApp => {
     const dayjs = useDayjs()
@@ -77,12 +78,7 @@ export default defineNuxtPlugin(nuxtApp => {
             return dayjs().utc().isBefore(dayjs(new Date(lesson.date)).utc().subtract(1, 'day'))
         },
         getCalenderLink(stream: string, date: string, type: string = 'hatha yoga') {
-            const lessonType = type == 'peachy bum' ? 'Peachy Bum les' : 'Hatha Yoga les'
-            const address = type == 'peachy bum' ? 'Kosboulevard 5, 3059 XZ Rotterdam' : 'Emmy van Leersumhof 24a, 3059 LT Rotterdam'
-            const lessonDate = dayjs(new Date(date)).utc()
-            const startTime = lessonDate.format('H')
-            const startMinutes = lessonDate.format('mm')
-            return `https://calndr.link/d/event/?service=${stream}&start=${lessonDate.format('YYYY-MM-DD')}%20${startTime}:${startMinutes}&title=${lessonType}%20Ravennah&timezone=Europe/Amsterdam&location=${encodeURIComponent(address)}`
+            return calendarLink(stream, { type }, new Date(date))
         },
 
         formatPhoneNumber(input: string) {

@@ -11,6 +11,10 @@ const { handleBooking, cancelBooking, error: bookingError, pending: isLoading } 
 const { set: setOnBehalfOf } = useOnBehalfOf()
 const toast = useToast()
 const { $rav } = useNuxtApp()
+const { isNativeApp } = useNativeApp()
+// Decided after mount: it depends on the browser, which the server-rendered page cannot know
+const canShare = ref(false)
+onMounted(() => { canShare.value = canShareLesson(isNativeApp) })
 
 definePageMeta({
 })
@@ -214,6 +218,10 @@ async function book(lesson: any) {
               <!-- Not logged in -->
               <UButton v-else-if="!loggedInUser" block color="primary" variant="solid" to="/login">
                 Login om te boeken
+              </UButton>
+              <UButton v-if="canShare" block class="mt-2" color="neutral" variant="ghost" size="sm" icon="i-lucide-share-2"
+                @click="shareLesson(isNativeApp, $rav.getLessonTitle(lesson), $rav.formatDateInDutch(lesson.date, true))">
+                Deel deze les
               </UButton>
             </div>
           </div>

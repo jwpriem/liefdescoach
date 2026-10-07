@@ -9,7 +9,8 @@ const pageUrl = ref('https://www.ravennah.com/account');
 const { user: loggedInUser, isAdmin, pending: isLoading } = useAuth()
 
 definePageMeta({
-	layout: 'app'
+	layout: 'app',
+	middleware: ['auth']
 })
 
 useHead({
@@ -28,10 +29,6 @@ useHead({
 		{ hid: "twitter:image", name: "twitter:image", content: ogImage },
 	]
 })
-if (!loggedInUser.value) {
-	navigateTo('/login')
-}
-
 const showBookingModal = ref(false)
 provide('openBookingModal', () => showBookingModal.value = true)
 

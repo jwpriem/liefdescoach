@@ -2,6 +2,10 @@
 const route = useRoute()
 const { verifyEmail } = useAuth()
 const token = route.query.token as string
+
+// A newer link while the page is open re-creates it, so the new token is used
+definePageMeta({ key: (route) => route.fullPath })
+
 const verifying = ref(true)
 const success = ref(false)
 const error = ref('')

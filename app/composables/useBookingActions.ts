@@ -4,6 +4,8 @@ export const useBookingActions = () => {
   const { refresh: refreshCredits } = useCredits()
   const { call, error, pending } = useApiCall()
   const { isNativeApp } = useNativeApp()
+  const toast = useToast()
+  const addToCalendar = useLessonCalendar()
 
   async function handleBooking(lesson: any, options: { extraSpot?: boolean; source?: 'regular' | 'classpass' } = {}) {
     await call(async () => {
@@ -27,10 +29,24 @@ export const useBookingActions = () => {
       } else {
         await refreshUser()
         await refreshCredits()
-        // The moment a reminder becomes useful: offer notifications, once
-        if (isNativeApp) void offerPushAfterBooking()
+        if (isNativeApp) {
+          // First the notification question (only asked if never answered), then the calendar offer,
+          // so the offer is never hidden under the system's permission dialog
+          void offerPushAfterBooking().catch(() => {}).then(() => {
+            toast.add({
+              id: 'calendar-offer',
+              title: 'Zet de les in je agenda',
+              icon: 'i-lucide-calendar-plus',
+              color: 'primary',
+              duration: 15_000,
+              close: true,
+              actions: [{ label: 'Zet in agenda', onClick: () => { void addToCalendar(lesson) } }],
+            })
+          })
+        }
       }
     })
+    if (isNativeApp) void haptic(error.value ? 'error' : 'success')
   }
 
   async function cancelBooking(booking: any) {
@@ -54,6 +70,7 @@ export const useBookingActions = () => {
         await refreshCredits()
       }
     })
+    if (isNativeApp) void haptic(error.value ? 'error' : 'warning')
   }
 
   return { handleBooking, cancelBooking, error, pending }

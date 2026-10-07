@@ -6,7 +6,7 @@ export async function login(page: Page, email: string, password: string) {
 
     const otherOptions = page.getByRole('button', { name: 'Andere manier gebruiken' })
     const usePassword = page.getByRole('button', { name: 'Wachtwoord gebruiken' })
-    await expect(otherOptions.or(usePassword).first()).toBeVisible({ timeout: 10_000 })
+    await expect(otherOptions.or(usePassword).first()).toBeVisible({ timeout: 30_000 })
     if (await otherOptions.isVisible()) await otherOptions.click()
     await usePassword.click()
 

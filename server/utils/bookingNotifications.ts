@@ -1,25 +1,19 @@
 import { eq } from 'drizzle-orm'
 import { lessons, bookings, students } from '../database/schema'
 import { bookingChangePush, creditsEmptyPush } from './pushMessages'
+import { calendarLink, lessonTypeLabel } from '../../shared/lesson'
 
 export type BookingNotificationKind = 'confirmation' | 'cancellation'
 
 const FROM = 'Yoga Ravennah <info@ravennah.com>'
 const ADMIN_EMAIL = 'info@ravennah.com'
 
-function lessonTitle(lesson: { type: string | null; teacher: string | null }) {
-    if (lesson.type === 'guest lesson') return `Yin-Yang Yoga door gastdocent ${lesson.teacher}`
-    return lesson.type === 'peachy bum' ? 'Peachy Bum' : 'Hatha Yoga'
-}
-
 function calendarLinks(lesson: { type: string | null }, lessonDate: Date) {
-    const address = lesson.type === 'peachy bum'
-        ? 'Kosboulevard 5, 3059 XZ Rotterdam'
-        : 'Emmy van Leersumhof 24a, 3059 LT Rotterdam'
-    const title = lesson.type === 'peachy bum' ? 'Peachy Bum les' : 'Hatha Yoga les'
-    const link = (stream: string) =>
-        `https://calndr.link/d/event/?service=${stream}&start=${formatISODate(lessonDate)}%20${formatHour(lessonDate)}:${formatMinutes(lessonDate)}&title=${title}%20Ravennah&timezone=Europe/Amsterdam&location=${encodeURIComponent(address)}`
-    return { apple: link('apple'), google: link('gmail'), outlook: link('outlook') }
+    return {
+        apple: calendarLink('apple', lesson, lessonDate),
+        google: calendarLink('gmail', lesson, lessonDate),
+        outlook: calendarLink('outlook', lesson, lessonDate),
+    }
 }
 
 /**
@@ -48,7 +42,7 @@ export async function sendBookingNotifications(
     const isConfirmation = kind === 'confirmation'
     const label = isConfirmation ? 'BookingConfirmation' : 'BookingCancellation'
     const lessonDate = new Date(lesson.date!)
-    const lessonType = lessonTitle(lesson)
+    const lessonType = lessonTypeLabel(lesson)
     const formattedDate = formatLessonDate(lessonDate)
 
     const adminData = {

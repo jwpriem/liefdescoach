@@ -1,5 +1,6 @@
 import { fileURLToPath } from 'node:url'
 import { toIosPages } from './config/ios-target'
+import { NUXT_UI_DEFAULT_ICONS } from './config/ios-icons'
 
 // APP_TARGET=ios builds the client-only bundle that ships inside the iOS app (yarn build:ios)
 const iosTarget = process.env.APP_TARGET === 'ios'
@@ -198,6 +199,16 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
   icon: {
     mode: 'svg',
+    // The iOS app has no server to ask for icons: ship the ones the source uses inside the bundle
+    // Nuxt UI's own icons live in node_modules, which the scan skips, so they are listed; .ts files are scanned too
+    ...(iosTarget
+      ? {
+          clientBundle: {
+            scan: { globInclude: ['**/*.{vue,jsx,tsx,ts,md,mdc,mdx,yml,yaml}'] },
+            icons: NUXT_UI_DEFAULT_ICONS,
+          },
+        }
+      : {}),
   },
 
   vite: {
@@ -208,8 +219,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
   nitro: {
     ...(iosTarget ? { output: { dir: '.output-ios' } } : {}),
+    // iOS reads this file (served as JSON, no extension) to learn which links open the app
+    handlers: [
+      { route: '/.well-known/apple-app-site-association', handler: fileURLToPath(new URL('./server/handlers/appleAppSiteAssociation.ts', import.meta.url)) },
+    ],
     // Compress static assets with gzip + brotli — reduces bandwidth and memory transfer
-    compressPublicAssets: { gzip: true, brotli: true },
+    // The app's own file server never serves .gz/.br copies, so the iOS bundle skips them
+    compressPublicAssets: iosTarget ? false : { gzip: true, brotli: true },
     // Minify the server bundle to reduce startup memory footprint
     minify: true,
     // Use bounded LRU cache instead of unbounded in-memory default

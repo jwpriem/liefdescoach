@@ -33,11 +33,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     /// Observed as a notification because a scene-based app is not sent applicationDidBecomeActive.
     private func clearBadgeWhenActive() {
         NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: .main) { _ in
-            if #available(iOS 16.0, *) {
-                UNUserNotificationCenter.current().setBadgeCount(0)
-            } else {
-                UIApplication.shared.applicationIconBadgeNumber = 0
-            }
+            UNUserNotificationCenter.current().setBadgeCount(0)
         }
     }
 

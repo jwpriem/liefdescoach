@@ -2,7 +2,7 @@ export default defineNuxtRouteMiddleware(async () => {
   const { user, isAdmin, refresh } = useAuth()
 
   if (!user.value) {
-    await refresh()
+    await refresh({ dedupe: 'defer' })
   }
 
   if (!user.value) {

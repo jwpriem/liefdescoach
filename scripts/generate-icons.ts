@@ -37,14 +37,13 @@ console.log('Generated icon-512.png')
 const figure = { centerX: 49.5, centerY: 50, height: 96 }
 const iosAssetsDir = path.join(__dirname, '..', 'ios', 'App', 'App', 'Assets.xcassets')
 
-function figureSvg(options: { canvas: number, share: number, background: string, fill: string, defs?: string }) {
-  const { canvas, share, background, fill, defs = '' } = options
+function figureSvg(options: { canvas: number, share: number, background: string, fill: string }) {
+  const { canvas, share, background, fill } = options
   const scale = (canvas * share) / figure.height
   const x = canvas / 2 - figure.centerX * scale
   const y = canvas / 2 - figure.centerY * scale
   // The stroke thickens the hairlines so the figure stays legible at home-screen size
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${canvas} ${canvas}" width="${canvas}" height="${canvas}">
-  <defs>${defs}</defs>
   <rect width="${canvas}" height="${canvas}" fill="${background}"/>
   <g transform="translate(${x}, ${y}) scale(${scale})">
     <path fill="${fill}" stroke="${fill}" stroke-width="0.9" stroke-linejoin="round" d="${yogaPath}"/>
@@ -58,14 +57,11 @@ async function writeIosPng(svgSource: string, ...segments: string[]) {
   console.log(`Generated ${segments.join('/')}`)
 }
 
-const emeraldField = `<linearGradient id="field" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0" stop-color="#047857"/>
-    <stop offset="1" stop-color="#064e3b"/>
-  </linearGradient>`
-
 const appIcon = { canvas: 1024, share: 0.64 }
-await writeIosPng(figureSvg({ ...appIcon, background: 'url(#field)', fill: '#d1fae5', defs: emeraldField }), 'AppIcon.appiconset', 'AppIcon-512@2x.png')
-await writeIosPng(figureSvg({ ...appIcon, background: '#030712', fill: '#d1fae5' }), 'AppIcon.appiconset', 'AppIcon-dark.png')
+// The dark design is the app's icon in every appearance; the explicit dark entry stops iOS from darkening it further
+const darkIcon = figureSvg({ ...appIcon, background: '#030712', fill: '#d1fae5' })
+await writeIosPng(darkIcon, 'AppIcon.appiconset', 'AppIcon-512@2x.png')
+await writeIosPng(darkIcon, 'AppIcon.appiconset', 'AppIcon-dark.png')
 // Tinted icons are greyscale; iOS lays the member's chosen colour over them
 await writeIosPng(figureSvg({ ...appIcon, background: '#000000', fill: '#ffffff' }), 'AppIcon.appiconset', 'AppIcon-tinted.png')
 

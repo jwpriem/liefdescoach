@@ -159,4 +159,20 @@ describe('sendApns', () => {
 
     expect(apns.clientOptions).toHaveLength(1)
   })
+
+  it('tells Apple to stop trying once the notification has expired, and does not send the expiry as tap data', async () => {
+    const sendApns = await loadSender(CONFIGURED)
+    await sendApns('device-token', { title: 'T', body: 'B', url: '/lessen', expiresAt: 1_783_237_500 })
+
+    const { options } = apns.send.mock.calls[0][0]
+    expect(options.expiration).toBe(1_783_237_500)
+    expect(options.data).toEqual({ url: '/lessen' })
+  })
+
+  it('sets no expiry when the notification has none', async () => {
+    const sendApns = await loadSender(CONFIGURED)
+    await sendApns('device-token', { title: 'T', body: 'B' })
+
+    expect(apns.send.mock.calls[0][0].options).not.toHaveProperty('expiration')
+  })
 })

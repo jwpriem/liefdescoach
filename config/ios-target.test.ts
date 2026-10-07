@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { EXTERNAL_ROUTE_NAME, toIosPages } from './ios-target'
+import { EXTERNAL_ROUTE_NAME, isMemberPath, toIosPages } from './ios-target'
 
 const page = (path: string) => ({ path, file: `/pages${path}.vue` })
 
@@ -29,5 +29,19 @@ describe('toIosPages', () => {
 
   it('adds a catch-all route for links that leave the member area', () => {
     expect(result.at(-1)).toEqual({ name: EXTERNAL_ROUTE_NAME, path: '/:path(.*)*', file: '/abs/external.vue' })
+  })
+})
+
+describe('isMemberPath', () => {
+  it('accepts member paths and everything below them', () => {
+    for (const path of ['/login', '/lessen', '/account', '/archief', '/admin/users/abc', '/verify-email', '/reset-wachtwoord']) {
+      expect(isMemberPath(path), path).toBe(true)
+    }
+  })
+
+  it('rejects marketing paths, the root and look-alikes', () => {
+    for (const path of ['/', '/tarieven', '/eerste-les', '/lessen-info', '/accounts', '']) {
+      expect(isMemberPath(path), path).toBe(false)
+    }
   })
 })

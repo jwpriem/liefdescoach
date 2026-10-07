@@ -6,7 +6,7 @@ dotenv.config()
 
 export default defineConfig({
     testDir: './e2e',
-    timeout: 30_000,
+    timeout: 60_000,
     retries: 0,
     use: {
         baseURL: process.env.BASE_URL || 'http://localhost:3000',

@@ -841,6 +841,11 @@
   resolved "https://registry.yarnpkg.com/@bomb.sh/tab/-/tab-0.0.14.tgz#95e49c8d755c7ad4c09813d76cda89fb6acfae66"
   integrity sha512-cHMk2LI430MVoX1unTt9oK1iZzQS4CYDz97MSxKLNErW69T43Z2QLFTpdS/3jVOIKrIADWfuxQ+nQNJkNV7E4w==
 
+"@capacitor/app@^8.1.2":
+  version "8.1.2"
+  resolved "https://registry.yarnpkg.com/@capacitor/app/-/app-8.1.2.tgz#3f39b7b02d2277b3ef6f659747d0d6e56b60a1cc"
+  integrity sha512-uKBlsrXH0IdvUn69e/KKYbZ32A06pcrUdG8LWuZ/6y33YMXZXLEEdNSwl+jKS/SrsTWqnePs8EqSWaiQM3mUGA==
+
 "@capacitor/cli@^8.5.2":
   version "8.5.2"
   resolved "https://registry.yarnpkg.com/@capacitor/cli/-/cli-8.5.2.tgz#3508c35adb52eef7d54d3cf95bd3636c6d4aab7f"
@@ -872,6 +877,11 @@
   dependencies:
     tslib "^2.1.0"
 
+"@capacitor/haptics@^8.0.2":
+  version "8.0.2"
+  resolved "https://registry.yarnpkg.com/@capacitor/haptics/-/haptics-8.0.2.tgz#821d2687b81ff8855327273314d0d146476f069f"
+  integrity sha512-c2hZzRR5Fk1tbTvhG1jhh2XBAf3EhnIerMIb2sl7Mt41Gxx1fhBJFDa0/BI1IbY4loVepyyuqNC9820/GZuoWQ==
+
 "@capacitor/ios@^8.5.2":
   version "8.5.2"
   resolved "https://registry.yarnpkg.com/@capacitor/ios/-/ios-8.5.2.tgz#05f805fc6e4b0478156212f06a30862abae67a67"
@@ -881,6 +891,11 @@
   version "8.1.3"
   resolved "https://registry.yarnpkg.com/@capacitor/push-notifications/-/push-notifications-8.1.3.tgz#00ae8fbc8347e733d9292df025a5a95201cf8551"
   integrity sha512-UlOCTS3uiw8ZUJ1rkFKJgoqPADipHDNn0lq5mNRwtXALVxQXIeIoRd3iqpzC+962R2LpCRJRkCTjPX2OHK3tBA==
+
+"@capacitor/share@^8.0.3":
+  version "8.0.3"
+  resolved "https://registry.yarnpkg.com/@capacitor/share/-/share-8.0.3.tgz#5a104f5b9a82be3e0717341c65fe0068d243b7d1"
+  integrity sha512-gnvZBV1NPu2B8vd1UKncR56G15ueHd0aZLqgDov++t3SmTBG9Q0VrAZ1VnHn5stxlmglVaTb4RwopMgbpLzroA==
 
 "@capsizecss/metrics@^3.5.0":
   version "3.7.0"
@@ -943,6 +958,11 @@
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/@dxup/unimport/-/unimport-0.1.2.tgz#a08e4039efe41c50d9c36fbb39d9976b88eefa68"
   integrity sha512-/B8YJGPzaYq1NbsQmwgP8EZqg40NpTw4ZB3suuI0TplbxKHeK94jeaawLmVhCv+YwUnOpiWEz9U6SeThku/8JQ==
+
+"@ebarooni/capacitor-calendar@^8.8.0":
+  version "8.8.0"
+  resolved "https://registry.yarnpkg.com/@ebarooni/capacitor-calendar/-/capacitor-calendar-8.8.0.tgz#595cf02fbcf456a425ec8d04963a5de63a766c07"
+  integrity sha512-Cas7G0F2GpQKbnGCT6/k1IKKS4AX9egHERwBtvQ9WuXxtOs/Saw3YInf4LMs5RrWp9taj2krlLEHu+KReBk3Uw==
 
 "@emnapi/core@^1.7.1", "@emnapi/core@^1.8.1":
   version "1.9.1"
@@ -1507,6 +1527,13 @@
   version "1.1.28"
   resolved "https://registry.yarnpkg.com/@hexagon/base64/-/base64-1.1.28.tgz#7d306a97f1423829be5b27c9d388fe50e3099d48"
   integrity sha512-lhqDEAvWixy3bZ+UOYbPwUbBkwBq5C1LAJ/xPC8Oi+lL54oyakv/npbA0aU2hgCsx/1NUd4IBvV03+aUBWxerw==
+
+"@iconify-json/heroicons@^1.2.3":
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/@iconify-json/heroicons/-/heroicons-1.2.3.tgz#041fe0d689535dddc51e97c8b692cdff792ac4b2"
+  integrity sha512-n+vmCEgTesRsOpp5AB5ILB6srsgsYK+bieoQBNlafvoEhjVXLq8nIGN4B0v/s4DUfa0dOrjwE/cKJgIKdJXOEg==
+  dependencies:
+    "@iconify/types" "*"
 
 "@iconify-json/lucide@^1.2.27":
   version "1.2.98"
