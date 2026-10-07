@@ -21,7 +21,13 @@ export type PushCategory = typeof PUSH_CATEGORY[keyof typeof PUSH_CATEGORY]
 /** What a tap needs to know to pick a destination. */
 export type PushTapData = { url?: string; address?: string; studentId?: string }
 
-export type PushPayload = PushTapData & { title: string; body: string; category?: PushCategory }
+export type PushPayload = PushTapData & {
+  title: string
+  body: string
+  category?: PushCategory
+  /** Unix seconds after which delivering the notification is pointless (a reminder for a lesson that has started). */
+  expiresAt?: number
+}
 
 /** Where a tap on a notification or one of its buttons leads: an in-app path, or an address for Maps. */
 export function pushDestination(actionId: string, data: PushTapData): { path: string } | { maps: string } {

@@ -47,7 +47,7 @@ export async function sendApns(deviceToken: string, payload: PushPayload): Promi
     return 'failed'
   }
 
-  const { title, body, category, ...data } = payload
+  const { title, body, category, expiresAt, ...data } = payload
   let timer: ReturnType<typeof setTimeout> | undefined
   try {
     const timeout = new Promise<never>((_, reject) => {
@@ -59,6 +59,7 @@ export async function sendApns(deviceToken: string, payload: PushPayload): Promi
         badge: 1,
         sound: 'default',
         ...(category ? { category } : {}),
+        ...(expiresAt ? { expiration: expiresAt } : {}),
         data,
       })),
       timeout,

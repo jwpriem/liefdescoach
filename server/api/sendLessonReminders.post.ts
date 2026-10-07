@@ -100,7 +100,7 @@ export default defineEventHandler(async (event) => {
             // Send push reminder (if opted in)
             if (student.pushNotifications) {
                 try {
-                    const sent = await sendPushToStudent(student.studentId, lessonReminderPush(lessonType, address))
+                    const sent = await sendPushToStudent(student.studentId, lessonReminderPush(lessonType, address, lessonDate))
                     pushSent += sent
                     console.log(`[LessonReminder] Push sent to ${student.studentEmail} (${sent} devices)`)
                 } catch (err: any) {

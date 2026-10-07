@@ -54,7 +54,9 @@ const pushEnabled = computed({
       toast.add({
         title: value ? 'Pushberichten inschakelen mislukt' : 'Pushberichten uitschakelen mislukt',
         description: value
-          ? 'Controleer of je meldingen hebt toegestaan in je browser.'
+          ? (isNativeApp
+              ? 'Sta meldingen toe in Instellingen > Meldingen > Yoga Ravennah.'
+              : 'Controleer of je meldingen hebt toegestaan in je browser.')
           : 'Probeer het later opnieuw.',
         color: 'error',
       })

@@ -1,14 +1,17 @@
 import { PUSH_CATEGORY, type PushPayload } from '../../shared/push'
+import { lessonStartInstant } from '../../shared/lesson'
 
 /** The studio's notifications. Each carries the category whose buttons fit it and the data those buttons need. */
 
-export function lessonReminderPush(lessonType: string, address: string): PushPayload {
+export function lessonReminderPush(lessonType: string, address: string, lessonDate: Date): PushPayload {
   return {
     title: 'Morgen yoga!',
     body: `Je hebt morgen ${lessonType} — tot dan!`,
     url: '/lessen',
     category: PUSH_CATEGORY.lessonReminder,
     address,
+    // A phone that was off should not show "tomorrow" after the lesson has begun
+    expiresAt: Math.floor(lessonStartInstant(lessonDate).getTime() / 1000),
   }
 }
 
