@@ -24,7 +24,9 @@ export async function shareLesson(isNativeApp: boolean, title: string, when: str
     } else {
       await navigator.share(content)
     }
-  } catch {
-    // The user closed the sheet, or sharing is not available
+  } catch (err: any) {
+    // Closing the sheet is not an error; anything else is worth a log line
+    const cancelled = err?.name === 'AbortError' || /cancel/i.test(err?.message ?? '')
+    if (!cancelled) console.error('[Share] Sharing the lesson failed:', err)
   }
 }

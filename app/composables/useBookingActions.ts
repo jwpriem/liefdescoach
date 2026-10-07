@@ -5,6 +5,7 @@ export const useBookingActions = () => {
   const { call, error, pending } = useApiCall()
   const { isNativeApp } = useNativeApp()
   const toast = useToast()
+  const addToCalendar = useLessonCalendar()
 
   async function handleBooking(lesson: any, options: { extraSpot?: boolean; source?: 'regular' | 'classpass' } = {}) {
     await call(async () => {
@@ -39,7 +40,7 @@ export const useBookingActions = () => {
               color: 'primary',
               duration: 15_000,
               close: true,
-              actions: [{ label: 'Zet in agenda', onClick: () => { void addLessonToCalendar(lesson) } }],
+              actions: [{ label: 'Zet in agenda', onClick: () => { void addToCalendar(lesson) } }],
             })
           })
         }

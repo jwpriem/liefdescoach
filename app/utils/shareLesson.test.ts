@@ -66,4 +66,22 @@ describe('shareLesson', () => {
     plugin.share.mockRejectedValue(new Error('Share canceled'))
     await expect(shareLesson(true, 'x', 'y')).resolves.toBeUndefined()
   })
+
+  it('logs nothing when the user cancels', async () => {
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {})
+    plugin.share.mockRejectedValueOnce(new Error('Share canceled'))
+    await shareLesson(true, 'x', 'y')
+    plugin.share.mockRejectedValueOnce(Object.assign(new Error('x'), { name: 'AbortError' }))
+    await shareLesson(true, 'x', 'y')
+    expect(log).not.toHaveBeenCalled()
+    log.mockRestore()
+  })
+
+  it('logs another error once and still resolves', async () => {
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {})
+    plugin.share.mockRejectedValue(new Error('Plugin is not implemented'))
+    await expect(shareLesson(true, 'x', 'y')).resolves.toBeUndefined()
+    expect(log).toHaveBeenCalledTimes(1)
+    log.mockRestore()
+  })
 })
