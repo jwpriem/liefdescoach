@@ -41,6 +41,7 @@ export const useBookingActions = () => {
         }
       }
     })
+    if (isNativeApp) void haptic(error.value ? 'error' : 'success')
   }
 
   async function cancelBooking(booking: any) {
@@ -64,6 +65,7 @@ export const useBookingActions = () => {
         await refreshCredits()
       }
     })
+    if (isNativeApp) void haptic(error.value ? 'error' : 'warning')
   }
 
   return { handleBooking, cancelBooking, error, pending }
