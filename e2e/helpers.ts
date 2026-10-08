@@ -28,7 +28,7 @@ export async function openAccountTab(page: Page, label: string) {
 
 export async function logout(page: Page) {
     await page.locator('nav').getByText('Logout', { exact: true }).click()
-    await page.waitForURL('**/', { timeout: 10_000 })
+    await page.waitForURL('**/login', { timeout: 10_000 })
 }
 
 /** On /account: opens the booking modal and books the first available lesson. Leaves the modal open. */

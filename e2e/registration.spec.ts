@@ -176,7 +176,7 @@ test.describe('Registration flow', () => {
 
         // Logout to clean up session
         await page.locator('nav').getByText('Logout', { exact: true }).click()
-        await page.waitForURL('**/', { timeout: 10_000 })
+        await page.waitForURL('**/login', { timeout: 10_000 })
     })
 
     test('should register minimum required fields only', async ({ page }) => {
@@ -222,7 +222,7 @@ test.describe('Registration flow', () => {
 
         // Logout
         await page.locator('nav').getByText('Logout', { exact: true }).click()
-        await page.waitForURL('**/', { timeout: 10_000 })
+        await page.waitForURL('**/login', { timeout: 10_000 })
     })
 
     test('a member can delete their own account, and the email address is free again', async ({ page }) => {
@@ -249,8 +249,8 @@ test.describe('Registration flow', () => {
         await expect(confirm).toBeEnabled()
         await confirm.click()
 
-        // Logged out, back on the home page
-        await page.waitForURL((url) => url.pathname === '/', { timeout: 15_000 })
+        // Logged out, on the login form
+        await page.waitForURL('**/login', { timeout: 15_000 })
         await expect(page.locator('nav').getByRole('link', { name: 'Login' })).toBeVisible({ timeout: 10_000 })
 
         // The old password no longer works
