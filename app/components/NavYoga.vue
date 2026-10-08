@@ -11,7 +11,7 @@ const toggle = () => {
 const logout = async () => {
 	try {
 		await authLogout();
-		await router.push('/');
+		await router.push('/login');
 	} catch (error) {
 		// Handle the error
 	}

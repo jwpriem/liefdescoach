@@ -20,7 +20,7 @@ async function remove() {
   await call(() => deleteAccount(typed.value))
   if (error.value) return
   toast.add({ title: 'Je account is verwijderd', color: 'primary' })
-  await navigateTo('/')
+  await navigateTo('/login')
 }
 
 function onKeydown(event: KeyboardEvent) {
