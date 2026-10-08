@@ -6,7 +6,7 @@ Related: [App Store listing text](app-store-listing.md), [privacy label answers]
 
 ## 0. Decide before the first submission
 
-- [ ] **iPhone only, or iPhone and iPad?** The project currently targets both (`TARGETED_DEVICE_FAMILY = "1,2"`). With iPad included, App Store Connect requires 13-inch iPad screenshots and Apple may review the app on an iPad. iPad support cannot be removed after the first release. To ship iPhone only: in Xcode, target App → General → Supported Destinations, remove iPad (and Mac / Vision if listed), and commit the change.
+- [x] **iPhone only, or iPhone and iPad?** Decided: iPhone only (`TARGETED_DEVICE_FAMILY = 1`), so App Store Connect asks for no iPad screenshots. An iPad can still install the app and runs it as an enlarged iPhone app.
 - [ ] **Reviewer's booking.** Decided: the reviewer account is a normal member account; a booking it makes takes one real spot until an admin removes the attendee.
 
 ## 1. The live site is ready
@@ -62,7 +62,7 @@ Account deletion
 
 - [ ] App record: name, subtitle, description, keywords, promotional text and URLs from [app-store-listing.md](app-store-listing.md).
 - [ ] Category: Health & Fitness. Price: free. Availability: at least the Netherlands.
-- [ ] Screenshots: 6.9-inch iPhone is required; 13-inch iPad too if iPad stays supported (see step 0). Not prepared in this repository yet.
+- [ ] Screenshots: 6.9-inch iPhone is required. Not prepared in this repository yet.
 - [ ] App Privacy: answer the questionnaire from [app-privacy-labels.md](app-privacy-labels.md). Privacy policy URL: https://www.ravennah.com/privacy.
 - [ ] Age rating questionnaire: no restricted content.
 - [ ] EU Digital Services Act: declare trader status and supply the contact details Apple shows on the product page. Yoga Ravennah has no Chamber of Commerce number; the address is the studio (Emmy van Leersumhof 24a, 3059 LT Rotterdam) and the contact address info@ravennah.com.
