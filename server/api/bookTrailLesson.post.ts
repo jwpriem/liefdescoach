@@ -17,6 +17,8 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 400, statusMessage: 'lessonId is verplicht' })
     }
 
+    const email = body.email.trim().toLowerCase()
+
     // Fetch lesson to get its capacity
     const lesson = await getLessonWithBookings(body.lessonId)
     if (!lesson) {
@@ -29,13 +31,24 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 409, statusMessage: 'Les is vol' })
     }
 
-    // Create temp student
-    const studentId = generateId()
-    await db.insert(students).values({
-        id: studentId,
-        name: body.name + ' (Proefles)',
-        email: body.email,
-    })
+    // Check if student with this email already exists to prevent duplicate email DB constraint errors
+    let studentId: string
+    const existing = await db
+        .select({ id: students.id })
+        .from(students)
+        .where(eq(students.email, email))
+        .limit(1)
+
+    if (existing.length > 0) {
+        studentId = existing[0].id
+    } else {
+        studentId = generateId()
+        await db.insert(students).values({
+            id: studentId,
+            name: body.name.trim() + ' (Proefles)',
+            email,
+        })
+    }
 
     // Create booking
     const bookingId = generateId()
