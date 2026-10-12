@@ -51,14 +51,33 @@ export default defineEventHandler(async (event) => {
         requestsByIP.set(ip, { count: 1, firstRequest: now });
     }
 
+    if (!body.data || typeof body.data !== 'object') {
+        throw createError({ statusCode: 400, statusMessage: 'Ongeldige gegevens' })
+    }
+
     let email: { subject: string; html: string; text: string }
     let to = 'info@ravennah.com'
 
     switch (body.type) {
         case 'contact':
+            if (
+                typeof body.data.name !== 'string' ||
+                typeof body.data.email !== 'string' ||
+                typeof body.data.message !== 'string'
+            ) {
+                throw createError({ statusCode: 400, statusMessage: 'Naam, e-mail en bericht zijn verplicht' })
+            }
             email = contactEmail(body.data)
             break
         case 'new-user':
+            if (
+                typeof body.data.name !== 'string' ||
+                typeof body.data.email !== 'string' ||
+                typeof body.data.date !== 'string' ||
+                (body.data.phone !== undefined && typeof body.data.phone !== 'string')
+            ) {
+                throw createError({ statusCode: 400, statusMessage: 'Ongeldige gegevens voor nieuwe gebruiker' })
+            }
             email = newUserEmail(body.data)
             break
         default:
