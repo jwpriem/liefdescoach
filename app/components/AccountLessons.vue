@@ -141,8 +141,7 @@ const { sortStudents, getLessonBookingsWithLabels } = useLessonBookings();
 
 // ⚡ Bolt: Prevent array recreation to preserve reactivity, move expensive transforms to a metric map.
 const futureLessons = computed(() => {
-    const nowTime = Date.now();
-    return lessons.value.filter((l: any) => new Date(l.date).getTime() > nowTime);
+    return lessons.value.filter((l: any) => $rav.isFutureBooking(l.date));
 });
 
 // ⚡ Bolt: Cache derived metrics to avoid O(N) array filtering in the template on every render
