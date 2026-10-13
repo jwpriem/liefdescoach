@@ -54,11 +54,21 @@ export default defineEventHandler(async (event) => {
     let email: { subject: string; html: string; text: string }
     let to = 'info@ravennah.com'
 
+    if (!body?.data || typeof body.data !== 'object' || Array.isArray(body.data)) {
+        throw createError({ statusCode: 400, statusMessage: 'Ongeldige data in verzoek' })
+    }
+
     switch (body.type) {
         case 'contact':
+            if (typeof body.data.name !== 'string' || typeof body.data.email !== 'string' || typeof body.data.message !== 'string') {
+                throw createError({ statusCode: 400, statusMessage: 'Ongeldige contactgegevens' })
+            }
             email = contactEmail(body.data)
             break
         case 'new-user':
+            if (typeof body.data.name !== 'string' || typeof body.data.email !== 'string' || typeof body.data.date !== 'string' || (body.data.phone !== undefined && typeof body.data.phone !== 'string')) {
+                throw createError({ statusCode: 400, statusMessage: 'Ongeldige gebruikersgegevens' })
+            }
             email = newUserEmail(body.data)
             break
         default:
