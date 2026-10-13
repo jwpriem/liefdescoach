@@ -75,7 +75,9 @@ export default defineNuxtPlugin(nuxtApp => {
             return new Date(lessonDate).getTime() > Date.now()
         },
         checkCancelPeriod(lesson: any) {
-            return dayjs().utc().isBefore(dayjs(new Date(lesson.date)).utc().subtract(1, 'day'))
+            // ⚡ Bolt: Replace expensive dayjs object instantiations with native timestamp comparison (24h = 86,400,000 ms)
+            const lessonTime = new Date(lesson.date).getTime()
+            return Date.now() < lessonTime - 86400000
         },
         getCalenderLink(stream: string, date: string, type: string = 'hatha yoga') {
             return calendarLink(stream, { type }, new Date(date))
