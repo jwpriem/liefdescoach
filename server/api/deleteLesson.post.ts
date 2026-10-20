@@ -1,9 +1,16 @@
+import { createError } from 'h3'
 import { eq, inArray } from 'drizzle-orm'
 import { lessons, bookings, credits } from '../database/schema'
 
 export default defineEventHandler(async (event) => {
   await requireAdmin(event)
-  const { lessonId } = await readBody(event)
+
+  const body = await readBody(event)
+  if (!body?.lessonId || typeof body.lessonId !== 'string') {
+    throw createError({ statusCode: 400, statusMessage: 'lessonId is verplicht' })
+  }
+
+  const { lessonId } = body
 
   // Find all bookings for this lesson
   const lessonBookings = await db
