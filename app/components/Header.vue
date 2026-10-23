@@ -20,7 +20,9 @@ const props = defineProps({
         <div class="w-full md:w-1/2 space-y-6">
           <slot/>
         </div>
-        <img :src="image" :alt="alt" class="h-64 mt-12 md:mt-0 md:h-full rounded-3xl w-full md:w-1/2 shadow-xl object-cover"
-             :class="alignment" />
+        <slot name="visual">
+          <img :src="image" :alt="alt" class="h-64 mt-12 md:mt-0 md:h-full rounded-3xl w-full md:w-1/2 shadow-xl object-cover"
+               :class="alignment" />
+        </slot>
     </div>
 </template>

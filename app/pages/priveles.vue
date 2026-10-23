@@ -42,7 +42,7 @@ useLocalBusinessSchema()
                 besloten setting? Een privéles is volledig afgestemd op jouw wensen, tempo en doelen.
             </p>
             <div class="flex flex-wrap gap-3 pt-2">
-                <nuxt-link class="emerald button" to="/contact">Plan een privéles</nuxt-link>
+                <nuxt-link class="emerald button" to="/aanvraag?type=priveles">Plan een privéles</nuxt-link>
                 <nuxt-link class="emerald-outlined button" to="/tarieven">Tarieven</nuxt-link>
             </div>
         </Header>
@@ -150,7 +150,7 @@ useLocalBusinessSchema()
                         en het aantal deelnemers.
                     </p>
                     <div class="flex flex-wrap justify-center gap-3">
-                        <nuxt-link class="emerald button" to="/contact">Stuur een bericht</nuxt-link>
+                        <nuxt-link class="emerald button" to="/aanvraag?type=priveles">Vraag een privéles aan</nuxt-link>
                         <nuxt-link class="emerald-outlined button" to="/tarieven">Bekijk tarieven</nuxt-link>
                     </div>
                 </div>

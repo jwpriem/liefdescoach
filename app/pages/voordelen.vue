@@ -52,8 +52,8 @@ useLocalBusinessSchema();
                 als mentaal.
             </p>
             <div class="flex justify-start items-center gap-x-3 pt-2">
-                <nuxt-link class="emerald button" to="/lessen"
-                    >Bekijk het rooster</nuxt-link
+                <nuxt-link class="emerald button" to="/aanvraag"
+                    >Vraag een sessie aan</nuxt-link
                 >
                 <nuxt-link class="emerald-outlined button" to="/tarieven"
                     >Tarieven</nuxt-link
@@ -433,7 +433,7 @@ useLocalBusinessSchema();
                     <p
                         class="text-xl text-emerald-900 font-light leading-relaxed"
                     >
-                        In de kleine groepslessen is er ruimte voor persoonlijke
+                        In elke sessie is er ruimte voor persoonlijke
                         aandacht. Of je nu stijf bent als een plank of al een
                         tijdje sport — iedereen is welkom en niemand wordt
                         beoordeeld.
@@ -472,8 +472,8 @@ useLocalBusinessSchema();
                             je na één les al beter kunt voelen.
                         </p>
                         <div class="flex flex-wrap gap-3">
-                            <nuxt-link class="emerald button" to="/lessen"
-                                >Bekijk het rooster</nuxt-link
+                            <nuxt-link class="emerald button" to="/aanvraag"
+                                >Vraag een sessie aan</nuxt-link
                             >
                             <nuxt-link
                                 class="emerald-outlined button"

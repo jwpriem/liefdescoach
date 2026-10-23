@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const title = ref("Yoga Ravennah | Over mij");
 const description = ref(
-    "Ik ben Ravennah Matser, yoga-instructeur in Rotterdam Nesselande. Ik geef laagdrempelige hatha yogalessen in kleine groepen, met veel ruimte voor jouw eigen tempo en persoonlijke groei.",
+    "Ik ben Ravennah Matser, yoga-instructeur in Rotterdam Nesselande. Ik geef yogasessies op maat voor vrijgezellenfeesten, bedrijven, teamuitjes, workshops en events — in mijn studio of op locatie.",
 );
 const ogImage = ref("https://www.ravennah.com/ravennah-social.jpg");
 const pageUrl = ref("https://www.ravennah.com/over");
@@ -48,12 +48,13 @@ useLocalBusinessSchema();
             <p class="intro">
                 Welkom! Ik ben Ravennah Matser — yoga-instructeur, moeder van
                 twee, en iemand die gelooft dat iedereen recht heeft op even
-                stilstaan. Ik geef hatha yogalessen in Rotterdam Nesselande voor
-                mensen die willen bewegen, ademen en zichzelf terugvinden.
+                stilstaan. Ik geef yogasessies op maat voor groepen die samen
+                willen bewegen, ademen en even helemaal tot rust komen — in mijn
+                studio in Rotterdam Nesselande of op jullie eigen locatie.
             </p>
             <div class="flex justify-start items-center gap-x-3 pt-2">
-                <nuxt-link class="emerald button" to="/lessen"
-                    >Bekijk het rooster</nuxt-link
+                <nuxt-link class="emerald button" to="/aanvraag"
+                    >Vraag een sessie aan</nuxt-link
                 >
                 <nuxt-link class="emerald-outlined button" to="/contact"
                     >Neem contact op</nuxt-link
@@ -137,20 +138,19 @@ useLocalBusinessSchema();
                         <p
                             class="text-lg text-emerald-100/80 font-light leading-relaxed"
                         >
-                            Ik werk bewust in kleine groepen zodat er ruimte is
-                            voor persoonlijke aandacht. Ik zie wie er voor me
-                            zit, wat iemand nodig heeft en pas de les daarop
-                            aan. Geen standaard script, maar een echte
+                            Elke sessie stem ik af op de groep. Ik zie wie er
+                            voor me zit, wat iemand nodig heeft en pas de les
+                            daarop aan. Geen standaard script, maar een echte
                             verbinding met de groep.
                         </p>
                         <ul class="space-y-3">
                             <li
                                 v-for="item in [
-                                    'Kleine groepen voor persoonlijke aandacht',
+                                    'Persoonlijke aandacht, wat de groepsgrootte ook is',
                                     'Toegankelijk voor alle niveaus',
                                     'Veilige, vertrouwde sfeer zonder taboes',
                                     'Focus op adem, beweging én bewustzijn',
-                                    'Lessen in Rotterdam Nesselande',
+                                    'In de studio in Rotterdam Nesselande of op locatie',
                                 ]"
                                 :key="item"
                                 class="flex items-start space-x-3"
@@ -316,13 +316,13 @@ useLocalBusinessSchema();
                             aanwezig."
                         </blockquote>
                         <p class="intro">
-                            Benieuwd of mijn lessen iets voor jou zijn? Kom
-                            gerust een keer langs voor een proefles. Je bent
-                            altijd welkom.
+                            Benieuwd wat ik voor jullie feest, team of event
+                            kan betekenen? Stuur een aanvraag of een bericht,
+                            dan denk ik graag met je mee.
                         </p>
                         <div class="flex flex-wrap gap-3">
-                            <nuxt-link class="emerald button" to="/lessen"
-                                >Bekijk het rooster</nuxt-link
+                            <nuxt-link class="emerald button" to="/aanvraag"
+                                >Vraag een sessie aan</nuxt-link
                             >
                             <nuxt-link
                                 class="emerald-outlined button"

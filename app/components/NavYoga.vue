@@ -1,8 +1,25 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 const { user: loggedInUser, logout: authLogout } = useAuth()
 const router = useRouter()
 const navOpen = ref(false);
 const { isNativeApp } = useNativeApp()
+
+// Public pages before the offer menu, and after it; the app only shows the member pages
+const LEADING_LINKS = [{ label: 'Home', to: '/' }]
+const TRAILING_LINKS = [
+	{ label: 'Over mij', to: '/over' },
+	{ label: 'Tarieven', to: '/tarieven' },
+	{ label: 'Contact', to: '/contact' },
+]
+const offerItems = OFFER_LINKS.map((offer) => ({ label: offer.name, icon: offer.icon, to: offer.path }))
+
+// The schedule is for members: always in the app, on the website once logged in
+const showSchedule = computed(() => isNativeApp.value || !!loggedInUser.value)
+
+const mobileLinks = computed(() => [
+	...(isNativeApp.value ? [] : [...LEADING_LINKS, { label: 'Aanbod', to: '/#aanbod' }, ...TRAILING_LINKS, { label: 'Sessie aanvragen', to: '/aanvraag' }]),
+	...(showSchedule.value ? [{ label: 'Les schema', to: '/lessen' }] : []),
+])
 
 const toggle = () => {
 	navOpen.value = !navOpen.value;
@@ -38,51 +55,12 @@ const logout = async () => {
 			</button>
 			<div :class="navOpen ? 'translate-x-0' : 'translate-x-full'"
 				class="transition-transform duration-300 ease-in-out fixed top-0 left-0 bg-gray-950 min-h-screen flex justify-start items-center text-center z-40 w-screen">
-				<ul class="w-full space-y-8">
-					<template v-if="!isNativeApp">
-					<li>
-						<nuxt-link class="mobile-nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded-md px-2" to="/" @click="toggle">
-							Home
+				<ul class="w-full space-y-6">
+					<li v-for="link in mobileLinks" :key="link.to">
+						<nuxt-link class="mobile-nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded-md px-2" :to="link.to" @click="toggle">
+							{{ link.label }}
 						</nuxt-link>
 					</li>
-					<li>
-						<nuxt-link class="mobile-nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded-md px-2" to="/over" @click="toggle">
-							Over mij
-						</nuxt-link>
-					</li>
-					<li>
-						<nuxt-link class="mobile-nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded-md px-2" to="/voordelen" @click="toggle">
-							Voordelen
-						</nuxt-link>
-					</li>
-					</template>
-					<li>
-						<nuxt-link class="mobile-nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded-md px-2" to="/lessen" @click="toggle">
-							Les schema
-						</nuxt-link>
-					</li>
-					<template v-if="!isNativeApp">
-					<li>
-						<nuxt-link class="mobile-nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded-md px-2" to="/priveles" @click="toggle">
-							Priveles
-						</nuxt-link>
-					</li>
-					<li>
-						<nuxt-link class="mobile-nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded-md px-2" to="/hatha-yoga" @click="toggle">
-							Hatha Yoga
-						</nuxt-link>
-					</li>
-					<li>
-						<nuxt-link class="mobile-nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded-md px-2" to="/tarieven" @click="toggle">
-							Tarieven
-						</nuxt-link>
-					</li>
-					<li>
-						<nuxt-link class="mobile-nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded-md px-2" to="/contact" @click="toggle">
-							Contact
-						</nuxt-link>
-					</li>
-					</template>
 					<li v-if="loggedInUser">
 						<nuxt-link class="mobile-nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded-md px-2" to="/account" @click="toggle">
 							{{ loggedInUser.name }}
@@ -109,49 +87,30 @@ const logout = async () => {
 					</nuxt-link>
 				</li>
 				<template v-if="!isNativeApp">
-				<li>
-					<nuxt-link class="nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-md px-1" to="/">
-						Home
+				<li v-for="link in LEADING_LINKS" :key="link.to">
+					<nuxt-link class="nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-md px-1" :to="link.to">
+						{{ link.label }}
 					</nuxt-link>
 				</li>
 				<li>
-					<nuxt-link class="nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-md px-1" to="/over">
-						Over mij
+					<UDropdownMenu :items="offerItems" :content="{ align: 'start' }">
+						<button class="nav-item uppercase cursor-pointer inline-flex items-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-md px-1">
+							Aanbod
+							<UIcon name="i-lucide-chevron-down" class="w-4 h-4" />
+						</button>
+					</UDropdownMenu>
+				</li>
+				<li v-for="link in TRAILING_LINKS" :key="link.to">
+					<nuxt-link class="nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-md px-1" :to="link.to">
+						{{ link.label }}
 					</nuxt-link>
 				</li>
 				</template>
-				<li>
+				<li v-if="showSchedule">
 					<nuxt-link class="nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-md px-1" to="/lessen">
 						Les schema
 					</nuxt-link>
 				</li>
-				<template v-if="!isNativeApp">
-				<li>
-					<nuxt-link class="nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-md px-1" to="/priveles">
-						Priveles
-					</nuxt-link>
-				</li>
-				<li>
-					<nuxt-link class="nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-md px-1" to="/hatha-yoga">
-						Hatha Yoga
-					</nuxt-link>
-				</li>
-				<li>
-					<nuxt-link class="nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-md px-1" to="/tarieven">
-						Tarieven
-					</nuxt-link>
-				</li>
-				<li>
-					<nuxt-link class="nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-md px-1" to="/voordelen">
-						Voordelen
-					</nuxt-link>
-				</li>
-				<li>
-					<nuxt-link class="nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-md px-1" to="/contact">
-						Contact
-					</nuxt-link>
-				</li>
-				</template>
 				<li v-if="loggedInUser">
 					<nuxt-link class="nav-item focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-md px-1" to="/account">
 						{{ loggedInUser.name }}
@@ -166,6 +125,11 @@ const logout = async () => {
 					<button class="nav-item cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded px-2" @click="logout()">
 						Logout
 					</button>
+				</li>
+				<li v-if="!isNativeApp">
+					<nuxt-link class="emerald button normal-case text-base" to="/aanvraag">
+						Sessie aanvragen
+					</nuxt-link>
 				</li>
 			</ul>
 			<!--<a href="https://www.instagram.com/yogaravennah" target="_blank" class="fixed bottom-0 right-0 m-4 rounded-xl font-bold text-lg px-4 py-2 bg-emerald-700 text-white hover:bg-emerald-500 cursor-pointer inline-block transition-all duration-300 ease-in-out antialiased" >-->

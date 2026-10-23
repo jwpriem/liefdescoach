@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { accountDeletedAdminEmail, accountDeletedEmail } from './emailTemplates'
+import { accountDeletedAdminEmail, accountDeletedEmail, sessionRequestEmail } from './emailTemplates'
 
 describe('accountDeletedEmail', () => {
   const mail = accountDeletedEmail({ name: 'Bea <b>' })
@@ -38,5 +38,45 @@ describe('accountDeletedAdminEmail', () => {
 
     expect(mail.text).toContain('E-mail: onbekend')
     expect(mail.text).toContain('Geannuleerde lessen: geen')
+  })
+})
+
+describe('sessionRequestEmail', () => {
+  const request = {
+    type: 'vrijgezellenfeest' as const,
+    name: 'Bea <b>',
+    email: 'bea@example.test',
+    phone: '',
+    date: '14 juni',
+    participants: '10',
+    location: 'op-locatie' as const,
+    place: 'Gouda',
+    message: 'Graag buiten',
+  }
+
+  it('lists what the studio needs to make a proposal', () => {
+    const mail = sessionRequestEmail(request)
+
+    expect(mail.subject).toBe('Aanvraag vrijgezellenfeest: Bea <b>')
+    expect(mail.text).toContain('Soort: Vrijgezellenfeest')
+    expect(mail.text).toContain('Telefoon: –')
+    expect(mail.text).toContain('Deelnemers: 10')
+    expect(mail.text).toContain('Locatie: Op een locatie naar keuze')
+    expect(mail.text).toContain('Plaats: Gouda')
+    expect(mail.text).toContain('Bericht:\nGraag buiten')
+  })
+
+  it('escapes what the visitor typed in the HTML version', () => {
+    const mail = sessionRequestEmail(request)
+
+    expect(mail.html).toContain('Bea &lt;b&gt;')
+    expect(mail.html).not.toContain('Bea <b>')
+  })
+
+  it('leaves out the place and message when there are none', () => {
+    const mail = sessionRequestEmail({ ...request, location: 'studio', place: '', message: '' })
+
+    expect(mail.text).not.toContain('Plaats:')
+    expect(mail.text).not.toContain('Bericht:')
   })
 })

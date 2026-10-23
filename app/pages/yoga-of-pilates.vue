@@ -3,7 +3,7 @@ const title = ref(
     "Yoga Ravennah | Yoga als alternatief voor Pilates — Rotterdam Nesselande",
 );
 const description = ref(
-    "Zoek je pilates in Rotterdam? Hatha yoga is een geweldig alternatief: zelfde focus op ademhaling, core en flexibiliteit — met meer rust en persoonlijke aandacht. Kleine groepen, geen ervaring nodig.",
+    "Zoek je pilates in Rotterdam? Hatha yoga is een geweldig alternatief: zelfde focus op ademhaling, core en flexibiliteit — met meer rust en persoonlijke aandacht. Op locatie of in de studio, geen ervaring nodig.",
 );
 const ogImage = ref("https://www.ravennah.com/ravennah-social.jpg");
 const pageUrl = ref("https://www.ravennah.com/yoga-of-pilates");
@@ -127,15 +127,15 @@ const comparison = [
                 aandacht voor jou als persoon.
             </p>
             <p class="intro text-emerald-300/80">
-                In Rotterdam Nesselande geef ik yogalessen in kleine groepen.
-                Geen ervaring nodig, geen abonnement verplicht.
+                Ik geef yogasessies op maat, in mijn studio in Rotterdam
+                Nesselande of op jullie eigen locatie. Geen ervaring nodig.
             </p>
             <div class="flex flex-wrap gap-3 pt-2">
-                <nuxt-link class="emerald button" to="/eerste-les"
-                    >Probeer een eerste les</nuxt-link
+                <nuxt-link class="emerald button" to="/aanvraag"
+                    >Vraag een sessie aan</nuxt-link
                 >
-                <nuxt-link class="emerald-outlined button" to="/lessen"
-                    >Bekijk het rooster</nuxt-link
+                <nuxt-link class="emerald-outlined button" to="/#aanbod"
+                    >Bekijk het aanbod</nuxt-link
                 >
             </div>
         </Header>
@@ -241,7 +241,7 @@ const comparison = [
                                     },
                                     {
                                         title: 'Persoonlijke aandacht',
-                                        text: 'In kleine groepen van maximaal 8 personen krijg je échte aandacht. Geen anonieme studiosfeer.',
+                                        text: 'Elke sessie is afgestemd op de groep, zodat iedereen échte aandacht krijgt. Geen anonieme studiosfeer.',
                                     },
                                 ]"
                                 :key="extra.title"
@@ -440,8 +440,8 @@ const comparison = [
                             ><span class="text-emerald-600">.</span>
                         </h2>
                         <p class="intro">
-                            In Rotterdam Nesselande geef ik hatha yogalessen in
-                            een rustige, huiselijke setting. Herkenbaar voor
+                            In Rotterdam Nesselande of op jullie locatie geef ik
+                            hatha yoga in een rustige, persoonlijke setting. Herkenbaar voor
                             iedereen die van pilates houdt: aandacht voor
                             uitlijning, bewuste ademhaling en een opbouw die je
                             lichaam respecteert.
@@ -451,18 +451,18 @@ const comparison = [
                                 v-for="info in [
                                     {
                                         icon: 'M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z',
-                                        label: 'Kleine groep',
-                                        value: 'Maximaal 9 personen',
+                                        label: 'Groepsgrootte',
+                                        value: 'Van klein tot groot',
                                     },
                                     {
                                         icon: 'M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5',
-                                        label: 'Dag & tijd',
-                                        value: 'Zondag 09:45 – 10:45',
+                                        label: 'Wanneer',
+                                        value: 'Op een moment dat jullie past',
                                     },
                                     {
                                         icon: 'M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z',
                                         label: 'Locatie',
-                                        value: 'Rotterdam Nesselande',
+                                        value: 'Studio in Nesselande of op locatie',
                                     },
                                     {
                                         icon: 'M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z',
@@ -530,16 +530,13 @@ const comparison = [
                     <p
                         class="text-xl text-emerald-900 font-light leading-relaxed"
                     >
-                        Boek een losse les voor € 16,00 en ontdek of yoga jouw
-                        nieuwe pilates wordt. Geen abonnement, geen verplichting
-                        — gewoon een uur voor jezelf.
+                        Plan een sessie met je vrienden, collega's of team en
+                        ontdek of yoga jullie nieuwe pilates wordt. Helemaal op
+                        maat, de prijs is op aanvraag.
                     </p>
                     <div class="flex flex-wrap justify-center gap-3">
-                        <nuxt-link class="emerald button" to="/eerste-les"
-                            >Jouw eerste les</nuxt-link
-                        >
-                        <nuxt-link class="emerald-outlined button" to="/lessen"
-                            >Bekijk het rooster</nuxt-link
+                        <nuxt-link class="emerald button" to="/aanvraag"
+                            >Vraag een sessie aan</nuxt-link
                         >
                         <nuxt-link
                             class="emerald-outlined button"

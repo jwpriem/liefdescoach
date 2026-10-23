@@ -16,7 +16,7 @@ import { canShareLesson, lessonShareContent, shareLesson } from './shareLesson'
 const expected = {
   title: 'Yoga Ravennah',
   text: 'Ga je mee naar Hatha Yoga met Ravennah op zondag 11 oktober van 9.45 tot 10.45 uur?',
-  url: 'https://www.ravennah.com/eerste-les',
+  url: 'https://www.ravennah.com/',
 }
 
 beforeEach(() => {
@@ -28,7 +28,7 @@ afterEach(() => {
 })
 
 describe('lessonShareContent', () => {
-  it('invites someone to the lesson and links to the trial-lesson page', () => {
+  it('invites someone to the lesson and links to the homepage', () => {
     expect(lessonShareContent('Hatha Yoga met Ravennah', 'zondag 11 oktober van 9.45 tot 10.45 uur')).toEqual(expected)
   })
 })
