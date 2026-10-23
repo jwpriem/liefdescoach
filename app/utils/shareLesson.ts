@@ -1,11 +1,11 @@
-/** Someone who receives a shared lesson probably has no account yet, so the link goes to the trial-lesson page. */
-export const TRIAL_LESSON_URL = 'https://www.ravennah.com/eerste-les'
+/** Someone who receives a shared lesson probably has no account yet, so the link goes to the homepage. */
+export const LESSON_SHARE_URL = 'https://www.ravennah.com/'
 
 export function lessonShareContent(title: string, when: string) {
   return {
     title: 'Yoga Ravennah',
     text: `Ga je mee naar ${title} op ${when}?`,
-    url: TRIAL_LESSON_URL,
+    url: LESSON_SHARE_URL,
   }
 }
 

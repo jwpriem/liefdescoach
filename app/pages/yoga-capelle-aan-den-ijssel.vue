@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-const title = ref('Yoga Capelle aan den IJssel | Yoga Ravennah - 8 minuten rijden');
-const description = ref('Woon je in Capelle aan den IJssel en zoek je yogalessen? Yoga Ravennah in Rotterdam Nesselande is slechts 8 minuten rijden. Ontdek ongedwongen hatha yoga met persoonlijke aandacht.');
+const title = ref('Yoga Capelle aan den IJssel | Yoga op maat op locatie | Yoga Ravennah');
+const description = ref('Yoga in Capelle aan den IJssel voor een vrijgezellenfeest, bedrijf, teamuitje, workshop of event. Ravennah komt naar jullie toe, of kom naar de studio in Nesselande: 8 minuten rijden.');
 const ogImage = ref('https://www.ravennah.com/ravennah-social.jpg');
 const pageUrl = ref('https://www.ravennah.com/yoga-capelle-aan-den-ijssel');
 
@@ -39,8 +39,8 @@ useLocationPageSchema('Capelle aan den IJssel', 'https://www.ravennah.com/yoga-c
         section-image="/ravennah_een_been.webp"
         section-image-alt="Yoga docent Ravennah in een staande balanshouding"
         approach-title="Even ontsnappen"
-        approach-body1="In de drukte van het dagelijks leven is het fijn om even volledig los te laten. Een uurtje yoga op zondagochtend geeft je de rust en energie om de week daarna vol aan te gaan."
-        approach-body2="Bij Yoga Ravennah werk ik in kleine groepen zodat iedereen de aandacht krijgt die nodig is. Geen massales, maar echte persoonlijke begeleiding — of je nu net begint of al langer beweegt."
-        cta-title="Start je zondag vanuit Capelle"
+        approach-body1="In de drukte van het dagelijks leven is het fijn om even volledig los te laten. Een yogasessie geeft je groep rust, energie en een moment samen dat bijblijft."
+        approach-body2="Ik stem elke sessie af op de groep, zodat iedereen de aandacht krijgt die nodig is — of je nu net begint of al langer beweegt."
+        cta-title="Plan jullie sessie in Capelle"
     />
 </template>

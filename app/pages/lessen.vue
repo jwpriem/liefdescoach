@@ -160,9 +160,6 @@ async function book(lesson: any) {
                     <nuxt-link v-if="lesson.type == 'hatha yoga'" to="/hatha-yoga">
                       <span v-html="$rav.getLessonDescription(lesson)" />
                     </nuxt-link>
-                    <nuxt-link v-else-if="lesson.type == 'guest lesson'" to="/bo-bol">
-                      <span v-html="$rav.getLessonDescription(lesson)" />
-                    </nuxt-link>
                     <span v-else v-html="$rav.getLessonDescription(lesson)" />
                   </p>
                   <p class="text-sm text-white/50 mt-0.5">{{ $rav.formatDateInDutch(lesson.date, true) }}</p>

@@ -3,7 +3,7 @@ const { call, pending: isLoading } = useApiCall();
 
 const title = ref("Yoga Ravennah | Contact");
 const description = ref(
-    "Wil je meer weten of een keer een proefles meedoen? Neem dan contact op via het formulier of mijn socials.",
+    "Een vraag over een yogasessie voor je feest, team of event? Neem contact op via het formulier of mijn socials.",
 );
 const ogImage = ref("https://www.ravennah.com/ravennah-social.jpg");
 const pageUrl = ref("https://www.ravennah.com/contact");

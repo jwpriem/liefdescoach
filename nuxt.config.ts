@@ -166,12 +166,16 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     '/hatha-yoga': { isr: true },
     '/voordelen': { isr: true },
     '/contact': { isr: true },
-    '/bo-bol': { isr: true },
+    '/aanvraag': { isr: true },
+    '/vrijgezellenfeest': { isr: true },
+    '/bedrijfsyoga': { isr: true },
+    '/teamuitje': { isr: true },
+    '/workshops': { isr: true },
+    '/events': { isr: true },
     '/yoga-capelle-aan-den-ijssel': { isr: true },
     '/yoga-zuidplas': { isr: true },
     '/yoga-waddinxveen': { isr: true },
     '/yoga-zevenhuizen': { isr: true },
-    '/eerste-les': { isr: true },
     '/privacy': { isr: true },
     '/yoga-of-pilates': { isr: true },
     // Dynamic/authenticated pages: disable SSR to prevent Vue instance accumulation
@@ -183,6 +187,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     '/reset-wachtwoord': { ssr: false },
     '/admin/**': { ssr: false },
     // Legacy redirects
+    // The weekly lessons stopped: these pages were about them
+    '/bo-bol': { redirect: '/', statusCode: 301 },
+    '/eerste-les': { redirect: '/', statusCode: 301 },
     '/liefdescoach/**': { redirect: '/', statusCode: 301 },
     '/yoga': { redirect: '/', statusCode: 301 },
     '/yoga/account': { redirect: '/account', statusCode: 301 },

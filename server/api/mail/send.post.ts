@@ -1,4 +1,5 @@
 import { createError, getRequestIP } from 'h3'
+import { parseSessionRequest } from '../../../shared/sessionRequest'
 
 const MAX_IP_REQUESTS = 5;
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
@@ -20,7 +21,7 @@ function lazyCleanup(now: number) {
  * Server-side email API for simple notification emails.
  *
  * Body: { type: string, data: object }
- * Types: 'contact' | 'new-user'
+ * Types: 'contact' | 'new-user' | 'session-request'
  *
  * Booking/cancellation emails are sent server-side by handleBooking / cancelBooking
  * via sendBookingNotifications (server/utils/bookingNotifications.ts).
@@ -53,6 +54,7 @@ export default defineEventHandler(async (event) => {
 
     let email: { subject: string; html: string; text: string }
     let to = 'info@ravennah.com'
+    let replyTo: string | undefined
 
     switch (body.type) {
         case 'contact':
@@ -61,6 +63,15 @@ export default defineEventHandler(async (event) => {
         case 'new-user':
             email = newUserEmail(body.data)
             break
+        case 'session-request': {
+            const parsed = parseSessionRequest(body.data)
+            if ('error' in parsed) {
+                throw createError({ statusCode: 400, statusMessage: parsed.error })
+            }
+            email = sessionRequestEmail(parsed.request)
+            replyTo = parsed.request.email
+            break
+        }
         default:
             throw createError({ statusCode: 400, statusMessage: `Onbekend email type: ${body.type}` })
     }
@@ -70,6 +81,7 @@ export default defineEventHandler(async (event) => {
             await smtpTransport.sendMail({
                 from: 'Yoga Ravennah <info@ravennah.com>',
                 to,
+                replyTo,
                 subject: email.subject,
                 html: email.html,
                 text: email.text,

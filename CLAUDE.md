@@ -110,7 +110,11 @@ Provides `$rav` globally with utility functions: Dutch date formatting, calendar
 
 ### Key UI Pages
 
-- `/lessen` — lesson listing with booking buttons
+The public site offers one-time sessions (no weekly lessons). Prices are on request.
+
+- `/` — homepage with the offer; `/vrijgezellenfeest`, `/bedrijfsyoga`, `/teamuitje`, `/workshops`, `/events` are rendered by `OfferPage.vue` from `app/utils/offers.ts` — add or change an offer there
+- `/aanvraag` — request form (`?type=` preselects the session type); it posts `session-request` to `/api/mail/send`, which checks it with `shared/sessionRequest.ts` and emails info@ravennah.com
+- `/lessen` — lesson listing with booking buttons (member area)
 - `/account` — tabbed view with `AccountBookings`, `AccountDetails`, `AccountLessons` (admin), `AccountUsers` (admin)
 - `/archief` — past lessons (admin only)
 

@@ -52,8 +52,8 @@ useLocalBusinessSchema();
                 tegelijkertijd krachtig.
             </p>
             <div class="flex justify-start items-center gap-x-3 pt-2">
-                <nuxt-link class="emerald button" to="/lessen"
-                    >Bekijk het rooster</nuxt-link
+                <nuxt-link class="emerald button" to="/aanvraag"
+                    >Vraag een sessie aan</nuxt-link
                 >
                 <nuxt-link class="emerald-outlined button" to="/voordelen"
                     >Voordelen</nuxt-link
@@ -371,8 +371,8 @@ useLocalBusinessSchema();
                         <p
                             class="text-lg text-emerald-100/80 font-light leading-relaxed"
                         >
-                            In de kleine groepen bij Ravennah is er altijd
-                            ruimte voor vragen en persoonlijke aanpassingen.
+                            In een sessie bij Ravennah is er altijd ruimte
+                            voor vragen en persoonlijke aanpassingen.
                             Niemand verwacht dat je meteen de houding perfect
                             uitvoert. Elke poging is goed.
                         </p>
@@ -428,12 +428,12 @@ useLocalBusinessSchema();
                         class="text-xl text-emerald-900 font-light leading-relaxed"
                     >
                         De enige manier om echt te weten of hatha yoga iets voor
-                        jou is, is door het te ervaren. Plan een les, rol je mat
-                        uit en ontdek wat het met je doet.
+                        jou is, is door het te ervaren. Plan een sessie met je
+                        groep, rol je mat uit en ontdek wat het met je doet.
                     </p>
                     <div class="flex flex-wrap justify-center gap-3">
-                        <nuxt-link class="emerald button" to="/lessen"
-                            >Bekijk het rooster</nuxt-link
+                        <nuxt-link class="emerald button" to="/aanvraag"
+                            >Vraag een sessie aan</nuxt-link
                         >
                         <nuxt-link
                             class="emerald-outlined button"

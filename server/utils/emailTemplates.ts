@@ -5,6 +5,8 @@
  * wrap around type-specific content sections.
  */
 
+import { sessionLocationLabel, sessionTypeLabel, type SessionRequest } from '../../shared/sessionRequest'
+
 const LOGO_URL = 'https://www.ravennah.com/logo.png'
 const SITE_URL = 'https://www.ravennah.com'
 const BRAND_COLOR = '#059669'  // emerald-600
@@ -88,6 +90,15 @@ function infoTable(rows: string): string {
     return `<table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #e5e7eb;border-radius:12px;margin:20px 0;">
     ${rows}
   </table>`
+}
+
+function messageBlock(message: string): string {
+    return `<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:20px 0;">
+      <tr><td style="padding:16px;background-color:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;">
+        <p style="font-size:12px;font-weight:600;color:${BRAND_COLOR};text-transform:uppercase;letter-spacing:0.5px;margin:0 0 8px 0;">Bericht</p>
+        <p style="font-size:14px;color:#374151;margin:0;white-space:pre-line;">${escapeHtml(message)}</p>
+      </td></tr>
+    </table>`
 }
 
 function heading(text: string): string {
@@ -324,7 +335,6 @@ export function contactEmail(data: {
 }): { subject: string; html: string; text: string } {
     const safeName = escapeHtml(data.name)
     const safeEmail = escapeHtml(data.email)
-    const safeMessage = escapeHtml(data.message)
 
     const content = `
     ${heading('Nieuw contactbericht')}
@@ -333,17 +343,40 @@ export function contactEmail(data: {
         infoRow('Naam', data.name) +
         infoRow('E-mail', data.email)
     )}
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:20px 0;">
-      <tr><td style="padding:16px;background-color:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;">
-        <p style="font-size:12px;font-weight:600;color:${BRAND_COLOR};text-transform:uppercase;letter-spacing:0.5px;margin:0 0 8px 0;">Bericht</p>
-        <p style="font-size:14px;color:#374151;margin:0;white-space:pre-line;">${safeMessage}</p>
-      </td></tr>
-    </table>`
+    ${messageBlock(data.message)}`
 
     return {
         subject: 'Contactformulier Yoga Ravennah',
         html: wrapInLayout('Contactformulier', content),
         text: `Contactformulier\n\nNaam: ${data.name}\nE-mail: ${data.email}\n\nBericht:\n${data.message}`,
+    }
+}
+
+// ─── Session request ────────────────────────────────────────────────────────
+
+export function sessionRequestEmail(request: SessionRequest): { subject: string; html: string; text: string } {
+    const typeLabel = sessionTypeLabel(request.type)
+    const rows: [string, string][] = [
+        ['Soort', typeLabel],
+        ['Naam', request.name],
+        ['E-mail', request.email],
+        ['Telefoon', request.phone || '–'],
+        ['Datum', request.date || '–'],
+        ['Deelnemers', request.participants || '–'],
+        ['Locatie', sessionLocationLabel(request.location)],
+        ...(request.place ? [['Plaats', request.place] as [string, string]] : []),
+    ]
+
+    const content = `
+    ${heading(`Aanvraag: ${escapeHtml(typeLabel)}`)}
+    ${subtext(`Van ${escapeHtml(request.name)} (${escapeHtml(request.email)})`)}
+    ${infoTable(rows.map(([label, value]) => infoRow(label, value)).join(''))}
+    ${request.message ? messageBlock(request.message) : ''}`
+
+    return {
+        subject: `Aanvraag ${typeLabel.toLowerCase()}: ${request.name}`,
+        html: wrapInLayout('Nieuwe aanvraag', content),
+        text: `Nieuwe aanvraag\n\n${rows.map(([label, value]) => `${label}: ${value}`).join('\n')}${request.message ? `\n\nBericht:\n${request.message}` : ''}`,
     }
 }
 

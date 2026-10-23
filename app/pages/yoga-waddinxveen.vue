@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-const title = ref('Yoga Waddinxveen | Yoga Ravennah - 15 minuten rijden');
-const description = ref('Woon je in Waddinxveen en zoek je yogalessen? Yoga Ravennah in Rotterdam Nesselande is slechts 15 minuten rijden. Ontdek ongedwongen hatha yoga met persoonlijke aandacht.');
+const title = ref('Yoga Waddinxveen | Yoga op maat op locatie | Yoga Ravennah');
+const description = ref('Yoga in Waddinxveen voor een vrijgezellenfeest, bedrijf, teamuitje, workshop of event. Ravennah komt naar jullie toe, of kom naar de studio in Nesselande: 15 minuten rijden.');
 const ogImage = ref('https://www.ravennah.com/ravennah-social.jpg');
 const pageUrl = ref('https://www.ravennah.com/yoga-waddinxveen');
 
@@ -38,9 +38,9 @@ useLocationPageSchema('Waddinxveen', 'https://www.ravennah.com/yoga-waddinxveen'
         hero-image-alt="Yoga docent Ravennah in kleermakerszit"
         section-image="/ravennah_squat_2.webp"
         section-image-alt="Yoga docent Ravennah in een squat yoga houding"
-        approach-title="Small group lessen"
-        approach-body1="In tegenstelling tot grote yogastudio's werk ik bewust met kleine groepen. Zo kun je altijd rekenen op persoonlijke aandacht en begeleiding die echt op jou is afgestemd."
-        approach-body2="Of je nu stress wilt verminderen, flexibeler wilt worden of gewoon een moment van rust zoekt — je bent van harte welkom, ook als beginner."
-        cta-title="Kom langs vanuit Waddinxveen"
+        approach-title="Echt op maat"
+        approach-body1="Geen standaardles, maar een sessie die echt bij jullie past. Ik stem de oefeningen, het tempo en de sfeer af op de groep en de gelegenheid."
+        approach-body2="Of jullie nu stress willen verminderen, samen iets bijzonders willen beleven of gewoon een moment van rust zoeken — iedereen is welkom, ook als beginner."
+        cta-title="Plan jullie sessie in Waddinxveen"
     />
 </template>

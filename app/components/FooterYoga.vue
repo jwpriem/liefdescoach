@@ -4,52 +4,27 @@
             <div
                 class="md:flex justify-between items-start space-y-8 md:space-y-0"
             >
-                <div class="w-full md:w-2/4">
+                <div class="w-full md:w-1/3">
                     <Yoga />
                     <br />
                     <small>&copy; www.ravennah.com</small><br />
                 </div>
                 <div class="w-full md:w-1/6">
+                    <h6 class="uppercase font-bold text-emerald-900">Aanbod</h6>
+                    <ul class="font-light">
+                        <li v-for="offer in OFFER_LINKS" :key="offer.path">
+                            <nuxt-link :to="offer.path">{{ offer.name }}</nuxt-link>
+                        </li>
+                        <li>
+                            <nuxt-link to="/aanvraag">Sessie aanvragen</nuxt-link>
+                        </li>
+                    </ul>
+                </div>
+                <div class="w-full md:w-1/6">
                     <h6 class="uppercase font-bold text-emerald-900">Menu</h6>
                     <ul class="font-light">
-                        <li>
-                            <nuxt-link to="/voordelen"> Voordelen </nuxt-link>
-                        </li>
-                        <li>
-                            <nuxt-link to="/over"> Over mij </nuxt-link>
-                        </li>
-                        <li>
-                            <nuxt-link to="/lessen"> Les schema </nuxt-link>
-                        </li>
-                        <li>
-                            <nuxt-link to="/priveles"> Priveles </nuxt-link>
-                        </li>
-                        <li>
-                            <nuxt-link to="/hatha-yoga"> Hatha Yoga </nuxt-link>
-                        </li>
-                        <li>
-                            <nuxt-link to="/eerste-les">
-                                Eerste keer?
-                            </nuxt-link>
-                        </li>
-                        <li>
-                            <nuxt-link to="/yoga-of-pilates">
-                                Yoga of Pilates?
-                            </nuxt-link>
-                        </li>
-                        <li>
-                            <nuxt-link to="/bo-bol"> Over Bo Bol </nuxt-link>
-                        </li>
-                        <li>
-                            <nuxt-link to="/tarieven"> Tarieven </nuxt-link>
-                        </li>
-                        <li>
-                            <nuxt-link to="/contact"> Contact </nuxt-link>
-                        </li>
-                        <li>
-                            <nuxt-link to="/privacy">
-                                Privacyverklaring
-                            </nuxt-link>
+                        <li v-for="link in MENU_LINKS" :key="link.to">
+                            <nuxt-link :to="link.to">{{ link.label }}</nuxt-link>
                         </li>
                     </ul>
                 </div>
@@ -148,4 +123,15 @@
         </div>
     </footer>
 </template>
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+const MENU_LINKS = [
+    { label: 'Over mij', to: '/over' },
+    { label: 'Hatha Yoga', to: '/hatha-yoga' },
+    { label: 'Voordelen', to: '/voordelen' },
+    { label: 'Yoga of Pilates?', to: '/yoga-of-pilates' },
+    { label: 'Tarieven', to: '/tarieven' },
+    { label: 'Contact', to: '/contact' },
+    { label: 'Login', to: '/login' },
+    { label: 'Privacyverklaring', to: '/privacy' },
+]
+</script>

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-const title = ref('Yoga Zevenhuizen | Yoga Ravennah - 10 minuten rijden');
-const description = ref('Woon je in Zevenhuizen en zoek je yogalessen? Yoga Ravennah in Rotterdam Nesselande is slechts 10 minuten rijden. Ontdek ongedwongen hatha yoga met persoonlijke aandacht.');
+const title = ref('Yoga Zevenhuizen | Yoga op maat op locatie | Yoga Ravennah');
+const description = ref('Yoga in Zevenhuizen voor een vrijgezellenfeest, bedrijf, teamuitje, workshop of event. Ravennah komt naar jullie toe, of kom naar de studio in Nesselande: 10 minuten rijden.');
 const ogImage = ref('https://www.ravennah.com/ravennah-social.jpg');
 const pageUrl = ref('https://www.ravennah.com/yoga-zevenhuizen');
 
@@ -41,6 +41,6 @@ useLocationPageSchema('Zevenhuizen', 'https://www.ravennah.com/yoga-zevenhuizen'
         approach-title="Ongedwongen sfeer"
         approach-body1="Bij Yoga Ravennah draait alles om jezelf zijn. Geen prestatiedruk, geen vergelijken met anderen. Gewoon jij op je mat, bezig met ademhaling, beweging en ontspanning."
         approach-body2="Ik geloof dat yoga toegankelijk moet zijn voor iedereen. Ook als je nog nooit yoga hebt gedaan, ben je meer dan welkom."
-        cta-title="Start je zondag vanuit Zevenhuizen"
+        cta-title="Plan jullie sessie in Zevenhuizen"
     />
 </template>

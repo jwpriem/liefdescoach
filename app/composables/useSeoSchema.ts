@@ -27,7 +27,7 @@ export function useLocalBusinessSchema(options?: Partial<LocalBusinessSchema>) {
   const defaults: LocalBusinessSchema = {
     name: "Yoga Ravennah",
     description:
-      "Ongedwongen yogales in Rotterdam Nesselande. Small group lessen met persoonlijke aandacht voor rust, balans en ontspanning.",
+      "Yogasessies op maat voor vrijgezellenfeesten, bedrijven, teamuitjes, workshops en events. In de studio in Rotterdam Nesselande of op elke locatie.",
     url: "https://www.ravennah.com",
     telephone: "+31647699709",
     address: {
@@ -40,7 +40,6 @@ export function useLocalBusinessSchema(options?: Partial<LocalBusinessSchema>) {
       latitude: 51.9683092,
       longitude: 4.5884189,
     },
-    openingHours: ["Su 09:45-10:45"],
     priceRange: "€€",
     image: "https://www.ravennah.com/ravennah-social.jpg",
     areaServed: [
@@ -137,6 +136,30 @@ export function useLocationPageSchema(
       {
         type: "application/ld+json",
         innerHTML: JSON.stringify(breadcrumbSchema),
+      },
+    ],
+  });
+}
+
+/** Structured data for one of the sessions offered, e.g. company yoga. */
+export function useServiceSchema(service: { name: string; description: string; path: string }) {
+  useLocalBusinessSchema();
+
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: service.name,
+    description: service.description,
+    url: `https://www.ravennah.com${service.path}`,
+    areaServed: { "@type": "Country", name: "Nederland" },
+    provider: { "@id": "https://www.ravennah.com" },
+  };
+
+  useHead({
+    script: [
+      {
+        type: "application/ld+json",
+        innerHTML: JSON.stringify(schema),
       },
     ],
   });
