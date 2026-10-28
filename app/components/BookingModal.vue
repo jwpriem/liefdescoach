@@ -58,17 +58,27 @@ async function book(lesson: any) {
   }
 }
 
+function onKeydown(e: KeyboardEvent) {
+  if (e.key === 'Escape' && open.value) {
+    open.value = false
+  }
+}
 
+onMounted(() => window.addEventListener('keydown', onKeydown))
+onUnmounted(() => window.removeEventListener('keydown', onKeydown))
 </script>
 
 <template>
   <div v-if="open" class="fixed inset-0 bg-black/75 flex justify-center items-center z-50 p-4" @click.self="open = false">
     <div
-      class="w-full max-w-2xl max-h-[80vh] overflow-y-auto rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-2xl shadow-emerald-950/20 p-6 sm:p-8">
+      class="w-full max-w-2xl max-h-[80vh] overflow-y-auto rounded-2xl bg-gray-950/50 border border-gray-800/80 backdrop-blur-sm shadow-2xl shadow-emerald-950/20 p-6 sm:p-8"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="booking-modal-title">
 
       <!-- Header -->
       <div class="flex items-center justify-between mb-6">
-        <h2 class="text-2xl font-bold text-emerald-100 tracking-tight">Boek een les</h2>
+        <h2 id="booking-modal-title" class="text-2xl font-bold text-emerald-100 tracking-tight">Boek een les</h2>
         <button @click="open = false" aria-label="Sluiten"
           class="text-gray-400 hover:text-gray-200 transition-colors rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
