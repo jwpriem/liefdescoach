@@ -63,3 +63,7 @@
 ## 2025-05-18 - Consistent Password Input UX
 **Learning:** Found inconsistencies in password input fields across the app. While the login page had visibility toggles, the password reset and account settings pages did not. Providing a consistent "lock icon + visibility toggle" pattern reduces user error and improves confidence during sensitive actions.
 **Action:** Always implement a leading `i-lucide-lock` icon and a trailing visibility toggle (using the `#trailing` slot with a ghost `UButton`) for all password fields.
+
+## 2026-05-06 - Modal confirmation dialog accessibility and Escape key handling
+**Learning:** Shared confirmation dialogs (like `ConfirmModal.vue`) must be rendered at the body level using `<Teleport to="body">` to avoid layout clipping and stacking context issues. Furthermore, screen reader accessibility requires `role="alertdialog"`, `aria-modal="true"`, `aria-labelledby`, and `aria-describedby`, while keyboard accessibility requires listening for the `Escape` key to dismiss the dialog.
+**Action:** When building modal components or confirmation dialogs, always teleport the overlay to `body`, add appropriate `role="dialog"` or `role="alertdialog"` with `aria-labelledby`/`aria-describedby`, and bind a global `Escape` keydown event handler to close the dialog.
