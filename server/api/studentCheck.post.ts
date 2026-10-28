@@ -11,10 +11,12 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 400, statusMessage: 'E-mail is verplicht' })
     }
 
+    const email = body.email.trim().toLowerCase()
+
     const rows = await db
         .select()
         .from(students)
-        .where(eq(students.email, body.email))
+        .where(eq(students.email, email))
 
     return {
         rows: rows.map(r => ({

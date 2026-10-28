@@ -17,6 +17,16 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 400, statusMessage: 'lessonId is verplicht' })
     }
 
+    const name = body.name.trim()
+    const email = body.email.trim().toLowerCase()
+
+    if (!name) {
+        throw createError({ statusCode: 400, statusMessage: 'Naam is verplicht' })
+    }
+    if (!email) {
+        throw createError({ statusCode: 400, statusMessage: 'E-mail is verplicht' })
+    }
+
     // Fetch lesson to get its capacity
     const lesson = await getLessonWithBookings(body.lessonId)
     if (!lesson) {
@@ -33,8 +43,8 @@ export default defineEventHandler(async (event) => {
     const studentId = generateId()
     await db.insert(students).values({
         id: studentId,
-        name: body.name + ' (Proefles)',
-        email: body.email,
+        name: name + ' (Proefles)',
+        email,
     })
 
     // Create booking
