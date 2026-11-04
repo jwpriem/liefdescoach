@@ -1,10 +1,15 @@
 import { createError, getRequestIP } from 'h3'
+import { parseContactRequest } from '../../../shared/contactRequest'
 import { parseSessionRequest } from '../../../shared/sessionRequest'
 
 const MAX_IP_REQUESTS = 5;
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
 const requestsByIP = new Map<string, { count: number; firstRequest: number }>();
 let lastCleanup = 0;
+
+export function resetMailSendRateLimit() {
+    requestsByIP.clear();
+}
 
 function lazyCleanup(now: number) {
     if (requestsByIP.size > 1000 && now - lastCleanup > 60000) {
@@ -57,9 +62,15 @@ export default defineEventHandler(async (event) => {
     let replyTo: string | undefined
 
     switch (body.type) {
-        case 'contact':
-            email = contactEmail(body.data)
+        case 'contact': {
+            const parsed = parseContactRequest(body.data)
+            if ('error' in parsed) {
+                throw createError({ statusCode: 400, statusMessage: parsed.error })
+            }
+            email = contactEmail(parsed.request)
+            replyTo = parsed.request.email
             break
+        }
         case 'new-user':
             email = newUserEmail(body.data)
             break
